@@ -2,8 +2,8 @@ from itertools import chain
 
 import numpy as np
 
-from skeletonRecognition.Compute import (calculate_direction_dataset, default_bit_array)
-from skeletonRecognition.Preprocessing import  prune_joints_dataset
+from Compute import (calculate_direction_dataset, default_bit_array)
+from Preprocessing import  prune_joints_dataset
 
 
 def extract_data(a):

@@ -6,9 +6,9 @@ from collections import deque
 
 import numpy as np
 
-from skeletonRecognition.Compute import (check_engage_disengage)
-from skeletonRecognition.SlidingWindow import sliding_window_dataset
-from skeletonRecognition.WindowProcess import (extract_data, process_window_data, collect_all_results, send_default_values)
+from Compute import (check_engage_disengage)
+from SlidingWindow import sliding_window_dataset
+from WindowProcess import (extract_data, process_window_data, collect_all_results, send_default_values)
 
 src_addr = '129.82.45.102'
 src_port = 8123
@@ -113,7 +113,7 @@ if __name__ == '__main__':
 
     # Time the network performance
     s = connect()
-    #r = connect_fusion()
+    r = connect_fusion()
 
     window_threshold = 15
     body_parts = ['LA', 'RA']
@@ -160,7 +160,7 @@ if __name__ == '__main__':
         #print 'timestamp:', time_stamp
         pack_list = [1, time_stamp] + result
         bytes = struct.pack("!iqii" + "ff" * 6 + 'i', *pack_list)
-        #r.sendall(bytes)
+        r.sendall(bytes)
 
 
 

@@ -6,9 +6,9 @@ from collections import deque
 
 import numpy as np
 
-from skeletonRecognition.Compute import (check_engage_disengage)
-from skeletonRecognition.SlidingWindow import sliding_window_dataset
-from skeletonRecognition.WindowProcess import (extract_data, process_window_data, collect_all_results, send_default_values)
+from Compute import (check_engage_disengage)
+from SlidingWindow import sliding_window_dataset
+from WindowProcess import (extract_data, process_window_data, collect_all_results, send_default_values)
 
 src_addr = '129.82.45.102'
 src_port = 8123
