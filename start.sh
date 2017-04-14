@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 echo 'logging into blue for fusion'
 gnome-terminal -x bash -c "ssh -t blue 'cd $PWD/fusion/; python fusion_server.py;bash;'" &
 sleep 2

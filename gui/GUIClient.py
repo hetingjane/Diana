@@ -78,6 +78,7 @@ class ThreadedClient:
             self.queue.put(decoded_frame)
 
     def endApplication(self):
+        self.sock.close()
         self.running = 0
 
 

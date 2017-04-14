@@ -176,15 +176,15 @@ class App:
         lhand_probs = self.latest_data[streams.get_stream_id("LH")][-len(left_hand_postures):]
         rhand_probs = self.latest_data[streams.get_stream_id("RH")][-len(right_hand_postures):]
         
-        print len(body_probs)
+        '''print len(body_probs)
         print len(lhand_probs)
-        print len(rhand_probs)
+        print len(rhand_probs)'''
 
         all_probs = body_probs + lhand_probs + rhand_probs
         
         raw_probs = struct.pack("!" + str(len(all_probs)) + "f", *all_probs)
 
-        print struct.unpack("!" + str(len(all_probs)) + "f", raw_probs)
+        #print struct.unpack("!" + str(len(all_probs)) + "f", raw_probs)
         return raw_probs
 
     def _update_queues(self):

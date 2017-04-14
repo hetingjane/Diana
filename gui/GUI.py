@@ -8,8 +8,6 @@ from pyqtgraph.Qt import QtGui
 import numpy as np
 import sys
 
-import socket, struct
-
 import Queue
 
 from collections import deque
@@ -85,6 +83,8 @@ class MyTabWidget(QWidget):
         y4 = [1 - sum(y4)] + y4
 
         curr_tab = self.tabs.currentIndex()
+
+        events_list = [self.ra_gestures[np.argmax(y4)]]
 
         if curr_tab == 1 and len(events_list)>0:
             font = QFont()
@@ -201,8 +201,8 @@ class MyTabWidget(QWidget):
                        'rh three front', 'rh thumbs down', 'rh thumbs up', 'rh to face',
                        'rh two back', 'rh two front']
 
-        self.ra_gestures = ['still','ra move right','ra move left','ra move up','ra move down','ra move front','ra move back']
-        self.la_gestures = ['still', 'la move right', 'la move left', 'la move up', 'la move down',  'la move front', 'la move back']
+        self.ra_gestures = ['still','ra move right','ra move left','ra move up','ra move down','ra move back','ra move front']
+        self.la_gestures = ['still', 'la move right', 'la move left', 'la move up', 'la move down',  'la move back', 'la move front']
 
         self.head_gestures = ['still', 'nod', 'shake']
 
