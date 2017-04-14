@@ -31,9 +31,18 @@ class RealTimeHandRecognition():
         self.sess = sess
         self.model = model
 
+        self.past_probs = None
+
     def classify(self, data):
         (predictions) = self.sess.run([self.model.predictions], feed_dict={self.model._images: data})
-        #print predictions
-        max_prediction = np.argmax(predictions)
-        return max_prediction, predictions[0][0]
+        probs = predictions[0][0]
+
+        if self.past_probs is None:
+            self.past_probs = probs
+        else:
+            self.past_probs = (self.past_probs+probs)/2
+
+
+        max_prediction = np.argmax(self.past_probs)
+        return max_prediction, self.past_probs
 
