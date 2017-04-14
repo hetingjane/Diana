@@ -84,7 +84,7 @@ class MyTabWidget(QWidget):
 
         curr_tab = self.tabs.currentIndex()
 
-        events_list = [self.ra_gestures[np.argmax(y4)]]
+        #events_list = [self.ra_gestures[np.argmax(y4)]]
 
         if curr_tab == 1 and len(events_list)>0:
             font = QFont()
