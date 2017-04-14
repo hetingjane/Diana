@@ -9,12 +9,13 @@ import numpy as np
 from Compute import (check_engage_disengage)
 from SlidingWindow import sliding_window_dataset
 from WindowProcess import (extract_data, process_window_data, collect_all_results, send_default_values)
+from support.constants import *
 
-src_addr = '129.82.45.102'
-src_port = 8123
+src_addr = KINECT_SRC_ADDR
+src_port = KINECT_SKELETON_PORT
 
-des_addr = 'blue'  # 'cwc1'
-des_port = 9125
+des_addr = FUSION_SRC_ADDR
+des_port = FUSION_INPUT_PORT
 
 
 def connect():

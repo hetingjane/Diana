@@ -130,7 +130,7 @@ class MyTabWidget(QWidget):
         self.barLayout = QVBoxLayout()
         self.l = pg.GraphicsLayoutWidget(border=(100, 100, 100))
 
-        text = """Waiting for clients"""
+        text = """Gesture Probabilities"""
 
         x1 = np.arange(32)
         y1 = np.random.rand(32)
@@ -229,12 +229,12 @@ class MyTabWidget(QWidget):
         self.event_log.setReadOnly(True)
         self.event_log.setLineWrapMode(QTextEdit.NoWrap)
 
-        self.event_log.setTextColor(QtGui.QColor("blue"))
+        '''self.event_log.setTextColor(QtGui.QColor("blue"))
         self.event_log.append("I'm blue !")
         self.event_log.setTextColor(QtGui.QColor("red"))
         self.event_log.append("I'm red !")
         self.event_log.setTextColor(QtGui.QColor("yellow"))
-        self.event_log.append("I'm ywllo !")
+        self.event_log.append("I'm ywllo !")'''
 
         self.labelLayout.addWidget(self.event_log)
 

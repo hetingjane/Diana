@@ -1,23 +1,25 @@
 #!/usr/bin/env python
 
-import socket, sys, struct
-import time, gzip
-import numpy as np
+import socket
+import struct
+import time
+import gzip
 import cv2
-from realtime_hand_recognition import RealTimeHandRecognition
-import matplotlib.pyplot as plt
 import sys
+import numpy as np
+from realtime_hand_recognition import RealTimeHandRecognition
+from support.constants import *
 
 def connect(server="kinect"):
     """
     Connect to a specific port
     """
     if server == "kinect":
-        src_addr = '129.82.45.102'
-        src_port = 8125
+        src_addr = KINECT_SRC_ADDR
+        src_port = KINECT_DEPTH_PORT
     else:
-        src_addr = 'blue'#'10.1.118.19'#'cwc1'
-        src_port = 9125
+        src_addr = FUSION_SRC_ADDR
+        src_port = FUSION_INPUT_PORT
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.settimeout(10)

@@ -11,6 +11,8 @@ from remote_thread import Remote
 from automata.state_machine import StateMachine
 from thread_sync import *
 
+from support.constants import *
+
 
 class App:
 
@@ -21,12 +23,12 @@ class App:
         self.started = True
 
         # Start remote thread at port 9126
-        self.remote = Remote("Brandeis", ('', 9126), remote_events, remote_connected)
+        self.remote = Remote("Brandeis", ('', FUSION_BRANDEIS_PORT), remote_events, remote_connected)
         self.remote.start()
         self.remote_started = True
 
         # Start remote gui n/w thread at port 9127
-        self.gui = Remote("GUI", ('', 9127), gui_events, gui_connected)
+        self.gui = Remote("GUI", ('', FUSION_GUI_PORT), gui_events, gui_connected)
         self.gui.start()
         self.gui_started = True
 
@@ -71,12 +73,12 @@ class App:
         self.started = True
 
         # Start remote thread at port 9126
-        self.remote = Remote(('', 9126), "Brandeis", remote_events, remote_connected)
+        self.remote = Remote(('', FUSION_BRANDEIS_PORT), "Brandeis", remote_events, remote_connected)
         self.remote.start()
         self.remote_started = True
 
         # Start remote gui n/w thread at port 9127
-        self.gui = Remote(('', 9127), "GUI", gui_events, gui_connected)
+        self.gui = Remote(('', FUSION_GUI_PORT), "GUI", gui_events, gui_connected)
         self.gui.start()
         self.gui_started = True
 

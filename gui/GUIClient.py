@@ -6,6 +6,8 @@ import sys
 import socket
 import struct
 
+from support.constants import *
+
 class ThreadedClient:
 
     def __init__(self):
@@ -24,8 +26,8 @@ class ThreadedClient:
         sys.exit(app.exec_())
 
     def connect(self):
-        src_addr = 'blue'  # '10.1.118.19'#'cwc1'
-        src_port = 9127
+        src_addr = FUSION_SRC_ADDR
+        src_port = FUSION_GUI_PORT
 
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.settimeout(10)
