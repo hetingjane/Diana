@@ -10,27 +10,15 @@ import sys
 
 import socket, struct
 
+import Queue
+
 from collections import deque
 
-def connect():
-    src_addr = '129.82.45.104'#'10.1.118.19'#'cwc1'
-    src_port = 9126
 
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.settimeout(10)
-
-    try:
-        sock.connect((src_addr, src_port))
-    except:
-        print "Error connecting to {}:{}".format(src_addr, src_port)
-        return None
-    print "Successfully connected to host "
-    return sock
 
 class App(QMainWindow):
-    def __init__(self):
+    def __init__(self, queue,endApplication):
         super(App, self).__init__()
-        socket = connect()
         self.title = 'GUI DEMO'
         self.left = 0
         self.top = 0
@@ -39,15 +27,16 @@ class App(QMainWindow):
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
 
-        self.tab_widget = MyTabWidget(self, socket)
+        self.tab_widget = MyTabWidget(self, queue)
         self.setCentralWidget(self.tab_widget)
+
 
         self.show()
 
 
 class MyTabWidget(QWidget):
-    def __init__(self, parent, socket):
-        self.socket = socket
+    def __init__(self, parent, queue):
+        self.queue = queue
         super(QWidget, self).__init__(parent)
         self.layout = QVBoxLayout(self)
         self.event_list = deque([],maxlen=10)
@@ -62,7 +51,6 @@ class MyTabWidget(QWidget):
         self.tabs.addTab(self.tab1, "Probabilities")
         self.tabs.addTab(self.tab2, "Labels")
 
-
         # Create first tab
         self.create_Bar_Grid()
         self.tab1.setLayout(self.barLayout)
@@ -76,19 +64,19 @@ class MyTabWidget(QWidget):
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.update)
-        self.timer.start(1)
+        self.timer.start(33)
 
 
     def update(self):
-        data = self.socket.recv(308)
-        print len(data)
-        if len(data)!=308:
+        try:
+            msg = self.queue.get(0)
+            decoded_probs = msg[:76]
+            events_list = msg[76:]
+        except Queue.Empty:
             return
-        decoded_probs = list(struct.unpack("!"+"f"*77, data))
-        print decoded_probs
 
-        y1 = decoded_probs[45:]#RH
-        y2 = decoded_probs[13:45]#LH
+        y1 = decoded_probs[44:]#RH
+        y2 = decoded_probs[12:44]#LH
         y3 = decoded_probs[:6] #LA
         y4 = decoded_probs[6:12]#RA
         y5 = np.random.rand(3)
@@ -96,18 +84,9 @@ class MyTabWidget(QWidget):
         y3 = [1-sum(y3)]+y3
         y4 = [1 - sum(y4)] + y4
 
-
-
         curr_tab = self.tabs.currentIndex()
 
-
-        if curr_tab == 1:
-            '''self.label1.setText(self.rh_gestures[np.argmax(y1)])
-            self.label2.setText(self.lh_gestures[np.argmax(y2)])
-            self.label3.setText(self.ra_gestures[np.argmax(y3)])
-            self.label4.setText(self.la_gestures[np.argmax(y4)])
-            self.label5.setText(self.head_gestures[np.argmax(y5)])'''
-
+        if curr_tab == 1 and len(events_list)>0:
             font = QFont()
             font.setPointSize(10)
 
@@ -117,23 +96,16 @@ class MyTabWidget(QWidget):
             self.event_log.moveCursor(QTextCursor.End)
 
 
-            curr_event = self.rh_gestures[np.argmax(y1)] +"\t"+self.lh_gestures[np.argmax(y2)]+"\t"+self.la_gestures[np.argmax(y3)] +"\t"+self.ra_gestures[np.argmax(y4)]
+            curr_event = "\n".join(events_list)
 
             font = QFont()
             font.setFamily("Courier")
-            font.setPointSize(50)
+            font.setPointSize(30)
             self.event_log.setCurrentFont(font)
             self.event_log.setTextColor(QColor("red"))
-            self.event_log.append("\n"+self.rh_gestures[np.argmax(y1)])
-            self.event_log.setTextColor(QColor("blue"))
-            self.event_log.append("\t"+self.lh_gestures[np.argmax(y2)])
-            self.event_log.setTextColor(QColor("green"))
-            self.event_log.append("\t"+self.la_gestures[np.argmax(y3)])
-            self.event_log.setTextColor(QColor("black"))
-            self.event_log.append("\t"+self.ra_gestures[np.argmax(y4)])
+            self.event_log.append(curr_event)
 
-            self.event_list.append(curr_event)
-
+            self.event_list.append(curr_event+"\n\n")
 
             sb = self.event_log.verticalScrollBar()
             sb.setValue(sb.maximum())
@@ -148,23 +120,9 @@ class MyTabWidget(QWidget):
 
                 bar.setOpts(brushes=brushes)
 
-            '''self.rh.setOpts(height=y1)
-            self.lh.setOpts(height=y2)
-            self.ra.setOpts(height=y3)
-            self.la.setOpts(height=y4)
-            self.head.setOpts(height=y5)
-
-
-            brushes = ['b'] * 32
-            brushes[np.argmax(y1)] = 'r'
-
-
-            self.rh.setOpts(brushes=brushes)'''
-
-
-
-
             #self.tabs.setCurrentIndex((curr_tab + 1) % 2)
+
+        #raw_input()
 
 
 
@@ -285,7 +243,6 @@ class MyTabWidget(QWidget):
 
 
 if __name__ == '__main__':
-    #connect()
     app = QApplication(sys.argv)
     ex = App()
     sys.exit(app.exec_())
