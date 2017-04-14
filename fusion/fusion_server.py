@@ -173,16 +173,24 @@ class App:
         body_probs = self.latest_data[streams.get_stream_id("Body")][-13:-1]
         lhand_probs = self.latest_data[streams.get_stream_id("LH")][-len(left_hand_postures):]
         rhand_probs = self.latest_data[streams.get_stream_id("RH")][-len(right_hand_postures):]
+        
+        print len(body_probs)
+        print len(lhand_probs)
+        print len(rhand_probs)
 
         all_probs = body_probs + lhand_probs + rhand_probs
+        
+        raw_probs = struct.pack("!" + str(len(all_probs)) + "f", *all_probs)
 
-        return struct.pack(str(len(all_probs)) + "f", *all_probs)
-
+        print struct.unpack("!" + str(len(all_probs)) + "f", raw_probs)
+        return raw_probs
+		
 
     def _update_queues(self):
 
         raw_events_list = self._prepare_events()
         raw_probs = self._prepare_probs()
+       
 
         if len(raw_events_list) > 0:
             # Include a check to see if the destination is connected or not
