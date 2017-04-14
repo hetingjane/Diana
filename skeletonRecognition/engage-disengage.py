@@ -157,7 +157,7 @@ if __name__ == '__main__':
                 result = collect_all_results(map_array, proba_array, 0)
 
         time_stamp = list(data_stream)[-1][0]
-        print 'timestamp:', time_stamp
+        #print 'timestamp:', time_stamp
         pack_list = [1, time_stamp] + result
         bytes = struct.pack("!iqii" + "ff" * 6 + 'i', *pack_list)
         r.sendall(bytes)
