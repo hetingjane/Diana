@@ -3,10 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="25cc1c77-91cf-4100-9c4b-c4ce164fef43" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fusion/fusion_server.py" afterPath="$PROJECT_DIR$/fusion/fusion_server.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gui/GUI.py" afterPath="$PROJECT_DIR$/gui/GUI.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gui/GUIClient.py" afterPath="$PROJECT_DIR$/gui/GUIClient.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/start.sh" afterPath="$PROJECT_DIR$/start.sh" />
     </list>
     <ignored path="RealTime.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -56,8 +53,8 @@
       <file leaf-file-name="GUI.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/gui/GUI.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="225">
-              <caret line="204" column="131" selection-start-line="204" selection-start-column="131" selection-end-line="204" selection-end-column="131" />
+            <state relative-caret-position="111">
+              <caret line="64" column="27" selection-start-line="64" selection-start-column="27" selection-end-line="64" selection-end-column="27" />
               <folding>
                 <element signature="e#0#155#0" expanded="true" />
               </folding>
@@ -544,7 +541,14 @@
       <option name="project" value="LOCAL" />
       <updated>1492208986847</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Changed front vs back in GUI">
+      <created>1492211615554</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1492211615554</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -587,7 +591,8 @@
     <MESSAGE value="Added init file to fusion" />
     <MESSAGE value="Pushing GUI" />
     <MESSAGE value="Removed ip addresses and ports from programs and put it in a global file support.constants" />
-    <option name="LAST_COMMIT_MESSAGE" value="Removed ip addresses and ports from programs and put it in a global file support.constants" />
+    <MESSAGE value="Changed front vs back in GUI" />
+    <option name="LAST_COMMIT_MESSAGE" value="Changed front vs back in GUI" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -893,8 +898,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/gui/GUI.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="204" column="131" selection-start-line="204" selection-start-column="131" selection-end-line="204" selection-end-column="131" />
+        <state relative-caret-position="111">
+          <caret line="64" column="27" selection-start-line="64" selection-start-column="27" selection-end-line="64" selection-end-column="27" />
           <folding>
             <element signature="e#0#155#0" expanded="true" />
           </folding>

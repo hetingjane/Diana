@@ -62,7 +62,7 @@ class MyTabWidget(QWidget):
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.update)
-        self.timer.start(33)
+        self.timer.start(10)
 
 
     def update(self):
