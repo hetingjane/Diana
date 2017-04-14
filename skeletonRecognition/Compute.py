@@ -6,8 +6,8 @@ def default_bit_array(body_part):
 
 def get_threshold_for_body_part(body_part):
     d = {
-        'RA' : 0.05,
-        'LA' : 0.05,
+        'RA' : 0.20,
+        'LA' : 0.20,
         'torso' : 0.055,
         'head' : 0.033
     }
