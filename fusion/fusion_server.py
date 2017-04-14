@@ -102,13 +102,7 @@ class App:
             while True:
                 self._update()
         except KeyboardInterrupt:
-            response = input("Do you want to reset? (y/n): ")
-            if response == ord('y') or response == ord('Y'):
-                print "Resetting..."
-                self.run()
-            else:
-                self._exit()
-                sys.exit(0)
+            self._exit()
 
 
     def _update(self):
@@ -117,17 +111,20 @@ class App:
         Also prints debugging messages related to sync queue
         :return:
         """
-        self.latest_data = synced_data.get()
-        #print self.latest_data
-        self._update_queues()
-        self.received += 1
-        if synced_data.qsize() <= 15:
+        try:
+            self.latest_data = synced_data.get(False, 0.2)
+            #print self.latest_data
+            self._update_queues()
+            self.received += 1
+            if synced_data.qsize() <= 15:
+                pass
+                #print "Backlog queue size: " + str(synced_data.qsize())
+            else:
+                self.skipped += 1
+                print "Timestamp " + str(self.latest_data[streams.get_stream_id("Body")][1]) + \
+                      " skipped because backlog too large: " + str(synced_data.qsize())
+        except Queue.Empty:
             pass
-            #print "Backlog queue size: " + str(synced_data.qsize())
-        else:
-            self.skipped += 1
-            print "Timestamp " + str(self.latest_data[streams.get_stream_id("Body")][1]) + \
-                  " skipped because backlog too large: " + str(synced_data.qsize())
 
     def _prepare_events(self):
         # Check if engaged or not
@@ -195,7 +192,7 @@ class App:
 
         if gui_connected.wait(0.0):
             ev_count = struct.pack("!i", len(raw_events_list))
-            gui_connected.put(ev_count + ''.join(raw_events_list) + raw_probs)
+            gui_events.put(ev_count + ''.join(raw_events_list) + raw_probs)
 
 
 def ensure_match(masks):

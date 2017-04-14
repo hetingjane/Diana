@@ -10,10 +10,11 @@ from thread_sync import *
 class Fusion(threading.Thread):
 
     def __init__(self):
+        threading.Thread.__init__(self)
+        self.daemon = True
         self.data_received = {}
         self._stop = threading.Event()
         self.synced = False
-        threading.Thread.__init__(self)
 
     def _recv_all(self, sock, size):
         result = b''

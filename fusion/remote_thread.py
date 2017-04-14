@@ -8,6 +8,7 @@ class Remote(threading.Thread):
 
     def __init__(self, name, serv_address, input_queue, conn_event):
         threading.Thread.__init__(self)
+        self.daemon = True
         self.name = str(name)
         self.id = "[ " + name + " ]\t"
         self.address = serv_address
