@@ -13,7 +13,7 @@ from WindowProcess import (extract_data, process_window_data, collect_all_result
 src_addr = '129.82.45.102'
 src_port = 8123
 
-des_addr = '10.1.118.19'  # 'cwc1'
+des_addr = 'blue'  # 'cwc1'
 des_port = 9125
 
 

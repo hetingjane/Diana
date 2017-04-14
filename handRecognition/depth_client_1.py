@@ -16,7 +16,7 @@ def connect(server="kinect"):
         src_addr = '129.82.45.102'
         src_port = 8125
     else:
-        src_addr = '129.82.45.104'#'10.1.118.19'#'cwc1'
+        src_addr = 'blue'#'10.1.118.19'#'cwc1'
         src_port = 9125
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

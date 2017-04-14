@@ -184,7 +184,6 @@ class App:
 
         print struct.unpack("!" + str(len(all_probs)) + "f", raw_probs)
         return raw_probs
-		
 
     def _update_queues(self):
 
