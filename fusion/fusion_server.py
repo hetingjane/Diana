@@ -352,7 +352,7 @@ sm_point_down = StateMachine(["point down start", "point down stop"], {
 }, "point down stop")
 
 sm_nack = StateMachine(["negack start", "negack stop"], {
-    "nack stop": {
+    "negack stop": {
         "negack start": ensure_match([
             posture_to_vec['rh thumbs down'],
             posture_to_vec['lh thumbs down'],
