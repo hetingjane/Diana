@@ -154,8 +154,9 @@ class MyTabWidget(QWidget):
         self.l.addLabel(text, col=0, colspan=3)
         self.l.nextRow()
 
-        self.p1 = self.l.addPlot(title="Right Hand", )
+        self.p1 = self.l.addPlot(title='<font size="5" color="black" style="background-color:white;"><b>Right Hand</b></font>', )
         self.p2 = self.l.addPlot(title="Left Hand")
+
 
         self.l1 = self.l.addLayout()
 
@@ -219,6 +220,10 @@ class MyTabWidget(QWidget):
 
         la_gestures = [l.replace("la ", "") for l in self.la_gestures]
         ra_gestures = [r.replace("ra ", "") for r in self.ra_gestures]
+
+        #font = QtGui.QFont()
+        #font.setPixelSize(20)
+        #self.p1.getAxis('left').tickFont = font
 
         self.p1.getAxis('left').setTicks([list(zip(range(0, -len(self.rh_gestures), -1), rh_gestures))])
         self.p2.getAxis('left').setTicks([list(zip(range(0, -len(self.lh_gestures), -1), lh_gestures))])
