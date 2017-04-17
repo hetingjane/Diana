@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import *#QMainWindow, QApplication, QPushButton, QWidget, QAction, QTabWidget, QVBoxLayout, QLabel, QMessageBox, QBoxLayout, QTextEdit
 from PyQt5.QtGui import *#QIcon, QFont, QTextCursor, QColor
-from PyQt5.QtCore import QTimer
+from PyQt5.QtCore import *
 
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtGui
@@ -37,7 +37,10 @@ class MyTabWidget(QWidget):
         self.queue = queue
         super(QWidget, self).__init__(parent)
         self.layout = QVBoxLayout(self)
+
         self.event_list = deque([],maxlen=10)
+        self.curr_event = ""
+        self.prev_event = ""
 
         # Initialize tab screen
         self.tabs = QTabWidget()
@@ -46,8 +49,9 @@ class MyTabWidget(QWidget):
         self.tabs.resize(800, 600)
 
         # Add tabs
-        self.tabs.addTab(self.tab1, "Probabilities")
-        self.tabs.addTab(self.tab2, "Labels")
+
+        self.tabs.addTab(self.tab2, "Gestural Events")
+        self.tabs.addTab(self.tab1, "Atomic Probabilities")
 
         # Create first tab
         self.create_Bar_Grid()
@@ -86,26 +90,30 @@ class MyTabWidget(QWidget):
 
         #events_list = [self.ra_gestures[np.argmax(y4)]]
 
-        if curr_tab == 1 and len(events_list)>0:
+        if curr_tab == 0 and len(events_list)>0:
+
             font = QFont()
             font.setPointSize(10)
 
             self.event_log.setCurrentFont(font)
-            self.event_log.setTextColor(QColor( "black" ))
-            self.event_log.setText("\n".join(self.event_list))
+            self.event_log.setTextColor(QColor("black"))
+            self.event_log.append(self.prev_event)
             self.event_log.moveCursor(QTextCursor.End)
 
+            self.prev_event = self.curr_event
+            self.curr_event = "\n".join(events_list)
 
-            curr_event = "\n".join(events_list)
+            self.curr_event_label.setText(self.curr_event)
+            self.prev_event_label.setText(self.prev_event)
 
-            font = QFont()
+            '''font = QFont()
             font.setFamily("Courier")
             font.setPointSize(30)
             self.event_log.setCurrentFont(font)
             self.event_log.setTextColor(QColor("red"))
             self.event_log.append(curr_event)
 
-            self.event_list.append(curr_event+"\n\n")
+            self.event_list.append(curr_event+"\n\n")'''
 
             sb = self.event_log.verticalScrollBar()
             sb.setValue(sb.maximum())
@@ -115,8 +123,8 @@ class MyTabWidget(QWidget):
             for bar, data in zip([self.rh, self.lh, self.la, self.ra, self.head],[y1, y2, y3, y4, y5]):
                 bar.setOpts(height=data)
 
-                brushes = ['b'] * len(data)
-                brushes[np.argmax(data)] = 'r'
+                brushes = ['y'] * len(data)
+                brushes[np.argmax(data)] = 'g'
 
                 bar.setOpts(brushes=brushes)
 
@@ -162,13 +170,13 @@ class MyTabWidget(QWidget):
         self.p5 = self.l1.addPlot(title="Head")
 
         self.rh = pg.BarGraphItem(x=x1, height=y1, width=0.8, brushes=['b']*32)
-        self.lh = pg.BarGraphItem(x=x1, height=y2, width=0.8, brush='r')
+        self.lh = pg.BarGraphItem(x=x1, height=y2, width=0.8, brush='b')
 
-        self.ra = pg.BarGraphItem(x=x2, height=y3, width=0.8, brush='r')
+        self.ra = pg.BarGraphItem(x=x2, height=y3, width=0.8, brush='b')
 
-        self.la = pg.BarGraphItem(x=x2, height=y4, width=0.8, brush='r')
+        self.la = pg.BarGraphItem(x=x2, height=y4, width=0.8, brush='b')
 
-        self.head = pg.BarGraphItem(x=x3, height=y5, width=0.8, brush='r')
+        self.head = pg.BarGraphItem(x=x3, height=y5, width=0.8, brush='b')
 
         self.p1.addItem(self.rh)
         self.p2.addItem(self.lh)
@@ -222,21 +230,48 @@ class MyTabWidget(QWidget):
 
         self.barLayout.addWidget(self.l)
 
-
     def create_Labels(self):
         self.labelLayout = QVBoxLayout()
+
+        self.curr_event_label = QLabel()
+        self.prev_event_label = QLabel()
         self.event_log = QTextEdit()
+
+        self.curr_event_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.curr_event_label.setAlignment(Qt.AlignCenter)
+
+        self.prev_event_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.prev_event_label.setAlignment(Qt.AlignCenter)
+
+        self.curr_event_label.setFrameStyle(QFrame.Box | QFrame.Plain);
+        self.curr_event_label.setLineWidth(3);
+
+        self.prev_event_label.setFrameStyle(QFrame.Box | QFrame.Plain);
+        self.prev_event_label.setLineWidth(3);
+
+        self.event_log.setFrameStyle(QFrame.Box | QFrame.Plain);
+        self.event_log.setLineWidth(3);
+
         self.event_log.setReadOnly(True)
         self.event_log.setLineWrapMode(QTextEdit.NoWrap)
 
-        '''self.event_log.setTextColor(QtGui.QColor("blue"))
-        self.event_log.append("I'm blue !")
-        self.event_log.setTextColor(QtGui.QColor("red"))
-        self.event_log.append("I'm red !")
-        self.event_log.setTextColor(QtGui.QColor("yellow"))
-        self.event_log.append("I'm ywllo !")'''
+        font = QFont();
+        font.setPointSize(32);
+        font.setBold(True);
 
+        self.curr_event_label.setFont(font)
+        self.prev_event_label.setFont(font)
+
+        self.curr_event_label.setStyleSheet('color: green')
+        self.prev_event_label.setStyleSheet('color: blue')
+
+        self.curr_event_label.setText("Current Event")
+        self.prev_event_label.setText("Previous Event")
+
+        self.labelLayout.addWidget(self.curr_event_label)
+        self.labelLayout.addWidget(self.prev_event_label)
         self.labelLayout.addWidget(self.event_log)
+
 
     def tabChangedSlot(self,argTabIndex):
         QMessageBox.information(self, "Tab Index Changed!", "Current Tab Index: "+ str(argTabIndex));

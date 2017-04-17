@@ -30,7 +30,7 @@ class ThreadedClient:
         src_port = FUSION_GUI_PORT
 
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(10)
+        #sock.settimeout(10)
 
         try:
             sock.connect((src_addr, src_port))
@@ -77,8 +77,9 @@ class ThreadedClient:
             decoded_frame = self.receive()
             self.queue.put(decoded_frame)
 
-    def endApplication(self):
         self.sock.close()
+
+    def endApplication(self):
         self.running = 0
 
 
