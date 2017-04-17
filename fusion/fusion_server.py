@@ -226,11 +226,6 @@ def ensure_mismatch(masks):
 
     return f
 
-
-def always_match(masks):
-    return True
-
-
 # Meta rule for ANDing
 def and_rules(*rules):
 
