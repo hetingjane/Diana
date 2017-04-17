@@ -138,7 +138,7 @@ class MyTabWidget(QWidget):
         self.barLayout = QVBoxLayout()
         self.l = pg.GraphicsLayoutWidget(border=(100, 100, 100))
 
-        text = """Gesture Probabilities"""
+        #text = """Gesture Probabilities"""
 
         x1 = np.arange(32)
         y1 = np.random.rand(32)
@@ -151,27 +151,31 @@ class MyTabWidget(QWidget):
         x3 = np.arange(3)
         y5 = np.random.rand(3)
 
-        self.l.addLabel(text, col=0, colspan=3)
-        self.l.nextRow()
+        #self.l.addLabel(text, col=0, colspan=3)
+        #self.l.nextRow()
 
-        self.p1 = self.l.addPlot(title='<font size="5" color="black" style="background-color:white;"><b>Right Hand</b></font>', )
-        self.p2 = self.l.addPlot(title="Left Hand")
+        self.p1 = self.l.addPlot(title='<font size="5" color="white"><b>Right Hand</b></font>')
+        self.p2 = self.l.addPlot(title='<font size="5" color="white"><b>Left Hand</b></font>')
+
+        #font = QtGui.QFont()
+        #font.setPixelSize(20)
+        #self.p1.getAxis('left').tickFont = font
 
 
         self.l1 = self.l.addLayout()
 
-        self.p3 = self.l1.addPlot(title="Right Arm")
+        self.p3 = self.l1.addPlot(title='<font size="5" color="white"><b>Right Arm</b></font>')
         self.p3.setXRange(0,1)
         self.l1.nextRow()
 
-        self.p4 = self.l1.addPlot(title="Left Arm")
+        self.p4 = self.l1.addPlot(title='<font size="5" color="white"><b>Left Arm</b></font>')
         self.p4.setXRange(0, 1)
         self.l1.nextRow()
 
-        self.p5 = self.l1.addPlot(title="Head")
+        self.p5 = self.l1.addPlot(title='<font size="5" color="white"><b>Head</b></font>')
 
         self.rh = pg.BarGraphItem(x=x1, height=y1, width=0.8, brushes=['b']*32)
-        self.lh = pg.BarGraphItem(x=x1, height=y2, width=0.8, brush='b')
+        self.lh = pg.BarGraphItem(x=x1, height=y2, width=0.8, brush='c')
 
         self.ra = pg.BarGraphItem(x=x2, height=y3, width=0.8, brush='b')
 
@@ -221,9 +225,7 @@ class MyTabWidget(QWidget):
         la_gestures = [l.replace("la ", "") for l in self.la_gestures]
         ra_gestures = [r.replace("ra ", "") for r in self.ra_gestures]
 
-        #font = QtGui.QFont()
-        #font.setPixelSize(20)
-        #self.p1.getAxis('left').tickFont = font
+
 
         self.p1.getAxis('left').setTicks([list(zip(range(0, -len(self.rh_gestures), -1), rh_gestures))])
         self.p2.getAxis('left').setTicks([list(zip(range(0, -len(self.lh_gestures), -1), lh_gestures))])
