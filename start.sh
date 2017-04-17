@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-#echo 'logging into blue for fusion'
-#gnome-terminal -x bash -c "ssh -t blue 'cd $PWD/fusion/; python fusion_server.py;bash;'" &
-#sleep 2
+echo 'logging into blue for fusion'
+gnome-terminal -x bash -c "ssh -t blue 'cd $PWD/fusion/; python fusion_server.py;bash;'" &
+sleep 2
 
 echo 'logging into corvette for Depth LH'
 gnome-terminal -x bash -c "ssh -t corvette 'cd $PWD/handRecognition/; python depth_client.py LH;bash;'" &
