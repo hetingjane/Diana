@@ -59,8 +59,7 @@ class Remote(threading.Thread):
                         self._log("Accepted destination {}:{}".format(client_addr[0], client_addr[1]))
                         client_sock.shutdown(socket.SHUT_RD)
                         outputs += [client_sock]
-                        addr, port = client_sock.getpeername()
-                        self.client = addr + ":" + str(port)
+                        self.client = client_addr[0] + ":" + str(client_addr[1])
                         self._conn.set()
                     else:
                         self._log("Rejected connection attempt by {}:{}".format(client_addr[0], client_addr[1]))
