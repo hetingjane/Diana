@@ -326,7 +326,7 @@ sm_engage = StateMachine(["engage start", "engage stop"], {
             posture_to_vec['engage']
         ])
     }
-}, "engage stop")
+}, "engage stop", 1)
 
 sm_point_left = StateMachine(["point left start", "point left stop"], {
     "point left stop": {
@@ -584,5 +584,4 @@ a = App([ sm_engage, sm_ack , sm_point_left, sm_point_right, sm_point_front, sm_
           sm_grab_move_right, sm_grab_move_left, sm_grab_move_up, sm_grab_move_down,
           sm_grab_move_front, sm_grab_move_back])
 
-#a = App([sm_engage, sm_grab, sm_grab_move_right])
 a.run()
