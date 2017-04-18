@@ -86,7 +86,7 @@ class Fusion(threading.Thread):
                     try:
                         select.select([sock], [], [], 0)
                     except:
-                        print str(sock.getpeername()) + " disconnected."
+                        print "Client disconnected."
                         inputs.remove(sock)
                 continue
 
@@ -105,7 +105,7 @@ class Fusion(threading.Thread):
                     try:
                         data = self._handle_client(s)
                     except (socket.error, EOFError):
-                        print str(s.getpeername()) + " disconnected."
+                        print "Client disconnected."
                         inputs.remove(s)
                         self.synced = False
                         continue
