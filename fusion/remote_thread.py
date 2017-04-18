@@ -15,6 +15,7 @@ class Remote(threading.Thread):
         self.input_queue = input_queue
         self._stop = threading.Event()
         self._conn = conn_event
+        self.client = ""
 
 
     def stop(self):
@@ -58,6 +59,8 @@ class Remote(threading.Thread):
                         self._log("Accepted destination {}:{}".format(client_addr[0], client_addr[1]))
                         client_sock.shutdown(socket.SHUT_RD)
                         outputs += [client_sock]
+                        addr, port = client_sock.getpeername()
+                        self.client = addr + ":" + str(port)
                         self._conn.set()
                     else:
                         self._log("Rejected connection attempt by {}:{}".format(client_addr[0], client_addr[1]))
@@ -70,7 +73,8 @@ class Remote(threading.Thread):
                         try:
                             s.sendall(data)
                         except (socket.error, EOFError):
-                            self._log(str(s.getpeername()) + " disconnected.")
+                            self._log(self.client + " disconnected.")
+                            self.client = ""
                             outputs.remove(s)
                             self._conn.clear()
                             break

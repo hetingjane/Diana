@@ -154,6 +154,8 @@ class App:
 
         # More than one output data is possible from multiple state machines
         all_events_to_send = []
+        raw_events_to_send = []
+
         ts = datetime.datetime.fromtimestamp(time.time()).strftime("%M:%S:%f")[:-3]
 
         for state_machine in self.state_machines:
@@ -165,11 +167,18 @@ class App:
                 # Get bytes from the string according to UTF-8 encoding
                 new_state = state_machine.get_state()
                 # Prepare ; delimited data consisting of <state>;<timestamp>
-                data_to_send = new_state + ";" + ts
-                print new_state.ljust(30) + ts + "\n\n"
-                all_events_to_send.append( struct.pack("!i" + str(len(data_to_send)) + "s", len(data_to_send), data_to_send) )
+                # Sort events by stop then start
+                if new_state.split(' ')[-1] == 'stop':
+                    all_events_to_send = [new_state + ";" + ts] + all_events_to_send
+                else:
+                    all_events_to_send.append(new_state + ";" + ts)
 
-        return all_events_to_send
+        for e in all_events_to_send:
+            state, timestamp = e.split(';')
+            print state.ljust(30) + timestamp + "\n\n"
+            raw_events_to_send.append(struct.pack("!i" + str(len(e)) + "s", len(e), e))
+
+        return raw_events_to_send
 
     def _prepare_probs(self):
         body_probs = self.latest_data[streams.get_stream_id("Body")][-13:-1]
@@ -242,6 +251,20 @@ def ensure_mismatch_all(masks):
             if (in_sym & m) == m:
                 return False
         return True
+
+    return f
+
+def ensure_mismatch_any(masks):
+    """
+    Returns a function that allows you to check if input symbol matches  of the masks
+    :param masks: a list of masks you want to be mismatched
+    :return: function that accepts an input symbol and returns True if none of the masks mathces input symbol or False otherwise
+    """
+    def f(in_sym):
+        for m in masks:
+            if (in_sym & m) != m:
+                return True
+        return False
 
     return f
 
@@ -402,11 +425,11 @@ sm_grab = StateMachine(["grab start", "grab stop"], {
 sm_grab_move_right = StateMachine(["grab move right start", "grab move right stop"], {
     "grab move right start": {
         "grab move right stop": and_rules(
-            ensure_mismatch_all([
+            ensure_mismatch_any([
                 posture_to_vec['rh claw down'],
                 posture_to_vec['RA: move right']
             ]),
-            ensure_mismatch_all([
+            ensure_mismatch_any([
                 posture_to_vec['lh claw down'],
                 posture_to_vec['LA: move right']
             ])
@@ -426,6 +449,143 @@ sm_grab_move_right = StateMachine(["grab move right start", "grab move right sto
     }
 }, "grab move right stop")
 
-a = App([ sm_engage, sm_ack , sm_point_left, sm_point_right, sm_point_front, sm_point_down, sm_nack, sm_grab, sm_grab_move_right])
+sm_grab_move_left = StateMachine(["grab move left start", "grab move left stop"], {
+    "grab move left start": {
+        "grab move left stop": and_rules(
+            ensure_mismatch_any([
+                posture_to_vec['rh claw down'],
+                posture_to_vec['RA: move left']
+            ]),
+            ensure_mismatch_any([
+                posture_to_vec['lh claw down'],
+                posture_to_vec['LA: move left']
+            ])
+        )
+    },
+    "grab move left stop": {
+        "grab move left start": or_rules(
+            ensure_match_all([
+                posture_to_vec['rh claw down'],
+                posture_to_vec['RA: move left']
+            ]),
+            ensure_match_all([
+                posture_to_vec['lh claw down'],
+                posture_to_vec['LA: move left']
+            ])
+        )
+    }
+}, "grab move left stop")
+
+sm_grab_move_up = StateMachine(["grab move up start", "grab move up stop"], {
+    "grab move up start": {
+        "grab move up stop": and_rules(
+            ensure_mismatch_any([
+                posture_to_vec['rh claw down'],
+                posture_to_vec['RA: move up']
+            ]),
+            ensure_mismatch_any([
+                posture_to_vec['lh claw down'],
+                posture_to_vec['LA: move up']
+            ])
+        )
+    },
+    "grab move up stop": {
+        "grab move up start": or_rules(
+            ensure_match_all([
+                posture_to_vec['rh claw down'],
+                posture_to_vec['RA: move up']
+            ]),
+            ensure_match_all([
+                posture_to_vec['lh claw down'],
+                posture_to_vec['LA: move up']
+            ])
+        )
+    }
+}, "grab move up stop")
+
+sm_grab_move_down = StateMachine(["grab move down start", "grab move down stop"], {
+    "grab move down start": {
+        "grab move down stop": and_rules(
+            ensure_mismatch_any([
+                posture_to_vec['rh claw down'],
+                posture_to_vec['RA: move down']
+            ]),
+            ensure_mismatch_any([
+                posture_to_vec['lh claw down'],
+                posture_to_vec['LA: move down']
+            ])
+        )
+    },
+    "grab move down stop": {
+        "grab move down start": or_rules(
+            ensure_match_all([
+                posture_to_vec['rh claw down'],
+                posture_to_vec['RA: move down']
+            ]),
+            ensure_match_all([
+                posture_to_vec['lh claw down'],
+                posture_to_vec['LA: move down']
+            ])
+        )
+    }
+}, "grab move down stop")
+
+sm_grab_move_front = StateMachine(["grab move front start", "grab move front stop"], {
+    "grab move front start": {
+        "grab move front stop": and_rules(
+            ensure_mismatch_any([
+                posture_to_vec['rh claw down'],
+                posture_to_vec['RA: move front']
+            ]),
+            ensure_mismatch_any([
+                posture_to_vec['lh claw down'],
+                posture_to_vec['LA: move front']
+            ])
+        )
+    },
+    "grab move front stop": {
+        "grab move front start": or_rules(
+            ensure_match_all([
+                posture_to_vec['rh claw down'],
+                posture_to_vec['RA: move front']
+            ]),
+            ensure_match_all([
+                posture_to_vec['lh claw down'],
+                posture_to_vec['LA: move front']
+            ])
+        )
+    }
+}, "grab move front stop")
+
+sm_grab_move_back = StateMachine(["grab move back start", "grab move back stop"], {
+    "grab move back start": {
+        "grab move back stop": and_rules(
+            ensure_mismatch_any([
+                posture_to_vec['rh claw down'],
+                posture_to_vec['RA: move back']
+            ]),
+            ensure_mismatch_any([
+                posture_to_vec['lh claw down'],
+                posture_to_vec['LA: move back']
+            ])
+        )
+    },
+    "grab move back stop": {
+        "grab move back start": or_rules(
+            ensure_match_all([
+                posture_to_vec['rh claw down'],
+                posture_to_vec['RA: move back']
+            ]),
+            ensure_match_all([
+                posture_to_vec['lh claw down'],
+                posture_to_vec['LA: move back']
+            ])
+        )
+    }
+}, "grab move back stop")
+
+a = App([ sm_engage, sm_ack , sm_point_left, sm_point_right, sm_point_front, sm_point_down, sm_nack, sm_grab,
+          sm_grab_move_right, sm_grab_move_left, sm_grab_move_up, sm_grab_move_down,
+          sm_grab_move_front, sm_grab_move_back])
 
 a.run()
