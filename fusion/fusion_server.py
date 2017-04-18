@@ -5,7 +5,7 @@ import time
 import sys
 
 from conf import streams
-from conf.postures import right_hand_postures, left_hand_postures, body_postures
+from conf.postures import left_hand_postures, right_hand_postures, left_arm_motions, right_arm_motions
 from fusion_thread import Fusion
 from remote_thread import Remote
 from automata.state_machine import StateMachine
@@ -141,8 +141,8 @@ class App:
 
         left_hand_gesture_received = left_hand_postures[left_hand_label]
         right_hand_gesture_received = right_hand_postures[right_hand_label]
-        left_arm_movement_received = body_postures[left_arm_label]
-        right_arm_movement_received = body_postures[right_arm_label]
+        left_arm_movement_received = left_arm_motions[left_arm_label]
+        right_arm_movement_received = right_arm_motions[right_arm_label]
 
         # Convert integer labels to one hot representations
         left_hand_vec = posture_to_vec[left_hand_gesture_received]
@@ -294,12 +294,8 @@ def or_rules(*rules):
 
 # Create vector form for each posture
 engage_vec = [ 1 << 0 ]
-left_hand_vecs = [1<<i for i in range(1, len(left_hand_postures) + 1)]
-right_hand_vecs = [1<<i for i in range(len(left_hand_postures) + 1, len(left_hand_postures) + len(right_hand_postures) + 1)]
-body_vecs = [1<<i for i in range(len(left_hand_postures) + len(right_hand_postures) + 1, len(left_hand_postures) + len(right_hand_postures) + len(body_postures) + 1)]
-
-vecs = engage_vec + left_hand_vecs + right_hand_vecs + body_vecs
-postures = ["engage"] + left_hand_postures + right_hand_postures + body_postures
+vecs = engage_vec + [1 << i for i in range(1, len(left_hand_postures + right_hand_postures + left_arm_motions + right_arm_motions) + 1)]
+postures = ["engage"] + left_hand_postures + right_hand_postures + left_arm_motions + right_arm_motions
 
 vec_to_posture = dict(zip(vecs, postures))
 posture_to_vec = dict(zip(postures, vecs))
@@ -588,4 +584,5 @@ a = App([ sm_engage, sm_ack , sm_point_left, sm_point_right, sm_point_front, sm_
           sm_grab_move_right, sm_grab_move_left, sm_grab_move_up, sm_grab_move_down,
           sm_grab_move_front, sm_grab_move_back])
 
+#a = App([sm_engage, sm_grab, sm_grab_move_right])
 a.run()

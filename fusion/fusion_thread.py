@@ -3,7 +3,7 @@ import socket
 import struct
 
 from conf import streams
-from conf.postures import body_postures, right_hand_postures
+from conf.postures import right_hand_postures
 from thread_sync import *
 
 
