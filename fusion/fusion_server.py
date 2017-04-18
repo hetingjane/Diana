@@ -200,7 +200,8 @@ class App:
 def ensure_match(masks):
     """
     Returs a function that allows you to check if input symbol matches at least one of the masks
-    For mask to match, all the bits in the mask must be set. It doesn't matter if input has more bits set than in mask
+    For mask to match, all the bits that are set in the mask must also be set in input symbol.
+    It doesn't matter if input symbol has more bits set than the mask.
     :param masks: a list of masks you want to be matched
     :return: function that accepts an input symbol and returns True if any of the mask matches input symbol or False otherwise
     """
@@ -209,6 +210,24 @@ def ensure_match(masks):
             if (in_sym & m) == m:
                 return True
         return False
+    
+    return f
+
+
+def ensure_match_all(masks):
+    """
+    Returs a function that allows you to check if input symbol matches all of the masks
+    For mask to match, all the bits that are set in the mask must also be set in input symbol.
+    It doesn't matter if input symbol has more bits set than the mask.
+    :param masks: a list of masks you want to be matched
+    :return: function that accepts an input symbol and returns True if any of the mask matches input symbol or False otherwise
+    """
+    def f(in_sym):
+        for m in masks:
+            if (in_sym & m) != m:
+                return False
+        return True
+
     return f
 
 
