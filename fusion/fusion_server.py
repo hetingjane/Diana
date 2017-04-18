@@ -166,7 +166,7 @@ class App:
                 new_state = state_machine.get_state()
                 # Prepare ; delimited data consisting of <state>;<timestamp>
                 data_to_send = new_state + ";" + ts
-                print new_state.ljust(18) + ts + "\n\n"
+                print new_state.ljust(30) + ts + "\n\n"
                 all_events_to_send.append( struct.pack("!i" + str(len(data_to_send)) + "s", len(data_to_send), data_to_send) )
 
         return all_events_to_send
@@ -197,7 +197,7 @@ class App:
             gui_events.put(ev_count + ''.join(raw_events_list) + raw_probs)
 
 
-def ensure_match(masks):
+def ensure_match_any(masks):
     """
     Returs a function that allows you to check if input symbol matches at least one of the masks
     For mask to match, all the bits that are set in the mask must also be set in input symbol.
@@ -210,7 +210,7 @@ def ensure_match(masks):
             if (in_sym & m) == m:
                 return True
         return False
-    
+
     return f
 
 
@@ -231,7 +231,7 @@ def ensure_match_all(masks):
     return f
 
 
-def ensure_mismatch(masks):
+def ensure_mismatch_all(masks):
     """
     Returns a function that allows you to check if input symbol matches none of the masks
     :param masks: a list of masks you want to be mismatched
@@ -283,13 +283,13 @@ posture_to_vec = dict(zip(postures, vecs))
 
 sm_ack = StateMachine(["posack start", "posack stop"], {
     "posack stop": {
-        "posack start": ensure_match([
+        "posack start": ensure_match_any([
             posture_to_vec['rh thumbs up'],
             posture_to_vec['lh thumbs up']
         ])
     },
     "posack start": {
-        "posack stop": ensure_mismatch([
+        "posack stop": ensure_mismatch_all([
             posture_to_vec['rh thumbs up'],
             posture_to_vec['lh thumbs up']
         ])
@@ -298,12 +298,12 @@ sm_ack = StateMachine(["posack start", "posack stop"], {
 
 sm_engage = StateMachine(["engage start", "engage stop"], {
     "engage stop": {
-        "engage start": ensure_match([
+        "engage start": ensure_match_any([
             posture_to_vec['engage']
         ])
     },
     "engage start": {
-        "engage stop": ensure_mismatch([
+        "engage stop": ensure_mismatch_all([
             posture_to_vec['engage']
         ])
     }
@@ -311,12 +311,12 @@ sm_engage = StateMachine(["engage start", "engage stop"], {
 
 sm_point_left = StateMachine(["point left start", "point left stop"], {
     "point left stop": {
-        "point left start": ensure_match([
+        "point left start": ensure_match_any([
             posture_to_vec['rh point left']
         ])
     },
     "point left start": {
-        "point left stop": ensure_mismatch([
+        "point left stop": ensure_mismatch_all([
             posture_to_vec['rh point left']
         ])
     }
@@ -324,12 +324,12 @@ sm_point_left = StateMachine(["point left start", "point left stop"], {
 
 sm_point_right = StateMachine(["point right start", "point right stop"], {
     "point right stop": {
-        "point right start": ensure_match([
+        "point right start": ensure_match_any([
             posture_to_vec['lh point right']
         ])
     },
     "point right start": {
-        "point right stop": ensure_mismatch([
+        "point right stop": ensure_mismatch_all([
             posture_to_vec['lh point right']
         ])
     }
@@ -337,13 +337,13 @@ sm_point_right = StateMachine(["point right start", "point right stop"], {
 
 sm_point_front = StateMachine(["point front start", "point front stop"], {
     "point front stop": {
-        "point front start": ensure_match([
+        "point front start": ensure_match_any([
             posture_to_vec['lh point front'],
             posture_to_vec['rh point front']
         ])
     },
     "point front start": {
-        "point front stop": ensure_mismatch([
+        "point front stop": ensure_mismatch_all([
             posture_to_vec['lh point front'],
             posture_to_vec['rh point front']
         ])
@@ -352,13 +352,13 @@ sm_point_front = StateMachine(["point front start", "point front stop"], {
 
 sm_point_down = StateMachine(["point down start", "point down stop"], {
     "point down stop": {
-        "point down start": ensure_match([
+        "point down start": ensure_match_any([
             posture_to_vec['lh point down'],
             posture_to_vec['rh point down']
         ])
     },
     "point down start": {
-        "point down stop": ensure_mismatch([
+        "point down stop": ensure_mismatch_all([
             posture_to_vec['lh point down'],
             posture_to_vec['rh point down']
         ])
@@ -367,7 +367,7 @@ sm_point_down = StateMachine(["point down start", "point down stop"], {
 
 sm_nack = StateMachine(["negack start", "negack stop"], {
     "negack stop": {
-        "negack start": ensure_match([
+        "negack start": ensure_match_any([
             posture_to_vec['rh thumbs down'],
             posture_to_vec['lh thumbs down'],
             posture_to_vec['rh stop'],
@@ -375,7 +375,7 @@ sm_nack = StateMachine(["negack start", "negack stop"], {
         ]),
     },
     "negack start": {
-        "negack stop": ensure_mismatch([
+        "negack stop": ensure_mismatch_all([
             posture_to_vec['rh thumbs down'],
             posture_to_vec['lh thumbs down'],
             posture_to_vec['rh stop'],
@@ -386,13 +386,13 @@ sm_nack = StateMachine(["negack start", "negack stop"], {
 
 sm_grab = StateMachine(["grab start", "grab stop"], {
     "grab stop": {
-        "grab start": ensure_match([
+        "grab start": ensure_match_any([
             posture_to_vec['rh claw down'],
             posture_to_vec['lh claw down']
         ]),
     },
     "grab start": {
-        "grab stop": ensure_mismatch([
+        "grab stop": ensure_mismatch_all([
             posture_to_vec['rh claw down'],
             posture_to_vec['lh claw down']
         ])
@@ -402,11 +402,11 @@ sm_grab = StateMachine(["grab start", "grab stop"], {
 sm_grab_move_right = StateMachine(["grab move right start", "grab move right stop"], {
     "grab move right start": {
         "grab move right stop": and_rules(
-            ensure_mismatch([
+            ensure_mismatch_all([
                 posture_to_vec['rh claw down'],
                 posture_to_vec['RA: move right']
             ]),
-            ensure_mismatch([
+            ensure_mismatch_all([
                 posture_to_vec['lh claw down'],
                 posture_to_vec['LA: move right']
             ])
@@ -414,21 +414,15 @@ sm_grab_move_right = StateMachine(["grab move right start", "grab move right sto
     },
     "grab move right stop": {
         "grab move right start": or_rules(
-            and_rules(
-                ensure_match([
-                    posture_to_vec['rh claw down'],
-                ]),
-                ensure_match([
-                    posture_to_vec['RA: move right']
-                ])),
-            and_rules(
-                ensure_match([
-                    posture_to_vec['lh claw down'],
-                ]),
-                ensure_match([
-                    posture_to_vec['LA: move right']
-                ]))
-            )
+            ensure_match_all([
+                posture_to_vec['rh claw down'],
+                posture_to_vec['RA: move right']
+            ]),
+            ensure_match_all([
+                posture_to_vec['lh claw down'],
+                posture_to_vec['LA: move right']
+            ])
+        )
     }
 }, "grab move right stop")
 
