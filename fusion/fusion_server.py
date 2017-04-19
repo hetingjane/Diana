@@ -580,8 +580,118 @@ sm_grab_move_back = BinaryStateMachine(["grab move back start", "grab move back 
     }
 }, "grab move back stop")
 
+sm_grab_move_right_front = BinaryStateMachine(["grab move right front start", "grab move right front stop"], {
+    "grab move right front start": {
+        "grab move right front stop": and_rules(
+            ensure_mismatch_any([
+                posture_to_vec['rh claw down'],
+                posture_to_vec['RA: move right front']
+            ]),
+            ensure_mismatch_any([
+                posture_to_vec['lh claw down'],
+                posture_to_vec['LA: move right front']
+            ])
+        )
+    },
+    "grab move right front stop": {
+        "grab move right front start": or_rules(
+            ensure_match_all([
+                posture_to_vec['rh claw down'],
+                posture_to_vec['RA: move right front']
+            ]),
+            ensure_match_all([
+                posture_to_vec['lh claw down'],
+                posture_to_vec['LA: move right front']
+            ])
+        )
+    }
+}, "grab move right front stop")
+
+sm_grab_move_left_front = BinaryStateMachine(["grab move left front start", "grab move left front stop"], {
+    "grab move left front start": {
+        "grab move left front stop": and_rules(
+            ensure_mismatch_any([
+                posture_to_vec['rh claw down'],
+                posture_to_vec['RA: move left front']
+            ]),
+            ensure_mismatch_any([
+                posture_to_vec['lh claw down'],
+                posture_to_vec['LA: move left front']
+            ])
+        )
+    },
+    "grab move left front stop": {
+        "grab move left front start": or_rules(
+            ensure_match_all([
+                posture_to_vec['rh claw down'],
+                posture_to_vec['RA: move left front']
+            ]),
+            ensure_match_all([
+                posture_to_vec['lh claw down'],
+                posture_to_vec['LA: move left front']
+            ])
+        )
+    }
+}, "grab move left front stop")
+
+sm_grab_move_left_back = BinaryStateMachine(["grab move left back start", "grab move left back stop"], {
+    "grab move left back start": {
+        "grab move left back stop": and_rules(
+            ensure_mismatch_any([
+                posture_to_vec['rh claw down'],
+                posture_to_vec['RA: move left back']
+            ]),
+            ensure_mismatch_any([
+                posture_to_vec['lh claw down'],
+                posture_to_vec['LA: move left back']
+            ])
+        )
+    },
+    "grab move left back stop": {
+        "grab move left back start": or_rules(
+            ensure_match_all([
+                posture_to_vec['rh claw down'],
+                posture_to_vec['RA: move left back']
+            ]),
+            ensure_match_all([
+                posture_to_vec['lh claw down'],
+                posture_to_vec['LA: move left back']
+            ])
+        )
+    }
+}, "grab move left back stop")
+
+sm_grab_move_right_back = BinaryStateMachine(["grab move right back start", "grab move right back stop"], {
+    "grab move right back start": {
+        "grab move right back stop": and_rules(
+            ensure_mismatch_any([
+                posture_to_vec['rh claw down'],
+                posture_to_vec['RA: move right back']
+            ]),
+            ensure_mismatch_any([
+                posture_to_vec['lh claw down'],
+                posture_to_vec['LA: move right back']
+            ])
+        )
+    },
+    "grab move right back stop": {
+        "grab move right back start": or_rules(
+            ensure_match_all([
+                posture_to_vec['rh claw down'],
+                posture_to_vec['RA: move right back']
+            ]),
+            ensure_match_all([
+                posture_to_vec['lh claw down'],
+                posture_to_vec['LA: move right back']
+            ])
+        )
+    }
+}, "grab move right back stop")
+
 a = App([ sm_engage, sm_ack , sm_point_left, sm_point_right, sm_point_front, sm_point_down, sm_nack, sm_grab,
           sm_grab_move_right, sm_grab_move_left, sm_grab_move_up, sm_grab_move_down,
-          sm_grab_move_front, sm_grab_move_back])
+          sm_grab_move_front, sm_grab_move_back,
+          sm_grab_move_right_front, sm_grab_move_left_front,
+          sm_grab_move_left_back, sm_grab_move_right_back])
 
 a.run()
