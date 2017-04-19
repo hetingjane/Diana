@@ -8,7 +8,7 @@ from conf import streams
 from conf.postures import left_hand_postures, right_hand_postures, left_arm_motions, right_arm_motions
 from fusion_thread import Fusion
 from remote_thread import Remote
-from automata.state_machine import StateMachine
+from automata.state_machine import BinaryStateMachine
 from thread_sync import *
 
 from support.constants import *
@@ -300,7 +300,7 @@ postures = ["engage"] + left_hand_postures + right_hand_postures + left_arm_moti
 vec_to_posture = dict(zip(vecs, postures))
 posture_to_vec = dict(zip(postures, vecs))
 
-sm_ack = StateMachine(["posack start", "posack stop"], {
+sm_ack = BinaryStateMachine(["posack start", "posack stop"], {
     "posack stop": {
         "posack start": ensure_match_any([
             posture_to_vec['rh thumbs up'],
@@ -315,7 +315,7 @@ sm_ack = StateMachine(["posack start", "posack stop"], {
     }
 }, "posack stop")
 
-sm_engage = StateMachine(["engage start", "engage stop"], {
+sm_engage = BinaryStateMachine(["engage start", "engage stop"], {
     "engage stop": {
         "engage start": ensure_match_any([
             posture_to_vec['engage']
@@ -328,7 +328,7 @@ sm_engage = StateMachine(["engage start", "engage stop"], {
     }
 }, "engage stop", 1)
 
-sm_point_left = StateMachine(["point left start", "point left stop"], {
+sm_point_left = BinaryStateMachine(["point left start", "point left stop"], {
     "point left stop": {
         "point left start": ensure_match_any([
             posture_to_vec['rh point left']
@@ -341,7 +341,7 @@ sm_point_left = StateMachine(["point left start", "point left stop"], {
     }
 }, "point left stop")
 
-sm_point_right = StateMachine(["point right start", "point right stop"], {
+sm_point_right = BinaryStateMachine(["point right start", "point right stop"], {
     "point right stop": {
         "point right start": ensure_match_any([
             posture_to_vec['lh point right']
@@ -354,7 +354,7 @@ sm_point_right = StateMachine(["point right start", "point right stop"], {
     }
 }, "point right stop")
 
-sm_point_front = StateMachine(["point front start", "point front stop"], {
+sm_point_front = BinaryStateMachine(["point front start", "point front stop"], {
     "point front stop": {
         "point front start": ensure_match_any([
             posture_to_vec['lh point front'],
@@ -369,7 +369,7 @@ sm_point_front = StateMachine(["point front start", "point front stop"], {
     }
 }, "point front stop")
 
-sm_point_down = StateMachine(["point down start", "point down stop"], {
+sm_point_down = BinaryStateMachine(["point down start", "point down stop"], {
     "point down stop": {
         "point down start": ensure_match_any([
             posture_to_vec['lh point down'],
@@ -384,7 +384,7 @@ sm_point_down = StateMachine(["point down start", "point down stop"], {
     }
 }, "point down stop")
 
-sm_nack = StateMachine(["negack start", "negack stop"], {
+sm_nack = BinaryStateMachine(["negack start", "negack stop"], {
     "negack stop": {
         "negack start": ensure_match_any([
             posture_to_vec['rh thumbs down'],
@@ -403,7 +403,7 @@ sm_nack = StateMachine(["negack start", "negack stop"], {
     }
 }, "negack stop")
 
-sm_grab = StateMachine(["grab start", "grab stop"], {
+sm_grab = BinaryStateMachine(["grab start", "grab stop"], {
     "grab stop": {
         "grab start": ensure_match_any([
             posture_to_vec['rh claw down'],
@@ -418,7 +418,7 @@ sm_grab = StateMachine(["grab start", "grab stop"], {
     }
 }, "grab stop")
 
-sm_grab_move_right = StateMachine(["grab move right start", "grab move right stop"], {
+sm_grab_move_right = BinaryStateMachine(["grab move right start", "grab move right stop"], {
     "grab move right start": {
         "grab move right stop": and_rules(
             ensure_mismatch_any([
@@ -445,7 +445,7 @@ sm_grab_move_right = StateMachine(["grab move right start", "grab move right sto
     }
 }, "grab move right stop")
 
-sm_grab_move_left = StateMachine(["grab move left start", "grab move left stop"], {
+sm_grab_move_left = BinaryStateMachine(["grab move left start", "grab move left stop"], {
     "grab move left start": {
         "grab move left stop": and_rules(
             ensure_mismatch_any([
@@ -472,7 +472,7 @@ sm_grab_move_left = StateMachine(["grab move left start", "grab move left stop"]
     }
 }, "grab move left stop")
 
-sm_grab_move_up = StateMachine(["grab move up start", "grab move up stop"], {
+sm_grab_move_up = BinaryStateMachine(["grab move up start", "grab move up stop"], {
     "grab move up start": {
         "grab move up stop": and_rules(
             ensure_mismatch_any([
@@ -499,7 +499,7 @@ sm_grab_move_up = StateMachine(["grab move up start", "grab move up stop"], {
     }
 }, "grab move up stop")
 
-sm_grab_move_down = StateMachine(["grab move down start", "grab move down stop"], {
+sm_grab_move_down = BinaryStateMachine(["grab move down start", "grab move down stop"], {
     "grab move down start": {
         "grab move down stop": and_rules(
             ensure_mismatch_any([
@@ -526,7 +526,7 @@ sm_grab_move_down = StateMachine(["grab move down start", "grab move down stop"]
     }
 }, "grab move down stop")
 
-sm_grab_move_front = StateMachine(["grab move front start", "grab move front stop"], {
+sm_grab_move_front = BinaryStateMachine(["grab move front start", "grab move front stop"], {
     "grab move front start": {
         "grab move front stop": and_rules(
             ensure_mismatch_any([
@@ -553,7 +553,7 @@ sm_grab_move_front = StateMachine(["grab move front start", "grab move front sto
     }
 }, "grab move front stop")
 
-sm_grab_move_back = StateMachine(["grab move back start", "grab move back stop"], {
+sm_grab_move_back = BinaryStateMachine(["grab move back start", "grab move back stop"], {
     "grab move back start": {
         "grab move back stop": and_rules(
             ensure_mismatch_any([
