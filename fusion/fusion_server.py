@@ -389,16 +389,16 @@ sm_nack = BinaryStateMachine(["negack start", "negack stop"], {
         "negack start": ensure_match_any([
             posture_to_vec['rh thumbs down'],
             posture_to_vec['lh thumbs down'],
-            posture_to_vec['rh stop'],
-            posture_to_vec['lh stop']
+            #posture_to_vec['rh stop'],
+            #posture_to_vec['lh stop']
         ]),
     },
     "negack start": {
         "negack stop": ensure_mismatch_all([
             posture_to_vec['rh thumbs down'],
             posture_to_vec['lh thumbs down'],
-            posture_to_vec['rh stop'],
-            posture_to_vec['lh stop']
+            #posture_to_vec['rh stop'],
+            #posture_to_vec['lh stop']
         ])
     }
 }, "negack stop")
@@ -688,10 +688,136 @@ sm_grab_move_right_back = BinaryStateMachine(["grab move right back start", "gra
     }
 }, "grab move right back stop")
 
+sm_push_left = BinaryStateMachine(["push left start", "push left stop"], {
+    "push left start": {
+        "push left stop": or_rules(
+            ensure_mismatch_all([
+                posture_to_vec['rh closed left'],
+                posture_to_vec['rh open left']
+            ]),
+            ensure_mismatch_any([
+                posture_to_vec['RA: move left']
+            ])
+        )
+    },
+    "push left stop": {
+        "push left start": and_rules(
+            ensure_match_any([
+                posture_to_vec['rh closed left'],
+                posture_to_vec['rh open left']
+            ]),
+            ensure_match_all([
+                posture_to_vec['RA: move left']
+            ])
+        )
+    }
+}, "push left stop")
+
+sm_push_right = BinaryStateMachine(["push right start", "push right stop"], {
+    "push right start": {
+        "push right stop": or_rules(
+            ensure_mismatch_all([
+                posture_to_vec['lh closed right'],
+                posture_to_vec['lh open right']
+            ]),
+            ensure_mismatch_any([
+                posture_to_vec['LA: move right']
+            ])
+        )
+    },
+    "push right stop": {
+        "push right start": and_rules(
+            ensure_match_any([
+                posture_to_vec['lh closed right'],
+                posture_to_vec['lh open right']
+            ]),
+            ensure_match_all([
+                posture_to_vec['LA: move right']
+            ])
+        )
+    }
+}, "push right stop")
+
+sm_push_front = BinaryStateMachine(["push front start", "push front stop"], {
+    "push front start": {
+        "push front stop": and_rules(
+            ensure_mismatch_any([
+                posture_to_vec['rh stop'],
+                posture_to_vec['RA: move front']
+            ]),
+            ensure_mismatch_any([
+                posture_to_vec['lh stop'],
+                posture_to_vec['LA: move front']
+            ])
+        )
+    },
+    "push front stop": {
+        "push front start": or_rules(
+            ensure_match_all([
+                posture_to_vec['rh stop'],
+                posture_to_vec['RA: move front']
+            ]),
+            ensure_match_all([
+                posture_to_vec['lh stop'],
+                posture_to_vec['LA: move front']
+            ])
+        )
+    }
+}, "push front stop")
+
+sm_push_back = BinaryStateMachine(["push back start", "push back stop"], {
+    "push back start": {
+        "push back stop": and_rules(
+            or_rules(
+                ensure_mismatch_all([
+                    posture_to_vec['rh open back'],
+                    posture_to_vec['rh closed back']
+                ]),
+                ensure_mismatch_any([
+                    posture_to_vec['RA: move back']
+                ])
+            ),
+            or_rules(
+                ensure_mismatch_all([
+                    posture_to_vec['lh open back'],
+                    posture_to_vec['lh closed back']
+                ]),
+                ensure_mismatch_any([
+                    posture_to_vec['LA: move back']
+                ])
+            )
+        )
+    },
+    "push back stop": {
+        "push back start": or_rules(
+            and_rules(
+                ensure_match_any([
+                    posture_to_vec['rh open back'],
+                    posture_to_vec['rh closed back']
+                ]),
+                ensure_match_all([
+                    posture_to_vec['RA: move back']
+                ])
+            ),
+            and_rules(
+                ensure_match_any([
+                    posture_to_vec['lh open back'],
+                    posture_to_vec['lh closed back']
+                ]),
+                ensure_match_all([
+                    posture_to_vec['LA: move back']
+                ])
+            )
+        )
+    }
+}, "push back stop")
+
 a = App([ sm_engage, sm_ack , sm_point_left, sm_point_right, sm_point_front, sm_point_down, sm_nack, sm_grab,
           sm_grab_move_right, sm_grab_move_left, sm_grab_move_up, sm_grab_move_down,
           sm_grab_move_front, sm_grab_move_back,
           sm_grab_move_right_front, sm_grab_move_left_front,
-          sm_grab_move_left_back, sm_grab_move_right_back])
+          sm_grab_move_left_back, sm_grab_move_right_back,
+          sm_push_left, sm_push_right,
+          sm_push_back, sm_push_front])
 
 a.run()
