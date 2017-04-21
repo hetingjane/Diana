@@ -389,16 +389,16 @@ sm_nack = BinaryStateMachine(["negack start", "negack stop"], {
         "negack start": ensure_match_any([
             posture_to_vec['rh thumbs down'],
             posture_to_vec['lh thumbs down'],
-            #posture_to_vec['rh stop'],
-            #posture_to_vec['lh stop']
+            posture_to_vec['rh stop'],
+            posture_to_vec['lh stop']
         ]),
     },
     "negack start": {
         "negack stop": ensure_mismatch_all([
             posture_to_vec['rh thumbs down'],
             posture_to_vec['lh thumbs down'],
-            #posture_to_vec['rh stop'],
-            #posture_to_vec['lh stop']
+            posture_to_vec['rh stop'],
+            posture_to_vec['lh stop']
         ])
     }
 }, "negack stop")
@@ -742,11 +742,11 @@ sm_push_front = BinaryStateMachine(["push front start", "push front stop"], {
     "push front start": {
         "push front stop": and_rules(
             ensure_mismatch_any([
-                posture_to_vec['rh stop'],
+                posture_to_vec['rh closed front'],
                 posture_to_vec['RA: move front']
             ]),
             ensure_mismatch_any([
-                posture_to_vec['lh stop'],
+                posture_to_vec['lh closed front'],
                 posture_to_vec['LA: move front']
             ])
         )
@@ -754,11 +754,11 @@ sm_push_front = BinaryStateMachine(["push front start", "push front stop"], {
     "push front stop": {
         "push front start": or_rules(
             ensure_match_all([
-                posture_to_vec['rh stop'],
+                posture_to_vec['rh closed front'],
                 posture_to_vec['RA: move front']
             ]),
             ensure_match_all([
-                posture_to_vec['lh stop'],
+                posture_to_vec['lh closed front'],
                 posture_to_vec['LA: move front']
             ])
         )
@@ -785,7 +785,11 @@ sm_push_back = BinaryStateMachine(["push back start", "push back stop"], {
                 ensure_mismatch_any([
                     posture_to_vec['LA: move back']
                 ])
-            )
+            ),
+            ensure_mismatch_all([
+                posture_to_vec['rh beckon'],
+                posture_to_vec['lh beckon']
+            ])
         )
     },
     "push back stop": {
@@ -807,17 +811,125 @@ sm_push_back = BinaryStateMachine(["push back start", "push back stop"], {
                 ensure_match_all([
                     posture_to_vec['LA: move back']
                 ])
-            )
+            ),
+            ensure_match_any([
+                posture_to_vec['rh beckon'],
+                posture_to_vec['lh beckon']
+            ])
         )
     }
 }, "push back stop")
 
-a = App([ sm_engage, sm_ack , sm_point_left, sm_point_right, sm_point_front, sm_point_down, sm_nack, sm_grab,
-          sm_grab_move_right, sm_grab_move_left, sm_grab_move_up, sm_grab_move_down,
-          sm_grab_move_front, sm_grab_move_back,
-          sm_grab_move_right_front, sm_grab_move_left_front,
-          sm_grab_move_left_back, sm_grab_move_right_back,
-          sm_push_left, sm_push_right,
-          sm_push_back, sm_push_front])
+sm_count_one = BinaryStateMachine(["count one start", "count one stop"], {
+    "count one stop": {
+        "count one start": ensure_match_any([
+            posture_to_vec['rh one front'],
+            posture_to_vec['lh one front']
+        ])
+    },
+    "count one start": {
+        "count one stop": ensure_mismatch_all([
+            posture_to_vec['rh one front'],
+            posture_to_vec['lh one front']
+        ])
+    }
+}, "count one stop")
 
-a.run()
+sm_count_two = BinaryStateMachine(["count two start", "count two stop"], {
+    "count two stop": {
+        "count two start": ensure_match_any([
+            posture_to_vec['rh two front'],
+            posture_to_vec['rh two back'],
+            posture_to_vec['lh two front'],
+            posture_to_vec['lh two back']
+        ])
+    },
+    "count two start": {
+        "count two stop": ensure_mismatch_all([
+            posture_to_vec['rh two front'],
+            posture_to_vec['rh two back'],
+            posture_to_vec['lh two front'],
+            posture_to_vec['lh two back']
+        ])
+    }
+}, "count two stop")
+
+sm_count_three = BinaryStateMachine(["count three start", "count three stop"], {
+    "count three stop": {
+        "count three start": ensure_match_any([
+            posture_to_vec['rh three front'],
+            posture_to_vec['rh three back'],
+            posture_to_vec['lh three front'],
+            posture_to_vec['lh three back']
+        ])
+    },
+    "count three start": {
+        "count three stop": ensure_mismatch_all([
+            posture_to_vec['rh three front'],
+            posture_to_vec['rh three back'],
+            posture_to_vec['lh three front'],
+            posture_to_vec['lh three back']
+        ])
+    }
+}, "count three stop")
+
+sm_count_four = BinaryStateMachine(["count four start", "count four stop"], {
+    "count four stop": {
+        "count four start": ensure_match_any([
+            posture_to_vec['rh four front'],
+            posture_to_vec['lh four front']
+        ])
+    },
+    "count four start": {
+        "count four stop": ensure_mismatch_all([
+            posture_to_vec['rh four front'],
+            posture_to_vec['lh four front']
+        ])
+    }
+}, "count four stop")
+
+sm_count_five = BinaryStateMachine(["count five start", "count five stop"], {
+    "count five stop": {
+        "count five start": ensure_match_any([
+            posture_to_vec['rh five front'],
+            posture_to_vec['lh five front']
+        ])
+    },
+    "count five start": {
+        "count five stop": ensure_mismatch_all([
+            posture_to_vec['rh five front'],
+            posture_to_vec['lh five front']
+        ])
+    }
+}, "count five stop")
+
+
+brandeis_events = [ sm_engage, sm_ack , sm_point_left, sm_point_right, sm_point_front, sm_point_down, sm_nack, sm_grab,
+                    sm_grab_move_right, sm_grab_move_left, sm_grab_move_up, sm_grab_move_down,
+                    sm_grab_move_front, sm_grab_move_back,
+                    sm_grab_move_right_front, sm_grab_move_left_front,
+                    sm_grab_move_left_back, sm_grab_move_right_back,
+                    sm_push_left, sm_push_right, sm_push_back, sm_push_front ]
+
+csu_events = [ sm_engage, sm_ack , sm_point_left, sm_point_right, sm_point_front, sm_point_down, sm_nack, sm_grab,
+               sm_grab_move_right, sm_grab_move_left, sm_grab_move_up, sm_grab_move_down,
+               sm_grab_move_front, sm_grab_move_back,
+               sm_grab_move_right_front, sm_grab_move_left_front,
+               sm_grab_move_left_back, sm_grab_move_right_back,
+               sm_push_left, sm_push_right, sm_push_back, sm_push_front,
+
+               sm_count_one, sm_count_two, sm_count_three, sm_count_four, sm_count_five ]
+
+import argparse
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--mode', choices=['csu', 'brandeis'], default='csu', type=str,
+                        help="the mode in which fusion server is run")
+    args = parser.parse_args()
+    if args.mode == 'brandeis':
+        event_set = brandeis_events
+    elif args.mode == 'csu':
+        event_set = csu_events
+
+    a = App(event_set)
+    a.run()
