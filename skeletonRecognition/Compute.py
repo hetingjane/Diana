@@ -2,14 +2,13 @@ import numpy as np
 
 def default_bit_array(body_part):
     if (body_part=='RA') or (body_part=='LA'): return np.zeros(6)
+    elif (body_part=='arms_x') or (body_part=='arms_y'): return np.array([1,0,0])
 
 
 def get_threshold_for_body_part(body_part):
     d = {
         'RA' : 0.15,
-        'LA' : 0.15,
-        'torso' : 0.055,
-        'head' : 0.033
+        'LA' : 0.15
     }
     return d[body_part]
 
@@ -33,6 +32,32 @@ def calculate_direction(data, body_part): #data is a (window_size,9) array
     if (body_part=='RA')or(body_part=='LA'):
         #print "Processing for "+str(body_part)
         return get_arm_motion(data)
+    elif (body_part=='arms_x') or (body_part=='arms_y'):
+        return check_arms_apart_together(data)
+
+
+def check_arms_apart_together(data):
+    proba_array = np.zeros(3)
+    bit_value = 0
+
+    diff = data[-1] - data[0]
+    movement_left = np.sum(np.abs(diff[:len(diff) / 2]))
+    movement_right = np.sum(np.abs(diff[len(diff) / 2:]))
+    if movement_right > 0 and movement_left > 0:
+        first_frame = [np.abs(data[0][i + 3] - data[0][i]) for i in range(3)]
+        last_frame = [np.abs(data[-1][i + 3] - data[-1][i]) for i in range(3)]
+
+        if sum(np.subtract(last_frame, first_frame)) >= 0:
+            proba_array[1] = 1
+            bit_value = 1
+        else:
+            proba_array[2] = 1
+            bit_value = 2
+    else:
+        proba_array[0]=1
+        bit_value = 0
+
+    return proba_array, bit_value
 
 
 def get_arm_motion(data):
@@ -83,6 +108,8 @@ def get_arm_motion(data):
 
     data_mag = get_magnitude([data])[0]
     mag_threshold = get_threshold_for_body_part('RA')
+
+    #print mag_threshold, data_mag
     bit_array = np.zeros(6)
     proba_array = np.zeros(6)
 
@@ -115,10 +142,13 @@ def check_engage_disengage(data):
         ref_shoulder_vector = [0.99478572, -0.01661349,  0.1006249]
         shoulder_vector = np.array([data[i] for i in [24, 25, 26]]) - np.array([data[i] for i in [12, 13, 14]])
 
-        shoulder_vector /= np.linalg.norm(shoulder_vector)
+        try:
+            shoulder_vector /= np.linalg.norm(shoulder_vector)
+        except:
+            shoulder_vector /= 1
         angle = np.dot(ref_shoulder_vector, shoulder_vector)
         if (angle < 0.8):
-            print "Angle threshold failed"
+            #print "Angle threshold failed"
             return 0
         else:
             return 1
@@ -126,15 +156,15 @@ def check_engage_disengage(data):
 
     def get_distance_bool(data):
         if data[2]>2.1:
-            print "Distance threshold failed"
+            #print "Distance threshold failed"
             return 0
         else: return 1
 
-    if (get_distance_bool(data) and get_angle_of_shoulder_vector(data)):
-        print "Engage"
+    if (get_distance_bool(data)): #and get_angle_of_shoulder_vector(data)):
+        #print "Engage"
         return 1
     else:
-        print "Disengage"
+        #print "Disengage"
         return 0
 
 
