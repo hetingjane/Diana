@@ -903,6 +903,66 @@ sm_count_five = BinaryStateMachine(["count five start", "count five stop"], {
     }
 }, "count five stop")
 
+sm_arms_apart_X = BinaryStateMachine(["arms apart X start", "arms apart X stop"], {
+    "arms apart X stop": {
+        "arms apart X start": ensure_match_all([
+            posture_to_vec['LA: apart X'],
+            posture_to_vec['RA: apart X']
+        ])
+    },
+    "arms apart X start": {
+        "arms apart X stop": ensure_mismatch_any([
+            posture_to_vec['LA: apart X'],
+            posture_to_vec['RA: apart X']
+        ])
+    }
+}, "arms apart X stop")
+
+sm_arms_together_X = BinaryStateMachine(["arms together X start", "arms together X stop"], {
+    "arms together X stop": {
+        "arms together X start": ensure_match_all([
+            posture_to_vec['LA: together X'],
+            posture_to_vec['RA: together X']
+        ])
+    },
+    "arms together X start": {
+        "arms together X stop": ensure_mismatch_any([
+            posture_to_vec['LA: together X'],
+            posture_to_vec['RA: together X']
+        ])
+    }
+}, "arms together X stop")
+
+sm_arms_apart_Y = BinaryStateMachine(["arms apart Y start", "arms apart Y stop"], {
+    "arms apart Y stop": {
+        "arms apart Y start": ensure_match_all([
+            posture_to_vec['LA: apart Y'],
+            posture_to_vec['RA: apart Y']
+        ])
+    },
+    "arms apart Y start": {
+        "arms apart Y stop": ensure_mismatch_any([
+            posture_to_vec['LA: apart Y'],
+            posture_to_vec['RA: apart Y']
+        ])
+    }
+}, "arms apart Y stop")
+
+sm_arms_together_Y = BinaryStateMachine(["arms together Y start", "arms together Y stop"], {
+    "arms together Y stop": {
+        "arms together Y start": ensure_match_all([
+            posture_to_vec['LA: together Y'],
+            posture_to_vec['RA: together Y']
+        ])
+    },
+    "arms together Y start": {
+        "arms together Y stop": ensure_mismatch_any([
+            posture_to_vec['LA: together Y'],
+            posture_to_vec['RA: together Y']
+        ])
+    }
+}, "arms together Y stop")
+
 
 brandeis_events = [ sm_engage, sm_ack , sm_point_left, sm_point_right, sm_point_front, sm_point_down, sm_nack, sm_grab,
                     sm_grab_move_right, sm_grab_move_left, sm_grab_move_up, sm_grab_move_down,
@@ -918,7 +978,8 @@ csu_events = [ sm_engage, sm_ack , sm_point_left, sm_point_right, sm_point_front
                sm_grab_move_left_back, sm_grab_move_right_back,
                sm_push_left, sm_push_right, sm_push_back, sm_push_front,
 
-               sm_count_one, sm_count_two, sm_count_three, sm_count_four, sm_count_five ]
+               sm_count_one, sm_count_two, sm_count_three, sm_count_four, sm_count_five,
+               sm_arms_together_X, sm_arms_apart_X, sm_arms_together_Y, sm_arms_apart_Y ]
 
 import argparse
 if __name__ == '__main__':
