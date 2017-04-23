@@ -206,71 +206,86 @@ class App:
             gui_events.put(ev_count + ''.join(raw_events_list) + raw_probs)
 
 
-def ensure_match_any(masks):
+def match_any(*postures):
     """
-    Returs a function that allows you to check if input symbol matches at least one of the masks
-    For mask to match, all the bits that are set in the mask must also be set in input symbol.
-    It doesn't matter if input symbol has more bits set than the mask.
-    :param masks: a list of masks you want to be matched
-    :return: function that accepts an input symbol and returns True if any of the mask matches input symbol or False otherwise
+    Returns a rule to match one or more postures with the input mask that is True when
+    at least one of the postures matches with the input mask, else False
+    :param postures: One or more postures as strings
+    :return: Rule to match the input postures with the input mask
     """
+    posture_vecs = [ posture_to_vec[posture] for posture in postures ]
+
     def f(in_sym):
-        for m in masks:
-            if (in_sym & m) == m:
+        for v in posture_vecs:
+            if (in_sym & v) == v:
                 return True
         return False
 
     return f
 
 
-def ensure_match_all(masks):
+def match_all(*postures):
     """
-    Returs a function that allows you to check if input symbol matches all of the masks
-    For mask to match, all the bits that are set in the mask must also be set in input symbol.
-    It doesn't matter if input symbol has more bits set than the mask.
-    :param masks: a list of masks you want to be matched
-    :return: function that accepts an input symbol and returns True if any of the mask matches input symbol or False otherwise
+    Returns a rule to match one or more postures with the input mask that is True when
+    all of the postures match with the input mask, else False
+    :param postures: One or more postures as strings
+    :return: Rule to match the input postures with the input mask
     """
+    posture_vecs = [ posture_to_vec[posture] for posture in postures ]
+
     def f(in_sym):
-        for m in masks:
-            if (in_sym & m) != m:
+        for v in posture_vecs:
+            if (in_sym & v) != v:
                 return False
         return True
 
     return f
 
 
-def ensure_mismatch_all(masks):
+def mismatch_any(*postures):
     """
-    Returns a function that allows you to check if input symbol matches none of the masks
-    :param masks: a list of masks you want to be mismatched
-    :return: function that accepts an input symbol and returns True if none of the masks mathces input symbol or False otherwise
+    Returns a rule to match one or more postures with the input mask that is True when
+    at least one of the postures does not match with the input mask, else False
+    :param postures: One or more postures as strings
+    :return: Rule to match the input postures with the input mask
     """
-    def f(in_sym):
-        for m in masks:
-            if (in_sym & m) == m:
-                return False
-        return True
 
-    return f
+    posture_vecs = [ posture_to_vec[posture] for posture in postures ]
 
-def ensure_mismatch_any(masks):
-    """
-    Returns a function that allows you to check if input symbol matches  of the masks
-    :param masks: a list of masks you want to be mismatched
-    :return: function that accepts an input symbol and returns True if none of the masks mathces input symbol or False otherwise
-    """
     def f(in_sym):
-        for m in masks:
-            if (in_sym & m) != m:
+        for v in posture_vecs:
+            if (in_sym & v) != v:
                 return True
         return False
 
     return f
+
+
+def mismatch_all(*postures):
+    """
+    Returns a rule to match one or more postures with the input mask that is True when
+    none of the postures matches with the input mask, else False
+    :param postures: One or more postures as strings
+    :return: Rule to match the input postures with the input mask
+    """
+    posture_vecs = [ posture_to_vec[posture] for posture in postures ]
+
+    def f(in_sym):
+        for v in posture_vecs:
+            if (in_sym & v) == v:
+                return False
+        return True
+
+    return f
+
 
 # Meta rule for ANDing
 def and_rules(*rules):
-
+    """
+    Returns a rule that computes the logical AND of the input rules with the input mask
+    :param rules: One or more boolean rules
+    :return: Rule that is logical AND of the input boolean rules
+    """
     def f(in_sym):
         for rule in rules:
             if not rule(in_sym):
@@ -282,7 +297,11 @@ def and_rules(*rules):
 
 # Meta rule for ORing
 def or_rules(*rules):
-
+    """
+    Returns a rule that computes the logical OR of the input rules with the input mask
+    :param rules: One or more boolean rules
+    :return: Rule that is logical OR of the input boolean rules
+    """
     def f(in_sym):
         for rule in rules:
             if rule(in_sym):
@@ -302,664 +321,408 @@ posture_to_vec = dict(zip(postures, vecs))
 
 sm_ack = BinaryStateMachine(["posack start", "posack stop"], {
     "posack stop": {
-        "posack start": ensure_match_any([
-            posture_to_vec['rh thumbs up'],
-            posture_to_vec['lh thumbs up']
-        ])
+        "posack start": match_any('rh thumbs up', 'lh thumbs up')
     },
     "posack start": {
-        "posack stop": ensure_mismatch_all([
-            posture_to_vec['rh thumbs up'],
-            posture_to_vec['lh thumbs up']
-        ])
+        "posack stop": mismatch_all('rh thumbs up', 'lh thumbs up')
     }
 }, "posack stop")
 
+
 sm_engage = BinaryStateMachine(["engage start", "engage stop"], {
     "engage stop": {
-        "engage start": ensure_match_any([
-            posture_to_vec['engage']
-        ])
+        "engage start": match_any('engage')
     },
     "engage start": {
-        "engage stop": ensure_mismatch_all([
-            posture_to_vec['engage']
-        ])
+        "engage stop": mismatch_all('engage')
     }
 }, "engage stop", 1)
 
+
 sm_point_left = BinaryStateMachine(["point left start", "point left stop"], {
     "point left stop": {
-        "point left start": ensure_match_any([
-            posture_to_vec['rh point left']
-        ])
+        "point left start": match_any('rh point left')
     },
     "point left start": {
-        "point left stop": ensure_mismatch_all([
-            posture_to_vec['rh point left']
-        ])
+        "point left stop": mismatch_all('rh point left')
     }
 }, "point left stop")
 
+
 sm_point_right = BinaryStateMachine(["point right start", "point right stop"], {
     "point right stop": {
-        "point right start": ensure_match_any([
-            posture_to_vec['lh point right']
-        ])
+        "point right start": match_any('lh point right')
     },
     "point right start": {
-        "point right stop": ensure_mismatch_all([
-            posture_to_vec['lh point right']
-        ])
+        "point right stop": mismatch_all('lh point right')
     }
 }, "point right stop")
 
+
 sm_point_front = BinaryStateMachine(["point front start", "point front stop"], {
     "point front stop": {
-        "point front start": ensure_match_any([
-            posture_to_vec['lh point front'],
-            posture_to_vec['rh point front']
-        ])
+        "point front start": match_any('lh point front', 'rh point front')
     },
     "point front start": {
-        "point front stop": ensure_mismatch_all([
-            posture_to_vec['lh point front'],
-            posture_to_vec['rh point front']
-        ])
+        "point front stop": mismatch_all('lh point front', 'rh point front')
     }
 }, "point front stop")
 
+
 sm_point_down = BinaryStateMachine(["point down start", "point down stop"], {
     "point down stop": {
-        "point down start": ensure_match_any([
-            posture_to_vec['lh point down'],
-            posture_to_vec['rh point down']
-        ])
+        "point down start": match_any('lh point down', 'rh point down')
     },
     "point down start": {
-        "point down stop": ensure_mismatch_all([
-            posture_to_vec['lh point down'],
-            posture_to_vec['rh point down']
-        ])
+        "point down stop": mismatch_all('lh point down', 'rh point down')
     }
 }, "point down stop")
 
+
 sm_nack = BinaryStateMachine(["negack start", "negack stop"], {
     "negack stop": {
-        "negack start": ensure_match_any([
-            posture_to_vec['rh thumbs down'],
-            posture_to_vec['lh thumbs down'],
-            posture_to_vec['rh stop'],
-            posture_to_vec['lh stop']
-        ]),
+        "negack start": match_any('rh thumbs down', 'lh thumbs down', 'rh stop', 'lh stop')
     },
     "negack start": {
-        "negack stop": ensure_mismatch_all([
-            posture_to_vec['rh thumbs down'],
-            posture_to_vec['lh thumbs down'],
-            posture_to_vec['rh stop'],
-            posture_to_vec['lh stop']
-        ])
+        "negack stop": mismatch_all('rh thumbs down', 'lh thumbs down', 'rh stop', 'lh stop')
     }
 }, "negack stop")
 
+
 sm_grab = BinaryStateMachine(["grab start", "grab stop"], {
     "grab stop": {
-        "grab start": ensure_match_any([
-            posture_to_vec['rh claw down'],
-            posture_to_vec['lh claw down']
-        ]),
+        "grab start": match_any('rh claw down', 'lh claw down')
     },
     "grab start": {
-        "grab stop": ensure_mismatch_all([
-            posture_to_vec['rh claw down'],
-            posture_to_vec['lh claw down']
-        ])
+        "grab stop": mismatch_all('rh claw down', 'lh claw down')
     }
 }, "grab stop")
+
 
 sm_grab_move_right = BinaryStateMachine(["grab move right start", "grab move right stop"], {
     "grab move right start": {
         "grab move right stop": and_rules(
-            ensure_mismatch_any([
-                posture_to_vec['rh claw down'],
-                posture_to_vec['RA: move right']
-            ]),
-            ensure_mismatch_any([
-                posture_to_vec['lh claw down'],
-                posture_to_vec['LA: move right']
-            ])
+            mismatch_any('rh claw down', 'RA: move right'),
+            mismatch_any('lh claw down', 'LA: move right')
         )
     },
     "grab move right stop": {
         "grab move right start": or_rules(
-            ensure_match_all([
-                posture_to_vec['rh claw down'],
-                posture_to_vec['RA: move right']
-            ]),
-            ensure_match_all([
-                posture_to_vec['lh claw down'],
-                posture_to_vec['LA: move right']
-            ])
+            match_all('rh claw down', 'RA: move right'),
+            match_all('lh claw down', 'LA: move right')
         )
     }
 }, "grab move right stop")
 
+
 sm_grab_move_left = BinaryStateMachine(["grab move left start", "grab move left stop"], {
     "grab move left start": {
         "grab move left stop": and_rules(
-            ensure_mismatch_any([
-                posture_to_vec['rh claw down'],
-                posture_to_vec['RA: move left']
-            ]),
-            ensure_mismatch_any([
-                posture_to_vec['lh claw down'],
-                posture_to_vec['LA: move left']
-            ])
+            mismatch_any('rh claw down', 'RA: move left'),
+            mismatch_any('lh claw down', 'LA: move left')
         )
     },
     "grab move left stop": {
         "grab move left start": or_rules(
-            ensure_match_all([
-                posture_to_vec['rh claw down'],
-                posture_to_vec['RA: move left']
-            ]),
-            ensure_match_all([
-                posture_to_vec['lh claw down'],
-                posture_to_vec['LA: move left']
-            ])
+            match_all('rh claw down', 'RA: move left'),
+            match_all('lh claw down', 'LA: move left')
         )
     }
 }, "grab move left stop")
 
+
 sm_grab_move_up = BinaryStateMachine(["grab move up start", "grab move up stop"], {
     "grab move up start": {
         "grab move up stop": and_rules(
-            ensure_mismatch_any([
-                posture_to_vec['rh claw down'],
-                posture_to_vec['RA: move up']
-            ]),
-            ensure_mismatch_any([
-                posture_to_vec['lh claw down'],
-                posture_to_vec['LA: move up']
-            ])
+            mismatch_any('rh claw down', 'RA: move up'),
+            mismatch_any('lh claw down', 'LA: move up')
         )
     },
     "grab move up stop": {
         "grab move up start": or_rules(
-            ensure_match_all([
-                posture_to_vec['rh claw down'],
-                posture_to_vec['RA: move up']
-            ]),
-            ensure_match_all([
-                posture_to_vec['lh claw down'],
-                posture_to_vec['LA: move up']
-            ])
+            match_all('rh claw down', 'RA: move up'),
+            match_all('lh claw down', 'LA: move up')
         )
     }
 }, "grab move up stop")
 
+
 sm_grab_move_down = BinaryStateMachine(["grab move down start", "grab move down stop"], {
     "grab move down start": {
         "grab move down stop": and_rules(
-            ensure_mismatch_any([
-                posture_to_vec['rh claw down'],
-                posture_to_vec['RA: move down']
-            ]),
-            ensure_mismatch_any([
-                posture_to_vec['lh claw down'],
-                posture_to_vec['LA: move down']
-            ])
+            mismatch_any('rh claw down', 'RA: move down'),
+            mismatch_any('lh claw down', 'LA: move down')
         )
     },
     "grab move down stop": {
         "grab move down start": or_rules(
-            ensure_match_all([
-                posture_to_vec['rh claw down'],
-                posture_to_vec['RA: move down']
-            ]),
-            ensure_match_all([
-                posture_to_vec['lh claw down'],
-                posture_to_vec['LA: move down']
-            ])
+            match_all('rh claw down', 'RA: move down'),
+            match_all('lh claw down', 'LA: move down')
         )
     }
 }, "grab move down stop")
 
+
 sm_grab_move_front = BinaryStateMachine(["grab move front start", "grab move front stop"], {
     "grab move front start": {
         "grab move front stop": and_rules(
-            ensure_mismatch_any([
-                posture_to_vec['rh claw down'],
-                posture_to_vec['RA: move front']
-            ]),
-            ensure_mismatch_any([
-                posture_to_vec['lh claw down'],
-                posture_to_vec['LA: move front']
-            ])
+            mismatch_any('rh claw down', 'RA: move front'),
+            mismatch_any('lh claw down', 'LA: move front')
         )
     },
     "grab move front stop": {
         "grab move front start": or_rules(
-            ensure_match_all([
-                posture_to_vec['rh claw down'],
-                posture_to_vec['RA: move front']
-            ]),
-            ensure_match_all([
-                posture_to_vec['lh claw down'],
-                posture_to_vec['LA: move front']
-            ])
+            match_all('rh claw down', 'RA: move front'),
+            match_all('lh claw down', 'LA: move front')
         )
     }
 }, "grab move front stop")
 
+
 sm_grab_move_back = BinaryStateMachine(["grab move back start", "grab move back stop"], {
     "grab move back start": {
         "grab move back stop": and_rules(
-            ensure_mismatch_any([
-                posture_to_vec['rh claw down'],
-                posture_to_vec['RA: move back']
-            ]),
-            ensure_mismatch_any([
-                posture_to_vec['lh claw down'],
-                posture_to_vec['LA: move back']
-            ])
+            mismatch_any('rh claw down', 'RA: move back'),
+            mismatch_any('lh claw down', 'LA: move back')
         )
     },
     "grab move back stop": {
         "grab move back start": or_rules(
-            ensure_match_all([
-                posture_to_vec['rh claw down'],
-                posture_to_vec['RA: move back']
-            ]),
-            ensure_match_all([
-                posture_to_vec['lh claw down'],
-                posture_to_vec['LA: move back']
-            ])
+            match_all('rh claw down', 'RA: move back'),
+            match_all('lh claw down', 'LA: move back')
         )
     }
 }, "grab move back stop")
 
+
 sm_grab_move_right_front = BinaryStateMachine(["grab move right front start", "grab move right front stop"], {
     "grab move right front start": {
         "grab move right front stop": and_rules(
-            ensure_mismatch_any([
-                posture_to_vec['rh claw down'],
-                posture_to_vec['RA: move right front']
-            ]),
-            ensure_mismatch_any([
-                posture_to_vec['lh claw down'],
-                posture_to_vec['LA: move right front']
-            ])
+            mismatch_any('rh claw down', 'RA: move right front'),
+            mismatch_any('lh claw down', 'LA: move right front')
         )
     },
     "grab move right front stop": {
         "grab move right front start": or_rules(
-            ensure_match_all([
-                posture_to_vec['rh claw down'],
-                posture_to_vec['RA: move right front']
-            ]),
-            ensure_match_all([
-                posture_to_vec['lh claw down'],
-                posture_to_vec['LA: move right front']
-            ])
+            match_all('rh claw down', 'RA: move right front'),
+            match_all('lh claw down', 'LA: move right front')
         )
     }
 }, "grab move right front stop")
 
+
 sm_grab_move_left_front = BinaryStateMachine(["grab move left front start", "grab move left front stop"], {
     "grab move left front start": {
         "grab move left front stop": and_rules(
-            ensure_mismatch_any([
-                posture_to_vec['rh claw down'],
-                posture_to_vec['RA: move left front']
-            ]),
-            ensure_mismatch_any([
-                posture_to_vec['lh claw down'],
-                posture_to_vec['LA: move left front']
-            ])
+            mismatch_any('rh claw down', 'RA: move left front'),
+            mismatch_any('lh claw down', 'LA: move left front')
         )
     },
     "grab move left front stop": {
         "grab move left front start": or_rules(
-            ensure_match_all([
-                posture_to_vec['rh claw down'],
-                posture_to_vec['RA: move left front']
-            ]),
-            ensure_match_all([
-                posture_to_vec['lh claw down'],
-                posture_to_vec['LA: move left front']
-            ])
+            match_all('rh claw down', 'RA: move left front'),
+            match_all('lh claw down', 'LA: move left front')
         )
     }
 }, "grab move left front stop")
 
+
 sm_grab_move_left_back = BinaryStateMachine(["grab move left back start", "grab move left back stop"], {
     "grab move left back start": {
         "grab move left back stop": and_rules(
-            ensure_mismatch_any([
-                posture_to_vec['rh claw down'],
-                posture_to_vec['RA: move left back']
-            ]),
-            ensure_mismatch_any([
-                posture_to_vec['lh claw down'],
-                posture_to_vec['LA: move left back']
-            ])
+            mismatch_any('rh claw down', 'RA: move left back'),
+            mismatch_any('lh claw down', 'LA: move left back')
         )
     },
     "grab move left back stop": {
         "grab move left back start": or_rules(
-            ensure_match_all([
-                posture_to_vec['rh claw down'],
-                posture_to_vec['RA: move left back']
-            ]),
-            ensure_match_all([
-                posture_to_vec['lh claw down'],
-                posture_to_vec['LA: move left back']
-            ])
+            match_all('rh claw down', 'RA: move left back'),
+            match_all('lh claw down', 'LA: move left back')
         )
     }
 }, "grab move left back stop")
 
+
 sm_grab_move_right_back = BinaryStateMachine(["grab move right back start", "grab move right back stop"], {
     "grab move right back start": {
         "grab move right back stop": and_rules(
-            ensure_mismatch_any([
-                posture_to_vec['rh claw down'],
-                posture_to_vec['RA: move right back']
-            ]),
-            ensure_mismatch_any([
-                posture_to_vec['lh claw down'],
-                posture_to_vec['LA: move right back']
-            ])
+            mismatch_any('rh claw down', 'RA: move right back'),
+            mismatch_any('lh claw down', 'LA: move right back')
         )
     },
     "grab move right back stop": {
         "grab move right back start": or_rules(
-            ensure_match_all([
-                posture_to_vec['rh claw down'],
-                posture_to_vec['RA: move right back']
-            ]),
-            ensure_match_all([
-                posture_to_vec['lh claw down'],
-                posture_to_vec['LA: move right back']
-            ])
+            match_all('rh claw down', 'RA: move right back'),
+            match_all('lh claw down', 'LA: move right back')
         )
     }
 }, "grab move right back stop")
 
+
 sm_push_left = BinaryStateMachine(["push left start", "push left stop"], {
     "push left start": {
         "push left stop": or_rules(
-            ensure_mismatch_all([
-                posture_to_vec['rh closed left'],
-                posture_to_vec['rh open left']
-            ]),
-            ensure_mismatch_any([
-                posture_to_vec['RA: move left']
-            ])
+            mismatch_all('rh closed left', 'rh open left'),
+            mismatch_any('RA: move left')
         )
     },
     "push left stop": {
         "push left start": and_rules(
-            ensure_match_any([
-                posture_to_vec['rh closed left'],
-                posture_to_vec['rh open left']
-            ]),
-            ensure_match_all([
-                posture_to_vec['RA: move left']
-            ])
+            match_any('rh closed left', 'rh open left'),
+            match_all('RA: move left')
         )
     }
 }, "push left stop")
 
+
 sm_push_right = BinaryStateMachine(["push right start", "push right stop"], {
     "push right start": {
         "push right stop": or_rules(
-            ensure_mismatch_all([
-                posture_to_vec['lh closed right'],
-                posture_to_vec['lh open right']
-            ]),
-            ensure_mismatch_any([
-                posture_to_vec['LA: move right']
-            ])
+            mismatch_all('lh closed right', 'lh open right'),
+            mismatch_any('LA: move right')
         )
     },
     "push right stop": {
         "push right start": and_rules(
-            ensure_match_any([
-                posture_to_vec['lh closed right'],
-                posture_to_vec['lh open right']
-            ]),
-            ensure_match_all([
-                posture_to_vec['LA: move right']
-            ])
+            match_any('lh closed right', 'lh open right'),
+            match_all('LA: move right')
         )
     }
 }, "push right stop")
 
+
 sm_push_front = BinaryStateMachine(["push front start", "push front stop"], {
     "push front start": {
         "push front stop": and_rules(
-            ensure_mismatch_any([
-                posture_to_vec['rh closed front'],
-                posture_to_vec['RA: move front']
-            ]),
-            ensure_mismatch_any([
-                posture_to_vec['lh closed front'],
-                posture_to_vec['LA: move front']
-            ])
+            mismatch_any('rh closed front', 'RA: move front'),
+            mismatch_any('lh closed front', 'LA: move front')
         )
     },
     "push front stop": {
         "push front start": or_rules(
-            ensure_match_all([
-                posture_to_vec['rh closed front'],
-                posture_to_vec['RA: move front']
-            ]),
-            ensure_match_all([
-                posture_to_vec['lh closed front'],
-                posture_to_vec['LA: move front']
-            ])
+            match_all('rh closed front', 'RA: move front'),
+            match_all('lh closed front', 'LA: move front')
         )
     }
 }, "push front stop")
+
 
 sm_push_back = BinaryStateMachine(["push back start", "push back stop"], {
     "push back start": {
         "push back stop": and_rules(
             or_rules(
-                ensure_mismatch_all([
-                    posture_to_vec['rh open back'],
-                    posture_to_vec['rh closed back']
-                ]),
-                ensure_mismatch_any([
-                    posture_to_vec['RA: move back']
-                ])
+                mismatch_all('rh open back', 'rh closed back'),
+                mismatch_any('RA: move back')
             ),
             or_rules(
-                ensure_mismatch_all([
-                    posture_to_vec['lh open back'],
-                    posture_to_vec['lh closed back']
-                ]),
-                ensure_mismatch_any([
-                    posture_to_vec['LA: move back']
-                ])
+                mismatch_all('lh open back', 'lh closed back'),
+                mismatch_any('LA: move back')
             ),
-            ensure_mismatch_all([
-                posture_to_vec['rh beckon'],
-                posture_to_vec['lh beckon']
-            ])
+            mismatch_all('rh beckon', 'lh beckon')
         )
     },
     "push back stop": {
         "push back start": or_rules(
             and_rules(
-                ensure_match_any([
-                    posture_to_vec['rh open back'],
-                    posture_to_vec['rh closed back']
-                ]),
-                ensure_match_all([
-                    posture_to_vec['RA: move back']
-                ])
+                match_any('rh open back', 'rh closed back'),
+                match_all('RA: move back')
             ),
             and_rules(
-                ensure_match_any([
-                    posture_to_vec['lh open back'],
-                    posture_to_vec['lh closed back']
-                ]),
-                ensure_match_all([
-                    posture_to_vec['LA: move back']
-                ])
+                match_any('lh open back', 'lh closed back'),
+                match_all('LA: move back')
             ),
-            ensure_match_any([
-                posture_to_vec['rh beckon'],
-                posture_to_vec['lh beckon']
-            ])
+            match_any('rh beckon', 'lh beckon')
         )
     }
 }, "push back stop")
 
+
 sm_count_one = BinaryStateMachine(["count one start", "count one stop"], {
     "count one stop": {
-        "count one start": ensure_match_any([
-            posture_to_vec['rh one front'],
-            posture_to_vec['lh one front']
-        ])
+        "count one start": match_any('rh one front', 'lh one front')
     },
     "count one start": {
-        "count one stop": ensure_mismatch_all([
-            posture_to_vec['rh one front'],
-            posture_to_vec['lh one front']
-        ])
+        "count one stop": mismatch_all('rh one front', 'lh one front')
     }
 }, "count one stop")
 
+
 sm_count_two = BinaryStateMachine(["count two start", "count two stop"], {
     "count two stop": {
-        "count two start": ensure_match_any([
-            posture_to_vec['rh two front'],
-            posture_to_vec['rh two back'],
-            posture_to_vec['lh two front'],
-            posture_to_vec['lh two back']
-        ])
+        "count two start": match_any('rh two front', 'rh two back', 'lh two front', 'lh two back')
     },
     "count two start": {
-        "count two stop": ensure_mismatch_all([
-            posture_to_vec['rh two front'],
-            posture_to_vec['rh two back'],
-            posture_to_vec['lh two front'],
-            posture_to_vec['lh two back']
-        ])
+        "count two stop": mismatch_all('rh two front', 'rh two back', 'lh two front', 'lh two back')
     }
 }, "count two stop")
 
+
 sm_count_three = BinaryStateMachine(["count three start", "count three stop"], {
     "count three stop": {
-        "count three start": ensure_match_any([
-            posture_to_vec['rh three front'],
-            posture_to_vec['rh three back'],
-            posture_to_vec['lh three front'],
-            posture_to_vec['lh three back']
-        ])
+        "count three start": match_any('rh three front', 'rh three back', 'lh three front', 'lh three back')
     },
     "count three start": {
-        "count three stop": ensure_mismatch_all([
-            posture_to_vec['rh three front'],
-            posture_to_vec['rh three back'],
-            posture_to_vec['lh three front'],
-            posture_to_vec['lh three back']
-        ])
+        "count three stop": mismatch_all('rh three front', 'rh three back', 'lh three front', 'lh three back')
     }
 }, "count three stop")
 
+
 sm_count_four = BinaryStateMachine(["count four start", "count four stop"], {
     "count four stop": {
-        "count four start": ensure_match_any([
-            posture_to_vec['rh four front'],
-            posture_to_vec['lh four front']
-        ])
+        "count four start": match_any('rh four front', 'lh four front')
     },
     "count four start": {
-        "count four stop": ensure_mismatch_all([
-            posture_to_vec['rh four front'],
-            posture_to_vec['lh four front']
-        ])
+        "count four stop": mismatch_all('rh four front', 'lh four front')
     }
 }, "count four stop")
 
+
 sm_count_five = BinaryStateMachine(["count five start", "count five stop"], {
     "count five stop": {
-        "count five start": ensure_match_any([
-            posture_to_vec['rh five front'],
-            posture_to_vec['lh five front']
-        ])
+        "count five start": match_any('rh five front', 'lh five front')
     },
     "count five start": {
-        "count five stop": ensure_mismatch_all([
-            posture_to_vec['rh five front'],
-            posture_to_vec['lh five front']
-        ])
+        "count five stop": mismatch_all('rh five front', 'lh five front')
     }
 }, "count five stop")
 
+
 sm_arms_apart_X = BinaryStateMachine(["arms apart X start", "arms apart X stop"], {
     "arms apart X stop": {
-        "arms apart X start": ensure_match_all([
-            posture_to_vec['LA: apart X'],
-            posture_to_vec['RA: apart X']
-        ])
+        "arms apart X start": match_all('LA: apart X', 'RA: apart X')
     },
     "arms apart X start": {
-        "arms apart X stop": ensure_mismatch_any([
-            posture_to_vec['LA: apart X'],
-            posture_to_vec['RA: apart X']
-        ])
+        "arms apart X stop": mismatch_any('LA: apart X', 'RA: apart X')
     }
 }, "arms apart X stop")
 
+
 sm_arms_together_X = BinaryStateMachine(["arms together X start", "arms together X stop"], {
     "arms together X stop": {
-        "arms together X start": ensure_match_all([
-            posture_to_vec['LA: together X'],
-            posture_to_vec['RA: together X']
-        ])
+        "arms together X start": match_all('LA: together X', 'RA: together X')
     },
     "arms together X start": {
-        "arms together X stop": ensure_mismatch_any([
-            posture_to_vec['LA: together X'],
-            posture_to_vec['RA: together X']
-        ])
+        "arms together X stop": mismatch_any('LA: together X', 'RA: together X')
     }
 }, "arms together X stop")
 
+
 sm_arms_apart_Y = BinaryStateMachine(["arms apart Y start", "arms apart Y stop"], {
     "arms apart Y stop": {
-        "arms apart Y start": ensure_match_all([
-            posture_to_vec['LA: apart Y'],
-            posture_to_vec['RA: apart Y']
-        ])
+        "arms apart Y start": match_all('LA: apart Y', 'RA: apart Y')
     },
     "arms apart Y start": {
-        "arms apart Y stop": ensure_mismatch_any([
-            posture_to_vec['LA: apart Y'],
-            posture_to_vec['RA: apart Y']
-        ])
+        "arms apart Y stop": mismatch_any('LA: apart Y', 'RA: apart Y')
     }
 }, "arms apart Y stop")
 
+
 sm_arms_together_Y = BinaryStateMachine(["arms together Y start", "arms together Y stop"], {
     "arms together Y stop": {
-        "arms together Y start": ensure_match_all([
-            posture_to_vec['LA: together Y'],
-            posture_to_vec['RA: together Y']
-        ])
+        "arms together Y start": match_all('LA: together Y', 'RA: together Y')
     },
     "arms together Y start": {
-        "arms together Y stop": ensure_mismatch_any([
-            posture_to_vec['LA: together Y'],
-            posture_to_vec['RA: together Y']
-        ])
+        "arms together Y stop": mismatch_any('LA: together Y', 'RA: together Y')
     }
 }, "arms together Y stop")
 
