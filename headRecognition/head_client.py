@@ -6,6 +6,8 @@ import cv2
 import sys
 import numpy as np
 from collections import deque
+
+from realtime_head_recognition import RealTimeHeadRecognition
 from support.constants import *
 import matplotlib.pyplot as plt
 
@@ -85,6 +87,8 @@ if __name__ == '__main__':
     kinect_socket = connect()
     #fusion_socket = connect("Fusion")
 
+    head_classifier = RealTimeHeadRecognition(3)
+
     index = 0
     start_time = time.time()
     window = deque(maxlen=30)
@@ -99,8 +103,6 @@ if __name__ == '__main__':
 
         timestamp, depth_head_count, head_pos, head_width, head_height, head_depth_data = decoded_frame
 
-        print timestamp,
-
         if depth_head_count>0:
             head = np.array(head_depth_data, dtype=np.float32).reshape((head_height, head_width))
             head = cv2.resize(head, (168, 168))
@@ -112,7 +114,6 @@ if __name__ == '__main__':
             head *= 127.5
 
             window.append(head)
-            print len(window)
 
             if len(window)==30:
                 new_window = [window[0]]
@@ -122,7 +123,8 @@ if __name__ == '__main__':
                 new_window = [n/255.0 for n in new_window]
 
                 new_window = np.rollaxis(np.stack(new_window), 0, 3)[np.newaxis,:,:,:]
-                print new_window.shape
+
+                print timestamp, head_classifier.classify(new_window)
 
                 if index%100 == 0:
                     count = 1

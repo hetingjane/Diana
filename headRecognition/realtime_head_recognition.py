@@ -5,7 +5,7 @@ import os
 
 os.environ["CUDA_VISIBLE_DEVICES"]="0"
 
-class RealTimeHandRecognition():
+class RealTimeHeadRecognition():
     def __init__(self, gestures):
 
         hps = resnet_model_half_weights.HParams(batch_size=1,
