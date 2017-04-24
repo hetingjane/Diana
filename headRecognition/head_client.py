@@ -89,6 +89,8 @@ if __name__ == '__main__':
 
     head_classifier = RealTimeHeadRecognition(3)
 
+    gesture_list = ["nod", "shake","other"]
+
     index = 0
     start_time = time.time()
     window = deque(maxlen=30)
@@ -124,7 +126,8 @@ if __name__ == '__main__':
 
                 new_window = np.rollaxis(np.stack(new_window), 0, 3)[np.newaxis,:,:,:]
 
-                print timestamp, head_classifier.classify(new_window)
+                gesture_index, prob = head_classifier.classify(new_window)
+                print timestamp, gesture_list[gesture_index], prob
 
                 if index%100 == 0:
                     count = 1
