@@ -65,8 +65,8 @@ class ThreadedClient:
             print event
             event_list.append(event)
 
-        probabilities = self.receive_all(struct.calcsize("!76f"))
-        probabilities = list(struct.unpack("!76f", probabilities))
+        probabilities = self.receive_all(struct.calcsize("!79f"))
+        probabilities = list(struct.unpack("!79f", probabilities))
         decoded_frame =  probabilities + event_list
         return decoded_frame
 

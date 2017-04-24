@@ -77,11 +77,11 @@ class MyTabWidget(QWidget):
         except Queue.Empty:
             return
 
-        y1 = decoded_probs[44:]#RH
+        y1 = decoded_probs[44:76]#RH
         y2 = decoded_probs[12:44]#LH
         y3 = decoded_probs[:6] #LA
         y4 = decoded_probs[6:12]#RA
-        y5 = np.random.rand(3)
+        y5 = decoded_probs[76:]#Head
 
         y3 = [1-sum(y3)]+y3
         y4 = [1 - sum(y4)] + y4
@@ -217,7 +217,7 @@ class MyTabWidget(QWidget):
         self.ra_gestures = ['still','ra move right','ra move left','ra move up','ra move down','ra move back','ra move front']
         self.la_gestures = ['still', 'la move right', 'la move left', 'la move up', 'la move down',  'la move back', 'la move front']
 
-        self.head_gestures = ['still', 'nod', 'shake']
+        self.head_gestures = ['nod', 'shake', 'other']
 
         lh_gestures = [l.replace("lh ", "") for l in self.lh_gestures]
         rh_gestures = [r.replace("rh ", "") for r in self.rh_gestures]
