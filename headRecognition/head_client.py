@@ -129,15 +129,5 @@ if __name__ == '__main__':
                 gesture_index, prob = head_classifier.classify(new_window)
                 print timestamp, gesture_list[gesture_index], prob
 
-                if index%100 == 0:
-                    count = 1
-                    for i in range(5):
-                        for j in range(6):
-                            plt.subplot(5, 6, count)
-                            plt.imshow(new_window[0,:,:,count-1], vmin=-1.0, vmax=1.0)
-                            plt.colorbar()
-                            count += 1
-                    plt.show()
-
 
             index += 1
