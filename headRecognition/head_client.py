@@ -106,7 +106,7 @@ if __name__ == '__main__':
 
         timestamp, depth_head_count, head_pos, head_width, head_height, head_depth_data = decoded_frame
 
-        if depth_head_count>0:
+        if depth_head_count>0 and head_depth_data:
             head = np.array(head_depth_data, dtype=np.float32).reshape((head_height, head_width))
             head = cv2.resize(head, (168, 168))
             head = head[20:-20, 20:-20]
