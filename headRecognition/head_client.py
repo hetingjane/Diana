@@ -87,8 +87,6 @@ if __name__ == '__main__':
     kinect_socket = connect()
     fusion_socket = connect("Fusion")
 
-    id = 8
-
     gesture_list = ["nod", "shake","other"]
     num_gestures = len(gesture_list)
 
@@ -132,7 +130,7 @@ if __name__ == '__main__':
                 gesture_index, probs = head_classifier.classify(new_window)
                 print timestamp, gesture_list[gesture_index], probs
 
-                pack_list = [id, timestamp, gesture_index] + list(probs)
+                pack_list = [FUSION_HEAD_ID, timestamp, gesture_index] + list(probs)
 
                 bytes = struct.pack("!iqi" + "f" * num_gestures, *pack_list)
 
