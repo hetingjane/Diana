@@ -177,9 +177,8 @@ if __name__ == '__main__':
             print "="*100,"FPS",100/(time.time()-start_time)
             start_time = time.time()
 
-        #timestamp = i-1
+
         pack_list = [id,timestamp,max_index]+list(probs)
-        #print pack_list
 
         bytes = struct.pack("!iqi"+"f"*num_gestures, *pack_list)
 
