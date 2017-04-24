@@ -139,5 +139,8 @@ if __name__ == '__main__':
                 if fusion_socket is not None:
                     fusion_socket.send(bytes)
 
-
             index += 1
+
+    kinect_socket.close()
+    if fusion_socket is not None:
+        fusion_socket.close()
