@@ -22,12 +22,12 @@ def prune_joints(data, body_part='RA'):
     elif (body_part=='LA'):
         joints = [4, 5, 6] #all 17 joints considered, x values taken, thus dimensioanlity = 17
         points = list(chain(*[[(i * 3), (i * 3 + 1), (i * 3 + 2)] for i in joints]))
-    elif (body_part=='torso'):
-        joints = [0, 4, 8, 12] #all 17 joints considered, y values taken, thus dimensioanlity = 17
-        points = list(chain(*[[(i * 3), (i * 3 + 1), (i * 3 + 2)] for i in joints]))
-    elif (body_part=='head'):
-        joints = [2, 3, 12] #all 17 joints considered, z values taken, thus dimensioanlity = 17
-        points = list(chain(*[[(i * 3), (i * 3 + 1), (i * 3 + 2)] for i in joints]))
+    elif (body_part == 'arms_x'):
+        joints = [5, 6, 7, 9, 10, 11]  # 3 joints of right and left hand considered: (hand, elbow and wrist) only x : dimensionality = 6
+        points = list(chain(*[[(i * 3)] for i in joints])) #points = list(chain(*[[(i * 3), (i * 3 + 1), (i * 3 + 2)] for i in joints]))
+    elif (body_part == 'arms_y'):
+        joints = [5, 6, 7, 9, 10, 11]  # 3 joints of right and left hand considered: (hand, elbow and wrist) only x : dimensionality = 6
+        points = list(chain(*[[(i * 3 + 1)] for i in joints])) #points = list(chain(*[[(i * 3), (i * 3 + 1), (i * 3 + 2)] for i in joints]))
     return data[:, points]
 
 

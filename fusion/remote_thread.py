@@ -48,8 +48,8 @@ class Remote(threading.Thread):
             try:
                 read_socks, write_socks, except_socks = select.select(inputs, outputs, excepts, 0.02)
             except socket.error:
-                # Only input is remote_sock
-                self._log("Problem in the server socket" + str(remote_sock.getsockname()) + ". Stopping ...")
+                # Only input is server socket, so exit if there is a problem
+                self._log("Problem in the server socket. Stopping ...")
                 sys.exit(0)
 
             for s in read_socks:
@@ -65,21 +65,22 @@ class Remote(threading.Thread):
                         self._log("Rejected connection attempt by {}:{}".format(client_addr[0], client_addr[1]))
                         client_sock.close()
 
-            for s in write_socks:
-                while True:
-                    try:
-                        data = self.input_queue.get_nowait()
+            while True:
+                try:
+                    data = self.input_queue.get_nowait()
+
+                    for s in write_socks:
                         try:
                             s.sendall(data)
                         except (socket.error, EOFError):
+                            outputs.remove(s)
+                            if len(outputs) == 0:
+                                self._conn.clear()
+                            # Strictly for single client context only
                             self._log(self.client + " disconnected.")
                             self.client = ""
-                            outputs.remove(s)
-                            self._conn.clear()
-                            break
-
-                    except Queue.Empty:
-                        break
+                except Queue.Empty:
+                    break
 
         self._log("Stopped")
 
