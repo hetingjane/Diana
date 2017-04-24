@@ -77,19 +77,22 @@ def recv_all(sock, size):
         result += data
     return result
 
+
 def recv_depth_frame(sock):
     (frame_size,) = struct.unpack("!i", recv_all(sock, 4))
     return recv_all(sock, frame_size)
 
 
-
 if __name__ == '__main__':
     kinect_socket = connect()
-    #fusion_socket = connect("Fusion")
+    fusion_socket = connect("Fusion")
 
-    head_classifier = RealTimeHeadRecognition(3)
+    id = 8
 
     gesture_list = ["nod", "shake","other"]
+    num_gestures = len(gesture_list)
+
+    head_classifier = RealTimeHeadRecognition(num_gestures)
 
     index = 0
     start_time = time.time()
@@ -126,8 +129,15 @@ if __name__ == '__main__':
 
                 new_window = np.rollaxis(np.stack(new_window), 0, 3)[np.newaxis,:,:,:]
 
-                gesture_index, prob = head_classifier.classify(new_window)
-                print timestamp, gesture_list[gesture_index], prob
+                gesture_index, probs = head_classifier.classify(new_window)
+                print timestamp, gesture_list[gesture_index], probs
+
+                pack_list = [id, timestamp, gesture_index] + list(probs)
+
+                bytes = struct.pack("!iqi" + "f" * num_gestures, *pack_list)
+
+                if fusion_socket is not None:
+                    fusion_socket.send(bytes)
 
 
             index += 1
