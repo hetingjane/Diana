@@ -28,7 +28,6 @@ class App(QMainWindow):
         self.tab_widget = MyTabWidget(self, queue)
         self.setCentralWidget(self.tab_widget)
 
-
         self.show()
 
 
@@ -72,8 +71,8 @@ class MyTabWidget(QWidget):
     def update(self):
         try:
             msg = self.queue.get(0)
-            decoded_probs = msg[:76]
-            events_list = msg[76:]
+            decoded_probs = msg[:79]
+            events_list = msg[79:]
         except Queue.Empty:
             return
 
