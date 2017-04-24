@@ -5,6 +5,7 @@ import gzip
 import cv2
 import sys
 import numpy as np
+from collections import deque
 from support.constants import *
 import matplotlib.pyplot as plt
 
@@ -87,8 +88,8 @@ if __name__ == '__main__':
     #fusion_socket = connect("Fusion")
 
     i = 0
-
     start_time = time.time()
+    window = deque(maxlen=30)
     while True:
         try:
             frame = recv_depth_frame(kinect_socket)
@@ -109,5 +110,26 @@ if __name__ == '__main__':
             head -= head_pos[2]
             head /= 150
 
-            plt.imshow(head)
-            plt.show()
+            head += 1
+            head *= 127.5
+
+            window.append(head)
+            print len(window)
+
+            if len(window)==30:
+                new_window = [window[0]]
+                for i in range(1,30):
+                    new_window.append(window[i]-window[i-1])
+
+                new_window = [n/255.0 for n in new_window]
+                count = 1
+                for i in range(5):
+                    for j in range(6):
+                        plt.subplot(5, 6, count)
+                        plt.imshow(new_window[count-1], vmin=-1.0, vmax=1.0)
+                        plt.colorbar()
+                        count += 1
+                plt.show()
+
+            #plt.imshow(head)
+            #plt.show()
