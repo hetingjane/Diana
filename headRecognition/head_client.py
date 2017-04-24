@@ -77,8 +77,6 @@ def recv_all(sock, size):
 
 def recv_depth_frame(sock):
     (frame_size,) = struct.unpack("!i", recv_all(sock, 4))
-    print "FS", frame_size
-
     return recv_all(sock, frame_size)
 
 
@@ -87,7 +85,7 @@ if __name__ == '__main__':
     kinect_socket = connect()
     #fusion_socket = connect("Fusion")
 
-    i = 0
+    index = 0
     start_time = time.time()
     window = deque(maxlen=30)
     while True:
@@ -101,7 +99,7 @@ if __name__ == '__main__':
 
         timestamp, depth_head_count, head_pos, head_width, head_height, head_depth_data = decoded_frame
 
-        print timestamp
+        print timestamp,
 
         if depth_head_count>0:
             head = np.array(head_depth_data, dtype=np.float32).reshape((head_height, head_width))
@@ -122,14 +120,19 @@ if __name__ == '__main__':
                     new_window.append(window[i]-window[i-1])
 
                 new_window = [n/255.0 for n in new_window]
-                count = 1
-                for i in range(5):
-                    for j in range(6):
-                        plt.subplot(5, 6, count)
-                        plt.imshow(new_window[count-1], vmin=-1.0, vmax=1.0)
-                        plt.colorbar()
-                        count += 1
-                plt.show()
 
-            #plt.imshow(head)
-            #plt.show()
+                new_window = np.rollaxis(np.stack(new_window), 0, 3)[np.newaxis,:,:,:]
+                print new_window.shape
+
+                if index%100 == 0:
+                    count = 1
+                    for i in range(5):
+                        for j in range(6):
+                            plt.subplot(5, 6, count)
+                            plt.imshow(new_window[0,:,:,count-1], vmin=-1.0, vmax=1.0)
+                            plt.colorbar()
+                            count += 1
+                    plt.show()
+
+
+            index += 1
