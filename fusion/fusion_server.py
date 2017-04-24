@@ -5,7 +5,7 @@ import time
 import sys
 
 from conf import streams
-from conf.postures import left_hand_postures, right_hand_postures, left_arm_motions, right_arm_motions
+from conf.postures import left_hand_postures, right_hand_postures, left_arm_motions, right_arm_motions, head_postures
 from fusion_thread import Fusion
 from remote_thread import Remote
 from automata.state_machine import BinaryStateMachine
@@ -138,19 +138,22 @@ class App:
         right_hand_label = self.latest_data[streams.get_stream_id("RH")][2]
         left_arm_label = self.latest_data[streams.get_stream_id("Body")][2]
         right_arm_label = self.latest_data[streams.get_stream_id("Body")][3]
+        head_label = self.latest_data[streams.get_stream_id("Head")][2]
 
         left_hand_gesture_received = left_hand_postures[left_hand_label]
         right_hand_gesture_received = right_hand_postures[right_hand_label]
         left_arm_movement_received = left_arm_motions[left_arm_label]
         right_arm_movement_received = right_arm_motions[right_arm_label]
+        head_gesture_received = head_postures[head_label]
 
         # Convert integer labels to one hot representations
         left_hand_vec = posture_to_vec[left_hand_gesture_received]
         right_hand_vec = posture_to_vec[right_hand_gesture_received]
         left_arm_vec = posture_to_vec[left_arm_movement_received]
         right_arm_vec = posture_to_vec[right_arm_movement_received]
+        head_vec = posture_to_vec[head_gesture_received]
 
-        combined_vec = engage_vec | left_hand_vec | right_hand_vec | left_arm_vec | right_arm_vec
+        combined_vec = engage_vec | left_hand_vec | right_hand_vec | left_arm_vec | right_arm_vec | head_vec
 
         # More than one output data is possible from multiple state machines
         all_events_to_send = []
@@ -184,8 +187,9 @@ class App:
         body_probs = self.latest_data[streams.get_stream_id("Body")][-13:-1]
         lhand_probs = self.latest_data[streams.get_stream_id("LH")][-len(left_hand_postures):]
         rhand_probs = self.latest_data[streams.get_stream_id("RH")][-len(right_hand_postures):]
+        head_probs = self.latest_data[streams.get_stream_id("Head")][-len(head_postures):]
 
-        all_probs = body_probs + lhand_probs + rhand_probs
+        all_probs = body_probs + lhand_probs + rhand_probs + head_probs
 
         return struct.pack("!" + str(len(all_probs)) + "f", *all_probs)
 
@@ -313,8 +317,8 @@ def or_rules(*rules):
 
 # Create vector form for each posture
 engage_vec = [ 1 << 0 ]
-vecs = engage_vec + [1 << i for i in range(1, len(left_hand_postures + right_hand_postures + left_arm_motions + right_arm_motions) + 1)]
-postures = ["engage"] + left_hand_postures + right_hand_postures + left_arm_motions + right_arm_motions
+vecs = engage_vec + [1 << i for i in range(1, len(left_hand_postures + right_hand_postures + left_arm_motions + right_arm_motions + head_postures) + 1)]
+postures = ["engage"] + left_hand_postures + right_hand_postures + left_arm_motions + right_arm_motions + head_postures
 
 vec_to_posture = dict(zip(vecs, postures))
 posture_to_vec = dict(zip(postures, vecs))
@@ -726,6 +730,23 @@ sm_arms_together_Y = BinaryStateMachine(["arms together Y start", "arms together
     }
 }, "arms together Y stop")
 
+sm_head_nod = BinaryStateMachine(["head nod start", "head nod stop"], {
+    "head nod stop": {
+        "head nod start": match_all('head: nod')
+    },
+    "head nod start": {
+        "head nod stop": mismatch_all('head: nod')
+    }
+}, "head nod stop")
+
+sm_head_shake= BinaryStateMachine(["head shake start", "head shake stop"], {
+    "head shake stop": {
+        "head shake start": match_all('head: shake')
+    },
+    "head shake start": {
+        "head shake stop": mismatch_all('head: shake')
+    }
+}, "head shake stop")
 
 brandeis_events = [ sm_engage, sm_ack , sm_point_left, sm_point_right, sm_point_front, sm_point_down, sm_nack, sm_grab,
                     sm_grab_move_right, sm_grab_move_left, sm_grab_move_up, sm_grab_move_down,
@@ -742,7 +763,8 @@ csu_events = [ sm_engage, sm_ack , sm_point_left, sm_point_right, sm_point_front
                sm_push_left, sm_push_right, sm_push_back, sm_push_front,
 
                sm_count_one, sm_count_two, sm_count_three, sm_count_four, sm_count_five,
-               sm_arms_together_X, sm_arms_apart_X, sm_arms_together_Y, sm_arms_apart_Y ]
+               sm_arms_together_X, sm_arms_apart_X, sm_arms_together_Y, sm_arms_apart_Y,
+               sm_head_nod, sm_head_shake]
 
 import argparse
 if __name__ == '__main__':

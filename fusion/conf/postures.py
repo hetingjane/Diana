@@ -47,3 +47,5 @@ right_arm_motions = ['RA: move right', 'RA: move left', 'RA: move up', 'RA: move
                      'RA: move right down back', 'RA: move right down front', 'RA: move left up back',
                      'RA: move left up front', 'RA: move left down back', 'RA: move left down front', 'RA: still',
                      'RA: apart X', 'RA: together X', 'RA: apart Y', 'RA: together Y']
+
+head_postures = ['head: nod', 'head: shake', 'other']

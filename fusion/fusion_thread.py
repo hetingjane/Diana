@@ -3,7 +3,7 @@ import socket
 import struct
 
 from conf import streams
-from conf.postures import right_hand_postures
+from conf.postures import right_hand_postures, head_postures
 from thread_sync import *
 
 
@@ -47,11 +47,18 @@ class Fusion(threading.Thread):
         raw_data = self._recv_all(sock, struct.calcsize(data_format))
         return struct.unpack(data_format, raw_data)
 
+    def _read_head_data(self, sock):
+        data_format = "!" + "i" + "f" * len(head_postures)
+        raw_data = self._recv_all(sock, struct.calcsize(data_format))
+        return struct.unpack(data_format, raw_data)
+
     def _read_stream_data(self, sock, stream_id):
         if streams.get_stream_type(stream_id) in ["LH", "RH"]:
             return self._read_hands_data(sock)
         elif streams.get_stream_type(stream_id) == "Body":
             return self._read_body_data(sock)
+        elif streams.get_stream_type(stream_id) == "Head":
+            return self._read_head_data(sock)
 
     def _handle_client(self, sock):
         stream_type, timestamp = self._read_stream_header(sock)
