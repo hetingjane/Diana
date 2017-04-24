@@ -49,6 +49,10 @@ class ThreadedClient:
             result += data
         return result
 
+    def map_events(self, event):
+        event = event.replace("grab move", "carry")
+        event = event.replace("push back", "pull")
+        return event
 
     def receive(self):
         events = self.receive_all(struct.calcsize("!i"))
@@ -61,7 +65,7 @@ class ThreadedClient:
 
             event = self.receive_all(event_length)
 
-            event = struct.unpack("!" + str(event_length) + "s", event)[0]
+            event = self.map_events(struct.unpack("!" + str(event_length) + "s", event)[0])
             print event
             event_list.append(event)
 
