@@ -81,8 +81,8 @@ class MyTabWidget(QWidget):
         except Queue.Empty:
             return
 
-        y1 = decoded_probs[44:76]#RH
-        y2 = decoded_probs[12:44]#LH
+        y1 = np.array(decoded_probs[44:76])[self.shuffle_indices]#RH
+        y2 = np.array(decoded_probs[12:44])[self.shuffle_indices]#LH
         y3 = decoded_probs[:6] #LA
         y4 = decoded_probs[6:12]#RA
         y5 = decoded_probs[76:]#Head
@@ -198,23 +198,26 @@ class MyTabWidget(QWidget):
         self.la.rotate(-90)
         self.head.rotate(-90)
 
-        self.lh_gestures = ['blank', 'hands together', 'other', 'lh beckon', 'lh claw down',
+        self.shuffle_indices = [7, 4, 5, 6, 10, 8, 9, 11, 18, 19, 20, 21, 22, 23, 28, 27, 17, 31, 30, 26, 25, 14, 13, 24,
+                           12, 15, 16, 3, 29, 1, 0, 2]
+
+        self.lh_gestures = np.array(['blank', 'hands together', 'other', 'lh beckon', 'lh claw down',
                        'lh claw front', 'lh claw right', 'lh claw up', 'lh closed back',
                        'lh closed down', 'lh closed front', 'lh closed right', 'lh fist',
                        'lh five front', 'lh four front', 'lh inch', 'lh l', 'lh one front',
                        'lh open back', 'lh open down', 'lh open right', 'lh point down',
                        'lh point front', 'lh point right', 'lh stop', 'lh three back',
                        'lh three front', 'lh thumbs down', 'lh thumbs up', 'lh to face',
-                       'lh two back', 'lh two front']
+                       'lh two back', 'lh two front'])[self.shuffle_indices]
 
-        self.rh_gestures = ['blank', 'hands together', 'other', 'rh beckon', 'rh claw down',
+        self.rh_gestures = np.array(['blank', 'hands together', 'other', 'rh beckon', 'rh claw down',
                        'rh claw front', 'rh claw left', 'rh claw up', 'rh closed back',
                        'rh closed down', 'rh closed front', 'rh closed left', 'rh fist',
                        'rh five front', 'rh four front', 'rh inch', 'rh l', 'rh one front',
                        'rh open back', 'rh open down', 'rh open left', 'rh point down',
                        'rh point front', 'rh point left', 'rh stop', 'rh three back',
                        'rh three front', 'rh thumbs down', 'rh thumbs up', 'rh to face',
-                       'rh two back', 'rh two front']
+                       'rh two back', 'rh two front'])[self.shuffle_indices]
 
         self.ra_gestures = ['still','ra move right','ra move left','ra move up','ra move down','ra move back','ra move front']
         self.la_gestures = ['still', 'la move right', 'la move left', 'la move up', 'la move down',  'la move back', 'la move front']
@@ -332,3 +335,4 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = App()
     sys.exit(app.exec_())
+
