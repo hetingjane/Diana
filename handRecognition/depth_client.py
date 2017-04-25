@@ -156,7 +156,8 @@ if __name__ == '__main__':
                 left_hand = left_hand.reshape((1,128,128,1))
                 max_index, probs = hand_classfier.classify(left_hand)
             else:
-                continue
+                max_index = num_gestures
+                probs = [0]*num_gestures
 
         if hand == "RH":
             if decoded_frame[offset + 5]:
@@ -168,7 +169,8 @@ if __name__ == '__main__':
                 right_hand = right_hand.reshape((1, 128, 128, 1))
                 max_index, probs = hand_classfier.classify(right_hand)
             else:
-                continue
+                max_index = num_gestures
+                probs = [0] * num_gestures
 
         print i, timestamp, gestures[max_index], probs[max_index]
         i += 1

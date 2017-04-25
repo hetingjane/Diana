@@ -139,6 +139,14 @@ if __name__ == '__main__':
 
             index += 1
 
+        else:
+            pack_list = [FUSION_HEAD_ID, timestamp, len(gesture_list)] + [0]*len(gesture_list)
+            bytes = struct.pack("!iqi" + "f" * num_gestures, *pack_list)
+
+            if fusion_socket is not None:
+                fusion_socket.send(bytes)
+
+
     kinect_socket.close()
     if fusion_socket is not None:
         fusion_socket.close()
