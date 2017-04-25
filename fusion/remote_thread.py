@@ -15,8 +15,6 @@ class Remote(threading.Thread):
         self.input_queue = input_queue
         self._stop = threading.Event()
         self._conn = conn_event
-        self.client = ""
-
 
     def stop(self):
         self._stop.set()
@@ -43,7 +41,6 @@ class Remote(threading.Thread):
 
         while not self.is_stopped():
 
-            assert len(outputs) <= 1
 
             try:
                 read_socks, write_socks, except_socks = select.select(inputs, outputs, excepts, 0.02)
@@ -55,15 +52,11 @@ class Remote(threading.Thread):
             for s in read_socks:
                 if s is remote_sock:
                     client_sock, client_addr = s.accept()
-                    if len(outputs) == 0:
-                        self._log("Accepted destination {}:{}".format(client_addr[0], client_addr[1]))
-                        client_sock.shutdown(socket.SHUT_RD)
-                        outputs += [client_sock]
-                        self.client = client_addr[0] + ":" + str(client_addr[1])
+                    self._log("Accepted destination {}:{}".format(client_addr[0], client_addr[1]))
+                    client_sock.shutdown(socket.SHUT_RD)
+                    outputs += [client_sock]
+                    if not self._conn.is_set():
                         self._conn.set()
-                    else:
-                        self._log("Rejected connection attempt by {}:{}".format(client_addr[0], client_addr[1]))
-                        client_sock.close()
 
             while True:
                 try:
@@ -71,14 +64,13 @@ class Remote(threading.Thread):
 
                     for s in write_socks:
                         try:
+                            client_addr = s.getpeername()
                             s.sendall(data)
                         except (socket.error, EOFError):
                             outputs.remove(s)
                             if len(outputs) == 0:
                                 self._conn.clear()
-                            # Strictly for single client context only
-                            self._log(self.client + " disconnected.")
-                            self.client = ""
+                            self._log("{}:{} disconnected".format(client_addr[0], client_addr[1]))
                 except Queue.Empty:
                     break
 
