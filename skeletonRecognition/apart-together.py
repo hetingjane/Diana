@@ -6,15 +6,16 @@ from collections import deque
 
 import numpy as np
 
-from skeletonRecognition.Compute import (check_engage_disengage)
-from skeletonRecognition.SlidingWindow import sliding_window_dataset
-from skeletonRecognition.WindowProcess import (extract_data, process_window_data, collect_all_results, send_default_values)
+from Compute import (check_engage_disengage)
+from SlidingWindow import sliding_window_dataset
+from WindowProcess import (extract_data, process_window_data, collect_all_results, send_default_values)
+from support.constants import *
 
-src_addr = '129.82.45.102'
-src_port = 8123
+src_addr = KINECT_SRC_ADDR
+src_port = KINECT_SKELETON_PORT
 
-des_addr = 'blue.cs.colostate.edu'  # 'cwc1'
-des_port = 9125
+des_addr = FUSION_SRC_ADDR
+des_port = FUSION_INPUT_PORT
 
 
 def connect():
@@ -55,6 +56,7 @@ def decode_frame(raw_frame):
     joint_format = "BB7f"
 
     frame_format = body_format + (joint_format * 25)
+
 
     # Unpack the raw frame into individual pieces of data as a tuple
     frame_pieces = struct.unpack(endianness + (frame_format * body_count), raw_frame[struct.calcsize(header_format):])
@@ -124,9 +126,18 @@ if __name__ == '__main__':
         avg_frame_time += (t_end - t_begin)
 
         input_data = decode_frame(f)
+	body_count = input_data[1]
+	#print 'body count: ', body_count
 
-        if (len(input_data) == 0):
-            continue
+	if body_count>1:
+	    print "More than one skeleton detected! XD"
+
+	if (body_count==0):
+	    print 'no skeleton detected! :( ' 
+	    map_array, proba_array = send_default_values(body_parts, value_to_add=31)
+            result = collect_all_results(map_array, proba_array, 0)
+	    time_stamp = input_data[0]
+            #continue
         else:
             dta = extract_data(input_data)
             data_stream.extend([input_data])  # append(input_data)
@@ -174,8 +185,8 @@ if __name__ == '__main__':
                 #map_array.append(0) #add the one bit for the arms later
                 result = collect_all_results(map_array, proba_array, 0)
 
-        time_stamp = list(data_stream)[-1][0]
-        #print 'timestamp:', time_stamp
+            time_stamp = list(data_stream)[-1][0]
+        print time_stamp, (result[:2])
         pack_list = [1, time_stamp] + result
         bytes = struct.pack("!iqii" + "ff" * 6 + 'i', *pack_list)
         r.sendall(bytes)

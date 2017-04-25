@@ -8,7 +8,8 @@ from Preprocessing import  prune_joints_dataset
 
 def extract_data(a):
     joints_to_consider = list(np.arange(12))  + list(np.arange(20, 25))
-    data = list(chain(*[(a[(i*9+8)],a[(i*9+9)],a[(i*9+10)]) for i in joints_to_consider]))
+    data = list(chain(*[(a[(i * 9 + 9)], a[(i * 9 + 10)], a[(i * 9 + 11)]) for i in joints_to_consider]))
+    #data = list(chain(*[(a[(i*9+8)],a[(i*9+9)],a[(i*9+10)]) for i in joints_to_consider]))
     return data
 
 
@@ -22,10 +23,10 @@ def collect_all_results(map_array, proba_array, value):
     return map_array + list(chain(*proba_array)) + [value]
 
 
-def send_default_values(body_parts):
+def send_default_values(body_parts, value_to_add= 26):
     proba_array, map_array = [], []
     for b in body_parts:
-        proba_array.append(default_bit_array(b).tolist()), map_array.append(26)
+        proba_array.append(default_bit_array(b).tolist()), map_array.append(value_to_add)
 
     return map_array, proba_array
 '''
