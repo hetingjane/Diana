@@ -92,6 +92,8 @@ if __name__ == '__main__':
 
     head_classifier = RealTimeHeadRecognition(num_gestures)
 
+    gesture_list += ['blind']
+
     index = 0
     start_time = time.time()
     window = deque(maxlen=30)
@@ -128,11 +130,12 @@ if __name__ == '__main__':
                 new_window = np.rollaxis(np.stack(new_window), 0, 3)[np.newaxis,:,:,:]
 
                 gesture_index, probs = head_classifier.classify(new_window)
+                probs = list(probs)+[0]
                 print timestamp, gesture_list[gesture_index], probs
 
                 pack_list = [FUSION_HEAD_ID, timestamp, gesture_index] + list(probs)
 
-                bytes = struct.pack("!iqi" + "f" * num_gestures, *pack_list)
+                bytes = struct.pack("!iqi" + "f" * (num_gestures+1), *pack_list)
 
                 if fusion_socket is not None:
                     fusion_socket.send(bytes)
@@ -140,8 +143,9 @@ if __name__ == '__main__':
             index += 1
 
         else:
-            pack_list = [FUSION_HEAD_ID, timestamp, len(gesture_list)] + [0]*len(gesture_list)
-            bytes = struct.pack("!iqi" + "f" * num_gestures, *pack_list)
+            pack_list = [FUSION_HEAD_ID, timestamp, num_gestures] + [0]*num_gestures+[1]
+            print pack_list
+            bytes = struct.pack("!iqi" + "f" * (num_gestures+1), *pack_list)
 
             if fusion_socket is not None:
                 fusion_socket.send(bytes)

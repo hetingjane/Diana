@@ -158,6 +158,8 @@ class MyTabWidget(QWidget):
 
         self.p1 = self.l.addPlot(title='<font size="5" color="white"><b>Right Hand</b></font>')
         self.p2 = self.l.addPlot(title='<font size="5" color="white"><b>Left Hand</b></font>')
+        self.p1.setXRange(0, 1)
+        self.p2.setXRange(0, 1)
 
         #font = QtGui.QFont()
         #font.setPixelSize(20)
@@ -175,6 +177,7 @@ class MyTabWidget(QWidget):
         self.l1.nextRow()
 
         self.p5 = self.l1.addPlot(title='<font size="5" color="white"><b>Head</b></font>')
+        self.p5.setXRange(0, 1)
 
         self.rh = pg.BarGraphItem(x=x1, height=y1, width=0.8, brushes=['b']*32)
         self.lh = pg.BarGraphItem(x=x1, height=y2, width=0.8, brush='c')
