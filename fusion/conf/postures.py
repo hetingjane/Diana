@@ -12,7 +12,7 @@ left_hand_postures = ['blank', 'hands together', 'other', 'lh beckon', 'lh claw 
 
                       'lh three front', 'lh thumbs down', 'lh thumbs up', 'lh to face',
 
-                      'lh two back', 'lh two front']
+                      'lh two back', 'lh two front', 'blind']
 
 right_hand_postures = ['blank', 'hands together', 'other', 'rh beckon', 'rh claw down',
 
@@ -28,7 +28,7 @@ right_hand_postures = ['blank', 'hands together', 'other', 'rh beckon', 'rh claw
 
                       'rh three front', 'rh thumbs down', 'rh thumbs up', 'rh to face',
 
-                      'rh two back', 'rh two front']
+                      'rh two back', 'rh two front', 'blind']
 
 left_arm_motions = ['LA: move right', 'LA: move left', 'LA: move up', 'LA: move down', 'LA: move back',
                     'LA: move front', 'LA: move right up', 'LA: move right down', 'LA: move right back',
@@ -37,7 +37,7 @@ left_arm_motions = ['LA: move right', 'LA: move left', 'LA: move up', 'LA: move 
                     'LA: move down front', 'LA: move right up back', 'LA: move right up front',
                     'LA: move right down back', 'LA: move right down front', 'LA: move left up back',
                     'LA: move left up front', 'LA: move left down back', 'LA: move left down front', 'LA: still',
-                    'LA: apart X', 'LA: together X', 'LA: apart Y', 'LA: together Y']
+                    'LA: apart X', 'LA: together X', 'LA: apart Y', 'LA: together Y', 'blind']
 
 right_arm_motions = ['RA: move right', 'RA: move left', 'RA: move up', 'RA: move down', 'RA: move back',
                      'RA: move front', 'RA: move right up', 'RA: move right down', 'RA: move right back',
@@ -46,6 +46,6 @@ right_arm_motions = ['RA: move right', 'RA: move left', 'RA: move up', 'RA: move
                      'RA: move down front', 'RA: move right up back', 'RA: move right up front',
                      'RA: move right down back', 'RA: move right down front', 'RA: move left up back',
                      'RA: move left up front', 'RA: move left down back', 'RA: move left down front', 'RA: still',
-                     'RA: apart X', 'RA: together X', 'RA: apart Y', 'RA: together Y']
+                     'RA: apart X', 'RA: together X', 'RA: apart Y', 'RA: together Y', 'blind']
 
-head_postures = ['head: nod', 'head: shake', 'other']
+head_postures = ['head nod', 'head shake', 'other', 'blind']
