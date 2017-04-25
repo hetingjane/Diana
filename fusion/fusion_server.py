@@ -325,10 +325,10 @@ posture_to_vec = dict(zip(postures, vecs))
 
 sm_ack = BinaryStateMachine(["posack start", "posack stop"], {
     "posack stop": {
-        "posack start": match_any('rh thumbs up', 'lh thumbs up')
+        "posack start": match_any('rh thumbs up', 'lh thumbs up', 'head nod')
     },
     "posack start": {
-        "posack stop": mismatch_all('rh thumbs up', 'lh thumbs up')
+        "posack stop": mismatch_all('rh thumbs up', 'lh thumbs up', 'head nod')
     }
 }, "posack stop")
 
@@ -385,10 +385,10 @@ sm_point_down = BinaryStateMachine(["point down start", "point down stop"], {
 
 sm_nack = BinaryStateMachine(["negack start", "negack stop"], {
     "negack stop": {
-        "negack start": match_any('rh thumbs down', 'lh thumbs down', 'rh stop', 'lh stop')
+        "negack start": match_any('rh thumbs down', 'lh thumbs down', 'rh stop', 'lh stop', 'head shake')
     },
     "negack start": {
-        "negack stop": mismatch_all('rh thumbs down', 'lh thumbs down', 'rh stop', 'lh stop')
+        "negack stop": mismatch_all('rh thumbs down', 'lh thumbs down', 'rh stop', 'lh stop', 'head shake')
     }
 }, "negack stop")
 
@@ -730,24 +730,6 @@ sm_arms_together_Y = BinaryStateMachine(["arms together Y start", "arms together
     }
 }, "arms together Y stop")
 
-sm_head_nod = BinaryStateMachine(["head nod start", "head nod stop"], {
-    "head nod stop": {
-        "head nod start": match_all('head: nod')
-    },
-    "head nod start": {
-        "head nod stop": mismatch_all('head: nod')
-    }
-}, "head nod stop")
-
-sm_head_shake= BinaryStateMachine(["head shake start", "head shake stop"], {
-    "head shake stop": {
-        "head shake start": match_all('head: shake')
-    },
-    "head shake start": {
-        "head shake stop": mismatch_all('head: shake')
-    }
-}, "head shake stop")
-
 brandeis_events = [ sm_engage, sm_ack , sm_point_left, sm_point_right, sm_point_front, sm_point_down, sm_nack, sm_grab,
                     sm_grab_move_right, sm_grab_move_left, sm_grab_move_up, sm_grab_move_down,
                     sm_grab_move_front, sm_grab_move_back,
@@ -763,8 +745,7 @@ csu_events = [ sm_engage, sm_ack , sm_point_left, sm_point_right, sm_point_front
                sm_push_left, sm_push_right, sm_push_back, sm_push_front,
 
                sm_count_one, sm_count_two, sm_count_three, sm_count_four, sm_count_five,
-               sm_arms_together_X, sm_arms_apart_X, sm_arms_together_Y, sm_arms_apart_Y,
-               sm_head_nod, sm_head_shake]
+               sm_arms_together_X, sm_arms_apart_X, sm_arms_together_Y, sm_arms_apart_Y ]
 
 import argparse
 if __name__ == '__main__':
