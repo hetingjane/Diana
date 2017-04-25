@@ -41,32 +41,27 @@ def decode_frame(raw_frame):
     # Expect network byte order
     endianness = "!"
 
+    # [ commonTimestamp | Tracked body count
+    header_format = "qB"
+
+    timestamp, body_count = struct.unpack(endianness + header_format, raw_frame[:struct.calcsize(header_format)])
+
     # For each body, a header is transmitted
-    # [ commonTimestamp | TrackingId | HandLeftConfidence | HandLeftState | HandRightConfidence | HandRightState ]
-    header_format = "qQBBBB"
+    # TrackingId | HandLeftConfidence | HandLeftState | HandRightConfidence | HandRightState ]
+    body_format = "Q4B"
 
     # For each of the 25 joints, the following info is transmitted
     # [ JointType | TrackingState | Position.X | Position.Y | Position.Z | Orientation.W | Orientation.X | Orientation.Y | Orientation.Z ]
-    joint_format = "BBfffffff"
+    joint_format = "BB7f"
 
-    frame_format = header_format + (joint_format * 25)
-
-    body_frame_length = struct.calcsize(endianness + frame_format)
-
-    # Confirm that the length of the frame is a valid one, i.e.
-    # length of raw_frame is a multiple of length of single body frame
-    # indicating multiple bodies in a single frame of skeleton data
-    assert len(
-        raw_frame) % body_frame_length == 0, "Frame length {} is not a multiple of single body frame length {}".format(
-        len(raw_frame), body_frame_length)
-
-    body_count = len(raw_frame) // body_frame_length
+    frame_format = body_format + (joint_format * 25)
 
     # Unpack the raw frame into individual pieces of data as a tuple
-    frame_pieces = struct.unpack(endianness + (frame_format * body_count), raw_frame)
+    frame_pieces = struct.unpack(endianness + (frame_format * body_count), raw_frame[struct.calcsize(header_format):])
 
-    # Need to give the user a way to iterate over body frames if needed
-    return frame_pieces
+    decoded = (timestamp, body_count) + frame_pieces
+
+    return decoded
 
 
 def recv_all(sock, size):
@@ -79,15 +74,11 @@ def recv_all(sock, size):
     return result
 
 
-def check_savings(raw_frame):
-    return ((len(raw_frame) - len(gzip.compress(raw_frame))) / len(raw_frame)) * 100
-
-
 def recv_skeleton_frame(sock):
     """
     Experimental function to read each stream frame from the server
     """
-    (frame_size,) = struct.unpack("!i", recv_all(sock, 4))
+    (frame_size,) = struct.unpack("!i", recv_all(sock, struct.calcsize("!i")))
 
     return recv_all(sock, frame_size)
 
@@ -189,7 +180,7 @@ if __name__ == '__main__':
         bytes = struct.pack("!iqii" + "ff" * 6 + 'i', *pack_list)
         r.sendall(bytes)
 
-
+        
 
     print "Total frame time: {}".format(avg_frame_time)
 
