@@ -49,6 +49,10 @@ class ThreadedClient:
             result += data
         return result
 
+    def map_events(self, event):
+        event = event.replace("grab move", "carry")
+        event = event.replace("push back", "pull")
+        return event
 
     def receive(self):
         events = self.receive_all(struct.calcsize("!i"))
@@ -61,12 +65,12 @@ class ThreadedClient:
 
             event = self.receive_all(event_length)
 
-            event = struct.unpack("!" + str(event_length) + "s", event)[0]
+            event = self.map_events(struct.unpack("!" + str(event_length) + "s", event)[0])
             print event
             event_list.append(event)
 
-        probabilities = self.receive_all(struct.calcsize("!76f"))
-        probabilities = list(struct.unpack("!76f", probabilities))
+        probabilities = self.receive_all(struct.calcsize("!79f"))
+        probabilities = list(struct.unpack("!79f", probabilities))
         decoded_frame =  probabilities + event_list
         return decoded_frame
 

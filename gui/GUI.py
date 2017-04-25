@@ -28,7 +28,6 @@ class App(QMainWindow):
         self.tab_widget = MyTabWidget(self, queue)
         self.setCentralWidget(self.tab_widget)
 
-
         self.show()
 
 
@@ -46,12 +45,14 @@ class MyTabWidget(QWidget):
         self.tabs = QTabWidget()
         self.tab1 = QWidget()
         self.tab2 = QWidget()
+        self.tab3 = QWidget()
         self.tabs.resize(800, 600)
 
         # Add tabs
 
         self.tabs.addTab(self.tab2, "Gestural Events")
         self.tabs.addTab(self.tab1, "Atomic Probabilities")
+        self.tabs.addTab(self.tab3, "Demo")
 
         # Create first tab
         self.create_Bar_Grid()
@@ -59,6 +60,9 @@ class MyTabWidget(QWidget):
 
         self.create_Labels()
         self.tab2.setLayout(self.labelLayout)
+
+        self.create_Demo_Labels()
+        self.tab3.setLayout(self.demoLabelLayout)
 
         # Add tabs to widget
         self.layout.addWidget(self.tabs)
@@ -72,16 +76,16 @@ class MyTabWidget(QWidget):
     def update(self):
         try:
             msg = self.queue.get(0)
-            decoded_probs = msg[:76]
-            events_list = msg[76:]
+            decoded_probs = msg[:79]
+            events_list = msg[79:]
         except Queue.Empty:
             return
 
-        y1 = decoded_probs[44:]#RH
+        y1 = decoded_probs[44:76]#RH
         y2 = decoded_probs[12:44]#LH
         y3 = decoded_probs[:6] #LA
         y4 = decoded_probs[6:12]#RA
-        y5 = np.random.rand(3)
+        y5 = decoded_probs[76:]#Head
 
         y3 = [1-sum(y3)]+y3
         y4 = [1 - sum(y4)] + y4
@@ -106,17 +110,15 @@ class MyTabWidget(QWidget):
             self.curr_event_label.setText(self.curr_event)
             self.prev_event_label.setText(self.prev_event)
 
-            '''font = QFont()
-            font.setFamily("Courier")
-            font.setPointSize(30)
-            self.event_log.setCurrentFont(font)
-            self.event_log.setTextColor(QColor("red"))
-            self.event_log.append(curr_event)
-
-            self.event_list.append(curr_event+"\n\n")'''
-
             sb = self.event_log.verticalScrollBar()
             sb.setValue(sb.maximum())
+
+        elif curr_tab == 2 and len(events_list)>0:
+            self.prev_event = self.curr_event
+            self.curr_event = "\n".join(events_list)
+
+            self.curr_event_label.setText(self.curr_event)
+            self.prev_event_label.setText(self.prev_event)
 
         else:
 
@@ -217,7 +219,7 @@ class MyTabWidget(QWidget):
         self.ra_gestures = ['still','ra move right','ra move left','ra move up','ra move down','ra move back','ra move front']
         self.la_gestures = ['still', 'la move right', 'la move left', 'la move up', 'la move down',  'la move back', 'la move front']
 
-        self.head_gestures = ['still', 'nod', 'shake']
+        self.head_gestures = ['nod', 'shake', 'other']
 
         lh_gestures = [l.replace("lh ", "") for l in self.lh_gestures]
         rh_gestures = [r.replace("rh ", "") for r in self.rh_gestures]
@@ -278,6 +280,48 @@ class MyTabWidget(QWidget):
         self.labelLayout.addWidget(self.curr_event_label)
         self.labelLayout.addWidget(self.prev_event_label)
         self.labelLayout.addWidget(self.event_log)
+
+
+    def create_Demo_Labels(self):
+        self.demoLabelLayout = QVBoxLayout()
+
+        self.layout1 = QHBoxLayout()
+
+
+
+        self.curr_event_label = QLabel()
+        self.prev_event_label = QLabel()
+
+        self.curr_event_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.curr_event_label.setAlignment(Qt.AlignCenter)
+
+        self.prev_event_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.prev_event_label.setAlignment(Qt.AlignCenter)
+
+        self.curr_event_label.setFrameStyle(QFrame.Box | QFrame.Plain);
+        self.curr_event_label.setLineWidth(3);
+
+        self.prev_event_label.setFrameStyle(QFrame.Box | QFrame.Plain);
+        self.prev_event_label.setLineWidth(3);
+
+
+        font = QFont();
+        font.setPointSize(32);
+        font.setBold(True);
+
+        self.curr_event_label.setFont(font)
+        self.prev_event_label.setFont(font)
+
+        self.curr_event_label.setStyleSheet('color: green')
+        self.prev_event_label.setStyleSheet('color: blue')
+
+        self.curr_event_label.setText("Current Event")
+        self.prev_event_label.setText("Previous Event")
+
+        self.layout1.addWidget(self.curr_event_label)
+        self.layout1.addWidget(self.prev_event_label)
+        self.demoLabelLayout.addLayout(self.layout1)
+        self.demoLabelLayout.addStretch(2)
 
 
     def tabChangedSlot(self,argTabIndex):

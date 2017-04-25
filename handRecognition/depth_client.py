@@ -119,9 +119,9 @@ if __name__ == '__main__':
     i = 0
 
     if hand == "RH":
-        id = 4
+        id = FUSION_RIGHT_HAND_ID
     else:
-        id = 2
+        id = FUSION_LEFT_HAND_ID
     hands_list = []
 
     start_time = time.time()
@@ -177,9 +177,8 @@ if __name__ == '__main__':
             print "="*100,"FPS",100/(time.time()-start_time)
             start_time = time.time()
 
-        #timestamp = i-1
+
         pack_list = [id,timestamp,max_index]+list(probs)
-        #print pack_list
 
         bytes = struct.pack("!iqi"+"f"*num_gestures, *pack_list)
 
