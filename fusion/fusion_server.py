@@ -325,10 +325,10 @@ posture_to_vec = dict(zip(postures, vecs))
 
 sm_ack = BinaryStateMachine(["posack start", "posack stop"], {
     "posack stop": {
-        "posack start": match_any('rh thumbs up', 'lh thumbs up', 'head nod')
+        "posack start": match_any('rh thumbs up', 'lh thumbs up')
     },
     "posack start": {
-        "posack stop": mismatch_all('rh thumbs up', 'lh thumbs up', 'head nod')
+        "posack stop": mismatch_all('rh thumbs up', 'lh thumbs up')
     }
 }, "posack stop")
 
@@ -351,6 +351,24 @@ sm_point_left = BinaryStateMachine(["point left start", "point left stop"], {
         "point left stop": mismatch_all('rh point left')
     }
 }, "point left stop")
+
+sm_point_left_front = BinaryStateMachine(["point left front start", "point left front stop"], {
+    "point left front stop": {
+        "point left front start": match_all('rh point front', 'RA: move left front')
+    },
+    "point left front start": {
+        "point left front stop": mismatch_all('rh point front')
+    }
+}, "point left front stop")
+
+sm_point_right_front = BinaryStateMachine(["point right front start", "point right front stop"], {
+    "point right front stop": {
+        "point right front start": match_all('lh point front', 'LA: move right front')
+    },
+    "point right front start": {
+        "point right front stop": mismatch_all('lh point front')
+    }
+}, "point right front stop")
 
 
 sm_point_right = BinaryStateMachine(["point right start", "point right stop"], {
@@ -385,10 +403,10 @@ sm_point_down = BinaryStateMachine(["point down start", "point down stop"], {
 
 sm_nack = BinaryStateMachine(["negack start", "negack stop"], {
     "negack stop": {
-        "negack start": match_any('rh thumbs down', 'lh thumbs down', 'rh stop', 'lh stop', 'head shake')
+        "negack start": match_any('rh thumbs down', 'lh thumbs down', 'rh stop', 'lh stop')
     },
     "negack start": {
-        "negack stop": mismatch_all('rh thumbs down', 'lh thumbs down', 'rh stop', 'lh stop', 'head shake')
+        "negack stop": mismatch_all('rh thumbs down', 'lh thumbs down', 'rh stop', 'lh stop')
     }
 }, "negack stop")
 
@@ -730,14 +748,12 @@ sm_arms_together_Y = BinaryStateMachine(["arms together Y start", "arms together
     }
 }, "arms together Y stop")
 
-brandeis_events = [ sm_engage, sm_ack , sm_point_left, sm_point_right, sm_point_front, sm_point_down, sm_nack, sm_grab,
+brandeis_events = [ sm_engage, sm_ack, sm_point_left, sm_point_right, sm_point_front, sm_point_down, sm_nack, sm_grab,
                     sm_grab_move_right, sm_grab_move_left, sm_grab_move_up, sm_grab_move_down,
                     sm_grab_move_front, sm_grab_move_back,
-                    sm_grab_move_right_front, sm_grab_move_left_front,
-                    sm_grab_move_left_back, sm_grab_move_right_back,
                     sm_push_left, sm_push_right, sm_push_back, sm_push_front ]
 
-csu_events = [ sm_engage, sm_ack , sm_point_left, sm_point_right, sm_point_front, sm_point_down, sm_nack, sm_grab,
+csu_events = [ sm_engage, sm_ack, sm_point_left, sm_point_right, sm_point_front, sm_point_down, sm_nack, sm_grab,
                sm_grab_move_right, sm_grab_move_left, sm_grab_move_up, sm_grab_move_down,
                sm_grab_move_front, sm_grab_move_back,
                sm_grab_move_right_front, sm_grab_move_left_front,
@@ -750,12 +766,14 @@ csu_events = [ sm_engage, sm_ack , sm_point_left, sm_point_right, sm_point_front
 import argparse
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--mode', choices=['csu', 'brandeis'], default='csu', type=str,
+    parser.add_argument('--mode', choices=['csu', 'brandeis'], default='brandeis', type=str,
                         help="the mode in which fusion server is run")
     args = parser.parse_args()
     if args.mode == 'brandeis':
+        print "Running in Brandeis mode"
         event_set = brandeis_events
     elif args.mode == 'csu':
+        print "Running in CSU mode"
         event_set = csu_events
 
     a = App(event_set)
