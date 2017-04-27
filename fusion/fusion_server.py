@@ -326,12 +326,22 @@ posture_to_vec = dict(zip(postures, vecs))
 
 sm_ack = BinaryStateMachine(["posack start", "posack stop"], {
     "posack stop": {
-        "posack start": match_any('rh thumbs up', 'lh thumbs up')
+        "posack start": match_any('rh thumbs up', 'lh thumbs up', 'head nod')
     },
     "posack start": {
-        "posack stop": mismatch_all('rh thumbs up', 'lh thumbs up')
+        "posack stop": mismatch_all('rh thumbs up', 'lh thumbs up', 'head nod')
     }
 }, "posack stop")
+
+
+sm_nack = BinaryStateMachine(["negack start", "negack stop"], {
+    "negack stop": {
+        "negack start": match_any('rh thumbs down', 'lh thumbs down', 'rh stop', 'lh stop', 'head shake')
+    },
+    "negack start": {
+        "negack stop": mismatch_all('rh thumbs down', 'lh thumbs down', 'rh stop', 'lh stop', 'head shake')
+    }
+}, "negack stop")
 
 
 sm_engage = BinaryStateMachine(["engage start", "engage stop"], {
@@ -401,15 +411,6 @@ sm_point_down = BinaryStateMachine(["point down start", "point down stop"], {
     }
 }, "point down stop")
 
-
-sm_nack = BinaryStateMachine(["negack start", "negack stop"], {
-    "negack stop": {
-        "negack start": match_any('rh thumbs down', 'lh thumbs down', 'rh stop', 'lh stop')
-    },
-    "negack start": {
-        "negack stop": mismatch_all('rh thumbs down', 'lh thumbs down', 'rh stop', 'lh stop')
-    }
-}, "negack stop")
 
 
 sm_grab = BinaryStateMachine(["grab start", "grab stop"], {
