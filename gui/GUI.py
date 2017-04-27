@@ -117,8 +117,8 @@ class MyTabWidget(QWidget):
             self.prev_event = self.curr_event
             self.curr_event = "\n".join(events_list)
 
-            self.curr_event_label.setText(self.curr_event)
-            self.prev_event_label.setText(self.prev_event)
+            self.curr_event_label_1.setText(self.curr_event)
+            self.prev_event_label_1.setText(self.prev_event)
 
         else:
 
@@ -295,37 +295,37 @@ class MyTabWidget(QWidget):
 
 
 
-        self.curr_event_label = QLabel()
-        self.prev_event_label = QLabel()
+        self.curr_event_label_1 = QLabel()
+        self.prev_event_label_1 = QLabel()
 
-        self.curr_event_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.curr_event_label.setAlignment(Qt.AlignCenter)
+        self.curr_event_label_1.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.curr_event_label_1.setAlignment(Qt.AlignCenter)
 
-        self.prev_event_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.prev_event_label.setAlignment(Qt.AlignCenter)
+        self.prev_event_label_1.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.prev_event_label_1.setAlignment(Qt.AlignCenter)
 
-        self.curr_event_label.setFrameStyle(QFrame.Box | QFrame.Plain);
-        self.curr_event_label.setLineWidth(3);
+        self.curr_event_label_1.setFrameStyle(QFrame.Box | QFrame.Plain);
+        self.curr_event_label_1.setLineWidth(3);
 
-        self.prev_event_label.setFrameStyle(QFrame.Box | QFrame.Plain);
-        self.prev_event_label.setLineWidth(3);
+        self.prev_event_label_1.setFrameStyle(QFrame.Box | QFrame.Plain);
+        self.prev_event_label_1.setLineWidth(3);
 
 
         font = QFont();
         font.setPointSize(32);
         font.setBold(True);
 
-        self.curr_event_label.setFont(font)
-        self.prev_event_label.setFont(font)
+        self.curr_event_label_1.setFont(font)
+        self.prev_event_label_1.setFont(font)
 
-        self.curr_event_label.setStyleSheet('color: green')
-        self.prev_event_label.setStyleSheet('color: blue')
+        self.curr_event_label_1.setStyleSheet('color: green')
+        self.prev_event_label_1.setStyleSheet('color: blue')
 
-        self.curr_event_label.setText("Current Event")
-        self.prev_event_label.setText("Previous Event")
+        self.curr_event_label_1.setText("Current Event")
+        self.prev_event_label_1.setText("Previous Event")
 
-        self.layout1.addWidget(self.curr_event_label)
-        self.layout1.addWidget(self.prev_event_label)
+        self.layout1.addWidget(self.curr_event_label_1)
+        self.layout1.addWidget(self.prev_event_label_1)
         self.demoLabelLayout.addLayout(self.layout1)
         self.demoLabelLayout.addStretch(2)
 

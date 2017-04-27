@@ -16,4 +16,4 @@ gnome-terminal -x bash -c "ssh -t lotus 'cd $PWD/headRecognition/; python head_c
 sleep 1
 
 echo 'logging into cyan for skeleton recogntion'
-gnome-terminal -x bash -c "ssh -t cyan 'cd $PWD/skeletonRecognition/; python engage-disengage.py;bash;'" &
+gnome-terminal -x bash -c "ssh -t cyan 'cd $PWD/skeletonRecognition/; python apart-together.py;bash;'" &
