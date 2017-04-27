@@ -92,7 +92,6 @@ class MyTabWidget(QWidget):
 
         curr_tab = self.tabs.currentIndex()
 
-        #events_list = [self.ra_gestures[np.argmax(y4)]]
 
         if curr_tab == 0 and len(events_list)>0:
 
@@ -122,12 +121,15 @@ class MyTabWidget(QWidget):
 
         else:
 
-            for bar, data in zip([self.rh, self.lh, self.la, self.ra, self.head],[y1, y2, y3, y4, y5]):
+            for bar, data in zip([self.rh, self.lh, self.head],[y1, y2, y5]):
                 bar.setOpts(height=data)
+                brushes = [(141, 153, 174)] * len(data)
+                brushes[np.argmax(data)] = (255,99,71)
+                bar.setOpts(brushes=brushes)
 
-                brushes = ['y'] * len(data)
-                brushes[np.argmax(data)] = 'g'
-
+            for bar, data in zip([self.la, self.ra], [y3, y4]):
+                bar.setOpts(height=data)
+                brushes = [(141, 153, 174) if d<0.3 else (255,99,71) for d in data ]
                 bar.setOpts(brushes=brushes)
 
             #self.tabs.setCurrentIndex((curr_tab + 1) % 2)
@@ -222,7 +224,7 @@ class MyTabWidget(QWidget):
                        'rh three front', 'rh thumbs down', 'rh thumbs up', 'rh to face',
                        'rh two back', 'rh two front'])[self.shuffle_indices]
 
-        self.ra_gestures = ['still','ra move right','ra move left','ra move up','ra move down','ra move back','ra move front']
+        self.ra_gestures = ['still', 'ra move right','ra move left','ra move up','ra move down','ra move back','ra move front']
         self.la_gestures = ['still', 'la move right', 'la move left', 'la move up', 'la move down',  'la move back', 'la move front']
 
         self.head_gestures = ['nod', 'shake', 'other']

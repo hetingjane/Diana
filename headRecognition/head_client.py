@@ -52,7 +52,7 @@ def decode_frame(raw_frame):
 
     timestamp, depth_head_count, head_height, head_width = header
 
-    head_pos_format = "ffH"
+    head_pos_format = "fffH"
     head_pos_size = struct.calcsize(head_pos_format)
     head_pos = struct.unpack(endianness + head_pos_format,
                                   raw_frame[header_size: header_size + head_pos_size])
@@ -97,6 +97,9 @@ if __name__ == '__main__':
     index = 0
     start_time = time.time()
     window = deque(maxlen=30)
+    euclidean_skeleton = deque(maxlen=29)
+    prev_skeleton = None
+
     while True:
         try:
             frame = recv_depth_frame(kinect_socket)
@@ -107,18 +110,22 @@ if __name__ == '__main__':
             continue
 
         timestamp, depth_head_count, head_pos, head_width, head_height, head_depth_data = decoded_frame
+        curr_skeleton = np.array(head_pos[:-1])
 
         if depth_head_count>0 and head_depth_data:
             head = np.array(head_depth_data, dtype=np.float32).reshape((head_height, head_width))
             head = cv2.resize(head, (168, 168))
             head = head[20:-20, 20:-20]
-            head -= head_pos[2]
+            head -= head_pos[-1]
             head /= 150
 
             head += 1
             head *= 127.5
 
             window.append(head)
+            if prev_skeleton is not None:
+                euclidean_skeleton.append(np.linalg.norm(curr_skeleton-prev_skeleton))
+            prev_skeleton = curr_skeleton
 
             if len(window)==30:
                 new_window = [window[0]]
@@ -130,8 +137,15 @@ if __name__ == '__main__':
                 new_window = np.rollaxis(np.stack(new_window), 0, 3)[np.newaxis,:,:,:]
 
                 gesture_index, probs = head_classifier.classify(new_window)
+                head_movement = np.sum(euclidean_skeleton)
                 probs = list(probs)+[0]
-                print timestamp, gesture_list[gesture_index], probs
+                print timestamp, gesture_list[gesture_index], probs, head_movement,
+
+                if head_movement>0.03:
+                    gesture_index = 2
+                    probs = [0,0,1,0]
+                    print gesture_list[gesture_index], probs,
+                print
 
                 pack_list = [FUSION_HEAD_ID, timestamp, gesture_index] + list(probs)
 
