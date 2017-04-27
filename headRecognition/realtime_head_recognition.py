@@ -45,5 +45,10 @@ class RealTimeHeadRecognition():
 
 
         max_prediction = np.argmax(self.past_probs)
+        if (max_prediction == 0 or max_prediction == 1) and self.past_probs[max_prediction]<0.6:
+            print "*",self.past_probs
+            max_prediction = 2
+            self.past_probs = [0,0,1]
+
         return max_prediction, self.past_probs
 

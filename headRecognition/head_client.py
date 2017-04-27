@@ -139,12 +139,12 @@ if __name__ == '__main__':
                 gesture_index, probs = head_classifier.classify(new_window)
                 head_movement = np.sum(euclidean_skeleton)
                 probs = list(probs)+[0]
-                print timestamp, gesture_list[gesture_index], probs, head_movement,
+                print timestamp, gesture_list[gesture_index], probs[gesture_index], head_movement,
 
                 if head_movement>0.03:
                     gesture_index = 2
                     probs = [0,0,1,0]
-                    print gesture_list[gesture_index], probs,
+                    print gesture_list[gesture_index],
                 print
 
                 pack_list = [FUSION_HEAD_ID, timestamp, gesture_index] + list(probs)
@@ -158,7 +158,7 @@ if __name__ == '__main__':
 
         else:
             pack_list = [FUSION_HEAD_ID, timestamp, num_gestures] + [0]*num_gestures+[1]
-            print pack_list
+            print timestamp, 'blind'
             bytes = struct.pack("!iqi" + "f" * (num_gestures+1), *pack_list)
 
             if fusion_socket is not None:
