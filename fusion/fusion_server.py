@@ -16,7 +16,7 @@ from support.constants import *
 
 class App:
 
-    def __init__(self, state_machines):
+    def __init__(self, state_machines, debug):
         # Start fusion thread
         self.fusion = Fusion()
         self.fusion.start()
@@ -38,6 +38,7 @@ class App:
         # For performance evaluation
         self.skipped = 0
         self.received = 0
+        self.debug = debug
 
     def _stop(self):
         # Stop the fusion thread
@@ -768,6 +769,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--mode', choices=['csu', 'brandeis'], default='brandeis', type=str,
                         help="the mode in which fusion server is run")
+    parser.add_argument('-D', '--debug', dest='debug_mode', default=False, action='store_true', help='enable the debug mode')
     args = parser.parse_args()
     if args.mode == 'brandeis':
         print "Running in Brandeis mode"
@@ -776,5 +778,5 @@ if __name__ == '__main__':
         print "Running in CSU mode"
         event_set = csu_events
 
-    a = App(event_set)
+    a = App(event_set, args.debug_mode)
     a.run()
