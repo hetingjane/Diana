@@ -84,8 +84,7 @@ def recv_depth_frame(sock):
 
 
 if __name__ == '__main__':
-    kinect_socket = connect()
-    fusion_socket = connect("Fusion")
+
 
     gesture_list = ["nod", "shake","other"]
     num_gestures = len(gesture_list)
@@ -93,6 +92,9 @@ if __name__ == '__main__':
     head_classifier = RealTimeHeadRecognition(num_gestures)
 
     gesture_list += ['blind']
+
+    kinect_socket = connect()
+    fusion_socket = connect("Fusion")
 
     index = 0
     start_time = time.time()
