@@ -17,20 +17,7 @@ from support.constants import *
 class App:
 
     def __init__(self, state_machines, debug):
-        # Start fusion thread
-        self.fusion = Fusion()
-        self.fusion.start()
-        self.started = True
-
-        # Start remote thread at port 9126
-        self.remote = Remote("Brandeis", ('', FUSION_BRANDEIS_PORT), remote_events, remote_connected)
-        self.remote.start()
-        self.remote_started = True
-
-        # Start remote gui n/w thread at port 9127
-        self.gui = Remote("GUI", ('', FUSION_GUI_PORT), gui_events, gui_connected)
-        self.gui.start()
-        self.gui_started = True
+        self._start()
 
         # Initialize the state manager
         self.state_machines = state_machines
@@ -68,18 +55,18 @@ class App:
                 not_empty = False
 
     def _start(self):
-        # Start the fusion thread
+        # Start fusion thread
         self.fusion = Fusion()
         self.fusion.start()
         self.started = True
 
         # Start remote thread at port 9126
-        self.remote = Remote(('', FUSION_BRANDEIS_PORT), "Brandeis", remote_events, remote_connected)
+        self.remote = Remote("Brandeis", ('', FUSION_BRANDEIS_PORT), remote_events, remote_connected)
         self.remote.start()
         self.remote_started = True
 
         # Start remote gui n/w thread at port 9127
-        self.gui = Remote(('', FUSION_GUI_PORT), "GUI", gui_events, gui_connected)
+        self.gui = Remote("GUI", ('', FUSION_GUI_PORT), gui_events, gui_connected)
         self.gui.start()
         self.gui_started = True
 
