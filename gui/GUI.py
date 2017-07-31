@@ -92,7 +92,6 @@ class MyTabWidget(QWidget):
 
         curr_tab = self.tabs.currentIndex()
 
-        #events_list = [self.ra_gestures[np.argmax(y4)]]
 
         if curr_tab == 0 and len(events_list)>0:
 
@@ -117,17 +116,20 @@ class MyTabWidget(QWidget):
             self.prev_event = self.curr_event
             self.curr_event = "\n".join(events_list)
 
-            self.curr_event_label.setText(self.curr_event)
-            self.prev_event_label.setText(self.prev_event)
+            self.curr_event_label_1.setText(self.curr_event)
+            self.prev_event_label_1.setText(self.prev_event)
 
         else:
 
-            for bar, data in zip([self.rh, self.lh, self.la, self.ra, self.head],[y1, y2, y3, y4, y5]):
+            for bar, data in zip([self.rh, self.lh, self.head],[y1, y2, y5]):
                 bar.setOpts(height=data)
+                brushes = [(141, 153, 174)] * len(data)
+                brushes[np.argmax(data)] = (255,99,71)
+                bar.setOpts(brushes=brushes)
 
-                brushes = ['y'] * len(data)
-                brushes[np.argmax(data)] = 'g'
-
+            for bar, data in zip([self.la, self.ra], [y3, y4]):
+                bar.setOpts(height=data)
+                brushes = [(141, 153, 174) if d<0.3 else (255,99,71) for d in data ]
                 bar.setOpts(brushes=brushes)
 
             #self.tabs.setCurrentIndex((curr_tab + 1) % 2)
@@ -158,6 +160,8 @@ class MyTabWidget(QWidget):
 
         self.p1 = self.l.addPlot(title='<font size="5" color="white"><b>Right Hand</b></font>')
         self.p2 = self.l.addPlot(title='<font size="5" color="white"><b>Left Hand</b></font>')
+        self.p1.setXRange(0, 1)
+        self.p2.setXRange(0, 1)
 
         #font = QtGui.QFont()
         #font.setPixelSize(20)
@@ -175,6 +179,7 @@ class MyTabWidget(QWidget):
         self.l1.nextRow()
 
         self.p5 = self.l1.addPlot(title='<font size="5" color="white"><b>Head</b></font>')
+        self.p5.setXRange(0, 1)
 
         self.rh = pg.BarGraphItem(x=x1, height=y1, width=0.8, brushes=['b']*32)
         self.lh = pg.BarGraphItem(x=x1, height=y2, width=0.8, brush='c')
@@ -219,7 +224,7 @@ class MyTabWidget(QWidget):
                        'rh three front', 'rh thumbs down', 'rh thumbs up', 'rh to face',
                        'rh two back', 'rh two front'])[self.shuffle_indices]
 
-        self.ra_gestures = ['still','ra move right','ra move left','ra move up','ra move down','ra move back','ra move front']
+        self.ra_gestures = ['still', 'ra move right','ra move left','ra move up','ra move down','ra move back','ra move front']
         self.la_gestures = ['still', 'la move right', 'la move left', 'la move up', 'la move down',  'la move back', 'la move front']
 
         self.head_gestures = ['nod', 'shake', 'other']
@@ -292,37 +297,37 @@ class MyTabWidget(QWidget):
 
 
 
-        self.curr_event_label = QLabel()
-        self.prev_event_label = QLabel()
+        self.curr_event_label_1 = QLabel()
+        self.prev_event_label_1 = QLabel()
 
-        self.curr_event_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.curr_event_label.setAlignment(Qt.AlignCenter)
+        self.curr_event_label_1.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.curr_event_label_1.setAlignment(Qt.AlignCenter)
 
-        self.prev_event_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.prev_event_label.setAlignment(Qt.AlignCenter)
+        self.prev_event_label_1.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.prev_event_label_1.setAlignment(Qt.AlignCenter)
 
-        self.curr_event_label.setFrameStyle(QFrame.Box | QFrame.Plain);
-        self.curr_event_label.setLineWidth(3);
+        self.curr_event_label_1.setFrameStyle(QFrame.Box | QFrame.Plain);
+        self.curr_event_label_1.setLineWidth(3);
 
-        self.prev_event_label.setFrameStyle(QFrame.Box | QFrame.Plain);
-        self.prev_event_label.setLineWidth(3);
+        self.prev_event_label_1.setFrameStyle(QFrame.Box | QFrame.Plain);
+        self.prev_event_label_1.setLineWidth(3);
 
 
         font = QFont();
         font.setPointSize(32);
         font.setBold(True);
 
-        self.curr_event_label.setFont(font)
-        self.prev_event_label.setFont(font)
+        self.curr_event_label_1.setFont(font)
+        self.prev_event_label_1.setFont(font)
 
-        self.curr_event_label.setStyleSheet('color: green')
-        self.prev_event_label.setStyleSheet('color: blue')
+        self.curr_event_label_1.setStyleSheet('color: green')
+        self.prev_event_label_1.setStyleSheet('color: blue')
 
-        self.curr_event_label.setText("Current Event")
-        self.prev_event_label.setText("Previous Event")
+        self.curr_event_label_1.setText("Current Event")
+        self.prev_event_label_1.setText("Previous Event")
 
-        self.layout1.addWidget(self.curr_event_label)
-        self.layout1.addWidget(self.prev_event_label)
+        self.layout1.addWidget(self.curr_event_label_1)
+        self.layout1.addWidget(self.prev_event_label_1)
         self.demoLabelLayout.addLayout(self.layout1)
         self.demoLabelLayout.addStretch(2)
 

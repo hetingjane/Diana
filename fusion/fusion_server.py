@@ -16,21 +16,8 @@ from support.constants import *
 
 class App:
 
-    def __init__(self, state_machines):
-        # Start fusion thread
-        self.fusion = Fusion()
-        self.fusion.start()
-        self.started = True
-
-        # Start remote thread at port 9126
-        self.remote = Remote("Brandeis", ('', FUSION_BRANDEIS_PORT), remote_events, remote_connected)
-        self.remote.start()
-        self.remote_started = True
-
-        # Start remote gui n/w thread at port 9127
-        self.gui = Remote("GUI", ('', FUSION_GUI_PORT), gui_events, gui_connected)
-        self.gui.start()
-        self.gui_started = True
+    def __init__(self, state_machines, debug):
+        self._start()
 
         # Initialize the state manager
         self.state_machines = state_machines
@@ -38,6 +25,7 @@ class App:
         # For performance evaluation
         self.skipped = 0
         self.received = 0
+        self.debug = debug
 
     def _stop(self):
         # Stop the fusion thread
@@ -67,18 +55,18 @@ class App:
                 not_empty = False
 
     def _start(self):
-        # Start the fusion thread
+        # Start fusion thread
         self.fusion = Fusion()
         self.fusion.start()
         self.started = True
 
         # Start remote thread at port 9126
-        self.remote = Remote(('', FUSION_BRANDEIS_PORT), "Brandeis", remote_events, remote_connected)
+        self.remote = Remote("Brandeis", ('', FUSION_BRANDEIS_PORT), remote_events, remote_connected)
         self.remote.start()
         self.remote_started = True
 
         # Start remote gui n/w thread at port 9127
-        self.gui = Remote(('', FUSION_GUI_PORT), "GUI", gui_events, gui_connected)
+        self.gui = Remote("GUI", ('', FUSION_GUI_PORT), gui_events, gui_connected)
         self.gui.start()
         self.gui_started = True
 
@@ -115,12 +103,13 @@ class App:
         """
         try:
             self.latest_data = synced_data.get(False, 0.2)
-            #print self.latest_data
+            if self.debug:
+                print "Latest synced data: ", self.latest_data, "\n"
             self._update_queues()
             self.received += 1
             if synced_data.qsize() <= 15:
-                pass
-                #print "Backlog queue size: " + str(synced_data.qsize())
+                if self.debug:
+                    print "Backlog queue size exceeded limit: " + str(synced_data.qsize())
             else:
                 self.skipped += 1
                 print "Timestamp " + str(self.latest_data[streams.get_stream_id("Body")][1]) + \
@@ -333,6 +322,16 @@ sm_ack = BinaryStateMachine(["posack start", "posack stop"], {
 }, "posack stop")
 
 
+sm_nack = BinaryStateMachine(["negack start", "negack stop"], {
+    "negack stop": {
+        "negack start": match_any('rh thumbs down', 'lh thumbs down', 'rh stop', 'lh stop', 'head shake')
+    },
+    "negack start": {
+        "negack stop": mismatch_all('rh thumbs down', 'lh thumbs down', 'rh stop', 'lh stop', 'head shake')
+    }
+}, "negack stop")
+
+
 sm_engage = BinaryStateMachine(["engage start", "engage stop"], {
     "engage stop": {
         "engage start": match_any('engage')
@@ -351,6 +350,24 @@ sm_point_left = BinaryStateMachine(["point left start", "point left stop"], {
         "point left stop": mismatch_all('rh point left')
     }
 }, "point left stop")
+
+sm_point_left_front = BinaryStateMachine(["point left front start", "point left front stop"], {
+    "point left front stop": {
+        "point left front start": match_all('rh point front', 'RA: move left front')
+    },
+    "point left front start": {
+        "point left front stop": mismatch_all('rh point front')
+    }
+}, "point left front stop")
+
+sm_point_right_front = BinaryStateMachine(["point right front start", "point right front stop"], {
+    "point right front stop": {
+        "point right front start": match_all('lh point front', 'LA: move right front')
+    },
+    "point right front start": {
+        "point right front stop": mismatch_all('lh point front')
+    }
+}, "point right front stop")
 
 
 sm_point_right = BinaryStateMachine(["point right start", "point right stop"], {
@@ -382,15 +399,6 @@ sm_point_down = BinaryStateMachine(["point down start", "point down stop"], {
     }
 }, "point down stop")
 
-
-sm_nack = BinaryStateMachine(["negack start", "negack stop"], {
-    "negack stop": {
-        "negack start": match_any('rh thumbs down', 'lh thumbs down', 'rh stop', 'lh stop', 'head shake')
-    },
-    "negack start": {
-        "negack stop": mismatch_all('rh thumbs down', 'lh thumbs down', 'rh stop', 'lh stop', 'head shake')
-    }
-}, "negack stop")
 
 
 sm_grab = BinaryStateMachine(["grab start", "grab stop"], {
@@ -730,14 +738,12 @@ sm_arms_together_Y = BinaryStateMachine(["arms together Y start", "arms together
     }
 }, "arms together Y stop")
 
-brandeis_events = [ sm_engage, sm_ack , sm_point_left, sm_point_right, sm_point_front, sm_point_down, sm_nack, sm_grab,
+brandeis_events = [ sm_engage, sm_ack, sm_point_left, sm_point_right, sm_point_front, sm_point_down, sm_nack, sm_grab,
                     sm_grab_move_right, sm_grab_move_left, sm_grab_move_up, sm_grab_move_down,
                     sm_grab_move_front, sm_grab_move_back,
-                    sm_grab_move_right_front, sm_grab_move_left_front,
-                    sm_grab_move_left_back, sm_grab_move_right_back,
                     sm_push_left, sm_push_right, sm_push_back, sm_push_front ]
 
-csu_events = [ sm_engage, sm_ack , sm_point_left, sm_point_right, sm_point_front, sm_point_down, sm_nack, sm_grab,
+csu_events = [ sm_engage, sm_ack, sm_point_left, sm_point_right, sm_point_front, sm_point_down, sm_nack, sm_grab,
                sm_grab_move_right, sm_grab_move_left, sm_grab_move_up, sm_grab_move_down,
                sm_grab_move_front, sm_grab_move_back,
                sm_grab_move_right_front, sm_grab_move_left_front,
@@ -750,13 +756,16 @@ csu_events = [ sm_engage, sm_ack , sm_point_left, sm_point_right, sm_point_front
 import argparse
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--mode', choices=['csu', 'brandeis'], default='csu', type=str,
+    parser.add_argument('--mode', choices=['csu', 'brandeis'], default='brandeis', type=str,
                         help="the mode in which fusion server is run")
+    parser.add_argument('-D', '--debug', dest='debug_mode', default=False, action='store_true', help='enable the debug mode')
     args = parser.parse_args()
     if args.mode == 'brandeis':
+        print "Running in Brandeis mode"
         event_set = brandeis_events
     elif args.mode == 'csu':
+        print "Running in CSU mode"
         event_set = csu_events
 
-    a = App(event_set)
+    a = App(event_set, args.debug_mode)
     a.run()
