@@ -103,12 +103,13 @@ class App:
         """
         try:
             self.latest_data = synced_data.get(False, 0.2)
-            #print self.latest_data
+            if self.debug:
+                print "Latest synced data: ", self.latest_data, "\n"
             self._update_queues()
             self.received += 1
             if synced_data.qsize() <= 15:
-                pass
-                #print "Backlog queue size: " + str(synced_data.qsize())
+                if self.debug:
+                    print "Backlog queue size exceeded limit: " + str(synced_data.qsize())
             else:
                 self.skipped += 1
                 print "Timestamp " + str(self.latest_data[streams.get_stream_id("Body")][1]) + \
