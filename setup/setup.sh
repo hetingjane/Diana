@@ -18,11 +18,10 @@ fi
 source "../$ENV_NAME/bin/activate"
 
 # Install tensorflow 0.10
-export TF_BINARY_URL=https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow-0.10.0-cp27-none-linux_x86_64.whl
-pip install --upgrade $TF_BINARY_URL || exit 1
+pip install --upgrade tensorflow-gpu || exit 1
 
 # Setup OpenCV
-cp /usr/lib64/python2.7/site-packages/cv2.so ../env/lib/python2.7/site-packages/cv2.so || exit 1
+ln -s "~vision/usr/rahul/local/lib/python2.7/site-packages/cv2.so" ../env/lib/python2.7/site-packages/cv2.so || exit 1
 
 # Install matplotlib
 pip install --upgrade matplotlib || exit 1

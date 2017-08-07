@@ -1,20 +1,21 @@
 Preferrably install these in a separate virtual environment. Setup your virtual environment like:
 --------------
 cd {project_dir}
-virtualenv env -p python 
+virtualenv env -p python
 source env/bin/activate
 --------------
 
 tensorflow-gpu
 --------------
-export TF_BINARY_URL=https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow-0.10.0-cp27-none-linux_x86_64.whl
-pip install --upgrade $TF_BINARY_URL
+pip install tensorflow-gpu
 --------------
 
 opencv (cv2.so) 2.4.12.2
 --------------
+You need to build OpenCV from sources and copy cv2.so file from {opencv_install_dir}/lib/python2.7/site-packages/cv2.so into {your_virtual_env}/lib/python2.7/site-packages/
 
-You need to build OpenCV from sources and copy cv2.so file from {opencv_install_dir}/lib/python2.7/site-packages/cv2.so into {your_virtual_env}/lib/python2.7/site-packages/cv2.so
+Alternatively, for vision group members, you can link to an existing OpenCV build with FFMPEG support:
+ln -s ~vision/usr/rahul/local/lib/python2.7/site-packages/cv2.so {your_virtual_env}/lib/python2.7/site-packages/cv2.so
 --------------
 
 matplotlib
