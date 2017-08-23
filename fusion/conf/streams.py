@@ -1,8 +1,12 @@
 stream_masks = {
-    "Body": 0x1,
-    "LH": 0x2,
-    "RH": 0x4,
-    "Head": 0x8
+    "Color": 0x2,
+    "Speech": 0x4,
+    "Audio": 0x8,
+    "Depth": 0x10,
+    "Body": 0x20,
+    "LH": 0x40,
+    "RH": 0x70,
+    "Head": 0x100
 }
 
 
