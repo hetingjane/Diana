@@ -5,7 +5,7 @@ stream_masks = {
     "Depth": 0x10,  #16
     "Body": 0x20,   #32
     "LH": 0x40,     #64
-    "RH": 0x70,     #128
+    "RH": 0x80,     #128
     "Head": 0x100   #256
 }
 

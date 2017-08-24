@@ -21,6 +21,7 @@ def decode_frame(raw_frame):
     header = struct.unpack(endianness + header_format, raw_frame[:header_size])
 
     timestamp, frame_type, width, height, posx, posy = header
+    print timestamp, frame_type, width, height, posx, posy
 
     depth_data_format = str(width * height) + "H"
 
@@ -52,6 +53,8 @@ if __name__ == '__main__':
 
     hand = sys.argv[1]
     stream_id = streams.get_stream_id(hand)
+    print stream_id
+    raw_input()
     gestures = list(np.load("/s/red/a/nobackup/cwc/hands/real_time_training_data/%s/gesture_list.npy" % hand))
     gestures = [g.replace(".npy", "") for g in gestures]
     num_gestures = len(gestures)
@@ -77,17 +80,23 @@ if __name__ == '__main__':
 
         timestamp, frame_type, width, height, posx, posy, depth_data = decode_frame(frame)
 
-        hand = np.array(depth_data, dtype=np.float32).reshape((height, width))
-        print hand.shape, posx, posy
-        posz = hand[int(posx), int(posy)]
-        hand = cv2.resize(hand, (168, 168))
-        hand = hand[20:-20, 20:-20]
-        hand -= posz
-        hand /= 150
+        if posx == -1 and posy == -1:
+            probs = [0]*num_gestures+[1]
+            max_index = len(probs)-1
 
-        hand = hand.reshape((1, 128, 128, 1))
-        max_index, probs = hand_classfier.classify(hand)
-        probs = list(probs)+[0]
+        else:
+            hand = np.array(depth_data, dtype=np.float32).reshape((height, width))
+            print hand.shape, posx, posy
+            posz = hand[int(posx), int(posy)]
+            hand = cv2.resize(hand, (168, 168))
+            hand = hand[20:-20, 20:-20]
+            hand -= posz
+            hand /= 150
+
+            hand = hand.reshape((1, 128, 128, 1))
+            max_index, probs = hand_classfier.classify(hand)
+
+            probs = list(probs)+[0]
 
         print i, timestamp, gestures[max_index], probs[max_index]
         i += 1

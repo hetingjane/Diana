@@ -1,43 +1,37 @@
-import struct
-import time
-import cv2
-import numpy as np
-from collections import deque
+#!/usr/bin/env python
 
+import socket, sys, struct
+import time
+import numpy as np
+import matplotlib.pyplot as plt
+from collections import deque
+import cv2
 from realtime_head_recognition import RealTimeHeadRecognition
 from support.endpoints import connect
 import support.streams as streams
-import matplotlib.pyplot as plt
 
-# timestamp (long) | depth_head_count(int) | head_height (int) | head_width (int) |
-# head_pos_x (float) | head_pos_y (float) | ... |
-# left_hand_depth_data ([left_hand_width * left_hand_height]) |
-# right_hand_depth_data ([right_hand_width * right_hand_height])
+
+stream_id = 256;
+
+
+
+# Timestamp | frame type | width | height | depth_data
 def decode_frame(raw_frame):
-    # Expect network byte order
-    endianness = "!"
+    # Expect little endian byte order
+    endianness = "<"
 
     # In each frame, a header is transmitted
-    header_format = "qiii"
+    header_format = "qiiiff"
     header_size = struct.calcsize(endianness + header_format)
     header = struct.unpack(endianness + header_format, raw_frame[:header_size])
 
-    timestamp, depth_head_count, head_height, head_width = header
+    timestamp, frame_type, width, height, posx, posy = header
 
-    head_pos_format = "fffH"
-    head_pos_size = struct.calcsize(head_pos_format)
-    head_pos = struct.unpack(endianness + head_pos_format,
-                                  raw_frame[header_size: header_size + head_pos_size])
+    depth_data_format = str(width * height) + "H"
 
-    head_depth_data_format = str(head_width * head_height) + "H"
+    depth_data = struct.unpack_from(endianness + depth_data_format, raw_frame, header_size)
 
-    head_depth_data = ()
-
-    if head_width * head_height > 0:
-        head_depth_data = struct.unpack_from(endianness + head_depth_data_format, raw_frame, header_size + head_pos_size)
-    #print timestamp, depth_hands_count, depth_hands, left_hand_width, left_hand_height, right_hand_width, right_hand_height
-
-    return timestamp, depth_head_count, head_pos, head_width, head_height, head_depth_data
+    return (timestamp, frame_type, width, height, posx, posy, list(depth_data))
 
 
 def recv_all(sock, size):
@@ -51,22 +45,32 @@ def recv_all(sock, size):
 
 
 def recv_depth_frame(sock):
-    (frame_size,) = struct.unpack("!i", recv_all(sock, 4))
+    """
+    Experimental function to read each stream frame from the server
+    """
+    (frame_size,) = struct.unpack("<i", recv_all(sock, 4))
     return recv_all(sock, frame_size)
 
 
 if __name__ == '__main__':
+    stream_id = streams.get_stream_id("Head")
 
+    kinect_socket = connect('kinect', "Head")
+    fusion_socket = connect('fusion', "Head")
 
-    gesture_list = ["nod", "shake","other"]
+    if kinect_socket is None:
+        sys.exit(0)
+
+    i = 0
+    avg_frame_time = 0.0
+    do_plot = True #if len(sys.argv) > 1 and sys.argv[1] == '--plot' else False
+
+    gesture_list = ["nod", "shake", "other"]
     num_gestures = len(gesture_list)
 
     head_classifier = RealTimeHeadRecognition(num_gestures)
 
     gesture_list += ['blind']
-
-    kinect_socket = connect('kinect', 'Head')
-    fusion_socket = connect('fusion', 'Head')
 
     index = 0
     start_time = time.time()
@@ -76,21 +80,24 @@ if __name__ == '__main__':
 
     while True:
         try:
-            frame = recv_depth_frame(kinect_socket)
-            decoded_frame = decode_frame(frame)
-        except KeyboardInterrupt:
-           break
+            t_begin = time.time()
+            f = recv_depth_frame(kinect_socket)
+            t_end = time.time()
         except:
-            continue
+            break
+        #print "Time taken for this frame: {}".format(t_end - t_begin)
+        avg_frame_time += (t_end - t_begin)
+        timestamp, frame_type, width, height, posx, posy, depth_data = decode_frame(f)
+        print timestamp, frame_type, width, height,
 
-        timestamp, depth_head_count, head_pos, head_width, head_height, head_depth_data = decoded_frame
-        curr_skeleton = np.array(head_pos[:-1])
+        curr_skeleton = np.array([posx, posy])
 
-        if depth_head_count>0 and head_depth_data:
-            head = np.array(head_depth_data, dtype=np.float32).reshape((head_height, head_width))
+        if height>0 and width > 0:
+            head = np.array(depth_data, dtype=np.float32).reshape((height, width))
+            posz = head[int(posx), int(posy)]
             head = cv2.resize(head, (168, 168))
             head = head[20:-20, 20:-20]
-            head -= head_pos[-1]
+            head -= posz
             head /= 150
 
             head += 1
@@ -98,7 +105,7 @@ if __name__ == '__main__':
 
             window.append(head)
             if prev_skeleton is not None:
-                euclidean_skeleton.append(np.linalg.norm(curr_skeleton-prev_skeleton))
+                euclidean_skeleton.append(np.linalg.norm(curr_skeleton - prev_skeleton))
             prev_skeleton = curr_skeleton
 
             if len(window)==30:
@@ -113,15 +120,15 @@ if __name__ == '__main__':
                 gesture_index, probs = head_classifier.classify(new_window)
                 head_movement = np.sum(euclidean_skeleton)
                 probs = list(probs)+[0]
-                print timestamp, gesture_list[gesture_index], probs[gesture_index], head_movement,
+                print gesture_list[gesture_index], probs[gesture_index], head_movement,
 
-                if head_movement>0.03:
+                if head_movement>13: #0.03
                     gesture_index = 2
                     probs = [0,0,1,0]
                     print gesture_list[gesture_index],
-                print
+                print "\n"
 
-                pack_list = [streams.get_stream_id("Head"), timestamp, gesture_index] + list(probs)
+                pack_list = [stream_id, timestamp, gesture_index] + list(probs)
 
                 bytes = struct.pack("!iqi" + "f" * (num_gestures+1), *pack_list)
 
@@ -131,14 +138,19 @@ if __name__ == '__main__':
             index += 1
 
         else:
-            pack_list = [streams.get_stream_id("Head"), timestamp, num_gestures] + [0]*num_gestures+[1]
-            print timestamp, 'blind'
-            bytes = struct.pack("!iqi" + "f" * (num_gestures+1), *pack_list)
+            pack_list = [stream_id, timestamp, num_gestures] + [0] * num_gestures + [1]
+            print 'blind'
+            bytes = struct.pack("!iqi" + "f" * (num_gestures + 1), *pack_list)
 
             if fusion_socket is not None:
                 fusion_socket.send(bytes)
 
 
+        if index%100 == 0:
+            avg_frame_time /= i
+            print "\nAverage frame time over {} frames: {}\n".format(i, avg_frame_time)
+
     kinect_socket.close()
     if fusion_socket is not None:
         fusion_socket.close()
+    sys.exit(0)
