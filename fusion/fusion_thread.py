@@ -98,7 +98,7 @@ class Fusion(threading.Thread):
                 if s is serv_sock:
                     client_sock, client_addr = s.accept()
                     # 1 is for the server socket
-                    if len(inputs) < streams.get_stream_count() + 1:
+                    if len(inputs) < streams.get_active_streams_count() + 1:
                         print "Accepted client {}:{}".format(client_addr[0], client_addr[1])
                         client_sock.shutdown(socket.SHUT_WR)
                         inputs += [client_sock]
@@ -115,7 +115,7 @@ class Fusion(threading.Thread):
                         continue
 
                     # Read and discard data unless enough clients connect
-                    if len(inputs) == streams.get_stream_count() + 1:
+                    if len(inputs) == streams.get_active_streams_count() + 1:
                         cur_ts = data[1]
 
                         # Add data to appropriate timestamp bucket
@@ -128,7 +128,7 @@ class Fusion(threading.Thread):
                         if not self.synced:
                             # Try to find a sync point if it exists
                             for ts in self.data_received.keys():
-                                if len(self.data_received[ts]) == streams.get_stream_count():
+                                if len(self.data_received[ts]) == streams.get_active_streams_count():
                                     # This is the sync point, remove all older timestamp keys
                                     sync_ts = ts
                                     print "Synchronized at timestamp: " + str(sync_ts)
@@ -141,7 +141,7 @@ class Fusion(threading.Thread):
 
                         if self.synced:
                             sync_ts = min(self.data_received.keys())
-                            if len(self.data_received[sync_ts]) == streams.get_stream_count():
+                            if len(self.data_received[sync_ts]) == streams.get_active_streams_count():
                                 # Create a shared data object
                                 s_data = {}
                                 for dt in self.data_received[sync_ts]:

@@ -9,6 +9,12 @@ stream_masks = {
     "Head": 0x100   #256
 }
 
+active_streams = ["Body", "LH", "RH", "Head"]
+
+for s in active_streams:
+    if s not in stream_masks.keys():
+        raise Exception("Active streams configured incoorectly.\n{} not present in stream list.\n".format(s))
+
 
 def get_stream_id(stream_str):
     return stream_masks[stream_str]
@@ -27,5 +33,17 @@ def get_stream_type(stream_id):
     raise KeyError("Invalid stream type")
 
 
-def get_stream_count():
+def get_streams():
+    return stream_masks.keys()
+
+
+def get_streams_count():
     return len(stream_masks)
+
+
+def get_active_streams():
+    return active_streams
+
+
+def get_active_streams_count():
+    return len(active_streams)
