@@ -6,7 +6,7 @@ import sys
 import socket
 import struct
 
-from support.constants import *
+from support.endpoints import *
 
 class ThreadedClient:
 

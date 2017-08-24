@@ -2,8 +2,9 @@ import select
 import socket
 import struct
 
-from conf import streams
-from conf.postures import right_hand_postures, head_postures
+from support import streams
+from support.postures import right_hand_postures, head_postures
+from support.endpoints import serve
 from thread_sync import *
 
 
@@ -72,11 +73,7 @@ class Fusion(threading.Thread):
         return self._stop.is_set()
 
     def run(self):
-        serv_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        serv_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-
-        serv_sock.bind(('', 9125))
-
+        serv_sock = serve('fusion')
         serv_sock.listen(5)
 
         inputs = [serv_sock]

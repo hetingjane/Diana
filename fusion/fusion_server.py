@@ -1,17 +1,14 @@
-import Queue
 import datetime
-import struct
-import time
 import sys
+import time
 
-from conf import streams
-from conf.postures import left_hand_postures, right_hand_postures, left_arm_motions, right_arm_motions, head_postures
+from automata.state_machine import BinaryStateMachine
 from fusion_thread import Fusion
 from remote_thread import Remote
-from automata.state_machine import BinaryStateMachine
+from support import streams
+from support.endpoints import *
+from support.postures import *
 from thread_sync import *
-
-from support.constants import *
 
 
 class App:
@@ -60,13 +57,13 @@ class App:
         self.fusion.start()
         self.started = True
 
-        # Start remote thread at port 9126
-        self.remote = Remote("Brandeis", ('', FUSION_BRANDEIS_PORT), remote_events, remote_connected)
+        # Start server thread for Brandeis
+        self.remote = Remote('Brandeis', 'brandeis', remote_events, remote_connected)
         self.remote.start()
         self.remote_started = True
 
-        # Start remote gui n/w thread at port 9127
-        self.gui = Remote("GUI", ('', FUSION_GUI_PORT), gui_events, gui_connected)
+        # Start server thread for GUI
+        self.gui = Remote('GUI', 'gui', gui_events, gui_connected)
         self.gui.start()
         self.gui_started = True
 

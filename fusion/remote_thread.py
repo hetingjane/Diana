@@ -3,15 +3,17 @@ import socket
 import select
 import Queue
 import sys
+from support.endpoints import serve
+
 
 class Remote(threading.Thread):
 
-    def __init__(self, name, serv_address, input_queue, conn_event):
+    def __init__(self, name, target, input_queue, conn_event):
         threading.Thread.__init__(self)
         self.daemon = True
-        self.name = str(name)
+        self.name = name
         self.id = "[ " + name + " ]\t"
-        self.address = serv_address
+        self.target = target
         self.input_queue = input_queue
         self._stop = threading.Event()
         self._conn = conn_event
@@ -26,11 +28,7 @@ class Remote(threading.Thread):
         print self.id + msg
 
     def run(self):
-
-        remote_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        remote_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        remote_sock.bind(self.address)
-
+        remote_sock = serve(self.target)
         remote_sock.listen(5)
 
         inputs = [remote_sock]

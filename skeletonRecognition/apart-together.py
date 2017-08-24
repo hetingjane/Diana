@@ -1,4 +1,3 @@
-import socket
 import struct
 import sys
 from collections import deque
@@ -7,31 +6,7 @@ import numpy as np
 
 from SlidingWindow import sliding_window_dataset
 from WindowProcess import (extract_data, process_window_data, collect_all_results, send_default_values)
-from support.constants import *
-
-stream_id = 32
-
-
-def connect():
-    """
-    Connect to Kinect Server
-    """
-
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-    try:
-        sock.connect((KINECT_SRC_ADDR, KINECT_SKELETON_PORT))
-    except:
-        print "Error connecting to {}:{}".format(KINECT_SRC_ADDR, KINECT_SKELETON_PORT)
-        return None
-    try:
-        print "Sending stream info"
-        sock.sendall(struct.pack('<i', stream_id))
-    except:
-        print "Error: Stream rejected"
-        return None
-    print "Successfully connected to Kinect Server at " + str(KINECT_SRC_ADDR) + ":" + str(KINECT_SKELETON_PORT)
-    return sock
+from support.endpoints import connect
 
 
 def decode_frame(raw_frame):
@@ -82,28 +57,12 @@ def recv_skeleton_frame(sock):
     return recv_all(sock, load_size)
 
 
-def connect_fusion():
-    """
-    Connect to a specific port
-    """
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-    try:
-        sock.connect((FUSION_SRC_ADDR, FUSION_INPUT_PORT))
-        # Socket will only be used to read, so make it unidirectional
-    except:
-        print "Error connecting to {}:{}".format(FUSION_SRC_ADDR, FUSION_INPUT_PORT)
-        return None
-    print "Successfully connected to Fusion Server at " + str(FUSION_SRC_ADDR) + ":" + str(FUSION_INPUT_PORT)
-    return sock
-
-
 # By default read 100 frames
 if __name__ == '__main__':
 
     # Time the network performance
-    s = connect()
-    r = connect_fusion()
+    s = connect('kinect', 'Body')
+    r = connect('fusion', 'Body')
 
     if s is None:
         sys.exit(0)

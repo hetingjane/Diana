@@ -1,48 +1,11 @@
-#!/usr/bin/env python
-
-import socket
 import struct
 import time
-import gzip
 import cv2
 import sys
 import numpy as np
 from realtime_hand_recognition import RealTimeHandRecognition
-from support.constants import *
-
-stream_id = 64 | 128;
-
-def connect(server="kinect"):
-    """
-    Connect to a specific port
-    """
-    if server == "kinect":
-        src_addr = KINECT_SRC_ADDR
-        src_port = KINECT_DEPTH_PORT
-    else:
-        src_addr = FUSION_SRC_ADDR
-        src_port = FUSION_INPUT_PORT
-
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.settimeout(10)
-
-    try:
-        sock.connect((src_addr, src_port))
-    except:
-        print "Error connecting to {}:{}".format(src_addr, src_port)
-        return None
-
-    if server == "kinect":
-        try:
-            print "Sending stream info"
-            sock.sendall(struct.pack('<i', stream_id));
-        except:
-            print "Error: Stream rejected"
-            return None
-
-    print "Successfully connected to host ", server
-    return sock
-
+from support.endpoints import connect
+import support.streams as streams
 
 # timestamp (long) | depth_hands_count(int) | left_hand_height (int) | left_hand_width (int) |
 # right_hand_height (int) | right_hand_width (int)| left_hand_pos_x (float) | left_hand_pos_y (float) | ... |
@@ -88,6 +51,7 @@ def recv_depth_frame(sock):
 if __name__ == '__main__':
 
     hand = sys.argv[1]
+    stream_id = streams.get_stream_id(hand)
     gestures = list(np.load("/s/red/a/nobackup/cwc/hands/real_time_training_data/%s/gesture_list.npy" % hand))
     gestures = [g.replace(".npy", "") for g in gestures]
     num_gestures = len(gestures)
@@ -95,24 +59,11 @@ if __name__ == '__main__':
     gestures += ['blind']
     print hand, num_gestures
 
-    if hand == "RH":
-        id = FUSION_RIGHT_HAND_ID
-    else:
-        id = FUSION_LEFT_HAND_ID
-
-    if hand == "LH":
-        stream_id = 64
-    elif hand == "RH":
-        stream_id = 128
-
-
     hand_classfier = RealTimeHandRecognition(hand, num_gestures)
-    kinect_socket = connect()
-    fusion_socket = connect("Fusion")
+    kinect_socket = connect('kinect', hand)
+    fusion_socket = connect('fusion', hand)
 
     i = 0
-
-
     hands_list = []
 
     start_time = time.time()
@@ -134,19 +85,18 @@ if __name__ == '__main__':
         hand -= posz
         hand /= 150
 
-        hand = hand.reshape((1,128,128,1))
+        hand = hand.reshape((1, 128, 128, 1))
         max_index, probs = hand_classfier.classify(hand)
         probs = list(probs)+[0]
 
         print i, timestamp, gestures[max_index], probs[max_index]
         i += 1
 
-        if i%100==0:
-            print "="*100,"FPS",100/(time.time()-start_time)
+        if i % 100==0:
+            print "="*100, "FPS", 100/(time.time()-start_time)
             start_time = time.time()
 
-
-        pack_list = [id,timestamp,max_index]+list(probs)
+        pack_list = [stream_id, timestamp,max_index]+list(probs)
 
         bytes = struct.pack("!iqi"+"f"*(num_gestures+1), *pack_list)
 

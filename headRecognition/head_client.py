@@ -1,41 +1,13 @@
-import socket
 import struct
 import time
-import gzip
 import cv2
-import sys
 import numpy as np
 from collections import deque
 
 from realtime_head_recognition import RealTimeHeadRecognition
-from support.constants import *
+from support.endpoints import connect
+import support.streams as streams
 import matplotlib.pyplot as plt
-
-def connect(server="kinect"):
-    """
-    Connect to a specific port
-    """
-    print "Attempting to connect to ", server
-    if server == "kinect":
-        src_addr = KINECT_SRC_ADDR
-        src_port = KINECT_HEAD_DEPTH_PORT
-    else:
-        src_addr = FUSION_SRC_ADDR
-        src_port = FUSION_INPUT_PORT
-
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    #sock.settimeout(10)
-
-    try:
-        sock.connect((src_addr, src_port))
-        # Socket will only be used to read, so make it unidirectional
-        #sock.shutdown(socket.SHUT_WR)
-    except:
-        print "Error connecting to {}:{}".format(src_addr, src_port)
-        return None
-    print "Successfully connected to host ", server
-    return sock
-
 
 # timestamp (long) | depth_head_count(int) | head_height (int) | head_width (int) |
 # head_pos_x (float) | head_pos_y (float) | ... |
@@ -93,8 +65,8 @@ if __name__ == '__main__':
 
     gesture_list += ['blind']
 
-    kinect_socket = connect()
-    fusion_socket = connect("Fusion")
+    kinect_socket = connect('kinect', 'Head')
+    fusion_socket = connect('fusion', 'Head')
 
     index = 0
     start_time = time.time()
@@ -149,7 +121,7 @@ if __name__ == '__main__':
                     print gesture_list[gesture_index],
                 print
 
-                pack_list = [FUSION_HEAD_ID, timestamp, gesture_index] + list(probs)
+                pack_list = [streams.get_stream_id("Head"), timestamp, gesture_index] + list(probs)
 
                 bytes = struct.pack("!iqi" + "f" * (num_gestures+1), *pack_list)
 
@@ -159,7 +131,7 @@ if __name__ == '__main__':
             index += 1
 
         else:
-            pack_list = [FUSION_HEAD_ID, timestamp, num_gestures] + [0]*num_gestures+[1]
+            pack_list = [streams.get_stream_id("Head"), timestamp, num_gestures] + [0]*num_gestures+[1]
             print timestamp, 'blind'
             bytes = struct.pack("!iqi" + "f" * (num_gestures+1), *pack_list)
 
