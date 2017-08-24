@@ -53,8 +53,6 @@ if __name__ == '__main__':
 
     hand = sys.argv[1]
     stream_id = streams.get_stream_id(hand)
-    print stream_id
-    raw_input()
     gestures = list(np.load("/s/red/a/nobackup/cwc/hands/real_time_training_data/%s/gesture_list.npy" % hand))
     gestures = [g.replace(".npy", "") for g in gestures]
     num_gestures = len(gestures)

@@ -7,7 +7,7 @@ import numpy as np
 from SlidingWindow import sliding_window_dataset
 from WindowProcess import (extract_data, process_window_data, collect_all_results, send_default_values)
 from support.endpoints import connect
-
+from support import streams
 
 def decode_frame(raw_frame):
     # The format is given according to the following assumption of network data
@@ -132,7 +132,7 @@ if __name__ == '__main__':
         if len(data_stream) > 0:
             time_stamp = list(data_stream)[-1][0]
             print time_stamp, (result[:2]), body_count, engaged
-            pack_list = [1, time_stamp] + result
+            pack_list = [streams.get_stream_id("Body"), time_stamp] + result
             raw_data = struct.pack("!iqii" + "ff" * 6 + 'i', *pack_list)
 
             if r is not None:

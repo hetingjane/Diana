@@ -39,13 +39,12 @@ def connect(dest, stream_str):
     sock.settimeout(10)
     try:
         sock.connect(addr)
-        if dest == 'kinect':
-            try:
-                print "Sending stream info"
-                sock.sendall(struct.pack('<i', stream_id))
-            except:
-                print "Error: Destination '{}' refused to accept stream id".format(dest)
-                return None
+        try:
+            print "Sending stream info"
+            sock.sendall(struct.pack('<i', stream_id))
+        except:
+            print "Error: Destination '{}' refused to accept stream id".format(dest)
+            return None
     except:
         print "Failed to connect to '{}:{}'".format(*addr)
         return None

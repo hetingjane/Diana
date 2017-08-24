@@ -21,10 +21,7 @@ def get_stream_id(stream_str):
 
 
 def is_valid(stream_id):
-    if stream_id in stream_masks.values():
-        return True
-    return False
-
+    return stream_id in stream_masks.values()
 
 def get_stream_type(stream_id):
     for s in stream_masks.keys():
