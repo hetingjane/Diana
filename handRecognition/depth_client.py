@@ -105,7 +105,7 @@ if __name__ == '__main__':
 
         pack_list = [stream_id, timestamp,max_index]+list(probs)
 
-        bytes = struct.pack("!iqi"+"f"*(num_gestures+1), *pack_list)
+        bytes = struct.pack("<iqi"+"f"*(num_gestures+1), *pack_list)
 
         if fusion_socket is not None:
             fusion_socket.send(bytes)

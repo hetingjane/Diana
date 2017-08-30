@@ -130,7 +130,7 @@ if __name__ == '__main__':
 
                 pack_list = [stream_id, timestamp, gesture_index] + list(probs)
 
-                bytes = struct.pack("!iqi" + "f" * (num_gestures+1), *pack_list)
+                bytes = struct.pack("<iqi" + "f" * (num_gestures+1), *pack_list)
 
                 if fusion_socket is not None:
                     fusion_socket.send(bytes)
@@ -140,13 +140,13 @@ if __name__ == '__main__':
         else:
             pack_list = [stream_id, timestamp, num_gestures] + [0] * num_gestures + [1]
             print 'blind'
-            bytes = struct.pack("!iqi" + "f" * (num_gestures + 1), *pack_list)
+            bytes = struct.pack("<iqi" + "f" * (num_gestures + 1), *pack_list)
 
             if fusion_socket is not None:
                 fusion_socket.send(bytes)
 
 
-        if index%100 == 0:
+        if i != 0 and index%100 == 0:
             avg_frame_time /= i
             print "\nAverage frame time over {} frames: {}\n".format(i, avg_frame_time)
 

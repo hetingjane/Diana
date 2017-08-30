@@ -99,9 +99,11 @@ class App:
         :return:
         """
         try:
+            # Get synced data without blocking with timeout
             self.latest_data = synced_data.get(False, 0.2)
             if self.debug:
                 print "Latest synced data: ", self.latest_data, "\n"
+            #
             self._update_queues()
             self.received += 1
             if synced_data.qsize() <= 15:
@@ -125,6 +127,7 @@ class App:
         left_arm_label = self.latest_data[streams.get_stream_id("Body")][2]
         right_arm_label = self.latest_data[streams.get_stream_id("Body")][3]
         head_label = self.latest_data[streams.get_stream_id("Head")][2]
+        word = self.latest_data[streams.get_stream_id("Speech")][2]
 
         left_hand_gesture_received = left_hand_postures[left_hand_label]
         right_hand_gesture_received = right_hand_postures[right_hand_label]
@@ -158,14 +161,17 @@ class App:
                 # Prepare ; delimited data consisting of <state>;<timestamp>
                 # Sort events by stop then start
                 if new_state.split(' ')[-1] == 'stop':
-                    all_events_to_send = [new_state + ";" + ts] + all_events_to_send
+                    all_events_to_send = [ "G;" + new_state + ";" + ts] + all_events_to_send
                 else:
-                    all_events_to_send.append(new_state + ";" + ts)
+                    all_events_to_send.append("G;" + new_state + ";" + ts)
+
+        if len(word) > 0:
+            all_events_to_send.append("S;" + word + ";" + ts)
 
         for e in all_events_to_send:
-            state, timestamp = e.split(';')
-            print state.ljust(30) + timestamp + "\n\n"
-            raw_events_to_send.append(struct.pack("!i" + str(len(e)) + "s", len(e), e))
+            ev_type, ev, timestamp = e.split(';')
+            print ev_type.ljust(5) + ev.ljust(30) + timestamp + "\n\n"
+            raw_events_to_send.append(struct.pack("<i" + str(len(e)) + "s", len(e), e))
 
         return raw_events_to_send
 
@@ -177,13 +183,17 @@ class App:
 
         all_probs = body_probs + lhand_probs + rhand_probs + head_probs
 
-        return struct.pack("!" + str(len(all_probs)) + "f", *all_probs)
+        return struct.pack("<" + str(len(all_probs)) + "f", *all_probs)
 
     def _update_queues(self):
+        """
+        Update the queues for events to be sent.
+        Currently, two queues are updated: Remote GUI and Remote Client (Brandeis)
+        :return: None
+        """
 
         raw_events_list = self._prepare_events()
         raw_probs = self._prepare_probs()
-       
 
         if len(raw_events_list) > 0:
             # Include a check to see if the destination is connected or not
@@ -192,7 +202,7 @@ class App:
                     remote_events.put(e)
 
         if gui_connected.wait(0.0):
-            ev_count = struct.pack("!i", len(raw_events_list))
+            ev_count = struct.pack("<i", len(raw_events_list))
             gui_events.put(ev_count + ''.join(raw_events_list) + raw_probs)
 
 

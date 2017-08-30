@@ -133,7 +133,7 @@ if __name__ == '__main__':
             time_stamp = list(data_stream)[-1][0]
             print time_stamp, (result[:2]), body_count, engaged
             pack_list = [streams.get_stream_id("Body"), time_stamp] + result
-            raw_data = struct.pack("!iqii" + "ff" * 6 + 'i', *pack_list)
+            raw_data = struct.pack("<iqii" + "ff" * 6 + 'i', *pack_list)
 
             if r is not None:
                 r.sendall(raw_data)

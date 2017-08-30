@@ -25,7 +25,7 @@ _addresses = {
     }
 }
 
-def connect(dest, stream_str):
+def connect(dest, stream_str, timeout=True):
     """
     Connect to a machine in the system
     :param dest: Accepted values are those defined in _addresses['destination']
@@ -36,7 +36,8 @@ def connect(dest, stream_str):
     addr = _addresses['destination'][dest]
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.settimeout(10)
+    if timeout:
+        sock.settimeout(10)
     try:
         sock.connect(addr)
         try:
@@ -46,7 +47,7 @@ def connect(dest, stream_str):
             print "Error: Destination '{}' refused to accept stream id".format(dest)
             return None
     except:
-        print "Failed to connect to '{}:{}'".format(*addr)
+        print "Failed to connect to destination '{}' at '{}:{}'".format(*((dest,) + addr))
         return None
 
     print "Successfully connected to destination '{}'".format(dest)

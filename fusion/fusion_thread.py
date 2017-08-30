@@ -10,7 +10,7 @@ from thread_sync import *
 
 class Fusion(threading.Thread):
 
-    connected_clients = {}
+    _connected_clients = {}
 
     def __init__(self):
         threading.Thread.__init__(self)
@@ -30,7 +30,7 @@ class Fusion(threading.Thread):
 
     def _read_stream_header(self, sock):
         # ID, Timestamp
-        header_format = "!iq"
+        header_format = "<iq"
         stream_header = self._recv_all(sock, struct.calcsize(header_format))
         stream_id, timestamp = struct.unpack(header_format, stream_header)
         if streams.is_valid(stream_id):
@@ -40,44 +40,44 @@ class Fusion(threading.Thread):
 
     def _read_body_data(self, sock):
         # Left Max Index, Right Max Index, 6 probabilities for move left, right, up, down, front, back * 2, Engage (1/0)
-        data_format = "!" + "ii" + "ffffff" * 2 + "i"
+        data_format = "<" + "ii" + "ffffff" * 2 + "i"
         raw_data = self._recv_all(sock, struct.calcsize(data_format))
         return struct.unpack(data_format, raw_data)
 
     def _read_hands_data(self, sock):
         # Max Index, Probabilities
-        data_format = "!" + "i" + "f" * len(right_hand_postures)
+        data_format = "<" + "i" + "f" * len(right_hand_postures)
         raw_data = self._recv_all(sock, struct.calcsize(data_format))
         return struct.unpack(data_format, raw_data)
 
     def _read_head_data(self, sock):
-        data_format = "!" + "i" + "f" * len(head_postures)
+        data_format = "<" + "i" + "f" * len(head_postures)
         raw_data = self._recv_all(sock, struct.calcsize(data_format))
         return struct.unpack(data_format, raw_data)
 
+    def _read_speech_data(self, sock):
+        # Expect little endian byte order
+        endianness = "<"
+        command_length = struct.unpack(endianness + "i", self._recv_all(sock, 4))[0]
+        command_bytes = self._recv_all(sock, command_length)
+        command = struct.unpack(endianness + str(command_length) + "s", command_bytes)[0]
+        return (command,)
+
     def _read_stream_data(self, sock, stream_id):
-        if streams.get_stream_type(stream_id) in ["LH", "RH"]:
+        stream_str = streams.get_stream_type(stream_id)
+        if stream_str in ["LH", "RH"]:
             return self._read_hands_data(sock)
-        elif streams.get_stream_type(stream_id) == "Body":
+        elif stream_str == "Body":
             return self._read_body_data(sock)
-        elif streams.get_stream_type(stream_id) == "Head":
+        elif stream_str == "Head":
             return self._read_head_data(sock)
+        elif stream_str == "Speech":
+            return self._read_speech_data(sock)
 
     def _handle_client(self, sock):
-        stream_type, timestamp = self._read_stream_header(sock)
-        data = self._read_stream_data(sock, stream_type)
-        return (stream_type, timestamp) + data
-
-    def _all_connected(self):
-        """
-        Check if all the streams in active_streams as set in streams module have been connected
-        :return: True if all active streams are connected, False otherwise
-        """
-        active_streams = streams.get_active_streams()
-        for s in active_streams:
-            if s not in self.connected_clients.values():
-                return False
-        return True
+        stream_id, timestamp = self._read_stream_header(sock)
+        data = self._read_stream_data(sock, stream_id)
+        return (stream_id, timestamp) + data
 
     def _set_sync(self, sync_ts):
         if not self._synced:
@@ -123,7 +123,7 @@ class Fusion(threading.Thread):
                     except:
                         print "Client disconnected."
                         inputs.remove(sock)
-                        self.connected_clients.pop(sock)
+                        self._connected_clients.pop(sock)
                         self._unset_sync()
                 continue
 
@@ -132,7 +132,7 @@ class Fusion(threading.Thread):
                     client_sock, client_addr = s.accept()
                     # 1 is for the server socket
                     try:
-                        stream_id_bytes = client_sock.recv(4, socket.MSG_WAITALL)
+                        stream_id_bytes = self._recv_all(client_sock, 4)
                         stream_id = struct.unpack('<i', stream_id_bytes)[0]
                     except:
                         print "Unable to receive complete stream id. Ignoring the client"
@@ -142,11 +142,11 @@ class Fusion(threading.Thread):
                         stream_str = streams.get_stream_type(stream_id)
                         print "Stream is valid: {}".format(stream_str)
                         print "Checking if stream is already connected..."
-                        if stream_str not in self.connected_clients.values():
+                        if stream_str not in self._connected_clients.values():
                             print "New stream. Accepting the connection {}:{}".format(client_addr[0], client_addr[1])
                             client_sock.shutdown(socket.SHUT_WR)
                             inputs += [client_sock]
-                            self.connected_clients[client_sock] = stream_str
+                            self._connected_clients[client_sock] = stream_str
                         else:
                             print "Stream already exists. Rejecting the connection."
                             client_sock.close()
@@ -159,16 +159,16 @@ class Fusion(threading.Thread):
                     except (socket.error, EOFError):
                         print "Client disconnected."
                         inputs.remove(s)
-                        self.connected_clients.pop(s)
+                        self._connected_clients.pop(s)
                         self._unset_sync()
                         continue
 
                     # Read and discard data unless enough clients connect
-                    if self._all_connected():
+                    if streams.all_connected(self._connected_clients.values()):
                         cur_ts = data[1]
 
                         # Add data to appropriate timestamp bucket
-                        if not self._data_received.has_key(cur_ts):
+                        if cur_ts not in self._data_received:
                             self._data_received[cur_ts] = []
                         self._data_received[cur_ts] += [data]
 
@@ -187,7 +187,9 @@ class Fusion(threading.Thread):
                             # Already synced
                             sync_ts = min(self._data_received.keys())
                             if len(self._data_received[sync_ts]) == streams.get_active_streams_count():
-                                # Create a shared data object
+                                # Create a shared data object representing the synced data
+                                # Indexed by stream type
+                                # Value is the entire decoded frame of that stream type
                                 s_data = {}
                                 for dt in self._data_received[sync_ts]:
                                     stream_type = dt[0]
