@@ -17,3 +17,6 @@ sleep 1
 
 echo 'logging into cyan for skeleton recogntion'
 gnome-terminal -x bash -c "ssh -t cyan 'cd $PWD/skeletonRecognition/; python apart-together.py;bash;'" &
+
+echo 'Running speech client locally'
+gnome-terminal --window --working-directory="$START_DIR" --command "python ./speech/speech_client.py"
