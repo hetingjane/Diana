@@ -12,7 +12,7 @@ gnome-terminal -x bash -c "ssh -t maserati 'cd $PWD/handRecognition/; python dep
 sleep 1
 
 echo 'logging into corvette for Depth LH'
-gnome-terminal -x bash -c "ssh -t corvette 'cd $PWD/handRecognition/; python depth_client.py LH;bash;'" &
+gnome-terminal -x bash -c "ssh -t lamborghini 'cd $PWD/handRecognition/; python depth_client.py LH;bash;'" &
 sleep 1
 
 echo 'logging into lotus for Depth Head'
