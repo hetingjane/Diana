@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+
+START_DIR=$(dirname "$0")
+START_DIR=$(realpath "$START_DIR")
+
 echo 'logging into blue for fusion'
 gnome-terminal -x bash -c "ssh -t blue 'cd $PWD/fusion/; python fusion_server.py;bash;'" &
 sleep 2
