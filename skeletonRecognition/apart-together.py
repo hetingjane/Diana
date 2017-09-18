@@ -76,7 +76,8 @@ if __name__ == '__main__':
 
     arms_x_bits = ["still", "arms apart", "arms together"]
     arms_y_bits = ["still", "stack up", "stack down"]
-
+    
+    
     while True:
         try:
             f = recv_skeleton_frame(s)
@@ -85,10 +86,14 @@ if __name__ == '__main__':
             break
         fd = decode_frame(f)
         timestamp, frame_type, body_count, engaged = fd[:4]
+        print 'timestamp received: ', timestamp
 
-        if engaged:
-            input_data = (timestamp, body_count) + fd[4:]
+        input_data = (timestamp, body_count) + fd[4:]
+        
+
+        if engaged: 
             data_stream.extend([input_data])
+  
             if len(data_stream) >= window_threshold:
                 t = np.vstack([extract_data(frame) for frame in data_stream])
                 test_window = sliding_window_dataset([t], window_threshold)
@@ -123,20 +128,21 @@ if __name__ == '__main__':
 
             else:
                 map_array, proba_array = send_default_values(body_parts)
+
             result = collect_all_results(map_array, proba_array, int(engaged))
+            timestamp = list(data_stream)[-1][0]
 
         else:
             map_array, proba_array = send_default_values(body_parts)
             result = collect_all_results(map_array, proba_array, int(engaged))
+            data_stream.clear()
+	    
+        pack_list = [streams.get_stream_id("Body"), timestamp] + result
+        print timestamp, body_count, engaged, result[:2]
+        raw_data = struct.pack("<iqii" + "ff" * 6 + 'i', *pack_list)
 
-        if len(data_stream) > 0:
-            time_stamp = list(data_stream)[-1][0]
-            print time_stamp, (result[:2]), body_count, engaged
-            pack_list = [streams.get_stream_id("Body"), time_stamp] + result
-            raw_data = struct.pack("<iqii" + "ff" * 6 + 'i', *pack_list)
-
-            if r is not None:
-                r.sendall(raw_data)
+        if r is not None:
+            r.sendall(raw_data)
 
     print "Total frame time: {}".format(avg_frame_time)
    
@@ -145,4 +151,6 @@ if __name__ == '__main__':
         r.close()
 
     sys.exit(0)
+
+
 
