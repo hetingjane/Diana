@@ -8,6 +8,7 @@ from SlidingWindow import sliding_window_dataset
 from WindowProcess import (extract_data, process_window_data, collect_all_results, send_default_values)
 from support.endpoints import connect
 from support import streams
+from receiveAndShow import calculate_point
 
 def decode_frame(raw_frame):
     # The format is given according to the following assumption of network data
@@ -86,9 +87,10 @@ if __name__ == '__main__':
             break
         fd = decode_frame(f)
         timestamp, frame_type, body_count, engaged = fd[:4]
-        print 'timestamp received: ', timestamp
+        #print 'timestamp received: ', timestamp
 
         input_data = (timestamp, body_count) + fd[4:]
+        lpoint, rpoint = calculate_point(fd)
         
 
         if engaged: 
@@ -129,17 +131,17 @@ if __name__ == '__main__':
             else:
                 map_array, proba_array = send_default_values(body_parts)
 
-            result = collect_all_results(map_array, proba_array, int(engaged))
+            result = collect_all_results(map_array, [lpoint, rpoint], proba_array, int(engaged))
             timestamp = list(data_stream)[-1][0]
 
         else:
             map_array, proba_array = send_default_values(body_parts)
-            result = collect_all_results(map_array, proba_array, int(engaged))
+            result = collect_all_results(map_array, [lpoint, rpoint], proba_array, int(engaged))
             data_stream.clear()
 
         pack_list = [streams.get_stream_id("Body"), timestamp] + result
-        print timestamp, body_count, engaged, result[:2]
-        raw_data = struct.pack("<iqii" + "ff" * 6 + 'i', *pack_list)
+        print timestamp, body_count, engaged, result#[:2]
+        raw_data = struct.pack("<iqii" + "ff" * 2 + "ff" * 6 + 'i', *pack_list)
 
         if r is not None:
             r.sendall(raw_data)

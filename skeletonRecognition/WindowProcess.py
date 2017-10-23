@@ -19,8 +19,8 @@ def process_window_data(data, body_part):
     return calculate_direction_dataset(d, body_part)[0]
 
 
-def collect_all_results(map_array, proba_array, value):
-    return map_array + list(chain(*proba_array)) + [value]
+def collect_all_results(map_array, point_array, proba_array, value):
+    return map_array + list(chain(*point_array)) + list(chain(*proba_array)) + [value]
 
 
 def send_default_values(body_parts, value_to_add= 26):
