@@ -2,7 +2,7 @@ import socket
 import struct
 import support.streams as streams
 
-_KINECT_DEST_ADDR = 'pop'
+_KINECT_DEST_ADDR = 'cwc1'
 
 _FUSION_DEST_ADDR = 'blue'
 _FUSION_SRC_ADDR = ''

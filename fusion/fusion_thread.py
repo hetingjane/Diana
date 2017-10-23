@@ -186,17 +186,25 @@ class Fusion(threading.Thread):
                         else:
                             # Already synced
                             sync_ts = min(self._data_received.keys())
+                            #print "Minimum timestamp: {0}".format(sync_ts)
                             if len(self._data_received[sync_ts]) == streams.get_active_streams_count():
                                 # Create a shared data object representing the synced data
                                 # Indexed by stream type
                                 # Value is the entire decoded frame of that stream type
+                                #print "Timestamp contains all data"
                                 s_data = {}
                                 for dt in self._data_received[sync_ts]:
                                     stream_type = dt[0]
                                     s_data[stream_type] = dt
-
                                 synced_data.put(s_data)
                                 self._data_received.pop(sync_ts)
+                            """
+                            else:
+                                found_streams = []
+                                for dt in self._data_received[sync_ts]:
+                                    found_streams += [streams.get_stream_type(dt[0])]
+                                print "Only " + str(len(found_streams)) + " streams were found: " + ",".join(found_streams)
+                            """
 
         print "Stopped network thread"
 

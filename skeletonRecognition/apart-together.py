@@ -136,7 +136,7 @@ if __name__ == '__main__':
             map_array, proba_array = send_default_values(body_parts)
             result = collect_all_results(map_array, proba_array, int(engaged))
             data_stream.clear()
-	    
+
         pack_list = [streams.get_stream_id("Body"), timestamp] + result
         print timestamp, body_count, engaged, result[:2]
         raw_data = struct.pack("<iqii" + "ff" * 6 + 'i', *pack_list)
@@ -151,6 +151,3 @@ if __name__ == '__main__':
         r.close()
 
     sys.exit(0)
-
-
-
