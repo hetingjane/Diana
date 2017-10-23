@@ -9,11 +9,6 @@ from realtime_head_recognition import RealTimeHeadRecognition
 from support.endpoints import connect
 import support.streams as streams
 
-
-stream_id = 256;
-
-
-
 # Timestamp | frame type | width | height | depth_data
 def decode_frame(raw_frame):
     # Expect little endian byte order
