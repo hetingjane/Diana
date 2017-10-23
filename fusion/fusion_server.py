@@ -124,8 +124,11 @@ class App:
         # Get appropriate labels as integer values
         left_hand_label = self.latest_data[streams.get_stream_id("LH")][2]
         right_hand_label = self.latest_data[streams.get_stream_id("RH")][2]
-        left_arm_label = self.latest_data[streams.get_stream_id("Body")][2]
-        right_arm_label = self.latest_data[streams.get_stream_id("Body")][3]
+        left_arm_label, right_arm_label, lx, ly, rx, ry = self.latest_data[streams.get_stream_id("Body")][2:8]
+
+        print "Left point: ", lx, ly
+        print "Right point: ", rx, ry
+
         head_label = self.latest_data[streams.get_stream_id("Head")][2]
         word = self.latest_data[streams.get_stream_id("Speech")][2]
 
@@ -406,7 +409,35 @@ sm_point_down = BinaryStateMachine(["point down start", "point down stop"], {
     }
 }, "point down stop")
 
+sm_left_point_vec = BinaryStateMachine(["left point start", "left point stop"], {
+    "left point stop": {
+        "left point start": and_rules(
+            match_any('lh point down', 'lh point right', 'lh point front'),
+            match_all('LA: still')
+        )
+    },
+    "left point start": {
+        "left point stop": or_rules(
+            mismatch_all('lh point down', 'lh point right', 'lh point front'),
+            mismatch_any('LA: still')
+        )
+    }
+}, "left point stop")
 
+sm_right_point_vec = BinaryStateMachine(["right point start", "right point stop"], {
+    "right point stop": {
+        "right point start": and_rules(
+            match_any('rh point down', 'rh point left', 'rh point front'),
+            match_all('RA: still')
+        )
+    },
+    "right point start": {
+        "right point stop": or_rules(
+            mismatch_all('rh point down', 'rh point left', 'rh point front'),
+            mismatch_any('RA: still')
+        )
+    }
+}, "right point stop")
 
 sm_grab = BinaryStateMachine(["grab start", "grab stop"], {
     "grab stop": {
