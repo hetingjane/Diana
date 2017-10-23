@@ -5,7 +5,6 @@ import time
 from automata.state_machine import BinaryStateMachine
 from fusion_thread import Fusion
 from remote_thread import Remote
-from support import streams
 from support.endpoints import *
 from support.postures import *
 from thread_sync import *
@@ -126,8 +125,8 @@ class App:
         right_hand_label = self.latest_data[streams.get_stream_id("RH")][2]
         left_arm_label, right_arm_label, lx, ly, rx, ry = self.latest_data[streams.get_stream_id("Body")][2:8]
 
-        print "Left point: ", lx, ly
-        print "Right point: ", rx, ry
+        #print "Left point: ", lx, ly
+        #print "Right point: ", rx, ry
 
         head_label = self.latest_data[streams.get_stream_id("Head")][2]
         word = self.latest_data[streams.get_stream_id("Speech")][2]
@@ -164,6 +163,12 @@ class App:
                 # Prepare ; delimited data consisting of <state>;<timestamp>
                 # Sort events by stop then start
                 if new_state.split(' ')[-1] == 'stop':
+
+                    if "left point" in new_state:
+                        new_state += ",{0:.2f},{1:.2f}".format(lx, ly)
+                    elif "right point" in new_state:
+                        new_state += ",{0:.2f},{1:.2f}".format(rx, ry)
+
                     all_events_to_send = [ "G;" + new_state + ";" + ts] + all_events_to_send
                 else:
                     all_events_to_send.append("G;" + new_state + ";" + ts)
@@ -776,12 +781,16 @@ sm_arms_together_Y = BinaryStateMachine(["arms together Y start", "arms together
     }
 }, "arms together Y stop")
 
-brandeis_events = [ sm_engage, sm_ack, sm_point_left, sm_point_right, sm_point_front, sm_point_down, sm_nack, sm_grab,
+brandeis_events = [ sm_engage, sm_ack, sm_nack, sm_grab,
+                    #sm_point_left, sm_point_right, sm_point_front, sm_point_down,
+                    sm_left_point_vec, sm_right_point_vec,
                     sm_grab_move_right, sm_grab_move_left, sm_grab_move_up, sm_grab_move_down,
                     sm_grab_move_front, sm_grab_move_back,
                     sm_push_left, sm_push_right, sm_push_back, sm_push_front ]
 
-csu_events = [ sm_engage, sm_ack, sm_point_left, sm_point_right, sm_point_front, sm_point_down, sm_nack, sm_grab,
+csu_events = [ sm_engage, sm_ack, sm_nack, sm_grab,
+               #sm_point_left, sm_point_right, sm_point_front, sm_point_down,
+               sm_left_point_vec, sm_right_point_vec,
                sm_grab_move_right, sm_grab_move_left, sm_grab_move_up, sm_grab_move_down,
                sm_grab_move_front, sm_grab_move_back,
                sm_grab_move_right_front, sm_grab_move_left_front,
