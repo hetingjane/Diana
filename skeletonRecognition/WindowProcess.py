@@ -29,6 +29,40 @@ def send_default_values(body_parts, value_to_add= 26):
         proba_array.append(default_bit_array(b).tolist()), map_array.append(value_to_add)
 
     return map_array, proba_array
+
+
+def code_to_label_encoding(index):
+    label_list = [
+'Right',
+'Left',
+'Up',
+'Down',
+'Back',
+'Front',
+'Right Up',
+'Right Down',
+'Right Back',
+'Right Front',
+'Left Up',
+'Left down',
+'Left Back',
+'Left Front',
+'Up Back',
+'Up Front',
+'Back Down',
+'Back Front',
+'Right Up Back',
+'Right Up Front',
+'Right Down Back',
+'Right Down Front',
+'Left Up Back',
+'Left Up Front',
+'Left Down Back',
+'Left Down Front',
+'Still'
+    ]
+    return label_list[index]
+
 '''
     # mag_threshold = get_threshold_for_body_part(body_part)
     #magnitude = get_magnitude(d)[0]  #returns a list with only one element, hence access the first index of the list to get the magnitude

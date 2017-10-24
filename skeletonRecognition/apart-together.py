@@ -5,7 +5,7 @@ from collections import deque
 import numpy as np
 
 from SlidingWindow import sliding_window_dataset
-from WindowProcess import (extract_data, process_window_data, collect_all_results, send_default_values)
+from WindowProcess import (extract_data, process_window_data, collect_all_results, send_default_values, code_to_label_encoding)
 from support.endpoints import connect
 from support import streams
 from receiveAndShow import calculate_point
@@ -140,7 +140,7 @@ if __name__ == '__main__':
             data_stream.clear()
 
         pack_list = [streams.get_stream_id("Body"), timestamp] + result
-        print timestamp, body_count, engaged, result#[:2]
+        print timestamp, body_count, engaged, code_to_label_encoding(result[0]), ',', code_to_label_encoding(result[1])#, result[:2]
         raw_data = struct.pack("<iqii" + "ff" * 2 + "ff" * 6 + 'i', *pack_list)
 
         if r is not None:
