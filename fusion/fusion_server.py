@@ -5,7 +5,6 @@ import time
 from automata.state_machine import BinaryStateMachine
 from fusion_thread import Fusion
 from remote_thread import Remote
-from support import streams
 from support.endpoints import *
 from support.postures import *
 from thread_sync import *
@@ -126,8 +125,8 @@ class App:
         right_hand_label = self.latest_data[streams.get_stream_id("RH")][2]
         left_arm_label, right_arm_label, lx, ly, rx, ry = self.latest_data[streams.get_stream_id("Body")][2:8]
 
-        print "Left point: ", lx, ly
-        print "Right point: ", rx, ry
+        #print "Left point: ", lx, ly
+        #print "Right point: ", rx, ry
 
         head_label = self.latest_data[streams.get_stream_id("Head")][2]
         word = self.latest_data[streams.get_stream_id("Speech")][2]
@@ -166,6 +165,10 @@ class App:
                 if new_state.split(' ')[-1] == 'stop':
                     all_events_to_send = [ "G;" + new_state + ";" + ts] + all_events_to_send
                 else:
+                    if "left point" in new_state:
+                        new_state += ",{0:.2f},{1:.2f}".format(lx, ly)
+                    elif "right point" in new_state:
+                        new_state += ",{0:.2f},{1:.2f}".format(rx, ry)
                     all_events_to_send.append("G;" + new_state + ";" + ts)
 
         if len(word) > 0:
@@ -351,7 +354,7 @@ sm_engage = BinaryStateMachine(["engage start", "engage stop"], {
     }
 }, "engage stop", 1)
 
-
+"""
 sm_point_left = BinaryStateMachine(["point left start", "point left stop"], {
     "point left stop": {
         "point left start": match_any('rh point left')
@@ -408,18 +411,18 @@ sm_point_down = BinaryStateMachine(["point down start", "point down stop"], {
         "point down stop": mismatch_all('lh point down', 'rh point down')
     }
 }, "point down stop")
-
+"""
 sm_left_point_vec = BinaryStateMachine(["left point start", "left point stop"], {
     "left point stop": {
         "left point start": and_rules(
-            match_any('lh point down', 'lh point right', 'lh point front'),
-            match_all('LA: still')
+            match_all('LA: still'),
+            match_any('lh point down', 'lh point right', 'lh point front')
         )
     },
     "left point start": {
         "left point stop": or_rules(
-            mismatch_all('lh point down', 'lh point right', 'lh point front'),
-            mismatch_any('LA: still')
+            mismatch_any('LA: still'),
+            mismatch_all('lh point down', 'lh point right', 'lh point front')
         )
     }
 }, "left point stop")
@@ -427,14 +430,14 @@ sm_left_point_vec = BinaryStateMachine(["left point start", "left point stop"], 
 sm_right_point_vec = BinaryStateMachine(["right point start", "right point stop"], {
     "right point stop": {
         "right point start": and_rules(
-            match_any('rh point down', 'rh point left', 'rh point front'),
-            match_all('RA: still')
+            match_all('RA: still'),
+            match_any('rh point down', 'rh point left', 'rh point front')
         )
     },
     "right point start": {
         "right point stop": or_rules(
-            mismatch_all('rh point down', 'rh point left', 'rh point front'),
-            mismatch_any('RA: still')
+            mismatch_any('RA: still'),
+            mismatch_all('rh point down', 'rh point left', 'rh point front')
         )
     }
 }, "right point stop")
@@ -776,12 +779,16 @@ sm_arms_together_Y = BinaryStateMachine(["arms together Y start", "arms together
     }
 }, "arms together Y stop")
 
-brandeis_events = [ sm_engage, sm_ack, sm_point_left, sm_point_right, sm_point_front, sm_point_down, sm_nack, sm_grab,
+brandeis_events = [ sm_engage, sm_ack, sm_nack, sm_grab,
+                    #sm_point_left, sm_point_right, sm_point_front, sm_point_down,
+                    sm_left_point_vec, sm_right_point_vec,
                     sm_grab_move_right, sm_grab_move_left, sm_grab_move_up, sm_grab_move_down,
                     sm_grab_move_front, sm_grab_move_back,
                     sm_push_left, sm_push_right, sm_push_back, sm_push_front ]
 
-csu_events = [ sm_engage, sm_ack, sm_point_left, sm_point_right, sm_point_front, sm_point_down, sm_nack, sm_grab,
+csu_events = [ sm_engage, sm_ack, sm_nack, sm_grab,
+               #sm_point_left, sm_point_right, sm_point_front, sm_point_down,
+               sm_left_point_vec, sm_right_point_vec,
                sm_grab_move_right, sm_grab_move_left, sm_grab_move_up, sm_grab_move_down,
                sm_grab_move_front, sm_grab_move_back,
                sm_grab_move_right_front, sm_grab_move_left_front,
