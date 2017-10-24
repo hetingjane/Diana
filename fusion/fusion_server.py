@@ -163,14 +163,12 @@ class App:
                 # Prepare ; delimited data consisting of <state>;<timestamp>
                 # Sort events by stop then start
                 if new_state.split(' ')[-1] == 'stop':
-
+                    all_events_to_send = [ "G;" + new_state + ";" + ts] + all_events_to_send
+                else:
                     if "left point" in new_state:
                         new_state += ",{0:.2f},{1:.2f}".format(lx, ly)
                     elif "right point" in new_state:
                         new_state += ",{0:.2f},{1:.2f}".format(rx, ry)
-
-                    all_events_to_send = [ "G;" + new_state + ";" + ts] + all_events_to_send
-                else:
                     all_events_to_send.append("G;" + new_state + ";" + ts)
 
         if len(word) > 0:
@@ -356,7 +354,7 @@ sm_engage = BinaryStateMachine(["engage start", "engage stop"], {
     }
 }, "engage stop", 1)
 
-
+"""
 sm_point_left = BinaryStateMachine(["point left start", "point left stop"], {
     "point left stop": {
         "point left start": match_any('rh point left')
@@ -413,18 +411,18 @@ sm_point_down = BinaryStateMachine(["point down start", "point down stop"], {
         "point down stop": mismatch_all('lh point down', 'rh point down')
     }
 }, "point down stop")
-
+"""
 sm_left_point_vec = BinaryStateMachine(["left point start", "left point stop"], {
     "left point stop": {
         "left point start": and_rules(
-            match_any('lh point down', 'lh point right', 'lh point front'),
-            match_all('LA: still')
+            match_all('LA: still'),
+            match_any('lh point down', 'lh point right', 'lh point front')
         )
     },
     "left point start": {
         "left point stop": or_rules(
-            mismatch_all('lh point down', 'lh point right', 'lh point front'),
-            mismatch_any('LA: still')
+            mismatch_any('LA: still'),
+            mismatch_all('lh point down', 'lh point right', 'lh point front'),\
         )
     }
 }, "left point stop")
@@ -432,14 +430,14 @@ sm_left_point_vec = BinaryStateMachine(["left point start", "left point stop"], 
 sm_right_point_vec = BinaryStateMachine(["right point start", "right point stop"], {
     "right point stop": {
         "right point start": and_rules(
-            match_any('rh point down', 'rh point left', 'rh point front'),
-            match_all('RA: still')
+            match_all('RA: still'),
+            match_any('rh point down', 'rh point left', 'rh point front')
         )
     },
     "right point start": {
         "right point stop": or_rules(
-            mismatch_all('rh point down', 'rh point left', 'rh point front'),
-            mismatch_any('RA: still')
+            mismatch_any('RA: still'),
+            mismatch_all('rh point down', 'rh point left', 'rh point front')
         )
     }
 }, "right point stop")
