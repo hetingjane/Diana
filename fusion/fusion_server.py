@@ -422,7 +422,7 @@ sm_left_point_vec = BinaryStateMachine(["left point start", "left point stop"], 
     "left point start": {
         "left point stop": or_rules(
             mismatch_any('LA: still'),
-            mismatch_all('lh point down', 'lh point right', 'lh point front'),\
+            mismatch_all('lh point down', 'lh point right', 'lh point front')
         )
     }
 }, "left point stop")
