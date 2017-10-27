@@ -29,7 +29,7 @@ do
     params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; source env/bin/activate; python ./headRecognition/head_client.py RH; bash;'\" -t ${i}"
     ;;
     "speech")
-    params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; source env/bin/activate; python ./speech/speech_client.py; bash;'\" -t ${i}"
+    params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; source env/bin/activate; sleep 3; python ./speech/speech_client.py; bash;'\" -t ${i}"
     ;;
     "body")
     params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; python ./skeletonRecognition/apart-together.py; bash;'\" -t ${i}"
