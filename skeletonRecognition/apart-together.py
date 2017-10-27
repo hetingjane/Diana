@@ -63,7 +63,7 @@ if __name__ == '__main__':
 
     # Time the network performance
     s = connect('kinect', 'Body')
-    r = connect('fusion', 'Body')
+    r = connect('fusion', 'Body', timeout=False)
 
     if s is None:
         sys.exit(0)
