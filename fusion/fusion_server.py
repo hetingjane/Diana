@@ -178,7 +178,7 @@ class App:
                         new_state += ",{0:.2f},{1:.2f}".format(rx, ry)
                     all_events_to_send.append("G;" + new_state + ";" + ts)
 
-        if len(word) > 0:
+        if engage_vec == 1 and len(word) > 0:
             all_events_to_send.append("S;" + word + ";" + ts)
 
         for e in all_events_to_send:
@@ -208,11 +208,10 @@ class App:
         raw_events_list = self._prepare_events()
         raw_probs = self._prepare_probs()
 
-        if len(raw_events_list) > 0:
-            # Include a check to see if the destination is connected or not
-            for e in raw_events_list:
-                if remote_connected.wait(0.0):
-                    remote_events.put(e)
+        # Include a check to see if the destination is connected or not
+        for e in raw_events_list:
+            if remote_connected.wait(0.0):
+                remote_events.put(e)
 
         if gui_connected.wait(0.0):
             ev_count = struct.pack("<i", len(raw_events_list))
