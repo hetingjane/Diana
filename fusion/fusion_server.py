@@ -125,9 +125,6 @@ class App:
         right_hand_label = self.latest_data[streams.get_stream_id("RH")][2]
         left_arm_label, right_arm_label, lx, ly, rx, ry = self.latest_data[streams.get_stream_id("Body")][2:8]
 
-        #print "Left point: ", lx, ly
-        #print "Right point: ", rx, ry
-
         head_label = self.latest_data[streams.get_stream_id("Head")][2]
         word = self.latest_data[streams.get_stream_id("Speech")][2]
 
@@ -156,6 +153,16 @@ class App:
 
             # Input the combined label to the state machine
             changed = state_machine.input(combined_vec)
+
+            # Don't do anything with continuous point stops
+            if "continuous point stop" in state_machine.get_state():
+                continue
+            if state_machine.get_state() == "left continuous point start":
+                all_events_to_send.append("P;l,{0:.2f},{1:.2f};{2:s}".format(lx, ly, ts))
+                continue
+            if state_machine.get_state() == "right continuous point start":
+                all_events_to_send.append("P;r,{0:.2f},{1:.2f};{2:s}".format(rx, ry, ts))
+                continue
 
             if changed:
                 # Get bytes from the string according to UTF-8 encoding
@@ -354,64 +361,6 @@ sm_engage = BinaryStateMachine(["engage start", "engage stop"], {
     }
 }, "engage stop", 1)
 
-"""
-sm_point_left = BinaryStateMachine(["point left start", "point left stop"], {
-    "point left stop": {
-        "point left start": match_any('rh point left')
-    },
-    "point left start": {
-        "point left stop": mismatch_all('rh point left')
-    }
-}, "point left stop")
-
-sm_point_left_front = BinaryStateMachine(["point left front start", "point left front stop"], {
-    "point left front stop": {
-        "point left front start": match_all('rh point front', 'RA: move left front')
-    },
-    "point left front start": {
-        "point left front stop": mismatch_all('rh point front')
-    }
-}, "point left front stop")
-
-sm_point_right_front = BinaryStateMachine(["point right front start", "point right front stop"], {
-    "point right front stop": {
-        "point right front start": match_all('lh point front', 'LA: move right front')
-    },
-    "point right front start": {
-        "point right front stop": mismatch_all('lh point front')
-    }
-}, "point right front stop")
-
-
-sm_point_right = BinaryStateMachine(["point right start", "point right stop"], {
-    "point right stop": {
-        "point right start": match_any('lh point right')
-    },
-    "point right start": {
-        "point right stop": mismatch_all('lh point right')
-    }
-}, "point right stop")
-
-
-sm_point_front = BinaryStateMachine(["point front start", "point front stop"], {
-    "point front stop": {
-        "point front start": match_any('lh point front', 'rh point front')
-    },
-    "point front start": {
-        "point front stop": mismatch_all('lh point front', 'rh point front')
-    }
-}, "point front stop")
-
-
-sm_point_down = BinaryStateMachine(["point down start", "point down stop"], {
-    "point down stop": {
-        "point down start": match_any('lh point down', 'rh point down')
-    },
-    "point down start": {
-        "point down stop": mismatch_all('lh point down', 'rh point down')
-    }
-}, "point down stop")
-"""
 sm_left_point_vec = BinaryStateMachine(["left point start", "left point stop"], {
     "left point stop": {
         "left point start": and_rules(
@@ -441,6 +390,24 @@ sm_right_point_vec = BinaryStateMachine(["right point start", "right point stop"
         )
     }
 }, "right point stop")
+
+sm_left_continuous_point = BinaryStateMachine(["left continuous point start", "left continuous point stop"], {
+    "left continuous point stop": {
+        "left continuous point start": match_any('lh point down', 'lh point right', 'lh point front')
+    },
+    "left continuous point start": {
+        "left continuous point stop": mismatch_all('lh point down', 'lh point right', 'lh point front')
+    }
+}, "left continuous point stop", 3)
+
+sm_right_continuous_point = BinaryStateMachine(["right continuous point start", "right continuous point stop"], {
+    "right continuous point stop": {
+        "right continuous point start": match_any('rh point down', 'rh point left', 'rh point front')
+    },
+    "right continuous point start": {
+        "right continuous point stop": mismatch_all('rh point down', 'rh point left', 'rh point front')
+    }
+}, "right continuous point stop", 3)
 
 sm_grab = BinaryStateMachine(["grab start", "grab stop"], {
     "grab stop": {
@@ -780,15 +747,15 @@ sm_arms_together_Y = BinaryStateMachine(["arms together Y start", "arms together
 }, "arms together Y stop")
 
 brandeis_events = [ sm_engage, sm_ack, sm_nack, sm_grab,
-                    #sm_point_left, sm_point_right, sm_point_front, sm_point_down,
                     sm_left_point_vec, sm_right_point_vec,
+                    sm_left_continuous_point, sm_right_continuous_point,
                     sm_grab_move_right, sm_grab_move_left, sm_grab_move_up, sm_grab_move_down,
                     sm_grab_move_front, sm_grab_move_back,
                     sm_push_left, sm_push_right, sm_push_back, sm_push_front ]
 
 csu_events = [ sm_engage, sm_ack, sm_nack, sm_grab,
-               #sm_point_left, sm_point_right, sm_point_front, sm_point_down,
                sm_left_point_vec, sm_right_point_vec,
+               sm_left_continuous_point, sm_right_continuous_point,
                sm_grab_move_right, sm_grab_move_left, sm_grab_move_up, sm_grab_move_down,
                sm_grab_move_front, sm_grab_move_back,
                sm_grab_move_right_front, sm_grab_move_left_front,
