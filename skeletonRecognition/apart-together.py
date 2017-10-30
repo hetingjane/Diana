@@ -87,10 +87,16 @@ if __name__ == '__main__':
             break
         fd = decode_frame(f)
         timestamp, frame_type, body_count, engaged = fd[:4]
+
+        if engaged:engaged_bit = 'Engaged'
+        else: engaged_bit = 'Disengaged'
+
         #print 'timestamp received: ', timestamp
 
         input_data = (timestamp, body_count) + fd[4:]
         lpoint, rpoint = calculate_point(fd)
+
+        print 'left point: ', lpoint, 'right point: ', rpoint
         
 
         if engaged: 
@@ -140,7 +146,7 @@ if __name__ == '__main__':
             data_stream.clear()
 
         pack_list = [streams.get_stream_id("Body"), timestamp] + result
-        print timestamp, body_count, engaged, code_to_label_encoding(result[0]), ',', code_to_label_encoding(result[1])#, result[:2]
+        print timestamp, 'Body_count: ', body_count, engaged_bit, code_to_label_encoding(result[0]), ',', code_to_label_encoding(result[1])#, result[:2]
         raw_data = struct.pack("<iqii" + "ff" * 2 + "ff" * 6 + 'i', *pack_list)
 
         if r is not None:
