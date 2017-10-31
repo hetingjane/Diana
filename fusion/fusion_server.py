@@ -214,7 +214,7 @@ class App:
                 if state_machine is tsm_left_point_vec or state_machine is bsm_left_point_vec:
                     if state_machine.is_started():
                         cur_state += ",{0:.2f},{1:.2f}".format(lx, ly)
-                elif state_machine is tsm_right_point_vec or state_machine is bsm_left_point_vec:
+                elif state_machine is tsm_right_point_vec or state_machine is bsm_right_point_vec:
                     if state_machine.is_started():
                         cur_state += ",{0:.2f},{1:.2f}".format(rx, ry)
                 # Finally create a timestamped message
