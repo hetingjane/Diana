@@ -129,6 +129,15 @@ if __name__ == '__main__':
                 if fusion_socket is not None:
                     fusion_socket.send(bytes)
 
+            else:
+                pack_list = [stream_id, timestamp, num_gestures] + [0] * num_gestures + [1]
+                print 'Buffer not full'
+                bytes = struct.pack("<iqi" + "f" * (num_gestures + 1), *pack_list)
+
+                if fusion_socket is not None:
+                    fusion_socket.send(bytes)
+
+
             index += 1
 
         else:
