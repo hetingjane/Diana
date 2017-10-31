@@ -70,7 +70,8 @@ class TriStateMachine:
         self.cur_state = self.start_state
         self.rule = rule
         self.threshold = threshold
-        self.cur_val = 0
+        # Counts for transition from each state
+        self.cur_val = dict((s, 0) for s in TriStateMachine._states_arr)
 
     def input(self, engaged, high_pose, low_pose):
         # Reset if not engaged
@@ -78,30 +79,34 @@ class TriStateMachine:
             return self.reset()
         transitioned = False
         # Try high pose first, and possibly transition to high state
-        if self.rule(high_pose):
-            if not self.is_high():
-                self.cur_val += 1
-                if self.cur_val == self.threshold:
-                    transitioned = True
-                    self.cur_state = TriStateMachine._states["high"]
+        if self.rule(high_pose) and not self.is_high():
+            self.cur_val["high"] += 1
+            self.cur_val["low"] = 0
+            self.cur_val["stop"] = 0
+            if self.cur_val["high"] == self.threshold:
+                self.cur_val["high"] = 0
+                self.cur_state = TriStateMachine._states["high"]
+                transitioned = True
+
         # Else, low pose, and possibly transition to low state
-        elif self.rule(low_pose):
-            if not self.is_low():
-                self.cur_val += 1
-                if self.cur_val == self.threshold:
-                    transitioned = True
-                    self.cur_state = TriStateMachine._states["low"]
+        elif self.rule(low_pose) and not self.is_low():
+            self.cur_val["low"] += 1
+            self.cur_val["high"] = 0
+            self.cur_val["stop"] = 0
+            if self.cur_val["low"] == self.threshold:
+                self.cur_val["low"] = 0
+                self.cur_state = TriStateMachine._states["low"]
+                transitioned = True
+
         # Else, go to stop state
         elif not self.is_stopped():
-            self.cur_val += 1
-            if self.cur_val == self.threshold:
+            self.cur_val["stop"] += 1
+            self.cur_val["high"] = 0
+            self.cur_val["low"] = 0
+            if self.cur_val["stop"] == self.threshold:
+                self.cur_val["stop"] = 0
+                self.cur_state["stop"] = TriStateMachine._states["stop"]
                 transitioned = True
-                self.cur_state = TriStateMachine._states["stop"]
-
-        # To avoid spikes in transitions
-        # make change counter 0 if no transition was triggered
-        if not transitioned:
-            self.cur_val = 0
 
         return transitioned
 
@@ -118,7 +123,8 @@ class TriStateMachine:
         return self.name + " " + TriStateMachine._states_arr[self.cur_state]
 
     def reset(self):
-        self.cur_val = 0
+        for k in self.cur_val.keys():
+            self.cur_val[k] = 0
         transitioned = False
         if self.cur_state != self.start_state:
             self.cur_state = self.start_state
