@@ -1,14 +1,15 @@
 import datetime
 import sys
 import time
+import argparse
 
 from automata.state_machine import BinaryStateMachine
+from fusion.automata.rules import *
 from fusion_thread import Fusion
 from remote_thread import Remote
 from support.endpoints import *
 from support.postures import *
 from thread_sync import *
-
 
 class App:
 
@@ -216,120 +217,6 @@ class App:
         if gui_connected.wait(0.0):
             ev_count = struct.pack("<i", len(raw_events_list))
             gui_events.put(ev_count + ''.join(raw_events_list) + raw_probs)
-
-
-def match_any(*postures):
-    """
-    Returns a rule to match one or more postures with the input mask that is True when
-    at least one of the postures matches with the input mask, else False
-    :param postures: One or more postures as strings
-    :return: Rule to match the input postures with the input mask
-    """
-    posture_vecs = [ posture_to_vec[posture] for posture in postures ]
-
-    def f(in_sym):
-        for v in posture_vecs:
-            if (in_sym & v) == v:
-                return True
-        return False
-
-    return f
-
-
-def match_all(*postures):
-    """
-    Returns a rule to match one or more postures with the input mask that is True when
-    all of the postures match with the input mask, else False
-    :param postures: One or more postures as strings
-    :return: Rule to match the input postures with the input mask
-    """
-    posture_vecs = [ posture_to_vec[posture] for posture in postures ]
-
-    def f(in_sym):
-        for v in posture_vecs:
-            if (in_sym & v) != v:
-                return False
-        return True
-
-    return f
-
-
-def mismatch_any(*postures):
-    """
-    Returns a rule to match one or more postures with the input mask that is True when
-    at least one of the postures does not match with the input mask, else False
-    :param postures: One or more postures as strings
-    :return: Rule to match the input postures with the input mask
-    """
-
-    posture_vecs = [ posture_to_vec[posture] for posture in postures ]
-
-    def f(in_sym):
-        for v in posture_vecs:
-            if (in_sym & v) != v:
-                return True
-        return False
-
-    return f
-
-
-def mismatch_all(*postures):
-    """
-    Returns a rule to match one or more postures with the input mask that is True when
-    none of the postures matches with the input mask, else False
-    :param postures: One or more postures as strings
-    :return: Rule to match the input postures with the input mask
-    """
-    posture_vecs = [ posture_to_vec[posture] for posture in postures ]
-
-    def f(in_sym):
-        for v in posture_vecs:
-            if (in_sym & v) == v:
-                return False
-        return True
-
-    return f
-
-
-# Meta rule for ANDing
-def and_rules(*rules):
-    """
-    Returns a rule that computes the logical AND of the input rules with the input mask
-    :param rules: One or more boolean rules
-    :return: Rule that is logical AND of the input boolean rules
-    """
-    def f(in_sym):
-        for rule in rules:
-            if not rule(in_sym):
-                return False
-        return True
-
-    return f
-
-
-# Meta rule for ORing
-def or_rules(*rules):
-    """
-    Returns a rule that computes the logical OR of the input rules with the input mask
-    :param rules: One or more boolean rules
-    :return: Rule that is logical OR of the input boolean rules
-    """
-    def f(in_sym):
-        for rule in rules:
-            if rule(in_sym):
-                return True
-        return False
-
-    return f
-
-
-# Create vector form for each posture
-engage_vec = [ 1 << 0 ]
-vecs = engage_vec + [1 << i for i in range(1, len(left_hand_postures + right_hand_postures + left_arm_motions + right_arm_motions + head_postures) + 1)]
-postures = ["engage"] + left_hand_postures + right_hand_postures + left_arm_motions + right_arm_motions + head_postures
-
-vec_to_posture = dict(zip(vecs, postures))
-posture_to_vec = dict(zip(postures, vecs))
 
 sm_ack = BinaryStateMachine(["posack start", "posack stop"], {
     "posack stop": {
@@ -764,7 +651,6 @@ csu_events = [ sm_engage, sm_ack, sm_nack, sm_grab,
                sm_count_one, sm_count_two, sm_count_three, sm_count_four, sm_count_five,
                sm_arms_together_X, sm_arms_apart_X, sm_arms_together_Y, sm_arms_apart_Y ]
 
-import argparse
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--mode', choices=['csu', 'brandeis'], default='brandeis', type=str,
