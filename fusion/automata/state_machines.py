@@ -46,6 +46,12 @@ class BinaryStateMachine:
     def get_state(self):
         return self.cur_state
 
+    def is_started(self):
+        return "start" in self.cur_state
+
+    def is_stopped(self):
+        return "stop" in self.cur_state
+
     def reset(self):
         self.cur_val = 0
         changed = False
@@ -79,36 +85,42 @@ class TriStateMachine:
             return self.reset()
         transitioned = False
         # Try high pose first, and possibly transition to high state
-        if self.rule(high_pose) and not self.is_high():
-            self.cur_val["high"] += 1
+        if self.rule(high_pose):
             self.cur_val["low"] = 0
             self.cur_val["stop"] = 0
-            if self.cur_val["high"] == self.threshold:
-                self.cur_val["high"] = 0
-                self.cur_state = TriStateMachine._states["high"]
-                transitioned = True
+            if not self.is_high():
+                self.cur_val["high"] += 1
+                if self.cur_val["high"] == self.threshold:
+                    self.cur_val["high"] = 0
+                    self.cur_state = TriStateMachine._states["high"]
+                    transitioned = True
 
         # Else, low pose, and possibly transition to low state
-        elif self.rule(low_pose) and not self.is_low():
-            self.cur_val["low"] += 1
+        elif self.rule(low_pose):
             self.cur_val["high"] = 0
             self.cur_val["stop"] = 0
-            if self.cur_val["low"] == self.threshold:
-                self.cur_val["low"] = 0
-                self.cur_state = TriStateMachine._states["low"]
-                transitioned = True
+            if not self.is_low():
+                self.cur_val["low"] += 1
+                if self.cur_val["low"] == self.threshold:
+                    self.cur_val["low"] = 0
+                    self.cur_state = TriStateMachine._states["low"]
+                    transitioned = True
 
         # Else, go to stop state
-        elif not self.is_stopped():
-            self.cur_val["stop"] += 1
+        else:
             self.cur_val["high"] = 0
             self.cur_val["low"] = 0
-            if self.cur_val["stop"] == self.threshold:
-                self.cur_val["stop"] = 0
-                self.cur_state["stop"] = TriStateMachine._states["stop"]
-                transitioned = True
+            if not self.is_stopped():
+                self.cur_val["stop"] += 1
+                if self.cur_val["stop"] == self.threshold:
+                    self.cur_val["stop"] = 0
+                    self.cur_state = TriStateMachine._states["stop"]
+                    transitioned = True
 
         return transitioned
+
+    def get_state(self):
+        return self.name + " " + TriStateMachine._states_arr[self.cur_state]
 
     def is_stopped(self):
         return self.cur_state == TriStateMachine._states["stop"]
@@ -119,8 +131,8 @@ class TriStateMachine:
     def is_high(self):
         return self.cur_state == TriStateMachine._states["high"]
 
-    def get_state(self):
-        return self.name + " " + TriStateMachine._states_arr[self.cur_state]
+    def is_started(self):
+        return self.is_high() or self.is_low()
 
     def reset(self):
         for k in self.cur_val.keys():
