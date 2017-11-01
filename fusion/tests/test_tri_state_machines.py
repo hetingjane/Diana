@@ -16,8 +16,8 @@ posack_trigger = posture_to_vec['engage'] | posture_to_vec['rh thumbs up']
 posack_non_trigger = posture_to_vec['engage'] | posture_to_vec['rh thumbs down']
 
 posack_high, posack_low, posack_stop = get_high_low_stop(posack_trigger, posack_non_trigger)
-"""
-@pytest.mark.parametrize("test_inpuit, expected_output", [
+
+@pytest.mark.parametrize("test_input, expected_output", [
     # base
     ([], ['stop']),
     # Tests the transition stop -> high -> low -> high -> stop
@@ -36,7 +36,6 @@ def test_posack(test_input, expected_output):
         if tsm_posack.input(*i):
             actual_output.append(tsm_posack.get_state().split(' ')[-1])
     assert actual_output == expected_output
-"""
 
 point_trigger = posture_to_vec['engage'] | posture_to_vec['RA: still'] | posture_to_vec['rh point front']
 point_non_trigger = posture_to_vec['engage'] | posture_to_vec['rh thumbs down']
