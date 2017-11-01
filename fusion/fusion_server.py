@@ -138,11 +138,7 @@ class App:
 
         engaged, larm_probs, rarm_probs, lhand_probs, rhand_probs, head_probs = self._get_probs()
 
-        arm_labels = np.array(range(len(larm_probs)))
-        high_larm_labels = arm_labels[larm_probs >= high_threshold]
-        low_larm_labels = arm_labels[np.logical_and(larm_probs >= low_threshold, larm_probs < high_threshold)]
-        high_rarm_labels = arm_labels[rarm_probs >= high_threshold]
-        low_rarm_labels = arm_labels[np.logical_and(rarm_probs >= low_threshold, rarm_probs < high_threshold)]
+        larm_label, rarm_label = self.latest_data[streams.get_stream_id("Body")][2:4]
 
         hand_labels = np.array(range(len(lhand_probs)))
         high_lhand_labels = hand_labels[lhand_probs >= high_threshold]
@@ -152,13 +148,14 @@ class App:
 
         head_labels = np.array(range(len(head_probs)))
         high_head_labels = head_labels[head_probs >= high_threshold]
-        low_head_labels = head_labels[np.logical_and(head_probs >= low_threshold, head_probs < high_threshold)]
 
+        # High pose uses max probability arm labels,
+        # head labels with probabilities in [high_threshold, 1.0],
+        # and hand labels with probabilities in [low_threshold, high_threshold)
         high_pose = 1 if engaged else 0
-        for l in high_larm_labels:
-            high_pose |= posture_to_vec[left_arm_motions[l]]
-        for l in high_rarm_labels:
-            high_pose |= posture_to_vec[right_arm_motions[l]]
+        high_pose |= posture_to_vec[left_arm_motions[larm_label]]
+        high_pose |= posture_to_vec[right_arm_motions[rarm_label]]
+
         for l in high_lhand_labels:
             high_pose |= posture_to_vec[left_hand_postures[l]]
         for l in high_rhand_labels:
@@ -166,17 +163,17 @@ class App:
         for l in high_head_labels:
             high_pose |= posture_to_vec[head_postures[l]]
 
+        # Low pose uses max probability arm labels,
+        # no head labels,
+        # and hand labels with probabilities in [low_threshold, high_threshold)
         low_pose = 1 if engaged else 0
-        for l in low_larm_labels:
-            low_pose |= posture_to_vec[left_arm_motions[l]]
-        for l in low_rarm_labels:
-            low_pose |= posture_to_vec[right_arm_motions[l]]
+        low_pose |= posture_to_vec[left_arm_motions[larm_label]]
+        low_pose |= posture_to_vec[right_arm_motions[rarm_label]]
+
         for l in low_lhand_labels:
             low_pose |= posture_to_vec[left_hand_postures[l]]
         for l in low_rhand_labels:
             low_pose |= posture_to_vec[right_hand_postures[l]]
-        for l in low_head_labels:
-            low_pose |= posture_to_vec[head_postures[l]]
 
         return engaged, high_pose, low_pose
 
@@ -262,7 +259,6 @@ brandeis_events = [bsm_engage, tsm_count_five, tsm_count_four, tsm_count_three, 
                    tsm_right_point_vec, tsm_left_point_vec,
                    bsm_left_continuous_point, bsm_right_continuous_point]
 
-#brandeis_events = [bsm_engage, tsm_posack]
 csu_events = brandeis_events + []
 
 if __name__ == '__main__':
