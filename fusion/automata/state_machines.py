@@ -134,6 +134,9 @@ class TriStateMachine:
     def is_started(self):
         return self.is_high() or self.is_low()
 
+    def get_name(self):
+        return self.name
+
     def reset(self):
         for k in self.cur_val.keys():
             self.cur_val[k] = 0
