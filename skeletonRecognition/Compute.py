@@ -1,14 +1,7 @@
 import numpy as np
 
-def default_bit_array(body_part, engaged):
-    if (body_part=='RA') or (body_part=='LA'):
-        temp = np.zeros(8)
-        if engaged:
-            temp[-2] = 1.0 #Still
-            return temp
-        else:
-            temp[-1] = 1.0 #Blind
-            return temp
+def default_bit_array(body_part):
+    if (body_part=='RA') or (body_part=='LA'): return np.zeros(6)
     elif (body_part=='arms_x') or (body_part=='arms_y'): return np.array([1,0,0])
 
 
@@ -118,7 +111,7 @@ def get_arm_motion(data):
 
     #print mag_threshold, data_mag
     bit_array = np.zeros(6)
-    proba_array = np.zeros(8)
+    proba_array = np.zeros(6)
 
     if data_mag>= mag_threshold:
         delta = data[-1]-data[0]
@@ -132,11 +125,6 @@ def get_arm_motion(data):
             proba_array = get_direction(seg, k, proba_array, thresh)
             if (thresh) > 0.3:
                 bit_array = get_direction(seg, k, bit_array, 1)
-
-    else:
-        proba_array[-2] = 1.0
-
-    print 'Probability array :', proba_array
 
     return proba_array, get_bit_array_to_integer_encoding(map(int, list(bit_array)))
 
