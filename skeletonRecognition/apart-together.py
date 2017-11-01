@@ -96,7 +96,7 @@ if __name__ == '__main__':
         input_data = (timestamp, body_count) + fd[4:]
         lpoint, rpoint = calculate_point(fd)
 
-        print 'left point: ', lpoint, 'right point: ', rpoint
+        #print 'left point: ', lpoint, 'right point: ', rpoint
         
 
         if engaged: 
@@ -135,19 +135,20 @@ if __name__ == '__main__':
                     map_array[0] = map_array[1] = bit_val
 
             else:
-                map_array, proba_array = send_default_values(body_parts)
+                map_array, proba_array = send_default_values(body_parts, engaged)
 
             result = collect_all_results(map_array, [lpoint, rpoint], proba_array, int(engaged))
             timestamp = list(data_stream)[-1][0]
 
         else:
-            map_array, proba_array = send_default_values(body_parts)
+            map_array, proba_array = send_default_values(body_parts, engaged)
             result = collect_all_results(map_array, [lpoint, rpoint], proba_array, int(engaged))
             data_stream.clear()
 
+
         pack_list = [streams.get_stream_id("Body"), timestamp] + result
-        print timestamp, 'Body_count: ', body_count, engaged_bit, code_to_label_encoding(result[0]), ',', code_to_label_encoding(result[1])#, result[:2]
-        raw_data = struct.pack("<iqii" + "ff" * 2 + "ff" * 6 + 'i', *pack_list)
+        print timestamp, engaged_bit, code_to_label_encoding(result[0]), ',', code_to_label_encoding(result[1])#, result[:2]
+        raw_data = struct.pack("<iqii" + "ff" * 2 + "ff" * 8 + 'i', *pack_list)
 
         if r is not None:
             r.sendall(raw_data)

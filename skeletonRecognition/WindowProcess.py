@@ -23,10 +23,10 @@ def collect_all_results(map_array, point_array, proba_array, value):
     return map_array + list(chain(*point_array)) + list(chain(*proba_array)) + [value]
 
 
-def send_default_values(body_parts, value_to_add= 26):
+def send_default_values(body_parts, engage_bit, value_to_add= 26):
     proba_array, map_array = [], []
     for b in body_parts:
-        proba_array.append(default_bit_array(b).tolist()), map_array.append(value_to_add)
+        proba_array.append(default_bit_array(b, engage_bit).tolist()), map_array.append(value_to_add)
 
     return map_array, proba_array
 
