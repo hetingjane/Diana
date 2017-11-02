@@ -179,10 +179,10 @@ class App:
 
     def _get_events(self):
 
+        engaged, high_pose, low_pose = self._get_pose_vectors()
+
         lx, ly, rx, ry = self.latest_data[streams.get_stream_id("Body")][4:8]
         word = self.latest_data[streams.get_stream_id("Speech")][2]
-
-        engaged, high_pose, low_pose = self._get_pose_vectors()
 
         # More than one output data is possible from multiple state machines
         all_events_to_send = []
@@ -218,6 +218,9 @@ class App:
 
         if engaged and len(word) > 0:
             all_events_to_send.append("S;" + word + ";" + ts)
+
+        if not engaged:
+            self._clear_synced_data()
 
         return all_events_to_send
 
