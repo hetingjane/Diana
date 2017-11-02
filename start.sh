@@ -1,6 +1,15 @@
 START_DIR=$(dirname "$0")
 START_DIR=$(realpath "$START_DIR")
 
+if [ -d "$1" ]
+then
+    VENV_DIR=$(realpath "$1")
+    echo -e "Using virtualenv directory: ${VENV_DIR}\n"
+else
+    echo -e "No valid virtualenv directory specified. Using system environement. To specify a virtualenv directory: $0 <venv_dir>\n"
+    VENV_DIR=""
+fi
+
 target="machines"
 
 if [ ! -e "$target" ]; then
@@ -17,16 +26,16 @@ do
     fi
     case "$process" in
     "fusion")
-    params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; if [ -d env ]; then source env/bin/activate; fi; python ./fusion/fusion_server.py; bash;'\" -t ${i}"
+    params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; if [ $VENV_DIR != '' ]; then source env/bin/activate; fi; python ./fusion/fusion_server.py; bash;'\" -t ${i}"
     ;;
     "lh")
-    params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; if [ -d env ]; then source env/bin/activate; fi; python ./handRecognition/depth_client.py LH; bash;'\" -t ${i}"
+    params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; if [ $VENV_DIR != '' ]; then source env/bin/activate; fi; python ./handRecognition/depth_client.py LH; bash;'\" -t ${i}"
     ;;
     "rh")
-    params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; if [ -d env ]; then source env/bin/activate; fi; python ./handRecognition/depth_client.py RH; bash;'\" -t ${i}"
+    params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; if [ $VENV_DIR != '' ]; then source env/bin/activate; fi; python ./handRecognition/depth_client.py RH; bash;'\" -t ${i}"
     ;;
     "head")
-    params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; if [ -d env ]; then source env/bin/activate; fi; python ./headRecognition/head_client.py RH; bash;'\" -t ${i}"
+    params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; if [ $VENV_DIR != '' ]; then source env/bin/activate; fi; python ./headRecognition/head_client.py RH; bash;'\" -t ${i}"
     ;;
     "speech")
     params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; sleep 3; python ./speech/speech_client.py; bash;'\" -t ${i}"
