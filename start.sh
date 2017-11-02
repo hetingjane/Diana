@@ -7,7 +7,7 @@ then
     echo -e "Using virtualenv directory: ${VENV_DIR}\n"
 else
     echo -e "No valid virtualenv directory specified. Using system environement.\nTo specify a virtualenv directory: $0 <venv_dir>\n"
-    VENV_DIR=""
+    VENV_DIR="x"
 fi
 
 target="machines"
@@ -26,22 +26,22 @@ do
     fi
     case "$process" in
     "fusion")
-    params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; if [ $VENV_DIR != '' ]; then source env/bin/activate; fi; python ./fusion/fusion_server.py; bash;'\" -t ${i}"
+    params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; if [ ${VENV_DIR} != 'x' ]; then source ${VENV_DIR}/bin/activate; fi; python ./fusion/fusion_server.py; bash;'\" -t ${i}"
     ;;
     "lh")
-    params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; if [ $VENV_DIR != '' ]; then source env/bin/activate; fi; python ./handRecognition/depth_client.py LH; bash;'\" -t ${i}"
+    params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; if [ ${VENV_DIR} != 'x' ]; then source ${VENV_DIR}/bin/activate; fi; python ./handRecognition/depth_client.py LH; bash;'\" -t ${i}"
     ;;
     "rh")
-    params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; if [ $VENV_DIR != '' ]; then source env/bin/activate; fi; python ./handRecognition/depth_client.py RH; bash;'\" -t ${i}"
+    params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; if [ ${VENV_DIR} != 'x' ]; then source ${VENV_DIR}/bin/activate; fi; python ./handRecognition/depth_client.py RH; bash;'\" -t ${i}"
     ;;
     "head")
-    params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; if [ $VENV_DIR != '' ]; then source env/bin/activate; fi; python ./headRecognition/head_client.py RH; bash;'\" -t ${i}"
+    params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; if [ ${VENV_DIR} != 'x' ]; then source ${VENV_DIR}/bin/activate; fi; python ./headRecognition/head_client.py RH; bash;'\" -t ${i}"
     ;;
     "speech")
     params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; sleep 3; python ./speech/speech_client.py; bash;'\" -t ${i}"
     ;;
     "body")
-    params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; sleep 3; if [ -d env ]; then source env/bin/activate; fi; python ./skeletonRecognition/apart-together.py; bash;'\" -t ${i}"
+    params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; sleep 3; if [ ${VENV_DIR} != 'x' ]; then source ${VENV_DIR}/bin/activate; fi; python ./skeletonRecognition/apart-together.py; bash;'\" -t ${i}"
     ;;
     *)
     echo "Invalid process specified: ${process}"
