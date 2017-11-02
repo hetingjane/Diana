@@ -6,7 +6,7 @@ then
     VENV_DIR=$(realpath "$1")
     echo -e "Using virtualenv directory: ${VENV_DIR}\n"
 else
-    echo -e "No valid virtualenv directory specified. Using system environement. To specify a virtualenv directory: $0 <venv_dir>\n"
+    echo -e "No valid virtualenv directory specified. Using system environement.\nTo specify a virtualenv directory: $0 <venv_dir>\n"
     VENV_DIR=""
 fi
 
