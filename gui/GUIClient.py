@@ -35,9 +35,9 @@ class ThreadedClient:
         try:
             sock.connect((src_addr, src_port))
         except:
-            print "Error connecting to {}:{}".format(src_addr, src_port)
+            print("Error connecting to {}:{}".format(src_addr, src_port))
             return None
-        print "Successfully connected to host "
+        print("Successfully connected to host ")
         return sock
 
     def receive_all(self, size):
@@ -55,10 +55,8 @@ class ThreadedClient:
         return event
 
     def receive(self):
-        print "here"
         events = self.receive_all(struct.calcsize("<i"))
         events, = struct.unpack("<i", events)
-        print events
 
         event_list = []
         for e in range(events):
@@ -68,13 +66,12 @@ class ThreadedClient:
             event = self.receive_all(event_length)
 
             event = self.map_events(struct.unpack("<" + str(event_length) + "s", event)[0])
-            print event
+            print(event)
             event_list.append(event)
 
         probabilities = self.receive_all(struct.calcsize("<82f"))
         probabilities = list(struct.unpack("<82f", probabilities))
         probabilities = probabilities[:44]+probabilities[45:77]+probabilities[78:81]
-        print probabilities
         decoded_frame =  probabilities + event_list
         return decoded_frame
 
