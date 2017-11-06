@@ -52,7 +52,6 @@ def recv_depth_frame(sock):
 if __name__ == '__main__':
 
     hand = sys.argv[1]
-    hand_name = sys.argv[1]
     stream_id = streams.get_stream_id(hand)
     gestures = list(np.load("/s/red/a/nobackup/cwc/hands/real_time_training_data/%s/gesture_list.npy" % hand))
     gestures = [g.replace(".npy", "") for g in gestures]
@@ -67,8 +66,6 @@ if __name__ == '__main__':
 
     i = 0
     hands_list = []
-
-    save_list = []
 
     start_time = time.time()
     while True:
@@ -107,16 +104,11 @@ if __name__ == '__main__':
             start_time = time.time()
 
         pack_list = [stream_id, timestamp,max_index]+list(probs)
-        save_list.append(pack_list)
 
         bytes = struct.pack("<iqi"+"f"*(num_gestures+1), *pack_list)
 
         if fusion_socket is not None:
             fusion_socket.send(bytes)
-
-        if len(save_list)%100 == 0:
-            np.save("/s/red/a/nobackup/cwc/demo/%s.npy"%hand_name, hands_list)
-            print len(hands_list)
 
     kinect_socket.close()
     if fusion_socket is not None:
