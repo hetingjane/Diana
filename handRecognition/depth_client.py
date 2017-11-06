@@ -67,6 +67,8 @@ if __name__ == '__main__':
     i = 0
     hands_list = []
 
+    save_list = []
+
     start_time = time.time()
     while True:
         try:
@@ -104,11 +106,16 @@ if __name__ == '__main__':
             start_time = time.time()
 
         pack_list = [stream_id, timestamp,max_index]+list(probs)
+        save_list.append(pack_list)
 
         bytes = struct.pack("<iqi"+"f"*(num_gestures+1), *pack_list)
 
         if fusion_socket is not None:
             fusion_socket.send(bytes)
+
+        if len(save_list%100) == 0:
+            np.save("/s/red/a/nobackup/cwc/demo/%s.npy"%hand, hands_list)
+            print len(hands_list)
 
     kinect_socket.close()
     if fusion_socket is not None:
