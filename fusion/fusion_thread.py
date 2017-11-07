@@ -39,7 +39,7 @@ class Fusion(threading.Thread):
             raise KeyError("Invalid stream ID: {}".format(stream_id))
 
     def _read_body_data(self, sock):
-        # Left Max Index, Right Max Index, 6 probabilities for move left, right, up, down, front, back * 2, Engage (1/0)
+        # Left Max Index, Right Max Index, Left point x,y * 2, 6 probabilities for move left, right, up, down, front, back * 2, Engage (1/0)
         data_format = "<" + "ii" + "2f" * 2 + "6f" * 2 + "i"
         raw_data = self._recv_all(sock, struct.calcsize(data_format))
         return struct.unpack(data_format, raw_data)

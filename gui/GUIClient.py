@@ -26,8 +26,8 @@ class ThreadedClient:
         sys.exit(app.exec_())
 
     def connect(self):
-        src_addr = FUSION_SRC_ADDR
-        src_port = FUSION_GUI_PORT
+        src_addr = 'blue'
+        src_port = 9127
 
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         #sock.settimeout(10)
@@ -35,9 +35,9 @@ class ThreadedClient:
         try:
             sock.connect((src_addr, src_port))
         except:
-            print "Error connecting to {}:{}".format(src_addr, src_port)
+            print("Error connecting to {}:{}".format(src_addr, src_port))
             return None
-        print "Successfully connected to host "
+        print("Successfully connected to host ")
         return sock
 
     def receive_all(self, size):
@@ -55,22 +55,22 @@ class ThreadedClient:
         return event
 
     def receive(self):
-        events = self.receive_all(struct.calcsize("!i"))
-        events, = struct.unpack("!i", events)
+        events = self.receive_all(struct.calcsize("<i"))
+        events, = struct.unpack("<i", events)
 
         event_list = []
         for e in range(events):
-            event_length = self.receive_all(struct.calcsize("!i"))
-            event_length, = struct.unpack("!i", event_length)
+            event_length = self.receive_all(struct.calcsize("<i"))
+            event_length, = struct.unpack("<i", event_length)
 
             event = self.receive_all(event_length)
 
-            event = self.map_events(struct.unpack("!" + str(event_length) + "s", event)[0])
-            print event
+            event = self.map_events(struct.unpack("<" + str(event_length) + "s", event)[0])
+            print(event)
             event_list.append(event)
 
-        probabilities = self.receive_all(struct.calcsize("!82f"))
-        probabilities = list(struct.unpack("!82f", probabilities))
+        probabilities = self.receive_all(struct.calcsize("<82f"))
+        probabilities = list(struct.unpack("<82f", probabilities))
         probabilities = probabilities[:44]+probabilities[45:77]+probabilities[78:81]
         decoded_frame =  probabilities + event_list
         return decoded_frame

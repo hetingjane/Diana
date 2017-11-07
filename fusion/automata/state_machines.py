@@ -116,7 +116,6 @@ class TriStateMachine:
                     self.cur_val["stop"] = 0
                     self.cur_state = TriStateMachine._states["stop"]
                     transitioned = True
-
         return transitioned
 
     def get_state(self):

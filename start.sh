@@ -1,26 +1,55 @@
-#!/usr/bin/env bash
-
 START_DIR=$(dirname "$0")
 START_DIR=$(realpath "$START_DIR")
 
-echo 'logging into blue for fusion'
-gnome-terminal -x bash -c "ssh -t blue 'cd $PWD/fusion/; python fusion_server.py;bash;'" &
-sleep 2
+if [ -d "$1" ]
+then
+    VENV_DIR=$(realpath "$1")
+    echo -e "Using virtualenv directory: ${VENV_DIR}\n"
+else
+    echo -e "No valid virtualenv directory specified. Using system environement.\nTo specify a virtualenv directory: $0 <venv_dir>\n"
+    VENV_DIR="x"
+fi
 
-echo 'logging into maserati for Depth RH'
-gnome-terminal -x bash -c "ssh -t porsche 'cd $PWD/handRecognition/; python depth_client.py RH;bash;'" &
-sleep 1
+target="machines"
 
-echo 'logging into corvette for Depth LH'
-gnome-terminal -x bash -c "ssh -t lamborghini 'cd $PWD/handRecognition/; python depth_client.py LH;bash;'" &
-sleep 1
+if [ ! -e "$target" ]; then
+    target="machines.bak"
+fi
 
-echo 'logging into lotus for Depth Head'
-gnome-terminal -x bash -c "ssh -t lotus 'cd $PWD/headRecognition/; python head_client.py;bash;'" &
-sleep 1
+params=""
+for i in $(cat $target)
+do
+    process=${i%@*}
+    machine=${i#*@}
+    if [ "$machine" = "local" ]; then
+        machine="$HOSTNAME"
+    fi
+    case "$process" in
+    "fusion")
+    params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; if [ ${VENV_DIR} != 'x' ]; then source ${VENV_DIR}/bin/activate; fi; python ./fusion/fusion_server.py; bash;'\" -t ${i}"
+    ;;
+    "lh")
+    params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; if [ ${VENV_DIR} != 'x' ]; then source ${VENV_DIR}/bin/activate; fi; python ./handRecognition/depth_client.py LH; bash;'\" -t ${i}"
+    ;;
+    "rh")
+    params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; if [ ${VENV_DIR} != 'x' ]; then source ${VENV_DIR}/bin/activate; fi; python ./handRecognition/depth_client.py RH; bash;'\" -t ${i}"
+    ;;
+    "head")
+    params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; if [ ${VENV_DIR} != 'x' ]; then source ${VENV_DIR}/bin/activate; fi; python ./headRecognition/head_client.py RH; bash;'\" -t ${i}"
+    ;;
+    "speech")
+    params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; sleep 3; python ./speech/speech_client.py; bash;'\" -t ${i}"
+    ;;
+    "body")
+    params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; sleep 3; if [ ${VENV_DIR} != 'x' ]; then source ${VENV_DIR}/bin/activate; fi; python ./skeletonRecognition/apart-together.py; bash;'\" -t ${i}"
+    ;;
+    *)
+    echo "Invalid process specified: ${process}"
+    exit
+    ;;
+    esac
+done
 
-echo 'logging into cyan for skeleton recogntion'
-gnome-terminal -x bash -c "ssh -t cyan 'cd $PWD/skeletonRecognition/; python apart-together.py;bash;'" &
-
-echo 'Running speech client locally'
-gnome-terminal --window --working-directory="$START_DIR" --command "python ./speech/speech_client.py"
+cmd="gnome-terminal ${params}"
+#echo "$cmd"
+eval $cmd
