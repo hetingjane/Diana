@@ -255,12 +255,12 @@ class App:
             gui_events.put(ev_count + ''.join(raw_events_list) + raw_probs)
 
 
-brandeis_events = [bsm_engage, tsm_count_five, tsm_count_four, tsm_count_three, tsm_count_two, tsm_count_one,
-                   tsm_grab_move_back, tsm_grab_move_front, tsm_grab_move_left, tsm_grab_move_right,
+brandeis_events = [bsm_engage, bsm_left_continuous_point, bsm_right_continuous_point,
+                   tsm_count_five, tsm_count_four, tsm_count_three, tsm_count_two, tsm_count_one,
+                   tsm_grab, tsm_grab_move_back, tsm_grab_move_front, tsm_grab_move_left, tsm_grab_move_right,
                    tsm_grab_move_up, tsm_gram_move_down, tsm_negack, tsm_posack,
                    tsm_push_back, tsm_push_front, tsm_push_left, tsm_push_right,
-                   tsm_right_point_vec, tsm_left_point_vec,
-                   bsm_left_continuous_point, bsm_right_continuous_point]
+                   tsm_right_point_vec, tsm_left_point_vec]
 
 csu_events = brandeis_events + []
 

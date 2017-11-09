@@ -21,6 +21,8 @@ tsm_right_point_vec = TriStateMachine("right point",
                                           match_any('rh point down', 'rh point left', 'rh point front')
                                       ))
 
+tsm_grab = TriStateMachine("grab", match_any('rh claw down', 'lh claw down'))
+
 tsm_grab_move_up = TriStateMachine("grab move up",
                                    or_rules(
                                        match_all('rh claw down', 'RA: move up'),
