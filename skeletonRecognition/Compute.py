@@ -92,8 +92,8 @@ def get_arm_motion(data):
                      [ 0.,  1.,  0.,  0.,  0.,  1.], #Left Front
                      [ 0.,  0.,  1.,  0.,  1.,  0.], #Up Back
                      [ 0.,  0.,  1.,  0.,  0.,  1.], #Up Front
-                     [ 0.,  0.,  0.,  1.,  1.,  0.], #Back Down
-                     [ 0.,  0.,  0.,  1.,  0.,  1.], #Back Front
+                     [ 0.,  0.,  0.,  1.,  1.,  0.], #Down Back
+                     [ 0.,  0.,  0.,  1.,  0.,  1.], #Down Front
                      [ 1.,  0.,  1.,  0.,  1.,  0.], #Right Up Back
                      [ 1.,  0.,  1.,  0.,  0.,  1.], #Right Up Front
                      [ 1.,  0.,  0.,  1.,  1.,  0.], #Right Down Back
