@@ -124,9 +124,12 @@ def calcPointing(wrist, elbow):
     z = z1 - (y1-y) / (y2-y1) * (z2-z1)
     '''
     table_y = -0.582
+    if elbow[1] == wrist[1]:
+        return [-np.inf, -np.inf]
+
     table_x = wrist[0] - (wrist[1]-table_y) / (elbow[1] - wrist[1]) * (elbow[0] - wrist[0])
     table_z = wrist[2] - (wrist[1]-table_y) / (elbow[1] - wrist[1]) * (elbow[2] - wrist[2])
-    
+
     return [table_x, table_z]
 
 lpoint = [-0.5, 1.3] # inferred pointing coordinate on the table from left arm
