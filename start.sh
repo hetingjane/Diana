@@ -28,22 +28,22 @@ do
     fi
     case "$process" in
     "fusion")
-    params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; if [ ${VENV_DIR} != 'x' ]; then source ${VENV_DIR}/bin/activate; fi; python ./fusion/fusion_server.py; bash;'\" -t ${i}"
+    params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; if [ ${VENV_DIR} != 'x' ]; then source ${VENV_DIR}/bin/activate; fi; python ./fusion/fusion_server.py; bash;'\" --title ${i}"
     ;;
     "lh")
-    params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; if [ ${VENV_DIR} != 'x' ]; then source ${VENV_DIR}/bin/activate; fi; python ./handRecognition/depth_client.py LH; bash;'\" -t ${i}"
+    params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; if [ ${VENV_DIR} != 'x' ]; then source ${VENV_DIR}/bin/activate; fi; python ./handRecognition/depth_client.py LH; bash;'\" --title ${i}"
     ;;
     "rh")
-    params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; if [ ${VENV_DIR} != 'x' ]; then source ${VENV_DIR}/bin/activate; fi; python ./handRecognition/depth_client.py RH; bash;'\" -t ${i}"
+    params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; if [ ${VENV_DIR} != 'x' ]; then source ${VENV_DIR}/bin/activate; fi; python ./handRecognition/depth_client.py RH; bash;'\" --title ${i}"
     ;;
     "head")
-    params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; if [ ${VENV_DIR} != 'x' ]; then source ${VENV_DIR}/bin/activate; fi; python ./headRecognition/head_client.py RH; bash;'\" -t ${i}"
+    params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; if [ ${VENV_DIR} != 'x' ]; then source ${VENV_DIR}/bin/activate; fi; python ./headRecognition/head_client.py RH; bash;'\" --title ${i}"
     ;;
     "speech")
-    params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; sleep 3; python ./speech/speech_client.py; bash;'\" -t ${i}"
+    params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; sleep 3; python ./speech/speech_client.py; bash;'\" --title ${i}"
     ;;
     "body")
-    params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; sleep 3; if [ ${VENV_DIR} != 'x' ]; then source ${VENV_DIR}/bin/activate; fi; python ./skeletonRecognition/apart-together.py; bash;'\" -t ${i}"
+    params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; sleep 3; if [ ${VENV_DIR} != 'x' ]; then source ${VENV_DIR}/bin/activate; fi; python ./skeletonRecognition/apart-together.py; bash;'\" --title ${i}"
     ;;
     *)
     echo "Invalid process specified: ${process}"
@@ -52,6 +52,7 @@ do
     esac
 done
 
-cmd="gnome-terminal ${params}"
+cmd="xfce4-terminal ${params}"
+cmd=${cmd/--tab/}
 #echo "$cmd"
 eval $cmd
