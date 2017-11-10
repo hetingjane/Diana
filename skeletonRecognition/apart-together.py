@@ -79,6 +79,7 @@ if __name__ == '__main__':
     logpath = '/s/red/a/nobackup/vision/dkpatil/demo/GRU_5_class/'  # '/s/chopin/k/grad/dkpatil/temp/SkeletonRealTime/GRU_classifier/'
     model = GRU_RNN(logpath)
     solver = EGGNOGClassifierSlidingWindow(model=model, restore_model=True)
+    class_list = ['emblems', 'motions', 'neutral', 'oscillate', 'still']
 
     
     while True:
@@ -110,10 +111,10 @@ if __name__ == '__main__':
 
                 # Processing the GRU Classification for the 15 frame window
                 res = prune_joints_dataset([t], body_part='arms')
-                result = solver.predict(res)
+                predicted = solver.predict(res)
 
                 #Adding the probability values of 5 class first
-                proba_array.append(result[1].tolist())
+                proba_array.append(predicted[1].tolist())
 
 
                 for b in body_parts:
@@ -145,7 +146,7 @@ if __name__ == '__main__':
 
 
                 #Adding label index of 5 class result
-                map_array.append(result[0])
+                map_array.append(predicted[0])
 
             else:
                 map_array, proba_array = send_default_values(body_parts)
@@ -159,7 +160,7 @@ if __name__ == '__main__':
             data_stream.clear()
 
         pack_list = [streams.get_stream_id("Body"), timestamp] + result
-        print timestamp, 'Body_count: ', body_count, engaged_bit, code_to_label_encoding(result[0]), ',', code_to_label_encoding(result[1])#, result[:2]
+        print timestamp, engaged_bit, code_to_label_encoding(result[0]), ',', code_to_label_encoding(result[1]), class_list[result[2]]#, result[:2]
         raw_data = struct.pack("<iqiii" + "ff" * 2 + "f" * 5 + "ff" * 6 + 'i', *pack_list)
 
         if r is not None:
