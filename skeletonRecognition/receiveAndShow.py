@@ -84,7 +84,7 @@ def recv_skeleton_frame(sock):
 '''
     
 import numpy as np
-
+from scipy.signal import savgol_filter
 
 
 # following codes get the elbow and wrist information from the kinect sensor
@@ -92,8 +92,13 @@ WRISTLEFT = 6 # JointType specified by kinect
 WRISTRIGHT = 10
 ELBOWLEFT = 5
 ELBOWRIGHT = 9
-# joint_interest = ['WRISTLEFT', 'WRISTRIGHT', 'ELBOWLEFT', 'ELBOWRIGHT']
 joint_interest_coded = [WRISTLEFT, WRISTRIGHT, ELBOWLEFT, ELBOWRIGHT]
+
+lpoint_buffer = []
+rpoint_buffer = []
+lpoint = [-0.5, 1.3] # inferred pointing coordinate on the table from left arm
+rpoint = [0.5, 1.3] # inferred pointing coordinate on the table from left arm
+
 
 def getWristElbow(src):
     '''
@@ -110,7 +115,34 @@ def getWristElbow(src):
         if src[(i+1)*9] in joint_interest_coded:
             result[src[(i+1)*9]] = src[(i+1)*9 + 2: (i+2)*9 + 5]
     return result
-    
+
+
+def smoothing(window_length=5, polyorder=2):
+    global lpoint_buffer
+    global rpoint_buffer
+    global lpoint
+    global rpoint
+
+    #    print(len(lpoint_buffer))
+    if len(lpoint_buffer) >= window_length:
+        lpoint_buffer.pop(0)
+        lpoint_buffer.append(lpoint)
+        #        lpoint = savgol_filter(lpoint_buffer, window_length, polyorder, axis = 0)[int(window_length/2)]
+        lpoint_buffer = savgol_filter(lpoint_buffer, window_length, polyorder, axis=0).tolist()
+        lpoint = lpoint_buffer[int(window_length / 2)]
+    else:
+        lpoint_buffer.append(lpoint)
+
+    if len(rpoint_buffer) >= window_length:
+        rpoint_buffer.pop(0)
+        rpoint_buffer.append(rpoint)
+        #        rpoint = savgol_filter(rpoint_buffer, window_length, polyorder, axis = 0)[int(window_length/2)]
+        rpoint_buffer = savgol_filter(rpoint_buffer, window_length, polyorder, axis=0).tolist()
+        rpoint = rpoint_buffer[int(window_length / 2)]
+    else:
+        rpoint_buffer.append(rpoint)
+
+
 
 def calcPointing(wrist, elbow):
     '''
@@ -123,17 +155,15 @@ def calcPointing(wrist, elbow):
     x = x1 - (y1-y) / (y2-y1) * (x2-x1)
     z = z1 - (y1-y) / (y2-y1) * (z2-z1)
     '''
+    if ((elbow[1] - wrist[1]) == 0):
+        return (-np.inf, -np.inf)
     table_y = -0.582
-    if elbow[1] == wrist[1]:
-        return [-np.inf, -np.inf]
+    table_x = wrist[0] - (wrist[1] - table_y) / (elbow[1] - wrist[1]) * (elbow[0] - wrist[0])
+    table_z = wrist[2] - (wrist[1] - table_y) / (elbow[1] - wrist[1]) * (elbow[2] - wrist[2])
 
-    table_x = wrist[0] - (wrist[1]-table_y) / (elbow[1] - wrist[1]) * (elbow[0] - wrist[0])
-    table_z = wrist[2] - (wrist[1]-table_y) / (elbow[1] - wrist[1]) * (elbow[2] - wrist[2])
+    return (table_x, table_z)
 
-    return [table_x, table_z]
 
-lpoint = [-0.5, 1.3] # inferred pointing coordinate on the table from left arm
-rpoint = [0.5, 1.3] # inferred pointing coordinate on the table from left arm
 
 def calculate_point(fd):
     result = getWristElbow(fd)
@@ -147,6 +177,7 @@ def calculate_point(fd):
     else:
         lpoint = [-np.inf, -np.inf]
         rpoint = [-np.inf, -np.inf]
+        smoothing(5)
 
     return lpoint, rpoint
 

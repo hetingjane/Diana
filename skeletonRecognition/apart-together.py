@@ -6,6 +6,7 @@ import numpy as np
 
 from SlidingWindow import sliding_window_dataset
 from WindowProcess import (extract_data, process_window_data, collect_all_results, send_default_values, code_to_label_encoding)
+from Preprocessing import prune_joints_dataset
 from support.endpoints import connect
 from support import streams
 from receiveAndShow import calculate_point
@@ -75,9 +76,11 @@ if __name__ == '__main__':
 
     avg_frame_time = 0.0
 
-    arms_x_bits = ["still", "arms apart", "arms together"]
-    arms_y_bits = ["still", "stack up", "stack down"]
-    
+    from GRU_classifier import (GRU_RNN, EGGNOGClassifierSlidingWindow)
+    logpath = '/s/red/a/nobackup/vision/dkpatil/demo/GRU_5_class/'  # '/s/chopin/k/grad/dkpatil/temp/SkeletonRealTime/GRU_classifier/'
+    model = GRU_RNN(logpath)
+    solver = EGGNOGClassifierSlidingWindow(model=model, restore_model=True)
+
     
     while True:
         try:
@@ -91,7 +94,6 @@ if __name__ == '__main__':
         if engaged:engaged_bit = 'Engaged'
         else: engaged_bit = 'Disengaged'
 
-        #print 'timestamp received: ', timestamp
 
         input_data = (timestamp, body_count) + fd[4:]
         lpoint, rpoint = calculate_point(fd)
@@ -107,6 +109,14 @@ if __name__ == '__main__':
                 test_window = sliding_window_dataset([t], window_threshold)
 
                 proba_array, map_array = [], []
+                #Format of proba array is:  <<Emblem>, <Motion>, <Neutral>, <Oscillate>, <Still>> <<6 Probability values of LA> <6 of RA>>
+
+                # Processing the GRU cClassification for the 15 frame window
+                res = prune_joints_dataset([t], body_part='arms')
+                result = solver.predict(res)
+                proba_array.append(result[1].tolist())
+
+
                 for b in body_parts:
                     res = process_window_data(test_window, body_part=b)
                     proba_array.append(res[0].tolist()), map_array.append(res[1])
@@ -134,6 +144,7 @@ if __name__ == '__main__':
                         bit_val = 30
                     map_array[0] = map_array[1] = bit_val
 
+
             else:
                 map_array, proba_array = send_default_values(body_parts)
 
@@ -147,13 +158,12 @@ if __name__ == '__main__':
 
         pack_list = [streams.get_stream_id("Body"), timestamp] + result
         print timestamp, 'Body_count: ', body_count, engaged_bit, code_to_label_encoding(result[0]), ',', code_to_label_encoding(result[1])#, result[:2]
-        raw_data = struct.pack("<iqii" + "ff" * 2 + "ff" * 6 + 'i', *pack_list)
+        raw_data = struct.pack("<iqii" + "ff" * 2 + "f" * 5 + "ff" * 6 + 'i', *pack_list)
 
         if r is not None:
             r.sendall(raw_data)
 
     print "Total frame time: {}".format(avg_frame_time)
-   
     s.close()
     if r is not None:
         r.close()

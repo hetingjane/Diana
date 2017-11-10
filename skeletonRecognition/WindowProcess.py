@@ -25,6 +25,10 @@ def collect_all_results(map_array, point_array, proba_array, value):
 
 def send_default_values(body_parts, value_to_add= 26):
     proba_array, map_array = [], []
+
+    #Adding probability of 1.0 to still label for the 5 class probaility list
+    #<Emblem>, <Motion>, <Neutral>, <Oscillate>, <Still>
+    proba_array.append([0.0, 0.0, 0.0, 0.0, 1.0])
     for b in body_parts:
         proba_array.append(default_bit_array(b).tolist()), map_array.append(value_to_add)
 

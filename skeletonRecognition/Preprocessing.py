@@ -1,6 +1,39 @@
 import numpy as np
 from itertools import chain
 
+
+
+#Normalization by other joints
+def normalize_by_joint(data, joint_index, verbose=False):
+    dims = 3
+    #print 'normalization joint index is: ', joint_index
+    b = np.copy(data)
+    b = b.astype(np.float64)
+    joint = np.zeros(dims)
+
+    for i in range(dims):
+        joint[i] = np.mean(b[:, (joint_index*dims + i)])
+
+    m, n = b.shape
+    for i in range(n):
+        b[:, i] -= joint[i % dims]
+
+
+    if verbose:
+        print 'data before normalization: ', data
+        print 'mean of the spine joint:', joint
+        print 'data after normalization: ', b
+
+    return b
+
+
+
+def normalize_joint_dataset(data_list, joint_index, verbose=False):
+    return [normalize_by_joint(data, joint_index, verbose=verbose) for data in data_list]
+
+
+
+
 def get_pruned_dataset(data_list, label_list, window_size):
     temp_data = []
     temp_label = []
@@ -28,11 +61,17 @@ def prune_joints(data, body_part='RA'):
     elif (body_part == 'arms_y'):
         joints = [5, 6, 7, 9, 10, 11]  # 3 joints of right and left hand considered: (hand, elbow and wrist) only x : dimensionality = 6
         points = list(chain(*[[(i * 3 + 1)] for i in joints])) #points = list(chain(*[[(i * 3), (i * 3 + 1), (i * 3 + 2)] for i in joints]))
+    elif (body_part == 'arms'):
+        joints = [5,6,7,9,10,11,12]  # 3 joints of right and left hand considered: (hand, elbow and wrist) only x : dimensionality = 6
+        points = list(chain(*[[(i * 3), (i * 3 + 1), (i * 3 + 2)] for i in joints]))
     return data[:, points]
 
 
 def prune_joints_dataset(data_list, body_part):
     return [prune_joints(data, body_part) for data in data_list]
+
+
+
 
 
 
