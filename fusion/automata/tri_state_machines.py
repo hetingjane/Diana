@@ -93,10 +93,18 @@ tsm_push_back = TriStateMachine("push back",
 tsm_unknown = TriStateMachine("unknown",
                               and_rules(
                                   match_all('emblem'),
-                                  mismatch_all('rh one front', 'lh one front', )
-
-                              )
-                              )
+                                  mismatch_all('rh one front', 'lh one front', 'rh one front',
+                                               'rh two front', 'rh two back', 'lh two front', 'lh two back',
+                                               'rh three front', 'rh three back', 'lh three front', 'lh three back',
+                                               'rh four front', 'lh four front',
+                                               'rh five front', 'lh five front',
+                                               'rh inch', 'lh inch',
+                                               'rh l', 'lh l',
+                                               'rh stop', 'lh stop',
+                                               'rh thumbs up', 'lh thumbs up',
+                                               'rh thumbs down', 'lh thumbs down'
+                                               )
+                              ))
 
 tsm_count_one = TriStateMachine("count one", match_any('rh one front', 'lh one front'))
 

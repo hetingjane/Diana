@@ -270,7 +270,7 @@ brandeis_events = [bsm_engage, bsm_left_continuous_point, bsm_right_continuous_p
                    tsm_push_back, tsm_push_front, tsm_push_left, tsm_push_right,
                    tsm_right_point_vec, tsm_left_point_vec]
 
-csu_events = brandeis_events + []
+csu_events = brandeis_events + [tsm_unknown]
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
