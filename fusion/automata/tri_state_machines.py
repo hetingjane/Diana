@@ -106,6 +106,32 @@ tsm_unknown = TriStateMachine("unknown",
                                                )
                               ))
 
+tsm_servo_left = TriStateMachine("servo left",
+                                 and_rules(
+                                     match_any('rh closed left', 'rh open left'),
+                                     match_all('oscillate'))
+                                 )
+
+tsm_servo_right = TriStateMachine("servo right",
+                                  and_rules(
+                                      match_any('lh closed right', 'lh open right'),
+                                      match_all('oscillate'))
+                                  )
+
+tsm_servo_front = TriStateMachine("servo front",
+                                  and_rules(
+                                      match_any('rh closed front', 'lh closed front'),
+                                      match_all('oscillate'))
+                                  )
+
+tsm_servo_back = TriStateMachine("servo back",
+                                 and_rules(
+                                     match_any('rh closed back', 'lh closed back',
+                                               'rh open back', 'lh open back'),
+                                     match_all('oscillate'))
+                                 )
+
+
 tsm_count_one = TriStateMachine("count one", match_any('rh one front', 'lh one front'))
 
 tsm_count_two = TriStateMachine("count two", match_any('rh two front', 'rh two back', 'lh two front', 'lh two back'))

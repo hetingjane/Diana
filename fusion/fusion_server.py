@@ -263,14 +263,12 @@ gsm = GrabStateMachine()
 
 brandeis_events = [bsm_engage, bsm_left_continuous_point, bsm_right_continuous_point,
                    tsm_count_five, tsm_count_four, tsm_count_three, tsm_count_two, tsm_count_one,
-                   #tsm_grab, tsm_grab_move_back, tsm_grab_move_front, tsm_grab_move_left, tsm_grab_move_right,
-                   #tsm_grab_move_up, tsm_gram_move_down,
                    gsm,
                    tsm_negack, tsm_posack,
                    tsm_push_back, tsm_push_front, tsm_push_left, tsm_push_right,
                    tsm_right_point_vec, tsm_left_point_vec]
 
-csu_events = brandeis_events + [tsm_unknown]
+csu_events = brandeis_events + [tsm_unknown, tsm_servo_left, tsm_servo_right, tsm_servo_front, tsm_servo_back]
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
