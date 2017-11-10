@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 START_DIR=$(dirname "$0")
 START_DIR=$(realpath "$START_DIR")
 
