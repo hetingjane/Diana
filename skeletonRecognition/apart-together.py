@@ -1,15 +1,14 @@
 import struct
 import sys
 from collections import deque
-
 import numpy as np
-
 from SlidingWindow import sliding_window_dataset
 from WindowProcess import (extract_data, process_window_data, collect_all_results, send_default_values, code_to_label_encoding)
 from Preprocessing import prune_joints_dataset
 from support.endpoints import connect
 from support import streams
 from receiveAndShow import calculate_point
+
 
 def decode_frame(raw_frame):
     # The format is given according to the following assumption of network data
@@ -98,9 +97,6 @@ if __name__ == '__main__':
         input_data = (timestamp, body_count) + fd[4:]
         lpoint, rpoint = calculate_point(fd)
 
-        print 'left point: ', lpoint, 'right point: ', rpoint
-        
-
         if engaged: 
             data_stream.extend([input_data])
   
@@ -110,10 +106,13 @@ if __name__ == '__main__':
 
                 proba_array, map_array = [], []
                 #Format of proba array is:  <<Emblem>, <Motion>, <Neutral>, <Oscillate>, <Still>> <<6 Probability values of LA> <6 of RA>>
+                #Format of map_array is: <<LA index>, <RA index>, <Body index>>
 
-                # Processing the GRU cClassification for the 15 frame window
+                # Processing the GRU Classification for the 15 frame window
                 res = prune_joints_dataset([t], body_part='arms')
                 result = solver.predict(res)
+
+                #Adding the probability values of 5 class first
                 proba_array.append(result[1].tolist())
 
 
@@ -145,6 +144,9 @@ if __name__ == '__main__':
                     map_array[0] = map_array[1] = bit_val
 
 
+                #Adding label index of 5 class result
+                map_array.append(result[0])
+
             else:
                 map_array, proba_array = send_default_values(body_parts)
 
@@ -158,7 +160,7 @@ if __name__ == '__main__':
 
         pack_list = [streams.get_stream_id("Body"), timestamp] + result
         print timestamp, 'Body_count: ', body_count, engaged_bit, code_to_label_encoding(result[0]), ',', code_to_label_encoding(result[1])#, result[:2]
-        raw_data = struct.pack("<iqii" + "ff" * 2 + "f" * 5 + "ff" * 6 + 'i', *pack_list)
+        raw_data = struct.pack("<iqiii" + "ff" * 2 + "f" * 5 + "ff" * 6 + 'i', *pack_list)
 
         if r is not None:
             r.sendall(raw_data)

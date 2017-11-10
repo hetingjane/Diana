@@ -92,6 +92,7 @@ class EGGNOGClassifierSlidingWindow(object):
         pred_val = int(pred_val[0])
         proba = proba_output[0]
 
-        class_list = ['emblems', 'motions', 'neutral', 'oscillate', 'still']
-        return (class_list[pred_val], max(proba))
+        # class_list = ['emblems', 'motions', 'neutral', 'oscillate', 'still']
+        #Format of result of classifier <Label index>, <Probability values for 5 classes>
+        return (pred_val, proba)
 
