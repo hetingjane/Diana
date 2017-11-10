@@ -120,9 +120,10 @@ class App:
             pass
 
     def _get_probs(self):
-        body_probs = self.latest_data[streams.get_stream_id("Body")][-13:-1]
+        body_probs = self.latest_data[streams.get_stream_id("Body")][-18:-1]
         engaged = self.latest_data[streams.get_stream_id("Body")][-1] == 1
-        larm_probs, rarm_probs = np.array(body_probs[:6]), np.array(body_probs[6:12])
+        emblem, motion, neutral, oscillate, still = body_probs[:5]
+        larm_probs, rarm_probs = np.array(body_probs[5:11]), np.array(body_probs[11:])
 
         lhand_probs = np.array(self.latest_data[streams.get_stream_id("LH")][-len(left_hand_postures):])
         rhand_probs = np.array(self.latest_data[streams.get_stream_id("RH")][-len(right_hand_postures):])
@@ -139,7 +140,7 @@ class App:
 
         engaged, larm_probs, rarm_probs, lhand_probs, rhand_probs, head_probs = self._get_probs()
 
-        larm_label, rarm_label = self.latest_data[streams.get_stream_id("Body")][2:4]
+        larm_label, rarm_label, body_label = self.latest_data[streams.get_stream_id("Body")][2:5]
 
         hand_labels = np.array(range(len(lhand_probs)))
         high_lhand_labels = hand_labels[lhand_probs >= high_threshold]
@@ -150,12 +151,13 @@ class App:
         head_labels = np.array(range(len(head_probs)))
         high_head_labels = head_labels[head_probs >= high_threshold]
 
-        # High pose uses max probability arm labels,
+        # High pose uses max probability arm labels, max probability body label
         # head labels with probabilities in [high_threshold, 1.0],
         # and hand labels with probabilities in [low_threshold, high_threshold)
         high_pose = 1 if engaged else 0
         high_pose |= posture_to_vec[left_arm_motions[larm_label]]
         high_pose |= posture_to_vec[right_arm_motions[rarm_label]]
+        high_pose |= posture_to_vec[body_postures[body_label]]
 
         for l in high_lhand_labels:
             high_pose |= posture_to_vec[left_hand_postures[l]]
@@ -164,12 +166,13 @@ class App:
         for l in high_head_labels:
             high_pose |= posture_to_vec[head_postures[l]]
 
-        # Low pose uses max probability arm labels,
+        # Low pose uses max probability arm labels, and max probability body label
         # no head labels,
         # and hand labels with probabilities in [low_threshold, high_threshold)
         low_pose = 1 if engaged else 0
         low_pose |= posture_to_vec[left_arm_motions[larm_label]]
         low_pose |= posture_to_vec[right_arm_motions[rarm_label]]
+        low_pose |= posture_to_vec[body_postures[body_label]]
 
         for l in low_lhand_labels:
             low_pose |= posture_to_vec[left_hand_postures[l]]

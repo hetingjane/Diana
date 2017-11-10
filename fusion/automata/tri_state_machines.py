@@ -90,6 +90,14 @@ tsm_push_back = TriStateMachine("push back",
                                     match_any('rh beckon', 'lh beckon')
                                 ))
 
+tsm_unknown = TriStateMachine("unknown",
+                              and_rules(
+                                  match_all('emblem'),
+                                  mismatch_all('rh one front', 'lh one front', )
+
+                              )
+                              )
+
 tsm_count_one = TriStateMachine("count one", match_any('rh one front', 'lh one front'))
 
 tsm_count_two = TriStateMachine("count two", match_any('rh two front', 'rh two back', 'lh two front', 'lh two back'))

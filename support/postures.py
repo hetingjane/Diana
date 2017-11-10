@@ -50,10 +50,12 @@ right_arm_motions = ['RA: move right', 'RA: move left', 'RA: move up', 'RA: move
 
 head_postures = ['head nod', 'head shake', 'other', 'blind']
 
+body_postures = ['emblem', 'motion', 'neutral', 'oscillate', 'still']
+
 # Create vector form for each posture
 _engage_vec = [ 1 << 0 ]
-_vecs = _engage_vec + [1 << i for i in range(1, len(left_hand_postures + right_hand_postures + left_arm_motions + right_arm_motions + head_postures) + 1)]
-_postures = ["engage"] + left_hand_postures + right_hand_postures + left_arm_motions + right_arm_motions + head_postures
+_vecs = _engage_vec + [1 << i for i in range(1, len(left_hand_postures + right_hand_postures + left_arm_motions + right_arm_motions + head_postures + body_postures) + 1)]
+_postures = ["engage"] + left_hand_postures + right_hand_postures + left_arm_motions + right_arm_motions + head_postures + body_postures
 
 vec_to_posture = dict(zip(_vecs, _postures))
 posture_to_vec = dict(zip(_postures, _vecs))
