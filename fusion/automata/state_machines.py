@@ -283,9 +283,10 @@ class GrabStateMachine:
             raise KeyError("Attempted transition to absent state: " + state)
 
         transitioned = False
+        threshold = 2 if 'move' in state else self.threshold
         if not self._is_cur_state(state):
             self.cur_val[state] += 1
-            if self.cur_val[state] == self.threshold:
+            if self.cur_val[state] == threshold:
                 self.cur_val[state] = 0
                 self.cur_state = GrabStateMachine._states[state]
                 transitioned = True
