@@ -148,10 +148,9 @@ if __name__ == '__main__':
             if fusion_socket is not None:
                 fusion_socket.send(bytes)
 
-
-        if i != 0 and index%100 == 0:
-            avg_frame_time /= i
-            print "\nAverage frame time over {} frames: {}\n".format(i, avg_frame_time)
+        if index % 100==0:
+            print "="*100, "FPS", 100/(time.time()-start_time)
+            start_time = time.time()
 
     kinect_socket.close()
     if fusion_socket is not None:
