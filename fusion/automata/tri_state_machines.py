@@ -7,7 +7,7 @@ tsm_posack = TriStateMachine("posack",
                              match_any('rh thumbs up', 'lh thumbs up'))#, 'head nod'))
 
 tsm_negack = TriStateMachine("negack",
-                             match_any('rh thumbs down', 'lh thumbs down', 'rh stop', 'lh stop'))#, 'head shake'))
+                             match_any('rh thumbs down', 'lh thumbs down', 'rh stop', 'lh stop'), 8)#, 'head shake'))
 
 tsm_left_point_vec = TriStateMachine("left point",
                                      and_rules(
