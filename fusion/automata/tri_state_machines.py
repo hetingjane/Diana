@@ -7,7 +7,7 @@ tsm_posack = TriStateMachine("posack",
                              match_any('rh thumbs up', 'lh thumbs up'))#, 'head nod'))
 
 tsm_negack = TriStateMachine("negack",
-                             match_any('rh thumbs down', 'lh thumbs down', 'rh stop', 'lh stop'))#, 'head shake'))
+                             match_any('rh thumbs down', 'lh thumbs down', 'rh stop', 'lh stop'), 8)#, 'head shake'))
 
 tsm_left_point_vec = TriStateMachine("left point",
                                      and_rules(
@@ -93,10 +93,44 @@ tsm_push_back = TriStateMachine("push back",
 tsm_unknown = TriStateMachine("unknown",
                               and_rules(
                                   match_all('emblem'),
-                                  mismatch_all('rh one front', 'lh one front', )
+                                  mismatch_all('rh one front', 'lh one front', 'rh one front',
+                                               'rh two front', 'rh two back', 'lh two front', 'lh two back',
+                                               'rh three front', 'rh three back', 'lh three front', 'lh three back',
+                                               'rh four front', 'lh four front',
+                                               'rh five front', 'lh five front',
+                                               'rh inch', 'lh inch',
+                                               'rh l', 'lh l',
+                                               'rh stop', 'lh stop',
+                                               'rh thumbs up', 'lh thumbs up',
+                                               'rh thumbs down', 'lh thumbs down'
+                                               )
+                              ))
 
-                              )
-                              )
+tsm_servo_left = TriStateMachine("servo left",
+                                 and_rules(
+                                     match_any('rh closed left', 'rh open left'),
+                                     match_all('oscillate'))
+                                 )
+
+tsm_servo_right = TriStateMachine("servo right",
+                                  and_rules(
+                                      match_any('lh closed right', 'lh open right'),
+                                      match_all('oscillate'))
+                                  )
+
+tsm_servo_front = TriStateMachine("servo front",
+                                  and_rules(
+                                      match_any('rh closed front', 'lh closed front'),
+                                      match_all('oscillate'))
+                                  )
+
+tsm_servo_back = TriStateMachine("servo back",
+                                 and_rules(
+                                     match_any('rh closed back', 'lh closed back',
+                                               'rh open back', 'lh open back'),
+                                     match_all('oscillate'))
+                                 )
+
 
 tsm_count_one = TriStateMachine("count one", match_any('rh one front', 'lh one front'))
 
