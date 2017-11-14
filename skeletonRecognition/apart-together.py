@@ -81,10 +81,14 @@ if __name__ == '__main__':
     solver = EGGNOGClassifierSlidingWindow(model=model, restore_model=True)
     class_list = ['emblems', 'motions', 'neutral', 'oscillate', 'still']
 
-    
+    import time
+    start_time = time.time()
+    count = 0
+
     while True:
         try:
             f = recv_skeleton_frame(s)
+
         except EOFError:
             print "Disconnected from Kinect Server"
             break
@@ -160,11 +164,22 @@ if __name__ == '__main__':
             data_stream.clear()
 
         pack_list = [streams.get_stream_id("Body"), timestamp] + result
-        print timestamp, engaged_bit, code_to_label_encoding(result[0]), ',', code_to_label_encoding(result[1]), class_list[result[2]]#, result[:2]
+        # print lpoint, rpoint
+        print timestamp, engaged_bit, code_to_label_encoding(result[0]), ',', code_to_label_encoding(result[1]), class_list[result[2]]#, lpoint, rpoint
         raw_data = struct.pack("<iqiii" + "ff" * 2 + "f" * 5 + "ff" * 6 + 'i', *pack_list)
 
         if r is not None:
             r.sendall(raw_data)
+
+        count += 1
+
+        if count%100 == 0:
+            end_time = time.time()
+            print '=' * 30
+            print 'FPS: ', 100.0/(end_time - start_time)
+            print '=' * 30
+            start_time = end_time
+            count = 0
 
     print "Total frame time: {}".format(avg_frame_time)
     s.close()
