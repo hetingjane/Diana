@@ -268,7 +268,7 @@ brandeis_events = [bsm_engage, bsm_left_continuous_point, bsm_right_continuous_p
                    tsm_push_back, tsm_push_front, tsm_push_left, tsm_push_right,
                    tsm_right_point_vec, tsm_left_point_vec]
 
-csu_events = brandeis_events + [tsm_unknown, tsm_servo_left, tsm_servo_right, tsm_servo_front, tsm_servo_back]
+csu_events = brandeis_events + [tsm_unknown, tsm_servo_left, tsm_servo_right]
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -283,5 +283,5 @@ if __name__ == '__main__':
         print "Running in CSU mode"
         event_set = csu_events
 
-    a = App(event_set, args.debug_mode)
+    a = App(brandeis_events, args.debug_mode)
     a.run()
