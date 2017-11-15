@@ -122,6 +122,7 @@ def smoothing(window_length=5, polyorder=2):
     global rpoint_buffer
     global lpoint
     global rpoint
+    global timestamp
 
     #    print(len(lpoint_buffer))
     if len(lpoint_buffer) >= window_length:
@@ -166,6 +167,8 @@ def calcPointing(wrist, elbow):
 
 
 def calculate_point(fd):
+    global lpoint
+    global rpoint
     result = getWristElbow(fd)
     lwrist = result[WRISTLEFT]
     rwrist = result[WRISTRIGHT]
@@ -174,14 +177,15 @@ def calculate_point(fd):
     if lwrist is not None:
         lpoint = calcPointing(lwrist, lelbow)
         rpoint = calcPointing(rwrist, relbow)
+        smoothing(5)
     else:
         lpoint = [-np.inf, -np.inf]
         rpoint = [-np.inf, -np.inf]
-        smoothing(5)
+
 
     return lpoint, rpoint
 
-'''
+'''timestamp
 def updatePoint():
 
     Connect to the kinect server and get the coordinate

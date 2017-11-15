@@ -185,7 +185,7 @@ class App:
 
         engaged, high_pose, low_pose = self._get_pose_vectors()
 
-        lx, ly, rx, ry = self.latest_data[streams.get_stream_id("Body")][4:8]
+        lx, ly, rx, ry = self.latest_data[streams.get_stream_id("Body")][5:9]
         word = self.latest_data[streams.get_stream_id("Speech")][2]
 
         # More than one output data is possible from multiple state machines

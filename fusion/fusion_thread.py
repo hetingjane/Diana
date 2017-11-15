@@ -45,8 +45,7 @@ class Fusion(threading.Thread):
         # 6 probabilities for move left, right, up, down, front, back * 2, Engage (1/0)
         data_format = "<" + "iii" + "2f" * 2 + "5f" + "6f" * 2 + "i"
         raw_data = self._recv_all(sock, struct.calcsize(data_format))
-        body_data =  struct.unpack(data_format, raw_data)
-        #print body_data
+        body_data = struct.unpack(data_format, raw_data)
         return body_data
 
     def _read_hands_data(self, sock):
@@ -201,6 +200,7 @@ class Fusion(threading.Thread):
                                 for dt in self._data_received[sync_ts]:
                                     stream_type = dt[0]
                                     s_data[stream_type] = dt
+                                #print "{0:d}, LH: {1:.2f}, {2:.2f}, RH: {3:.2f}, {4:.2f}".format(sync_ts, *s_data.get(streams.get_stream_id("Body"))[5:9])
                                 synced_data.put(s_data)
                                 self._data_received.pop(sync_ts)
                             """
