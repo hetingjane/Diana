@@ -25,7 +25,7 @@ _addresses = {
     }
 }
 
-def connect(dest, stream_str, timeout=True):
+def connect(dest, stream_str, timeout=False):
     """
     Connect to a machine in the system
     :param dest: Accepted values are those defined in _addresses['destination']

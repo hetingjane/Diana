@@ -44,7 +44,7 @@ def recv_speech_frame(sock):
 
 if __name__ == '__main__':
 
-    k = connect('kinect', 'Speech', timeout=False)
+    k = connect('kinect', 'Speech')
     if k is None:
         sys.exit(0)
 

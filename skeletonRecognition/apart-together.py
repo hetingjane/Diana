@@ -63,7 +63,6 @@ if __name__ == '__main__':
 
     # Time the network performance
     s = connect('kinect', 'Body')
-    r = connect('fusion', 'Body', timeout=False)
 
     if s is None:
         sys.exit(0)
@@ -80,6 +79,8 @@ if __name__ == '__main__':
     model = GRU_RNN(logpath)
     solver = EGGNOGClassifierSlidingWindow(model=model, restore_model=True)
     class_list = ['emblems', 'motions', 'neutral', 'oscillate', 'still']
+
+    r = connect('fusion', 'Body')
 
     import time
     start_time = time.time()
