@@ -69,12 +69,18 @@ class TriStateMachine:
     _states_arr = ["stop", "low", "high"]
     _states = dict(zip(_states_arr, range(len(_states_arr))))
 
-    def __init__(self, name, rule, threshold=5):
+    def __init__(self, name, rule, thresholds=5):
         self.name = name
         self.start_state = TriStateMachine._states["stop"]
         self.cur_state = self.start_state
         self.rule = rule
-        self.threshold = threshold
+        if isinstance(thresholds, int):
+            thresholds = (thresholds,) * len(TriStateMachine._states_arr)
+            self.thresholds = dict(zip(TriStateMachine._states_arr, thresholds))
+        elif len(thresholds) == len(TriStateMachine._states_arr):
+            self.thresholds = dict(zip(TriStateMachine._states_arr, thresholds))
+        else:
+            raise ValueError("thresholds must be an integer or a list of size " + str(len(TriStateMachine._states_arr)))
         # Counts for transition from each state
         self.cur_val = dict((s, 0) for s in TriStateMachine._states_arr)
 
@@ -82,52 +88,52 @@ class TriStateMachine:
         # Reset if not engaged
         if not engaged:
             return self.reset()
-        transitioned = False
+
         # Try high pose first, and possibly transition to high state
         if self.rule(high_pose):
-            self.cur_val["low"] = 0
-            self.cur_val["stop"] = 0
-            if not self.is_high():
-                self.cur_val["high"] += 1
-                if self.cur_val["high"] == self.threshold:
-                    self.cur_val["high"] = 0
-                    self.cur_state = TriStateMachine._states["high"]
-                    transitioned = True
-
-        # Else, low pose, and possibly transition to low state
+            return self._try_transition_to("high")
         elif self.rule(low_pose):
-            self.cur_val["high"] = 0
-            self.cur_val["stop"] = 0
-            if not self.is_low():
-                self.cur_val["low"] += 1
-                if self.cur_val["low"] == self.threshold:
-                    self.cur_val["low"] = 0
-                    self.cur_state = TriStateMachine._states["low"]
-                    transitioned = True
-
-        # Else, go to stop state
+            return self._try_transition_to("low")
         else:
-            self.cur_val["high"] = 0
-            self.cur_val["low"] = 0
-            if not self.is_stopped():
-                self.cur_val["stop"] += 1
-                if self.cur_val["stop"] == self.threshold:
-                    self.cur_val["stop"] = 0
-                    self.cur_state = TriStateMachine._states["stop"]
-                    transitioned = True
+            return self._try_transition_to("stop")
+
+    def _is_cur_state(self, state):
+        return self.cur_state == TriStateMachine._states[state]
+
+    # WARNING: Check with a rule before attempting a transition
+    def _try_transition_to(self, state):
+        present = False
+        for s in TriStateMachine._states_arr:
+            if s != state:
+                self.cur_val[s] = 0
+            else:
+                present = True
+        if not present:
+            raise KeyError("Attempted transition to absent state: " + state)
+
+        transitioned = False
+        if not self._is_cur_state(state):
+            self.cur_val[state] += 1
+            if self.cur_val[state] == self.thresholds[state]:
+                self.cur_val[state] = 0
+                self.cur_state = TriStateMachine._states[state]
+                transitioned = True
+        else:
+            self.cur_val[state] = 0
+
         return transitioned
 
     def get_state(self):
         return self.name + " " + TriStateMachine._states_arr[self.cur_state]
 
     def is_stopped(self):
-        return self.cur_state == TriStateMachine._states["stop"]
+        return self._is_cur_state("stop")
 
     def is_low(self):
-        return self.cur_state == TriStateMachine._states["low"]
+        return self._is_cur_state("low")
 
     def is_high(self):
-        return self.cur_state == TriStateMachine._states["high"]
+        return self._is_cur_state("high")
 
     def is_started(self):
         return self.is_high() or self.is_low()
@@ -150,10 +156,16 @@ class GrabStateMachine:
                "grab move front", "grab move back"]
     _states = dict(zip(_states_arr, range(len(_states_arr))))
 
-    def __init__(self, threshold=5):
+    def __init__(self, thresholds=(8, 8, 2, 2, 2, 2, 2, 2)):
         self.start_state = GrabStateMachine._states['grab stop']
         self.cur_state = self.start_state
-        self.threshold = threshold
+        if isinstance(thresholds, int):
+            thresholds = (thresholds,) * len(GrabStateMachine._states_arr)
+            self.thresholds = dict(zip(GrabStateMachine._states_arr, thresholds))
+        elif len(thresholds) == len(GrabStateMachine._states_arr):
+            self.thresholds = dict(zip(GrabStateMachine._states_arr, thresholds))
+        else:
+            raise ValueError("thresholds must be an integer or a list of size " + str(len(GrabStateMachine._states_arr)))
 
         # Counts for transition from each state
         self.cur_val = dict((s, 0) for s in GrabStateMachine._states_arr)
@@ -283,10 +295,9 @@ class GrabStateMachine:
             raise KeyError("Attempted transition to absent state: " + state)
 
         transitioned = False
-        threshold = 2 if 'move' in state else self.threshold
         if not self._is_cur_state(state):
             self.cur_val[state] += 1
-            if self.cur_val[state] == threshold:
+            if self.cur_val[state] == self.thresholds[state]:
                 self.cur_val[state] = 0
                 self.cur_state = GrabStateMachine._states[state]
                 transitioned = True
