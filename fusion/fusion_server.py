@@ -50,7 +50,7 @@ class App:
         not_empty = True
         while not_empty:
             try:
-                synced_data.get_nowait()
+                synced_msgs.get_nowait()
             except Queue.Empty:
                 not_empty = False
 
@@ -103,31 +103,30 @@ class App:
         """
         try:
             # Get synced data without blocking with timeout
-            self.latest_data = synced_data.get(False, 0.2)
+            self.latest_s_msg = synced_msgs.get(False, 0.2)
             if self.debug:
-                print "Latest synced data: ", self.latest_data, "\n"
+                print "Latest synced message: ", self.latest_s_msg, "\n"
             #
             self._update_queues()
             self.received += 1
-            if synced_data.qsize() <= 15:
+            if synced_msgs.qsize() <= 15:
                 if self.debug:
-                    print "Backlog queue size exceeded limit: " + str(synced_data.qsize())
+                    print "Backlog queue size exceeded limit: " + str(synced_msgs.qsize())
             else:
                 self.skipped += 1
-                print "Timestamp " + str(self.latest_data[streams.get_stream_id("Body")][1]) + \
-                      " skipped because backlog too large: " + str(synced_data.qsize())
+                print "Timestamp " + str(self.latest_s_msg["Body"].header.timestamp) + \
+                      " skipped because backlog too large: " + str(synced_msgs.qsize())
         except Queue.Empty:
             pass
 
     def _get_probs(self):
-        body_probs = self.latest_data[streams.get_stream_id("Body")][-18:-1]
-        engaged = self.latest_data[streams.get_stream_id("Body")][-1] == 1
-        emblem, motion, neutral, oscillate, still = body_probs[:5]
-        larm_probs, rarm_probs = np.array(body_probs[5:11]), np.array(body_probs[11:])
+        body_msg = self.latest_s_msg["Body"]
+        engaged = body_msg.data.engaged
+        larm_probs, rarm_probs = np.array(body_msg.data.p_l_arm), np.array(body_msg.data.p_r_arm)
 
-        lhand_probs = np.array(self.latest_data[streams.get_stream_id("LH")][-len(left_hand_postures):])
-        rhand_probs = np.array(self.latest_data[streams.get_stream_id("RH")][-len(right_hand_postures):])
-        head_probs = np.array(self.latest_data[streams.get_stream_id("Head")][-len(head_postures):])
+        lhand_probs = np.array(self.latest_s_msg["LH"].data.probabilities)
+        rhand_probs = np.array(self.latest_s_msg["RH"].data.probabilities)
+        head_probs = np.array(self.latest_s_msg["Head"].data.probabilities)
 
         return engaged, larm_probs, rarm_probs, lhand_probs, rhand_probs, head_probs
 
@@ -140,7 +139,8 @@ class App:
 
         engaged, larm_probs, rarm_probs, lhand_probs, rhand_probs, head_probs = self._get_probs()
 
-        larm_label, rarm_label, body_label = self.latest_data[streams.get_stream_id("Body")][2:5]
+        body_msg = self.latest_s_msg["Body"]
+        idx_l_arm, idx_r_arm, idx_body = body_msg.data.idx_l_arm, body_msg.data.idx_r_arm, body_msg.data.idx_body
 
         hand_labels = np.array(range(len(lhand_probs)))
         high_lhand_labels = hand_labels[lhand_probs >= high_threshold]
@@ -155,9 +155,9 @@ class App:
         # head labels with probabilities in [high_threshold, 1.0],
         # and hand labels with probabilities in [low_threshold, high_threshold)
         high_pose = 1 if engaged else 0
-        high_pose |= posture_to_vec[left_arm_motions[larm_label]]
-        high_pose |= posture_to_vec[right_arm_motions[rarm_label]]
-        high_pose |= posture_to_vec[body_postures[body_label]]
+        high_pose |= posture_to_vec[left_arm_motions[idx_l_arm]]
+        high_pose |= posture_to_vec[right_arm_motions[idx_r_arm]]
+        high_pose |= posture_to_vec[body_postures[idx_body]]
 
         for l in high_lhand_labels:
             high_pose |= posture_to_vec[left_hand_postures[l]]
@@ -170,9 +170,9 @@ class App:
         # no head labels,
         # and hand labels with probabilities in [low_threshold, high_threshold)
         low_pose = 1 if engaged else 0
-        low_pose |= posture_to_vec[left_arm_motions[larm_label]]
-        low_pose |= posture_to_vec[right_arm_motions[rarm_label]]
-        low_pose |= posture_to_vec[body_postures[body_label]]
+        low_pose |= posture_to_vec[left_arm_motions[idx_l_arm]]
+        low_pose |= posture_to_vec[right_arm_motions[idx_r_arm]]
+        low_pose |= posture_to_vec[body_postures[idx_body]]
 
         for l in low_lhand_labels:
             low_pose |= posture_to_vec[left_hand_postures[l]]
@@ -184,9 +184,9 @@ class App:
     def _get_events(self):
 
         engaged, high_pose, low_pose = self._get_pose_vectors()
-
-        lx, ly, rx, ry = self.latest_data[streams.get_stream_id("Body")][5:9]
-        word = self.latest_data[streams.get_stream_id("Speech")][2]
+        body_msg = self.latest_s_msg["Body"]
+        lx, ly, rx, ry = body_msg.data.pos_l_x, body_msg.data.pos_l_y, body_msg.data.pos_r_x, body_msg.data.pos_r_y
+        word = self.latest_s_msg["Speech"].data.command
 
         # More than one output data is possible from multiple state machines
         all_events_to_send = []
@@ -234,7 +234,8 @@ class App:
 
         for e in all_events_to_send:
             ev_type, ev, timestamp = e.split(';')
-            print ev_type.ljust(5) + ev.ljust(30) + timestamp + "\n\n"
+            if ev_type != 'P':
+                print ev_type.ljust(5) + ev.ljust(30) + timestamp + "\n\n"
             raw_events_to_send.append(struct.pack("<i" + str(len(e)) + "s", len(e), e))
 
         return raw_events_to_send

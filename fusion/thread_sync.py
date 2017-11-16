@@ -2,7 +2,7 @@ import Queue
 import threading
 
 # Setup a FIFO queue for sharing received data across threads
-synced_data = Queue.Queue()
+synced_msgs = Queue.Queue()
 
 remote_events = Queue.Queue()
 
