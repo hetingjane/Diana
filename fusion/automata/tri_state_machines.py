@@ -88,7 +88,7 @@ tsm_push_back = TriStateMachine("push back",
                                         match_all('LA: move back')
                                     ),
                                     match_any('rh beckon', 'lh beckon')
-                                ))
+                                ), 8)
 
 tsm_unknown = TriStateMachine("unknown",
                               and_rules(
