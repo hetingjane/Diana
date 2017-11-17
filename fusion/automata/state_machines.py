@@ -167,6 +167,8 @@ class GrabStateMachine:
         else:
             raise ValueError("thresholds must be an integer or a list of size " + str(len(GrabStateMachine._states_arr)))
 
+        self.orig_thresholds = dict(self.thresholds)
+
         # Counts for transition from each state
         self.cur_val = dict((s, 0) for s in GrabStateMachine._states_arr)
 
@@ -259,6 +261,10 @@ class GrabStateMachine:
     def _is_cur_state(self, state):
         return self.cur_state == GrabStateMachine._states[state]
 
+    def _is_cur_state_move(self):
+        cur_state_str = GrabStateMachine._states_arr[self.cur_state]
+        return GrabStateMachine._states[cur_state_str] >= 2
+
     def _is_pose_grab_still(self, pose):
         return self._grab_still_rule(pose)
 
@@ -293,6 +299,8 @@ class GrabStateMachine:
                 present = True
         if not present:
             raise KeyError("Attempted transition to absent state: " + state)
+        if self._states[state] in GrabStateMachine._states_arr[2:]:
+            raise ValueError("For transition to a move state, use _try_transition_to_moves() instead")
 
         transitioned = False
         if not self._is_cur_state(state):
@@ -308,21 +316,48 @@ class GrabStateMachine:
 
     def _try_transition_to_moves(self, pose):
         if self._is_pose_grab_front(pose):
-            return self._try_transition_to('grab move front')
+            transitioned = self._try_transition_to('grab move front')
         elif self._is_pose_grab_back(pose):
-            return self._try_transition_to('grab move back')
+            transitioned = self._try_transition_to('grab move back')
         elif self._is_pose_grab_left(pose):
-            return self._try_transition_to('grab move left')
+            transitioned = self._try_transition_to('grab move left')
         elif self._is_pose_grab_right(pose):
-            return self._try_transition_to('grab move right')
+            transitioned = self._try_transition_to('grab move right')
         elif self._is_pose_grab_up(pose):
-            return self._try_transition_to('grab move up')
+            transitioned = self._try_transition_to('grab move up')
         elif self._is_pose_grab_down(pose):
-            return self._try_transition_to('grab move down')
+            transitioned = self._try_transition_to('grab move down')
         else:
-            return False
+            transitioned = False
+
+        if transitioned:
+            self._reset_thresholds()
+            self._set_opp_motion_threshold(8)
+
+        return transitioned
+
+    def _set_opp_motion_threshold(self, val):
+        if not self._is_cur_state_move():
+            raise AssertionError("_set_opp_motion_threshold() called when system is not in a motion state")
+        elif self._is_cur_state('grab move front'):
+            self.thresholds['grab move back'] = val
+        elif self._is_cur_state('grab move back'):
+            self.thresholds['grab move front'] = val
+        elif self._is_cur_state('grab move left'):
+            self.thresholds['grab move right'] = val
+        elif self._is_cur_state('grab move right'):
+            self.thresholds['grab move left'] = val
+        elif self._is_cur_state('grab move up'):
+            self.thresholds['grab move down'] = val
+        else:
+            self.thresholds['grab move up'] = val
+
+    def _reset_thresholds(self):
+        for k, v in self.orig_thresholds.items():
+            self.thresholds[k] = v
 
     def reset(self):
+        self._reset_thresholds()
         for k in self.cur_val.keys():
             self.cur_val[k] = 0
         transitioned = False

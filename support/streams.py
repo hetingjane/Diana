@@ -23,6 +23,7 @@ def get_stream_id(stream_str):
 def is_valid(stream_id):
     return stream_id in _stream_masks.values()
 
+
 def get_stream_type(stream_id):
     for s in _stream_masks.keys():
         if _stream_masks[s] & stream_id != 0:
