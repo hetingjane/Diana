@@ -19,7 +19,7 @@ if [ ! -e "$target" ]; then
 fi
 
 params=""
-for i in $(cat $target)
+for i in $(grep -e '^[^#].*' $target)
 do
     process=${i%@*}
     machine=${i#*@}
