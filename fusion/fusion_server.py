@@ -114,33 +114,46 @@ class App:
                     print "Backlog queue size exceeded limit: " + str(synced_msgs.qsize())
             else:
                 self.skipped += 1
-                print "Timestamp " + str(self.latest_s_msg["Body"].header.timestamp) + \
-                      " skipped because backlog too large: " + str(synced_msgs.qsize())
+                print "Skipping because backlog too large: " + str(synced_msgs.qsize())
         except Queue.Empty:
             pass
 
     def _get_probs(self):
-        body_msg = self.latest_s_msg["Body"]
-        engaged = body_msg.data.engaged
-        larm_probs, rarm_probs = np.array(body_msg.data.p_l_arm), np.array(body_msg.data.p_r_arm)
 
-        lhand_probs = np.array(self.latest_s_msg["LH"].data.probabilities)
-        rhand_probs = np.array(self.latest_s_msg["RH"].data.probabilities)
-        head_probs = np.array(self.latest_s_msg["Head"].data.probabilities)
+        if streams.is_active("Body"):
+            body_msg = self.latest_s_msg["Body"]
+            engaged = body_msg.data.engaged
+            larm_probs, rarm_probs = np.array(body_msg.data.p_l_arm), np.array(body_msg.data.p_r_arm)
+            body_probs = np.array([body_msg.data.p_emblem, body_msg.data.p_motion, body_msg.data.p_neutral,
+                               body_msg.data.p_oscillate, body_msg.data.p_still])
+        else:
+            engaged = True
+            larm_probs, rarm_probs = np.zeros(6), np.zeros(6)
+            body_probs = np.zeros(5)
 
-        return engaged, larm_probs, rarm_probs, lhand_probs, rhand_probs, head_probs
+        lhand_probs = np.array(self.latest_s_msg["LH"].data.probabilities) \
+            if streams.is_active("LH") else np.zeros(len(left_hand_postures))
+        rhand_probs = np.array(self.latest_s_msg["RH"].data.probabilities) \
+            if streams.is_active("RH") else np.zeros(len(right_hand_postures))
+        head_probs = np.array(self.latest_s_msg["Head"].data.probabilities) \
+            if streams.is_active("Head") else np.zeros(len(head_postures))
+
+        return engaged, larm_probs, rarm_probs, lhand_probs, rhand_probs, head_probs, body_probs
 
     def _prepare_probs(self):
-        engaged, larm_probs, rarm_probs, lhand_probs, rhand_probs, head_probs = self._get_probs()
-        all_probs = list(np.concatenate((larm_probs, rarm_probs, lhand_probs, rhand_probs, head_probs), axis=0))
+        engaged, larm_probs, rarm_probs, lhand_probs, rhand_probs, head_probs, body_probs = self._get_probs()
+        all_probs = list(np.concatenate((larm_probs, rarm_probs, lhand_probs, rhand_probs, head_probs, body_probs), axis=0))
         return struct.pack("<" + str(len(all_probs)) + "f", *all_probs)
 
     def _get_pose_vectors(self, low_threshold=0.1, high_threshold=0.5):
 
-        engaged, larm_probs, rarm_probs, lhand_probs, rhand_probs, head_probs = self._get_probs()
+        engaged, larm_probs, rarm_probs, lhand_probs, rhand_probs, head_probs, body_probs = self._get_probs()
 
-        body_msg = self.latest_s_msg["Body"]
-        idx_l_arm, idx_r_arm, idx_body = body_msg.data.idx_l_arm, body_msg.data.idx_r_arm, body_msg.data.idx_body
+        if streams.is_active("Body"):
+            body_msg = self.latest_s_msg["Body"]
+            idx_l_arm, idx_r_arm, idx_body = body_msg.data.idx_l_arm, body_msg.data.idx_r_arm, body_msg.data.idx_body
+        else:
+            idx_l_arm, idx_r_arm, idx_body = len(left_arm_motions)-1, len(right_arm_motions)-1, len(body_postures)-1
 
         hand_labels = np.array(range(len(lhand_probs)))
         high_lhand_labels = hand_labels[lhand_probs >= high_threshold]
@@ -184,9 +197,13 @@ class App:
     def _get_events(self):
 
         engaged, high_pose, low_pose = self._get_pose_vectors()
-        body_msg = self.latest_s_msg["Body"]
-        lx, ly, rx, ry = body_msg.data.pos_l_x, body_msg.data.pos_l_y, body_msg.data.pos_r_x, body_msg.data.pos_r_y
-        word = self.latest_s_msg["Speech"].data.command
+        if streams.is_active("Body"):
+            body_msg = self.latest_s_msg["Body"]
+            lx, ly, rx, ry = body_msg.data.pos_l_x, body_msg.data.pos_l_y, body_msg.data.pos_r_x, body_msg.data.pos_r_y
+        else:
+            lx, ly, rx, ry = (float("-inf"),)*4
+
+        word = self.latest_s_msg["Speech"].data.command if streams.is_active("Speech") else ""
 
         # More than one output data is possible from multiple state machines
         all_events_to_send = []
@@ -284,5 +301,5 @@ if __name__ == '__main__':
         print "Running in CSU mode"
         event_set = csu_events
 
-    a = App(brandeis_events, args.debug_mode)
+    a = App(event_set, args.debug_mode)
     a.run()

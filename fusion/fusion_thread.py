@@ -50,7 +50,7 @@ class Fusion(threading.Thread):
         header_format = "<iq"
         stream_header = self._recv_all(sock, struct.calcsize(header_format))
         header_data = struct.unpack(header_format, stream_header)
-        stream_name = streams.get_stream_type(header_data[0])
+        stream_name = streams.get_stream_name(header_data[0])
         header_data += (stream_name,)
         return Fusion.Header(*header_data)
 
@@ -96,14 +96,14 @@ class Fusion(threading.Thread):
         return Fusion.SpeechData(command)
 
     def _read_stream_data(self, sock, stream_id):
-        stream_str = streams.get_stream_type(stream_id)
-        if stream_str in ["LH", "RH"]:
-            return self._read_hands_data(sock, stream_str)
-        elif stream_str == "Body":
+        stream_name = streams.get_stream_name(stream_id)
+        if stream_name in ["LH", "RH"]:
+            return self._read_hands_data(sock, stream_name)
+        elif stream_name == "Body":
             return self._read_body_data(sock)
-        elif stream_str == "Head":
+        elif stream_name == "Head":
             return self._read_head_data(sock)
-        elif stream_str == "Speech":
+        elif stream_name == "Speech":
             return self._read_speech_data(sock)
 
     def _handle_client(self, sock):
@@ -135,6 +135,37 @@ class Fusion(threading.Thread):
     def is_stopped(self):
         return self._stop.is_set()
 
+    def _accept_stream(self, sock, addr):
+        try:
+            stream_id_bytes = self._recv_all(sock, 4)
+            stream_id = struct.unpack('<i', stream_id_bytes)[0]
+        except:
+            print "Unable to receive complete stream id. Ignoring the client"
+            sock.close()
+        print "Received stream id. Verifying..."
+        if streams.is_valid_id(stream_id):
+            stream_name = streams.get_stream_name(stream_id)
+            if streams.is_active(stream_name):
+                print "Stream is valid and active: {}".format(stream_name)
+                print "Checking if stream is already connected..."
+                if stream_name not in self._connected_clients.values():
+                    print "New stream. Accepting the connection {}:{}".format(addr[0], addr[1])
+                    sock.shutdown(socket.SHUT_WR)
+                    self._connected_clients[sock] = stream_name
+                    return True
+                else:
+                    print "Stream already exists. Rejecting the connection."
+                    sock.close()
+            else:
+                print "Rejecting inactive stream: {}".format(stream_name)
+                sock.close()
+        else:
+            print "Rejecting invalid stream with id: {}".format(stream_id)
+            sock.close()
+        return False
+
+
+
     def run(self):
         serv_sock = serve('fusion')
         serv_sock.listen(5)
@@ -163,28 +194,8 @@ class Fusion(threading.Thread):
                 if s is serv_sock:
                     client_sock, client_addr = s.accept()
                     # 1 is for the server socket
-                    try:
-                        stream_id_bytes = self._recv_all(client_sock, 4)
-                        stream_id = struct.unpack('<i', stream_id_bytes)[0]
-                    except:
-                        print "Unable to receive complete stream id. Ignoring the client"
-                        client_sock.close()
-                    print "Received stream id. Verifying..."
-                    if streams.is_valid(stream_id):
-                        stream_str = streams.get_stream_type(stream_id)
-                        print "Stream is valid: {}".format(stream_str)
-                        print "Checking if stream is already connected..."
-                        if stream_str not in self._connected_clients.values():
-                            print "New stream. Accepting the connection {}:{}".format(client_addr[0], client_addr[1])
-                            client_sock.shutdown(socket.SHUT_WR)
-                            inputs += [client_sock]
-                            self._connected_clients[client_sock] = stream_str
-                        else:
-                            print "Stream already exists. Rejecting the connection."
-                            client_sock.close()
-                    else:
-                        print "Rejecting invalid stream with stream mask: {}".format(stream_id)
-                        client_sock.close()
+                    if self._accept_stream(client_sock, client_addr):
+                        inputs += [client_sock]
                 else:
                     try:
                         msg = self._handle_client(s)
@@ -200,9 +211,7 @@ class Fusion(threading.Thread):
                         cur_ts = msg.header.timestamp
 
                         # Add data to appropriate timestamp bucket
-                        if cur_ts not in self._msgs_received:
-                            self._msgs_received[cur_ts] = []
-                        self._msgs_received[cur_ts] += [msg]
+                        self._msgs_received.setdefault(cur_ts, []).append(msg)
 
                         # Try to sync in presence of this new data
                         # Will run every time until we are synced
