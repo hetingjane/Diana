@@ -124,23 +124,36 @@ def smoothing(window_length=5, polyorder=2):
     global rpoint
     global timestamp
 
-    #    print(len(lpoint_buffer))
-    if len(lpoint_buffer) >= window_length:
+
+    if len(lpoint_buffer)>= window_length: #Assuming both buffers have same lengths
+        if not (np.isfinite(np.prod(lpoint)) and np.isfinite(np.prod(rpoint))):
+            print 'Buffer full but -inf seen! ', lpoint, rpoint
+            # If either entry is -inf, we append the previous values to the buffer for both, ignoring the point which was not -inf.
+            # No Error seen as most recent element is present in buffer
+            lpoint, rpoint = lpoint_buffer[-1], rpoint_buffer[-1]
+
         lpoint_buffer.pop(0)
         lpoint_buffer.append(lpoint)
-        #        lpoint = savgol_filter(lpoint_buffer, window_length, polyorder, axis = 0)[int(window_length/2)]
-        lpoint_buffer = savgol_filter(lpoint_buffer, window_length, polyorder, axis=0).tolist()
-        lpoint = lpoint_buffer[int(window_length / 2)]
-    else:
-        lpoint_buffer.append(lpoint)
 
-    if len(rpoint_buffer) >= window_length:
         rpoint_buffer.pop(0)
         rpoint_buffer.append(rpoint)
-        #        rpoint = savgol_filter(rpoint_buffer, window_length, polyorder, axis = 0)[int(window_length/2)]
+
+        lpoint_buffer = savgol_filter(lpoint_buffer, window_length, polyorder, axis=0).tolist()
+        lpoint = lpoint_buffer[int(window_length / 2)]
+
         rpoint_buffer = savgol_filter(rpoint_buffer, window_length, polyorder, axis=0).tolist()
         rpoint = rpoint_buffer[int(window_length / 2)]
+
     else:
+        if not (np.isfinite(np.prod(lpoint)) and np.isfinite(np.prod(rpoint))):
+            print 'Buffer not full, but -inf seen! ', lpoint, rpoint
+            try:
+                lpoint, rpoint = lpoint_buffer[-1], rpoint_buffer[-1]
+            except:
+                #Buffer empty and -inf encountered
+                print 'Cannot take the last recent element from buffer, Sending zeros values instead'
+                lpoint, rpoint = [0.0, 0.0], [0.0, 0.0]
+        lpoint_buffer.append(lpoint)
         rpoint_buffer.append(rpoint)
 
 
@@ -156,8 +169,8 @@ def calcPointing(wrist, elbow):
     x = x1 - (y1-y) / (y2-y1) * (x2-x1)
     z = z1 - (y1-y) / (y2-y1) * (z2-z1)
     '''
-    if ((elbow[1] - wrist[1]) == 0):
-        return (-np.inf, -np.inf)
+    if (round((elbow[1] - wrist[1]), 3) == 0.0):
+        return [float("-inf"), float("-inf")]
     table_y = -0.582
     table_x = wrist[0] - (wrist[1] - table_y) / (elbow[1] - wrist[1]) * (elbow[0] - wrist[0])
     table_z = wrist[2] - (wrist[1] - table_y) / (elbow[1] - wrist[1]) * (elbow[2] - wrist[2])
@@ -177,10 +190,14 @@ def calculate_point(fd):
     if lwrist is not None:
         lpoint = calcPointing(lwrist, lelbow)
         rpoint = calcPointing(rwrist, relbow)
+
+        if not (np.isfinite(np.prod(lpoint)) and np.isfinite(np.prod(rpoint))):
+            print 'NaN value seen! ', lpoint, rpoint
+
         smoothing(5)
     else:
-        lpoint = [-np.inf, -np.inf]
-        rpoint = [-np.inf, -np.inf]
+        lpoint = [float("-inf"), float("-inf")]
+        rpoint = [float("-inf"), float("-inf")]
 
 
     return lpoint, rpoint
