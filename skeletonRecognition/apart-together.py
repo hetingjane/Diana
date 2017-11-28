@@ -131,7 +131,7 @@ if __name__ == '__main__':
                         res = process_window_data(test_window, body_part=b)
                     else:
                         print 'Dangling arm, sending default values'
-                        res = (np.zeros(6), 26)
+                        res = (np.zeros(6), 31)
                     proba_array.append(res[0].tolist()), map_array.append(res[1])
 
 
@@ -169,7 +169,7 @@ if __name__ == '__main__':
             timestamp = list(data_stream)[-1][0]
 
         else:
-            map_array, proba_array = send_default_values(body_parts)
+            map_array, proba_array = send_default_values(body_parts, value_to_add=31)
             result = collect_all_results(map_array, [lpoint, rpoint], proba_array, int(engaged))
             data_stream.clear()
 
