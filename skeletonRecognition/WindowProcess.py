@@ -71,7 +71,8 @@ def code_to_label_encoding(index):
 'Arms Apart',
 'Arms together',
 'Stack up',
-'Stack down'
+'Stack down',
+'Blind'
 ]
     return label_list[index]
 
