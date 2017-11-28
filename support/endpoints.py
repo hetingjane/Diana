@@ -4,7 +4,7 @@ import support.streams as streams
 
 _KINECT_DEST_ADDR = 'cwc1'
 
-_FUSION_DEST_ADDR = 'magenta'
+_FUSION_DEST_ADDR = 'blue'
 _FUSION_SRC_ADDR = ''
 
 _GUI_DEST_ADDR = _FUSION_DEST_ADDR
