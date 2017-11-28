@@ -49,6 +49,13 @@ def recv_depth_frame(sock):
 if __name__ == '__main__':
     stream_id = streams.get_stream_id("Head")
 
+    gesture_list = ["nod", "shake", "other"]
+    num_gestures = len(gesture_list)
+
+    head_classifier = RealTimeHeadRecognition(num_gestures)
+
+    gesture_list += ['blind']
+
     kinect_socket = connect('kinect', "Head")
     fusion_socket = connect('fusion', "Head")
 
@@ -59,12 +66,6 @@ if __name__ == '__main__':
     avg_frame_time = 0.0
     do_plot = True #if len(sys.argv) > 1 and sys.argv[1] == '--plot' else False
 
-    gesture_list = ["nod", "shake", "other"]
-    num_gestures = len(gesture_list)
-
-    head_classifier = RealTimeHeadRecognition(num_gestures)
-
-    gesture_list += ['blind']
 
     index = 0
     start_time = time.time()
