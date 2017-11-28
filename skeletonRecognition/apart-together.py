@@ -4,7 +4,7 @@ from collections import deque
 import numpy as np
 from SlidingWindow import sliding_window_dataset
 from WindowProcess import (extract_data, process_window_data, collect_all_results, send_default_values, code_to_label_encoding)
-from Preprocessing import prune_joints_dataset
+from Preprocessing import (prune_joints_dataset, check_active_arm)
 from support.endpoints import connect
 from support import streams
 from receiveAndShow import calculate_point
@@ -70,9 +70,9 @@ if __name__ == '__main__':
     window_threshold = 15
     body_parts = ['LA', 'RA']
     data_stream = deque([], maxlen=window_threshold)
-    count = 0
 
     avg_frame_time = 0.0
+
 
     from GRU_classifier import (GRU_RNN, EGGNOGClassifierSlidingWindow)
     logpath = '/s/red/a/nobackup/vision/dkpatil/demo/GRU_5_class/'  # '/s/chopin/k/grad/dkpatil/temp/SkeletonRealTime/GRU_classifier/'
@@ -81,6 +81,7 @@ if __name__ == '__main__':
     class_list = ['emblems', 'motions', 'neutral', 'oscillate', 'still']
 
     r = connect('fusion', 'Body')
+
 
     import time
     start_time = time.time()
@@ -98,10 +99,12 @@ if __name__ == '__main__':
 
         if engaged:engaged_bit = 'Engaged'
         else: engaged_bit = 'Disengaged'
+        print engaged_bit
 
 
         input_data = (timestamp, body_count) + fd[4:]
         lpoint, rpoint = calculate_point(fd)
+        # print lpoint, rpoint
 
         if engaged: 
             data_stream.extend([input_data])
@@ -123,8 +126,14 @@ if __name__ == '__main__':
 
 
                 for b in body_parts:
-                    res = process_window_data(test_window, body_part=b)
+                    active = check_active_arm(t, body_part = b)
+                    if active:
+                        res = process_window_data(test_window, body_part=b)
+                    else:
+                        print 'Dangling arm, sending default values'
+                        res = (np.zeros(6), 26)
                     proba_array.append(res[0].tolist()), map_array.append(res[1])
+
 
                 # Processing arms apart and arms together -X direction
                 if (map_array[0] == 0 and map_array[1] == 1) or (map_array[0] == 1 and map_array[1] == 0):
@@ -166,11 +175,12 @@ if __name__ == '__main__':
 
         pack_list = [streams.get_stream_id("Body"), timestamp] + result
         # print lpoint, rpoint
-        print timestamp, engaged_bit, code_to_label_encoding(result[0]), ',', code_to_label_encoding(result[1]), class_list[result[2]]#, lpoint, rpoint
+        print timestamp, engaged_bit, code_to_label_encoding(result[0]), ',', code_to_label_encoding(result[1]), class_list[result[2]], lpoint, rpoint
         raw_data = struct.pack("<iqiii" + "ff" * 2 + "f" * 5 + "ff" * 6 + 'i', *pack_list)
 
         if r is not None:
             r.sendall(raw_data)
+
 
         count += 1
 
@@ -181,6 +191,7 @@ if __name__ == '__main__':
             print '=' * 30
             start_time = end_time
             count = 0
+
 
     print "Total frame time: {}".format(avg_frame_time)
     s.close()

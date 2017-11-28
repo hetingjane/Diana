@@ -72,6 +72,34 @@ def prune_joints_dataset(data_list, body_part):
 
 
 
+def check_active_arm(data, body_part):
+    data = prune_joints(data, body_part=body_part)
+
+    dims = 3
+    y_axis = np.array([0, 1, 0])
+    table_y, table_z = -0.582, 1.6
+
+    first_shoulder = data[0][(0 * dims):(1 * dims)]
+    first_wrist = data[0][(2 * dims):(3 * dims)]
+    last_shoulder = data[-1][(0 * dims):(1 * dims)]
+    last_wrist = data[-1][(2 * dims):(3 * dims)]
+
+    if (first_wrist[2] > table_z) and (last_wrist[2] > table_z):
+        first_shoulder_wrist = (first_shoulder - first_wrist)
+        last_shoulder_wrist = (last_shoulder - last_wrist)
+
+        first_shoulder_wrist /= np.linalg.norm(first_shoulder_wrist)
+        last_shoulder_wrist /= np.linalg.norm(last_shoulder_wrist)
+
+        first_angle = np.dot(first_shoulder_wrist, y_axis)
+        last_angle = np.dot(last_shoulder_wrist, y_axis)
+
+        if first_angle > 0.8 and last_angle > 0.8:
+            return False
+        else:
+            return True
+    else:
+        return True
 
 
 
