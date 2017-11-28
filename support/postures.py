@@ -1,33 +1,19 @@
 left_hand_postures = ['blank', 'hands together', 'other', 'lh beckon', 'lh claw down',
-
                       'lh claw front', 'lh claw right', 'lh claw up', 'lh closed back',
-
                       'lh closed down', 'lh closed front', 'lh closed right', 'lh fist',
-
                       'lh five front', 'lh four front', 'lh inch', 'lh l', 'lh one front',
-
                       'lh open back', 'lh open down', 'lh open right', 'lh point down',
-
                       'lh point front', 'lh point right', 'lh stop', 'lh three back',
-
                       'lh three front', 'lh thumbs down', 'lh thumbs up', 'lh to face',
-
                       'lh two back', 'lh two front', 'blind']
 
 right_hand_postures = ['blank', 'hands together', 'other', 'rh beckon', 'rh claw down',
-
                       'rh claw front', 'rh claw left', 'rh claw up', 'rh closed back',
-
                       'rh closed down', 'rh closed front', 'rh closed left', 'rh fist',
-
                       'rh five front', 'rh four front', 'rh inch', 'rh l', 'rh one front',
-
                       'rh open back', 'rh open down', 'rh open left', 'rh point down',
-
                       'rh point front', 'rh point left', 'rh stop', 'rh three back',
-
                       'rh three front', 'rh thumbs down', 'rh thumbs up', 'rh to face',
-
                       'rh two back', 'rh two front', 'blind']
 
 left_arm_motions = ['LA: move right', 'LA: move left', 'LA: move up', 'LA: move down', 'LA: move back',
