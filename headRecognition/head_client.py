@@ -4,7 +4,7 @@ import socket, sys, struct
 import time
 import numpy as np
 from collections import deque
-import cv2
+from skimage.transform import resize
 from realtime_head_recognition import RealTimeHeadRecognition
 from support.endpoints import connect
 import support.streams as streams
@@ -90,11 +90,11 @@ if __name__ == '__main__':
         if height>0 and width > 0:
             head = np.array(depth_data, dtype=np.float32).reshape((height, width))
             posz = head[int(posx), int(posy)]
-            head = cv2.resize(head, (168, 168))
-            head = head[20:-20, 20:-20]
             head -= posz
             head /= 150
-
+            head = np.clip(head, -1, 1)
+            head = resize(head, (168, 168))
+            head = head[20:-20, 20:-20]
             head += 1
             head *= 127.5
 

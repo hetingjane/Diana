@@ -1,6 +1,6 @@
 import struct
 import time
-import cv2
+from skimage.transform import resize
 import sys
 import numpy as np
 from realtime_hand_recognition import RealTimeHandRecognition
@@ -86,11 +86,11 @@ if __name__ == '__main__':
             hand = np.array(depth_data, dtype=np.float32).reshape((height, width))
             print hand.shape, posx, posy
             posz = hand[int(posx), int(posy)]
-            hand = cv2.resize(hand, (168, 168))
-            hand = hand[20:-20, 20:-20]
             hand -= posz
             hand /= 150
-
+            hand = np.clip(hand, -1, 1)
+            hand = resize(hand, (168, 168))
+            hand = hand[20:-20, 20:-20]
             hand = hand.reshape((1, 128, 128, 1))
             max_index, probs = hand_classfier.classify(hand)
 
