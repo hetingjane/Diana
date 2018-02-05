@@ -6,8 +6,8 @@ import numpy as np
 from collections import deque
 from skimage.transform import resize
 from realtime_head_recognition import RealTimeHeadRecognition
-from fusion.conf.endpoints import connect
-import fusion.conf.streams as streams
+from ..fusion.conf.endpoints import connect
+from ..fusion.conf import streams
 
 # Timestamp | frame type | width | height | depth_data
 def decode_frame(raw_frame):
