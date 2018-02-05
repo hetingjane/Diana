@@ -4,10 +4,8 @@ import os
 import numpy as np
 import resnet_utils
 import time
-from tensorflow.python.platform import tf_logging as logging
 from image_reader import get_input
-from sklearn.metrics import confusion_matrix
-import matplotlib.pyplot as plt
+
 slim = tf.contrib.slim
 
 FLAGS = tf.app.flags.FLAGS

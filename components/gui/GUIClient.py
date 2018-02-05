@@ -4,7 +4,7 @@ import threading
 import Queue
 import sys
 
-from fusion.conf.endpoints import *
+from ..fusion.conf.endpoints import *
 
 class ThreadedClient:
 

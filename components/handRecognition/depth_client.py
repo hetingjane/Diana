@@ -4,8 +4,8 @@ from skimage.transform import resize
 import sys
 import numpy as np
 from realtime_hand_recognition import RealTimeHandRecognition
-from fusion.conf.endpoints import connect
-import fusion.conf.streams as streams
+from ..fusion.conf.endpoints import connect
+from ..fusion.conf import streams
 
 # timestamp (long) | depth_hands_count(int) | left_hand_height (int) | left_hand_width (int) |
 # right_hand_height (int) | right_hand_width (int)| left_hand_pos_x (float) | left_hand_pos_y (float) | ... |

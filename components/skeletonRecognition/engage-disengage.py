@@ -7,7 +7,7 @@ import numpy as np
 from Compute import (check_engage_disengage)
 from SlidingWindow import sliding_window_dataset
 from WindowProcess import (extract_data, process_window_data, collect_all_results, send_default_values)
-from fusion.conf.endpoints import *
+from ..fusion.conf.endpoints import *
 
 src_addr = KINECT_SRC_ADDR
 src_port = KINECT_SKELETON_PORT
