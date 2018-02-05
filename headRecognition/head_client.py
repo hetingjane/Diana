@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 
-import socket, sys, struct
+import sys, struct
 import time
 import numpy as np
 from collections import deque
 from skimage.transform import resize
 from realtime_head_recognition import RealTimeHeadRecognition
-from support.endpoints import connect
-import support.streams as streams
+from fusion.conf.endpoints import connect
+import fusion.conf.streams as streams
 
 # Timestamp | frame type | width | height | depth_data
 def decode_frame(raw_frame):

@@ -3,12 +3,11 @@
 import socket, sys, struct
 import time
 import numpy as np
-import matplotlib.pyplot as plt
 from realtime_hand_recognition import RealTimeHandRecognition
 import os
 import cv2
-from support.endpoints import connect
-import support.streams as streams
+from fusion.conf.endpoints import connect
+import fusion.conf.streams as streams
 
 src_addr = '129.82.45.252'
 src_port = 9009

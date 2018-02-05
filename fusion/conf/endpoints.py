@@ -1,6 +1,7 @@
 import socket
 import struct
-import support.streams as streams
+
+from . import streams
 
 _KINECT_DEST_ADDR = 'cwc1'
 

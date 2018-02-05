@@ -12,8 +12,8 @@ from .automata.state_machines import GrabStateMachine
 from .fusion_thread import Fusion
 from .remote_thread import Remote
 from . import thread_sync
-from support import streams
-import support.postures as postures
+from .conf import streams
+from .conf import postures
 
 
 class App:
@@ -154,7 +154,8 @@ class App:
             body_msg = self.latest_s_msg["Body"]
             idx_l_arm, idx_r_arm, idx_body = body_msg.data.idx_l_arm, body_msg.data.idx_r_arm, body_msg.data.idx_body
         else:
-            idx_l_arm, idx_r_arm, idx_body = len(postures.left_arm_motions)-1, len(postures.right_arm_motions)-1, len(postures.body_postures)-1
+            idx_l_arm, idx_r_arm, idx_body = len(postures.left_arm_motions) - 1, len(
+                postures.right_arm_motions) - 1, len(postures.body_postures) - 1
 
         hand_labels = np.array(range(len(lhand_probs)))
         high_lhand_labels = hand_labels[lhand_probs >= high_threshold]

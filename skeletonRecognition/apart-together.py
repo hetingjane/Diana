@@ -5,8 +5,8 @@ import numpy as np
 from SlidingWindow import sliding_window_dataset
 from WindowProcess import (extract_data, process_window_data, collect_all_results, send_default_values, code_to_label_encoding)
 from Preprocessing import (prune_joints_dataset, check_active_arm)
-from support.endpoints import connect
-from support import streams
+from fusion.conf.endpoints import connect
+from fusion.conf import streams
 from receiveAndShow import calculate_point
 
 

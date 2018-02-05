@@ -4,7 +4,7 @@ import select
 import sys
 import Queue
 
-from support.endpoints import serve
+from .conf.endpoints import serve
 
 
 class Remote(threading.Thread):

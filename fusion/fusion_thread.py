@@ -4,9 +4,9 @@ import struct
 import threading
 from collections import namedtuple
 
-from support import streams
-from support.postures import right_hand_postures, head_postures
-from support.endpoints import serve
+from .conf import streams
+from .conf.postures import right_hand_postures, head_postures
+from .conf.endpoints import serve
 from .thread_sync import synced_msgs
 
 

@@ -1,4 +1,4 @@
-from support.postures import to_vec
+from fusion.conf.postures import to_vec
 
 def match_any(*postures):
     """
