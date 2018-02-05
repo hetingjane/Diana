@@ -5,7 +5,6 @@ import numpy as np
 import tensorflow as tf
 
 slim = tf.contrib.slim
-os.environ["CUDA_VISIBLE_DEVICES"]="0"
 
 class RealTimeHandRecognition():
     def __init__(self, hands, gestures):

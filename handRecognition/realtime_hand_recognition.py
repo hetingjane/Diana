@@ -3,8 +3,6 @@ import tensorflow as tf
 import numpy as np
 import os
 
-os.environ["CUDA_VISIBLE_DEVICES"]="0"
-
 class RealTimeHandRecognition():
     def __init__(self, hands, gestures):
 

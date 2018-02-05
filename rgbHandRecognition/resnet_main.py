@@ -9,7 +9,6 @@ from image_reader import get_input
 from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
 slim = tf.contrib.slim
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 FLAGS = tf.app.flags.FLAGS
 tf.app.flags.DEFINE_string('hand', 'RH', 'RH or LH')
