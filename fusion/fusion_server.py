@@ -1,17 +1,19 @@
 import sys
 import time
 import argparse
+import struct
+import Queue
 
 import numpy as np
 
-from fusion.automata.bi_state_machines import *
-from fusion.automata.state_machines import GrabStateMachine
-from fusion.automata.tri_state_machines import *
-from fusion_thread import Fusion
-from remote_thread import Remote
-from support.endpoints import *
-from support.postures import *
-from thread_sync import *
+from .automata import bi_state_machines as bsm
+from .automata import tri_state_machines as tsm
+from .automata.state_machines import GrabStateMachine
+from .fusion_thread import Fusion
+from .remote_thread import Remote
+from . import thread_sync
+from support import streams
+import support.postures as postures
 
 
 class App:
@@ -50,7 +52,7 @@ class App:
         not_empty = True
         while not_empty:
             try:
-                synced_msgs.get_nowait()
+                thread_sync.synced_msgs.get_nowait()
             except Queue.Empty:
                 not_empty = False
 
@@ -61,12 +63,12 @@ class App:
         self.started = True
 
         # Start server thread for Brandeis
-        self.remote = Remote('Brandeis', 'brandeis', remote_events, remote_connected)
+        self.remote = Remote('Brandeis', 'brandeis', thread_sync.remote_events, thread_sync.remote_connected)
         self.remote.start()
         self.remote_started = True
 
         # Start server thread for GUI
-        self.gui = Remote('GUI', 'gui', gui_events, gui_connected)
+        self.gui = Remote('GUI', 'gui', thread_sync.gui_events, thread_sync.gui_connected)
         self.gui.start()
         self.gui_started = True
 
@@ -94,7 +96,6 @@ class App:
         except KeyboardInterrupt:
             self._exit()
 
-
     def _update(self):
         """
         Updates the latest synced data, and requests updating the latest gesture
@@ -103,18 +104,18 @@ class App:
         """
         try:
             # Get synced data without blocking with timeout
-            self.latest_s_msg = synced_msgs.get(False, 0.2)
+            self.latest_s_msg = thread_sync.synced_msgs.get(False, 0.2)
             if self.debug:
                 print "Latest synced message: ", self.latest_s_msg, "\n"
             #
             self._update_queues()
             self.received += 1
-            if synced_msgs.qsize() <= 15:
+            if thread_sync.synced_msgs.qsize() <= 15:
                 if self.debug:
-                    print "Backlog queue size exceeded limit: " + str(synced_msgs.qsize())
+                    print "Backlog queue size exceeded limit: {}".format(thread_sync.synced_msgs.qsize())
             else:
                 self.skipped += 1
-                print "Skipping because backlog too large: " + str(synced_msgs.qsize())
+                print "Skipping because backlog too large: {}".format(thread_sync.synced_msgs.qsize())
         except Queue.Empty:
             pass
 
@@ -132,11 +133,11 @@ class App:
             body_probs = np.zeros(5)
 
         lhand_probs = np.array(self.latest_s_msg["LH"].data.probabilities) \
-            if streams.is_active("LH") else np.zeros(len(left_hand_postures))
+            if streams.is_active("LH") else np.zeros(len(postures.left_hand_postures))
         rhand_probs = np.array(self.latest_s_msg["RH"].data.probabilities) \
-            if streams.is_active("RH") else np.zeros(len(right_hand_postures))
+            if streams.is_active("RH") else np.zeros(len(postures.right_hand_postures))
         head_probs = np.array(self.latest_s_msg["Head"].data.probabilities) \
-            if streams.is_active("Head") else np.zeros(len(head_postures))
+            if streams.is_active("Head") else np.zeros(len(postures.head_postures))
 
         return engaged, larm_probs, rarm_probs, lhand_probs, rhand_probs, head_probs, body_probs
 
@@ -153,7 +154,7 @@ class App:
             body_msg = self.latest_s_msg["Body"]
             idx_l_arm, idx_r_arm, idx_body = body_msg.data.idx_l_arm, body_msg.data.idx_r_arm, body_msg.data.idx_body
         else:
-            idx_l_arm, idx_r_arm, idx_body = len(left_arm_motions)-1, len(right_arm_motions)-1, len(body_postures)-1
+            idx_l_arm, idx_r_arm, idx_body = len(postures.left_arm_motions)-1, len(postures.right_arm_motions)-1, len(postures.body_postures)-1
 
         hand_labels = np.array(range(len(lhand_probs)))
         high_lhand_labels = hand_labels[lhand_probs >= high_threshold]
@@ -168,29 +169,29 @@ class App:
         # head labels with probabilities in [high_threshold, 1.0],
         # and hand labels with probabilities in [low_threshold, high_threshold)
         high_pose = 1 if engaged else 0
-        high_pose |= posture_to_vec[left_arm_motions[idx_l_arm]]
-        high_pose |= posture_to_vec[right_arm_motions[idx_r_arm]]
-        high_pose |= posture_to_vec[body_postures[idx_body]]
+        high_pose |= postures.to_vec[postures.left_arm_motions[idx_l_arm]]
+        high_pose |= postures.to_vec[postures.right_arm_motions[idx_r_arm]]
+        high_pose |= postures.to_vec[postures.body_postures[idx_body]]
 
         for l in high_lhand_labels:
-            high_pose |= posture_to_vec[left_hand_postures[l]]
+            high_pose |= postures.to_vec[postures.left_hand_postures[l]]
         for l in high_rhand_labels:
-            high_pose |= posture_to_vec[right_hand_postures[l]]
+            high_pose |= postures.to_vec[postures.right_hand_postures[l]]
         for l in high_head_labels:
-            high_pose |= posture_to_vec[head_postures[l]]
+            high_pose |= postures.to_vec[postures.head_postures[l]]
 
         # Low pose uses max probability arm labels, and max probability body label
         # no head labels,
         # and hand labels with probabilities in [low_threshold, high_threshold)
         low_pose = 1 if engaged else 0
-        low_pose |= posture_to_vec[left_arm_motions[idx_l_arm]]
-        low_pose |= posture_to_vec[right_arm_motions[idx_r_arm]]
-        low_pose |= posture_to_vec[body_postures[idx_body]]
+        low_pose |= postures.to_vec[postures.left_arm_motions[idx_l_arm]]
+        low_pose |= postures.to_vec[postures.right_arm_motions[idx_r_arm]]
+        low_pose |= postures.to_vec[postures.body_postures[idx_body]]
 
         for l in low_lhand_labels:
-            low_pose |= posture_to_vec[left_hand_postures[l]]
+            low_pose |= postures.to_vec[postures.left_hand_postures[l]]
         for l in low_rhand_labels:
-            low_pose |= posture_to_vec[right_hand_postures[l]]
+            low_pose |= postures.to_vec[postures.right_hand_postures[l]]
 
         return engaged, high_pose, low_pose
 
@@ -218,20 +219,20 @@ class App:
 
             # If it is the binary state machine for continuous points
             # and is in start state, append pointer message contents to the sent message
-            if state_machine is bsm_left_continuous_point:
+            if state_machine is bsm.left_continuous_point:
                 if state_machine.is_started():
                     all_events_to_send.append("P;l,{0:.2f},{1:.2f};{2:s}".format(lx, ly, ts))
-            elif state_machine is bsm_right_continuous_point:
+            elif state_machine is bsm.right_continuous_point:
                 if state_machine.is_started():
                     all_events_to_send.append("P;r,{0:.2f},{1:.2f};{2:s}".format(rx, ry, ts))
             # Else, check if current input caused a transition
             elif changed:
                 # For the special case of binary state machines for left point vec and right point vec
                 # append x,y coordinates to state
-                if state_machine is tsm_left_point_vec or state_machine is bsm_left_point_vec:
+                if state_machine is tsm.left_point_vec or state_machine is bsm.left_point_vec:
                     if state_machine.is_started():
                         cur_state += ",{0:.2f},{1:.2f}".format(lx, ly)
-                elif state_machine is tsm_right_point_vec or state_machine is bsm_right_point_vec:
+                elif state_machine is tsm.right_point_vec or state_machine is bsm.right_point_vec:
                     if state_machine.is_started():
                         cur_state += ",{0:.2f},{1:.2f}".format(rx, ry)
                 # Finally create a timestamped message
@@ -269,24 +270,24 @@ class App:
 
         # Include a check to see if the destination is connected or not
         for e in raw_events_list:
-            if remote_connected.wait(0.0):
-                remote_events.put(e)
+            if thread_sync.remote_connected.wait(0.0):
+                thread_sync.remote_events.put(e)
 
-        if gui_connected.wait(0.0):
+        if thread_sync.gui_connected.wait(0.0):
             ev_count = struct.pack("<i", len(raw_events_list))
-            gui_events.put(ev_count + ''.join(raw_events_list) + raw_probs)
+            thread_sync.gui_events.put(ev_count + ''.join(raw_events_list) + raw_probs)
 
 
 gsm = GrabStateMachine()
 
-brandeis_events = [bsm_engage, bsm_left_continuous_point, bsm_right_continuous_point,
-                   tsm_count_five, tsm_count_four, tsm_count_three, tsm_count_two, tsm_count_one,
+brandeis_events = [bsm.engage, bsm.left_continuous_point, bsm.right_continuous_point,
+                   tsm.count_five, tsm.count_four, tsm.count_three, tsm.count_two, tsm.count_one,
                    gsm,
-                   tsm_negack, tsm_posack,
-                   tsm_push_back, tsm_push_front, tsm_push_left, tsm_push_right,
-                   tsm_right_point_vec, tsm_left_point_vec]
+                   tsm.negack, tsm.posack,
+                   tsm.push_back, tsm.push_front, tsm.push_left, tsm.push_right,
+                   tsm.right_point_vec, tsm.left_point_vec]
 
-csu_events = brandeis_events + [tsm_unknown, tsm_servo_left, tsm_servo_right]
+csu_events = brandeis_events + [tsm.unknown, tsm.servo_left, tsm.servo_right]
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -294,12 +295,15 @@ if __name__ == '__main__':
                         help="the mode in which fusion server is run")
     parser.add_argument('-D', '--debug', dest='debug_mode', default=False, action='store_true', help='enable the debug mode')
     args = parser.parse_args()
+
     if args.mode == 'brandeis':
         print "Running in Brandeis mode"
         event_set = brandeis_events
     elif args.mode == 'csu':
         print "Running in CSU mode"
         event_set = csu_events
+    else:
+        event_set = None
 
     a = App(event_set, args.debug_mode)
     a.run()

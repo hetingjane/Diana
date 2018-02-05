@@ -1,5 +1,4 @@
-# NOT A GENERAL PURPOSE STATE MACHINE BECAUSE OF ENGAGE/DISENGAGE CHECKS ON INPUTS
-from fusion.automata.rules import *
+from . import rules
 
 
 class BinaryStateMachine:
@@ -150,10 +149,11 @@ class TriStateMachine:
             transitioned = True
         return transitioned
 
+
 class GrabStateMachine:
 
     _states_arr = ["grab stop", "grab still", "grab move up", "grab move down", "grab move left", "grab move right",
-               "grab move front", "grab move back"]
+                   "grab move front", "grab move back"]
     _states = dict(zip(_states_arr, range(len(_states_arr))))
 
     def __init__(self, thresholds=(8, 8, 2, 2, 2, 2, 2, 2)):
@@ -165,58 +165,59 @@ class GrabStateMachine:
         elif len(thresholds) == len(GrabStateMachine._states_arr):
             self.thresholds = dict(zip(GrabStateMachine._states_arr, thresholds))
         else:
-            raise ValueError("thresholds must be an integer or a list of size " + str(len(GrabStateMachine._states_arr)))
+            raise ValueError(
+                "thresholds must be an integer or a list of size {}".format(len(GrabStateMachine._states_arr)))
 
         self.orig_thresholds = dict(self.thresholds)
 
         # Counts for transition from each state
         self.cur_val = dict((s, 0) for s in GrabStateMachine._states_arr)
 
-        self._grab_still_rule = or_rules(
-            match_all('rh claw down', 'RA: still'),
-            match_all('lh claw down', 'LA: still')
+        self._grab_still_rule = rules.or_rules(
+            rules.match_all('rh claw down', 'RA: still'),
+            rules.match_all('lh claw down', 'LA: still')
         )
 
-        self._grab_move_front_rule = or_rules(
-            match_all('rh claw down', 'RA: move front'),
-            match_all('lh claw down', 'LA: move front')
+        self._grab_move_front_rule = rules.or_rules(
+            rules.match_all('rh claw down', 'RA: move front'),
+            rules.match_all('lh claw down', 'LA: move front')
         )
 
-        self._grab_move_back_rule = or_rules(
-            match_all('rh claw down', 'RA: move back'),
-            match_all('lh claw down', 'LA: move back')
+        self._grab_move_back_rule = rules.or_rules(
+            rules.match_all('rh claw down', 'RA: move back'),
+            rules.match_all('lh claw down', 'LA: move back')
         )
 
-        self._grab_move_left_rule = or_rules(
-            match_all('rh claw down', 'RA: move left'),
-            match_all('lh claw down', 'LA: move left')
+        self._grab_move_left_rule = rules.or_rules(
+            rules.match_all('rh claw down', 'RA: move left'),
+            rules.match_all('lh claw down', 'LA: move left')
         )
 
-        self._grab_move_right_rule = or_rules(
-            match_all('rh claw down', 'RA: move right'),
-            match_all('lh claw down', 'LA: move right')
+        self._grab_move_right_rule = rules.or_rules(
+            rules.match_all('rh claw down', 'RA: move right'),
+            rules.match_all('lh claw down', 'LA: move right')
         )
 
-        self._grab_move_up_rule = or_rules(
-            match_all('rh claw down', 'RA: move up'),
-            match_all('lh claw down', 'LA: move up')
+        self._grab_move_up_rule = rules.or_rules(
+            rules.match_all('rh claw down', 'RA: move up'),
+            rules.match_all('lh claw down', 'LA: move up')
         )
 
-        self._grab_move_down_rule = or_rules(
-            match_all('rh claw down', 'RA: move down'),
-            match_all('lh claw down', 'LA: move down')
+        self._grab_move_down_rule = rules.or_rules(
+            rules.match_all('rh claw down', 'RA: move down'),
+            rules.match_all('lh claw down', 'LA: move down')
         )
 
-        self._grab_move_rule = or_rules(
-            and_rules(
-                match_all('lh claw down'),
-                match_any(
+        self._grab_move_rule = rules.or_rules(
+            rules.and_rules(
+                rules.match_all('lh claw down'),
+                rules.match_any(
                     'LA: move left', 'LA: move right', 'LA: move front', 'LA: move back', 'LA: move up', 'LA: move down'
                 )
             ),
-            and_rules(
-                match_all('rh claw down'),
-                match_any(
+            rules.and_rules(
+                rules.match_all('rh claw down'),
+                rules.match_any(
                     'RA: move left', 'RA: move right', 'RA: move front', 'RA: move back', 'RA: move up', 'RA: move down'
                 )
             )
@@ -365,9 +366,3 @@ class GrabStateMachine:
             self.cur_state = self.start_state
             transitioned = True
         return transitioned
-
-
-
-
-
-

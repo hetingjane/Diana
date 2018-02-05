@@ -1,8 +1,9 @@
 import threading
 import socket
 import select
-import Queue
 import sys
+import Queue
+
 from support.endpoints import serve
 
 
@@ -38,8 +39,6 @@ class Remote(threading.Thread):
         self._log("Waiting for the destination to connect\n")
 
         while not self.is_stopped():
-
-
             try:
                 read_socks, write_socks, except_socks = select.select(inputs, outputs, excepts, 0.02)
             except socket.error:

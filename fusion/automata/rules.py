@@ -1,4 +1,4 @@
-from support.postures import posture_to_vec
+from support.postures import to_vec
 
 def match_any(*postures):
     """
@@ -7,7 +7,7 @@ def match_any(*postures):
     :param postures: One or more postures as strings
     :return: Rule to match the input postures with the input mask
     """
-    posture_vecs = [ posture_to_vec[posture] for posture in postures ]
+    posture_vecs = [to_vec[posture] for posture in postures]
 
     def f(in_sym):
         for v in posture_vecs:
@@ -25,7 +25,7 @@ def match_all(*postures):
     :param postures: One or more postures as strings
     :return: Rule to match the input postures with the input mask
     """
-    posture_vecs = [ posture_to_vec[posture] for posture in postures ]
+    posture_vecs = [to_vec[posture] for posture in postures]
 
     def f(in_sym):
         for v in posture_vecs:
@@ -44,7 +44,7 @@ def mismatch_any(*postures):
     :return: Rule to match the input postures with the input mask
     """
 
-    posture_vecs = [ posture_to_vec[posture] for posture in postures ]
+    posture_vecs = [to_vec[posture] for posture in postures]
 
     def f(in_sym):
         for v in posture_vecs:
@@ -62,7 +62,7 @@ def mismatch_all(*postures):
     :param postures: One or more postures as strings
     :return: Rule to match the input postures with the input mask
     """
-    posture_vecs = [ posture_to_vec[posture] for posture in postures ]
+    posture_vecs = [to_vec[posture] for posture in postures]
 
     def f(in_sym):
         for v in posture_vecs:

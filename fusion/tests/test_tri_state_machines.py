@@ -1,7 +1,7 @@
 import pytest
 
 from fusion.automata.tri_state_machines import *
-from support.postures import posture_to_vec
+from support.postures import to_vec
 
 
 disengage = (False, 0, 0)
@@ -12,8 +12,8 @@ def get_high_low_stop(trigger, non_trigger):
     stop = (True, non_trigger, non_trigger)
     return high, low, stop
 
-posack_trigger = posture_to_vec['engage'] | posture_to_vec['rh thumbs up']
-posack_non_trigger = posture_to_vec['engage'] | posture_to_vec['rh thumbs down']
+posack_trigger = to_vec['engage'] | to_vec['rh thumbs up']
+posack_non_trigger = to_vec['engage'] | to_vec['rh thumbs down']
 
 posack_high, posack_low, posack_stop = get_high_low_stop(posack_trigger, posack_non_trigger)
 
@@ -34,15 +34,15 @@ posack_high, posack_low, posack_stop = get_high_low_stop(posack_trigger, posack_
     ([posack_high]*6 + [disengage] + [posack_high]*4, ['stop', 'high', 'stop'])
 ])
 def test_posack(test_input, expected_output):
-    tsm_posack.reset()
-    actual_output = [tsm_posack.get_state().split(' ')[-1]]
+    posack.reset()
+    actual_output = [posack.get_state().split(' ')[-1]]
     for i in test_input:
-        if tsm_posack.input(*i):
-            actual_output.append(tsm_posack.get_state().split(' ')[-1])
+        if posack.input(*i):
+            actual_output.append(posack.get_state().split(' ')[-1])
     assert actual_output == expected_output
 
-point_trigger = posture_to_vec['engage'] | posture_to_vec['RA: still'] | posture_to_vec['rh point front']
-point_non_trigger = posture_to_vec['engage'] | posture_to_vec['rh thumbs down']
+point_trigger = to_vec['engage'] | to_vec['RA: still'] | to_vec['rh point front']
+point_non_trigger = to_vec['engage'] | to_vec['rh thumbs down']
 
 point_high, point_low, point_stop = get_high_low_stop(point_trigger, point_non_trigger)
 
@@ -61,9 +61,9 @@ point_high, point_low, point_stop = get_high_low_stop(point_trigger, point_non_t
     ([point_high]*6 + [disengage] + [point_high]*4, ['stop', 'high', 'stop'])
 ])
 def test_point(test_input, expected_output):
-    tsm_right_point_vec.reset()
-    actual_output = [tsm_right_point_vec.get_state().split(' ')[-1]]
+    right_point_vec.reset()
+    actual_output = [right_point_vec.get_state().split(' ')[-1]]
     for i in test_input:
-        if tsm_right_point_vec.input(*i):
-            actual_output.append(tsm_right_point_vec.get_state().split(' ')[-1])
+        if right_point_vec.input(*i):
+            actual_output.append(right_point_vec.get_state().split(' ')[-1])
     assert actual_output == expected_output
