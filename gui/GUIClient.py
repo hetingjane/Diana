@@ -3,10 +3,8 @@ from GUI import App
 import threading
 import Queue
 import sys
-import socket
-import struct
 
-from support.endpoints import *
+from fusion.conf.endpoints import *
 
 class ThreadedClient:
 

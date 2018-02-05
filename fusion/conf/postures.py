@@ -8,13 +8,13 @@ left_hand_postures = ['blank', 'hands together', 'other', 'lh beckon', 'lh claw 
                       'lh two back', 'lh two front', 'blind']
 
 right_hand_postures = ['blank', 'hands together', 'other', 'rh beckon', 'rh claw down',
-                      'rh claw front', 'rh claw left', 'rh claw up', 'rh closed back',
-                      'rh closed down', 'rh closed front', 'rh closed left', 'rh fist',
-                      'rh five front', 'rh four front', 'rh inch', 'rh l', 'rh one front',
-                      'rh open back', 'rh open down', 'rh open left', 'rh point down',
-                      'rh point front', 'rh point left', 'rh stop', 'rh three back',
-                      'rh three front', 'rh thumbs down', 'rh thumbs up', 'rh to face',
-                      'rh two back', 'rh two front', 'blind']
+                       'rh claw front', 'rh claw left', 'rh claw up', 'rh closed back',
+                       'rh closed down', 'rh closed front', 'rh closed left', 'rh fist',
+                       'rh five front', 'rh four front', 'rh inch', 'rh l', 'rh one front',
+                       'rh open back', 'rh open down', 'rh open left', 'rh point down',
+                       'rh point front', 'rh point left', 'rh stop', 'rh three back',
+                       'rh three front', 'rh thumbs down', 'rh thumbs up', 'rh to face',
+                       'rh two back', 'rh two front', 'blind']
 
 left_arm_motions = ['LA: move right', 'LA: move left', 'LA: move up', 'LA: move down', 'LA: move back',
                     'LA: move front', 'LA: move right up', 'LA: move right down', 'LA: move right back',
@@ -43,5 +43,5 @@ _engage_vec = [ 1 << 0 ]
 _vecs = _engage_vec + [1 << i for i in range(1, len(left_hand_postures + right_hand_postures + left_arm_motions + right_arm_motions + head_postures + body_postures) + 1)]
 _postures = ["engage"] + left_hand_postures + right_hand_postures + left_arm_motions + right_arm_motions + head_postures + body_postures
 
-vec_to_posture = dict(zip(_vecs, _postures))
-posture_to_vec = dict(zip(_postures, _vecs))
+from_vec = dict(zip(_vecs, _postures))
+to_vec = dict(zip(_postures, _vecs))

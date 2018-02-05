@@ -1,12 +1,13 @@
 import select
 import socket
 import struct
+import threading
 from collections import namedtuple
 
-from support import streams
-from support.postures import right_hand_postures, head_postures
-from support.endpoints import serve
-from thread_sync import *
+from .conf import streams
+from .conf.postures import right_hand_postures, head_postures
+from .conf.endpoints import serve
+from .thread_sync import synced_msgs
 
 
 class Fusion(threading.Thread):
@@ -27,7 +28,6 @@ class Fusion(threading.Thread):
     SpeechData = namedtuple('SpeechData', ['command'])
 
     Message = namedtuple('Message', ['header', 'data'])
-
 
     def __init__(self):
         threading.Thread.__init__(self)
@@ -139,7 +139,7 @@ class Fusion(threading.Thread):
         try:
             stream_id_bytes = self._recv_all(sock, 4)
             stream_id = struct.unpack('<i', stream_id_bytes)[0]
-        except:
+        except Exception:
             print "Unable to receive complete stream id. Ignoring the client"
             sock.close()
         print "Received stream id. Verifying..."
@@ -164,8 +164,6 @@ class Fusion(threading.Thread):
             sock.close()
         return False
 
-
-
     def run(self):
         serv_sock = serve('fusion')
         serv_sock.listen(5)
@@ -183,7 +181,7 @@ class Fusion(threading.Thread):
                 for sock in inputs:
                     try:
                         select.select([sock], [], [], 0)
-                    except:
+                    except Exception:
                         print "Client disconnected."
                         inputs.remove(sock)
                         self._connected_clients.pop(sock)

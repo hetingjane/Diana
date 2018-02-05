@@ -29,7 +29,7 @@ do
     fi
     case "$process" in
     "fusion")
-    params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; if [ ${VENV_DIR} != 'x' ]; then source ${VENV_DIR}/bin/activate; fi; python ./fusion/fusion_server.py; bash;'\" --title ${i}"
+    params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; if [ ${VENV_DIR} != 'x' ]; then source ${VENV_DIR}/bin/activate; fi; python -m fusion.fusion_server; bash;'\" --title ${i}"
     ;;
     "lh")
     params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; export CUDA_VISIBLE_DEVICES=${device}; if [ ${VENV_DIR} != 'x' ]; then source ${VENV_DIR}/bin/activate; fi; python ./handRecognition/depth_client.py LH; bash;'\" --title ${i}"
