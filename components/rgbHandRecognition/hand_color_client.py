@@ -6,8 +6,8 @@ import numpy as np
 from realtime_hand_recognition import RealTimeHandRecognition
 import os
 import cv2
-from fusion.conf.endpoints import connect
-import fusion.conf.streams as streams
+from ..fusion.conf.endpoints import connect
+from ..fusion.conf import streams
 
 src_addr = '129.82.45.252'
 src_port = 9009
