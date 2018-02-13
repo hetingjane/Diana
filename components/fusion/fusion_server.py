@@ -281,7 +281,7 @@ class App:
 
 gsm = GrabStateMachine()
 
-brandeis_events = [bsm.engage, bsm.left_continuous_point, bsm.right_continuous_point,
+brandeis_events = [bsm.engage, bsm.left_continuous_point, bsm.right_continuous_point, bsm.wave,
                    tsm.count_five, tsm.count_four, tsm.count_three, tsm.count_two, tsm.count_one,
                    gsm,
                    tsm.negack, tsm.posack,

@@ -414,3 +414,12 @@ arms_together_Y = BinaryStateMachine(["arms together Y start", "arms together Y 
         "arms together Y stop": rules.mismatch_any('LA: together Y', 'RA: together Y')
     }
 }, "arms together Y stop")
+
+wave = BinaryStateMachine(["wave start", "wave stop"], {
+    "wave stop": {
+        "wave start": rules.match_any('LA: wave', 'RA: wave')
+    },
+    "wave start": {
+        "wave stop": rules.mismatch_all('LA: wave', 'RA: wave')
+    }
+}, "wave stop")
