@@ -23,7 +23,7 @@ left_arm_motions = ['LA: move right', 'LA: move left', 'LA: move up', 'LA: move 
                     'LA: move down front', 'LA: move right up back', 'LA: move right up front',
                     'LA: move right down back', 'LA: move right down front', 'LA: move left up back',
                     'LA: move left up front', 'LA: move left down back', 'LA: move left down front', 'LA: still',
-                    'LA: apart X', 'LA: together X', 'LA: apart Y', 'LA: together Y', 'blind']
+                    'LA: apart X', 'LA: together X', 'LA: apart Y', 'LA: together Y', 'LA: wave', 'blind']
 
 right_arm_motions = ['RA: move right', 'RA: move left', 'RA: move up', 'RA: move down', 'RA: move back',
                      'RA: move front', 'RA: move right up', 'RA: move right down', 'RA: move right back',
@@ -32,7 +32,7 @@ right_arm_motions = ['RA: move right', 'RA: move left', 'RA: move up', 'RA: move
                      'RA: move down front', 'RA: move right up back', 'RA: move right up front',
                      'RA: move right down back', 'RA: move right down front', 'RA: move left up back',
                      'RA: move left up front', 'RA: move left down back', 'RA: move left down front', 'RA: still',
-                     'RA: apart X', 'RA: together X', 'RA: apart Y', 'RA: together Y', 'blind']
+                     'RA: apart X', 'RA: together X', 'RA: apart Y', 'RA: together Y', 'RA: wave', 'blind']
 
 head_postures = ['head nod', 'head shake', 'other', 'blind']
 
