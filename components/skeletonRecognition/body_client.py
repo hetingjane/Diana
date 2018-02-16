@@ -214,7 +214,7 @@ if __name__ == '__main__':
         s = connect_rgb()
     else:
         s = connect('kinect', 'Body')
-    r = None #connect('fusion', 'Body', timeout=False)
+    r = connect('fusion', 'Body', timeout=False)
 
     if s is None:
         sys.exit(0)
