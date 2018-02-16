@@ -1,6 +1,6 @@
 import numpy as np
 from itertools import chain
-from support.postures import left_arm_motions, right_arm_motions
+from ..fusion.conf.postures import left_arm_motions, right_arm_motions
 
 
 def extract_data(a, rgb):

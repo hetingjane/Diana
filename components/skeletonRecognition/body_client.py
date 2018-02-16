@@ -304,8 +304,6 @@ if __name__ == '__main__':
                                 arm_motion_label, motion_encoding, probabilities = calculate_direction(pruned_data, body_part=body_part, rgb=rgb)
                             else:
                                 arm_motion_label, motion_encoding, probabilities = 'wave', 31, [0]*6
-
-
                         else:
                             arm_motion_label, motion_encoding, probabilities = 'blind', 32, [0]*6
 
@@ -352,12 +350,15 @@ if __name__ == '__main__':
         # print 'Length of result is: ', len(result)
         pack_list = [streams.get_stream_id("Body"), timestamp] + result
 
-        from support.postures import left_arm_motions, right_arm_motions
+
+        #Debugging mode
+        from ..fusion.conf.postures import left_arm_motions, right_arm_motions
         r = [left_arm_motions[result[0]], right_arm_motions[result[1]], class_list[result[2]]]
         if r==['blind', 'blind', 'still']:
             pass
         else:
             print 'Result is: ', result[:3], r
+
 
         count += 1
         if count % 100 == 0:
