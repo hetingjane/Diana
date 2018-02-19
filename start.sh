@@ -56,7 +56,7 @@ do
     params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; sleep 3; python -m components.speech.speech_client; bash;'\" --title ${i}"
     ;;
     "body")
-    params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; sleep 3; export CUDA_VISIBLE_DEVICES=${device}; if [ ${VENV_DIR} != 'x' ]; then source ${VENV_DIR}/bin/activate; fi; python -m components.skeletonRecognition.apart-together; bash;'\" --title ${i}"
+    params="$params --tab -e \"ssh -t ${machine} 'cd ${START_DIR}; sleep 3; export CUDA_VISIBLE_DEVICES=${device}; if [ ${VENV_DIR} != 'x' ]; then source ${VENV_DIR}/bin/activate; fi; python -m components.skeletonRecognition.body_client; bash;'\" --title ${i}"
     if [ "$2" = "--single-machine" ]
     then
         ((device++))
