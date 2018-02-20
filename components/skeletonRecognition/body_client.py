@@ -214,7 +214,10 @@ if __name__ == '__main__':
         s = connect_rgb()
     else:
         s = connect('kinect', 'Body')
+        print 'connected to Body Client'
     r = connect('fusion', 'Body', timeout=False)
+    if r is not None:
+        print 'Connected to fusion server'
 
     if s is None:
         sys.exit(0)
@@ -349,15 +352,21 @@ if __name__ == '__main__':
         assert len(result) == 25
         # print 'Length of result is: ', len(result)
         pack_list = [streams.get_stream_id("Body"), timestamp] + result
+        raw_data = struct.pack("<iqiii" + "ff" * 2 + "f" * 5 + "ff" * 6 + 'i', *pack_list)
+
 
 
         #Debugging mode
         from ..fusion.conf.postures import left_arm_motions, right_arm_motions
-        r = [left_arm_motions[result[0]], right_arm_motions[result[1]], class_list[result[2]]]
-        if r==['blind', 'blind', 'still']:
+        to_print_result = [left_arm_motions[result[0]], right_arm_motions[result[1]], class_list[result[2]]]
+        if to_print_result==['blind', 'blind', 'still']:
             pass
         else:
-            print 'Result is: ', result[:3], r
+            print 'Result is: ', result[:3], to_print_result
+
+
+        if r is not None:
+            r.sendall(raw_data)
 
 
         count += 1
