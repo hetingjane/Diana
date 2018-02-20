@@ -143,4 +143,11 @@ count_three = TriStateMachine("count three",
 
 count_four = TriStateMachine("count four", rules.match_any('rh four front', 'lh four front'))
 
-count_five = TriStateMachine("count five", rules.match_any('rh five front', 'lh five front'))
+count_five = TriStateMachine("count five", rules.or_rules(
+            rules.and_rules(
+                rules.match_all('rh five front'),
+                rules.mismatch_all('RA: wave')),
+            rules.and_rules(
+                rules.match_all('lh five front'),
+                rules.mismatch_all('LA: wave'))
+            ))

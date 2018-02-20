@@ -368,7 +368,14 @@ count_four = BinaryStateMachine(["count four start", "count four stop"], {
 
 count_five = BinaryStateMachine(["count five start", "count five stop"], {
     "count five stop": {
-        "count five start": rules.match_any('rh five front', 'lh five front')
+        "count five start": rules.or_rules(
+            rules.and_rules(
+                rules.match_all('rh five front'),
+                rules.mismatch_all('RA: wave')),
+            rules.and_rules(
+                rules.match_all('lh five front'),
+                rules.mismatch_all('LA: wave'))
+            )
     },
     "count five start": {
         "count five stop": rules.mismatch_all('rh five front', 'lh five front')
