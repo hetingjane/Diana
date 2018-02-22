@@ -68,18 +68,21 @@ class TriStateMachine:
     _states_arr = ["stop", "low", "high"]
     _states = dict(zip(_states_arr, range(len(_states_arr))))
 
-    def __init__(self, name, rule, thresholds=5):
+    def __init__(self, name, rule, *thresholds):
         self.name = name
         self.start_state = TriStateMachine._states["stop"]
         self.cur_state = self.start_state
         self.rule = rule
-        if isinstance(thresholds, int):
-            thresholds = (thresholds,) * len(TriStateMachine._states_arr)
-            self.thresholds = dict(zip(TriStateMachine._states_arr, thresholds))
+
+        if len(thresholds) == 0:
+            thresholds = (5,) * len(TriStateMachine._states_arr)
+        if len(thresholds) == 1:
+            thresholds = thresholds * len(TriStateMachine._states_arr)
         elif len(thresholds) == len(TriStateMachine._states_arr):
-            self.thresholds = dict(zip(TriStateMachine._states_arr, thresholds))
+            thresholds = thresholds
         else:
-            raise ValueError("thresholds must be an integer or a list of size " + str(len(TriStateMachine._states_arr)))
+            raise ValueError("thresholds should match state count {}".format(len(TriStateMachine._states_arr)))
+        self.thresholds = dict(zip(TriStateMachine._states_arr, thresholds))
         # Counts for transition from each state
         self.cur_val = dict((s, 0) for s in TriStateMachine._states_arr)
 
