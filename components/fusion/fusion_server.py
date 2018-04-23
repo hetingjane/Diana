@@ -273,10 +273,15 @@ class App:
         for e in raw_events_list:
             if thread_sync.remote_connected.wait(0.0):
                 thread_sync.remote_events.put(e)
+        if len(raw_events_list) > 0:
+            #print(len(raw_events_list))
+            #print(raw_events_list)
+            pass
 
         if thread_sync.gui_connected.wait(0.0):
             ev_count = struct.pack("<i", len(raw_events_list))
-            thread_sync.gui_events.put(ev_count + ''.join(raw_events_list) + raw_probs)
+            new_ev = ev_count + ''.join(raw_events_list) + raw_probs
+            thread_sync.gui_events.put(new_ev)
 
 
 gsm = GrabStateMachine()
