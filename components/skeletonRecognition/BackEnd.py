@@ -155,7 +155,7 @@ def get_direction(axis, sign):
     elif axis == 1:
         direction = 'up' if sign>0 else 'down'
     elif axis == 2:
-        direction = 'front' if sign>0 else 'back'
+        direction = 'back' if sign>0 else 'front'
     return direction
 
 

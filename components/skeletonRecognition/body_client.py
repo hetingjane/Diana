@@ -262,7 +262,10 @@ if __name__ == '__main__':
         if rgb:
             lpoint, rpoint = [0.0, 0.0], [0.0, 0.0]
         else:
-            lpoint, rpoint = calculate_point(fd)
+            if wave_flag:
+                lpoint, rpoint = calculate_point(fd)
+            else:
+                lpoint, rpoint = [0.0, 0.0], [0.0, 0.0]
 
 
         if engaged:
@@ -362,7 +365,7 @@ if __name__ == '__main__':
         if to_print_result==['blind', 'blind', 'still']:
             pass
         else:
-            print 'Result is: ', result[:3], to_print_result
+            print 'Result is: ', result[:7], to_print_result
 
 
         if r is not None:
