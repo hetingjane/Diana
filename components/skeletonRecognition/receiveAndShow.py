@@ -82,171 +82,163 @@ def recv_skeleton_frame(sock):
     #print load_size
     return recv_all(sock, load_size)
 '''
-    
 import numpy as np
 from scipy.signal import savgol_filter
 
 
 # following codes get the elbow and wrist information from the kinect sensor
-WRISTLEFT = 6 # JointType specified by kinect
-WRISTRIGHT = 10
-ELBOWLEFT = 5
-ELBOWRIGHT = 9
-joint_interest_coded = [WRISTLEFT, WRISTRIGHT, ELBOWLEFT, ELBOWRIGHT]
+class Pointing:
+    def __init__(self):
+        self.WRISTLEFT = 6  # JointType specified by kinect
+        self.WRISTRIGHT = 10
+        self.ELBOWLEFT = 5
+        self.ELBOWRIGHT = 9
+        self.joint_interest_coded = [self.WRISTLEFT, self.WRISTRIGHT, self.ELBOWLEFT, self.ELBOWRIGHT]
 
-lpoint_buffer = []
-rpoint_buffer = []
-lpoint = [-0.5, 1.3] # inferred pointing coordinate on the table from left arm
-rpoint = [0.5, 1.3] # inferred pointing coordinate on the table from left arm
+        self.joint_info = {i: None for i in self.joint_interest_coded}  # contains left/right wrists/elbows coordinates
+        self.joint_info_buffer = {i: [] for i in self.joint_interest_coded}
+        self.prev_joint_info = {i: None for i in self.joint_interest_coded}
 
+        self.lpoint_buffer = []
+        self.rpoint_buffer = []
+        self.lpoint = (0.0, -0.6)  # inferred pointing coordinate on the table from left arm
+        self.rpoint = (0.0, -0.6)  # inferred pointing coordinate on the table from right arm
+        self.prev_lpoint = (0.0, -0.6)
+        self.prev_rpoint = (0.0, -0.6)
 
-def getWristElbow(src):
-    '''
-    This function returns the coordinates for left/right wrists/elbows (4 sets of 3 values: x, y, z)
-    '''
-    result = {}
-    for i in range(len(joint_interest_coded)):
-        result[joint_interest_coded[i]] = None
-        
-    if len(src) <= 9:
-        return result
-    
-    for i in range(25):
-        if src[(i+1)*9] in joint_interest_coded:
-            result[src[(i+1)*9]] = src[(i+1)*9 + 2: (i+2)*9 + 5]
-    return result
-
-
-def smoothing(window_length=5, polyorder=2):
-    global lpoint_buffer
-    global rpoint_buffer
-    global lpoint
-    global rpoint
-    global timestamp
-
-
-    if len(lpoint_buffer)>= window_length: #Assuming both buffers have same lengths
-        if not (np.isfinite(np.prod(lpoint)) and np.isfinite(np.prod(rpoint))):
-            print 'Buffer full but -inf seen! ', lpoint, rpoint
-            # If either entry is -inf, we append the previous values to the buffer for both, ignoring the point which was not -inf.
-            # No Error seen as most recent element is present in buffer
-            lpoint, rpoint = lpoint_buffer[-1], rpoint_buffer[-1]
-
-        lpoint_buffer.pop(0)
-        lpoint_buffer.append(lpoint)
-
-        rpoint_buffer.pop(0)
-        rpoint_buffer.append(rpoint)
-
-        lpoint_buffer = savgol_filter(lpoint_buffer, window_length, polyorder, axis=0).tolist()
-        lpoint = lpoint_buffer[int(window_length / 2)]
-
-        rpoint_buffer = savgol_filter(rpoint_buffer, window_length, polyorder, axis=0).tolist()
-        rpoint = rpoint_buffer[int(window_length / 2)]
-
-    else:
-        if not (np.isfinite(np.prod(lpoint)) and np.isfinite(np.prod(rpoint))):
-            print 'Buffer not full, but -inf seen! ', lpoint, rpoint
-            try:
-                lpoint, rpoint = lpoint_buffer[-1], rpoint_buffer[-1]
-            except:
-                #Buffer empty and -inf encountered
-                print 'Cannot take the last recent element from buffer, Sending zeros values instead'
-                lpoint, rpoint = [0.0, 0.0], [0.0, 0.0]
-        lpoint_buffer.append(lpoint)
-        rpoint_buffer.append(rpoint)
-
-
-
-def calcPointing(wrist, elbow):
-    '''
-    Both wrist and elbow should contain (x,y,z) coordinates
-    Table plane: y = -0.582
-    Line equation: 
-    y = (y2-y1)/(x2-x1) * (x-x1) + y1
-    z = (z2-z1)/(y2-y1) * (y-y1) + z1
-    so:
-    x = x1 - (y1-y) / (y2-y1) * (x2-x1)
-    z = z1 - (y1-y) / (y2-y1) * (z2-z1)
-    '''
-    if (round((elbow[1] - wrist[1]), 3) == 0.0):
-        return [float("-inf"), float("-inf")]
-    table_y = -0.582
-    table_x = wrist[0] - (wrist[1] - table_y) / (elbow[1] - wrist[1]) * (elbow[0] - wrist[0])
-    table_z = wrist[2] - (wrist[1] - table_y) / (elbow[1] - wrist[1]) * (elbow[2] - wrist[2])
-
-    return (table_x, table_z)
-
-
-
-def calculate_point(fd):
-    global lpoint
-    global rpoint
-    result = getWristElbow(fd)
-    lwrist = result[WRISTLEFT]
-    rwrist = result[WRISTRIGHT]
-    lelbow = result[ELBOWLEFT]
-    relbow = result[ELBOWRIGHT]
-    if lwrist is not None:
-        lpoint = calcPointing(lwrist, lelbow)
-        rpoint = calcPointing(rwrist, relbow)
-
-        if not (np.isfinite(np.prod(lpoint)) and np.isfinite(np.prod(rpoint))):
-            print 'NaN value seen! ', lpoint, rpoint
-
-        smoothing(5)
-    else:
-        lpoint = [float("-inf"), float("-inf")]
-        rpoint = [float("-inf"), float("-inf")]
-
-
-    return lpoint, rpoint
-
-'''timestamp
-def updatePoint():
-
-    Connect to the kinect server and get the coordinate
-
-    global lpoint
-    global rpoint
-    s = connect()
-    if s is None:
-        sys.exit(0)
-        
-    while True:
+    def get_pointing_main(self, src, is_smoothing_joint=True, is_smoothing_point=True):
         try:
-            f = recv_skeleton_frame(s)
-            result = getWristElbow(decode_frame(f))
-            lwrist = result[WRISTLEFT]
-            rwrist = result[WRISTRIGHT]
-            lelbow = result[ELBOWLEFT]
-            relbow = result[ELBOWRIGHT]
-            if lwrist is None:
-                continue
-            lpoint = calcPointing(lwrist, lelbow)
-            rpoint = calcPointing(rwrist, relbow)
-            #print(lpoint, ' ', rpoint)
-        except:
-            s.close()
-            break
+            self._get_wrist_elbow(src)
+            if is_smoothing_joint:
+                # self._smoothing_joint(11, 2)
+                self._smoothing_point_weight(15)
+                self._smoothing_joint_median(11)
+            self._get_pointing()
+            if is_smoothing_point:
+                self._smoothing_point_weight(4)
+                # self._smoothing_point_median(9)
+                self._smoothing_point(11, 2)
+        except Exception as e:
+            print(e)
 
-if __name__ == '__main__':
-    
-    threading.Thread(target=updatePoint).start()
-    
-    # Plot where the pointing position is on the table
-    # The table has a width of (-1,1) and depth of (1.0, 1.6)
-    fig = plt.figure(figsize=(7, 7))
-    ax = fig.add_subplot(111)
-    
-    def animate(i):
-        ax.clear()
-        ax.set_xlim(-1, 1)#, ax.set_xticks([])
-        ax.set_ylim(1.0, 1.6)#, ax.set_yticks([])
-        plt.gca().invert_yaxis()
-        ax.plot(lpoint[0], lpoint[1], 'bo', label='left hand')
-        ax.plot(rpoint[0], rpoint[1], 'ro', label='right hand')
-    
-    ani = FuncAnimation(fig, animate)
-    plt.show()
-'''
+    def _get_wrist_elbow(self, src):
+        '''
+        This function retrieves the coordinates for left/right wrists/elbows (4 sets of 3 values: x, y, z)
+        @:param src: decoded frame retrieved from the decode_frame() function
+        '''
+        try:
+            for i in range(25):
+                if src[(i+1)*9] in self.joint_interest_coded:
+                    self.joint_info[src[(i+1)*9]] = src[(i+1)*9 + 2: (i+2)*9 + 5]
+        except IndexError:
+            print('Not enough coordinates to unpack')
+
+    def _smoothing_joint(self, window_length=5, polyorder=2):
+        for k, v in self.joint_info_buffer.items():
+            if len(v) >= window_length:
+                self.joint_info_buffer[k].pop(0)
+                self.joint_info_buffer[k].append(self.joint_info[k])
+                joint_smoothed = savgol_filter(self.joint_info_buffer[k], window_length, polyorder, axis=0).tolist()
+                self.joint_info[k] = joint_smoothed[window_length//2]
+            else:
+                self.joint_info_buffer[k].append(self.joint_info[k])
+            self.prev_joint_info[k] = self.joint_info[k]
+
+    def _smoothing_joint_weight(self, c):
+        for k, v in self.prev_joint_info.items():
+            if v is not None:
+                self.joint_info[k] = (self._weighting(self.joint_info[k][0], self.prev_joint_info[k][0], c),
+                                      self._weighting(self.joint_info[k][1], self.prev_joint_info[k][1], c),
+                                      self._weighting(self.joint_info[k][2], self.prev_joint_info[k][2], c),)
+
+    def _smoothing_joint_median(self, window_length=5):
+        for k, v in self.joint_info_buffer.items():
+            if len(v) >= window_length:
+                self.joint_info_buffer[k].pop(0)
+                self.joint_info_buffer[k].append(self.joint_info[k])
+                self.joint_info[k] = np.median(self.joint_info_buffer[k], axis=0)
+            else:
+                self.joint_info_buffer[k].append(self.joint_info[k])
+            self.prev_joint_info[k] = self.joint_info[k]
+
+    def _smoothing_point(self, window_length=5, polyorder=2):
+        '''
+        Smoothing function for left and right pointing coordinates
+        :param window_length:
+        :param polyorder:
+        :return:
+        '''
+        if len(self.lpoint_buffer) >= window_length:
+            self.lpoint_buffer.pop(0)
+            self.lpoint_buffer.append(self.lpoint)
+            left_smoothed = savgol_filter(self.lpoint_buffer, window_length, polyorder, axis=0).tolist()
+            self.lpoint = left_smoothed[int(window_length/2)]
+        else:
+            self.lpoint_buffer.append(self.lpoint)
+
+        if len(self.rpoint_buffer) >= window_length:
+            self.rpoint_buffer.pop(0)
+            self.rpoint_buffer.append(self.rpoint)
+            self.rpoint_buffer = savgol_filter(self.rpoint_buffer, window_length, polyorder, axis=0).tolist()
+            self.rpoint = self.rpoint_buffer[int(window_length/2)]
+        else:
+            self.rpoint_buffer.append(self.rpoint)
+
+        self.prev_lpoint = self.lpoint
+        self.prev_rpoint = self.rpoint
+
+    def _smoothing_point_weight(self, c):
+        self.lpoint = (self._weighting(self.lpoint[0], self.prev_lpoint[0], c),
+                       self._weighting(self.lpoint[1], self.prev_lpoint[1], c))
+        self.rpoint = (self._weighting(self.rpoint[0], self.prev_rpoint[0], c),
+                       self._weighting(self.rpoint[1], self.prev_rpoint[1], c))
+
+    def _smoothing_point_median(self, window_length=5):
+        if len(self.lpoint_buffer) >= window_length:
+            self.lpoint_buffer.pop(0)
+            self.lpoint_buffer.append(self.lpoint)
+            self.lpoint = np.median(self.lpoint_buffer, axis=0)
+        else:
+            self.lpoint_buffer.append(self.lpoint)
+
+        if len(self.rpoint_buffer) >= window_length:
+            self.rpoint_buffer.pop(0)
+            self.rpoint_buffer.append(self.rpoint)
+            self.rpoint = np.median(self.rpoint_buffer, axis=0)
+        else:
+            self.rpoint_buffer.append(self.rpoint)
+
+        self.prev_lpoint = self.lpoint
+        self.prev_rpoint = self.rpoint
+
+    def _weighting(self, curr, prev, c):
+        diff = np.abs(curr-prev)
+        w = np.exp(-c*diff)
+        return w*curr + (1-w)*prev
+
+    def _get_pointing(self):
+        lwrist = self.joint_info[self.WRISTLEFT]
+        rwrist = self.joint_info[self.WRISTRIGHT]
+        lelbow = self.joint_info[self.ELBOWLEFT]
+        relbow = self.joint_info[self.ELBOWRIGHT]
+
+        self.lpoint = self._calc_coordinates(lwrist, lelbow)
+        self.rpoint = self._calc_coordinates(rwrist, relbow)
+
+    def _calc_coordinates(self, wrist, elbow):
+        '''
+        Both wrist and elbow should contain (x,y,z) coordinates
+        screen plane: z=0, ie pz = 0
+        Line equation:
+            (ex - px)/(ex - wx) = (ez - pz)/(ez - wz) = ez/(ez - wz)
+            (ey - py)/(ey - wy) = (ez - pz)/(ez - wz) = ez/(ez - wz)
+        so:
+            px = ex - ez(ex-wx) / (ez-wz)
+            py = ey - ez(ey-wy) / (ez-wz)
+        '''
+        if (elbow[2] - wrist[2]) == 0:
+            return -np.inf, -np.inf
+        screen_x = elbow[0] - elbow[2] * (elbow[0] - wrist[0]) / (elbow[2] - wrist[2])
+        screen_y = elbow[1] - elbow[2] * (elbow[1] - wrist[1]) / (elbow[2] - wrist[2])
+
+        return screen_x, screen_y

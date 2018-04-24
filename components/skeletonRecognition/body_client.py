@@ -145,8 +145,7 @@ from collections import deque
 from BackEnd import *
 from ..fusion.conf.endpoints import connect
 from ..fusion.conf import streams
-from receiveAndShow import calculate_point
-
+from receiveAndShow import Pointing
 
 def decode_frame(raw_frame):
     # The format is given according to the following assumption of network data
@@ -242,6 +241,8 @@ if __name__ == '__main__':
 
     wave_flag = False
 
+    point = Pointing()
+
 
     while True:
         try:
@@ -263,7 +264,9 @@ if __name__ == '__main__':
             lpoint, rpoint = [0.0, 0.0], [0.0, 0.0]
         else:
             if wave_flag:
-                lpoint, rpoint = calculate_point(fd)
+                point.get_pointing_main(fd)
+                lpoint, rpoint = point.lpoint, point.rpoint
+
             else:
                 lpoint, rpoint = [0.0, 0.0], [0.0, 0.0]
 
