@@ -125,5 +125,5 @@ done
 
 cmd="xfce4-terminal ${params}"
 cmd=${cmd/--tab/}
-echo "$cmd"
+#echo "$cmd"
 eval $cmd
