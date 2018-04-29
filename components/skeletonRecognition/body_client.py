@@ -200,6 +200,9 @@ def recv_skeleton_frame(sock):
 
 
 if __name__ == '__main__':
+    pointing_mode = sys.argv[2]
+
+
     rgb = False
     lstm = False
     feature_size = 10 if rgb else 21
@@ -214,7 +217,7 @@ if __name__ == '__main__':
     else:
         s = connect('kinect', 'Body')
         print 'connected to Body Client'
-    r = connect('fusion', 'Body', timeout=False)
+    r = None#connect('fusion', 'Body', timeout=False)
     if r is not None:
         print 'Connected to fusion server'
 
@@ -264,11 +267,13 @@ if __name__ == '__main__':
             lpoint, rpoint = [0.0, 0.0], [0.0, 0.0]
         else:
             if wave_flag:
-                point.get_pointing_main(fd)
+                point.get_pointing_main(fd, pointing_mode=pointing_mode)
                 lpoint, rpoint = point.lpoint, point.rpoint
+                lvar, rvar = point.lpoint_var, point.rpoint_var
 
             else:
                 lpoint, rpoint = [0.0, 0.0], [0.0, 0.0]
+                lvar, rvar = [0.0, 0.0], [0.0, 0.0]
 
 
         if engaged:
@@ -297,12 +302,10 @@ if __name__ == '__main__':
                     proba_array.append(probabilities)
 
 
-
-
                 for body_part in body_parts:
                     pruned_data = prune_joints(data, body_part=body_part, rgb=rgb)
                     active_arm = check_active_arm(pruned_data, rgb=rgb)  # Confirm shoulder-elbow or shoulder-wrist and return respectively
-                    # print body_part, active_arm
+                    # print body_part, 'Active' if active_arm else 'Dangling'
 
                     if wave_flag:
                         active_arm = check_active_arm(pruned_data, rgb=rgb) #Confirm shoulder-elbow or shoulder-wrist and return respectively
@@ -343,7 +346,7 @@ if __name__ == '__main__':
                 encoding_array, active_arm_array, proba_array = send_default_values(body_parts)
 
 
-            result = collect_all_results(encoding_array, [lpoint, rpoint], proba_array, int(engaged))
+            result = collect_all_results(encoding_array, [lpoint,lvar, rpoint, rvar], proba_array, int(engaged))
             timestamp = list(data_stream)[-1][0]
 
         else:
@@ -351,14 +354,14 @@ if __name__ == '__main__':
             # print 'Disengaged....clearing buffer'
             #Blind (31) when disengaged
             encoding_array, active_arm_array, proba_array = send_default_values(body_parts, value_to_add=32)
-            result = collect_all_results(encoding_array, [lpoint, rpoint], proba_array, int(engaged))
+            result = collect_all_results(encoding_array, [lpoint,lvar, rpoint, rvar], proba_array, int(engaged))
             data_stream.clear()
 
 
-        assert len(result) == 25
+        assert len(result) == 29
         # print 'Length of result is: ', len(result)
         pack_list = [streams.get_stream_id("Body"), timestamp] + result
-        raw_data = struct.pack("<iqiii" + "ff" * 2 + "f" * 5 + "ff" * 6 + 'i', *pack_list)
+        raw_data = struct.pack("<iqiii" + "ffff" * 2 + "f" * 5 + "ff" * 6 + 'i', *pack_list)
 
 
 
@@ -368,7 +371,7 @@ if __name__ == '__main__':
         if to_print_result==['blind', 'blind', 'still']:
             pass
         else:
-            print 'Result is: ', result[:7], to_print_result
+            print 'Result is: ', result#[7:15], to_print_result
 
 
         if r is not None:
