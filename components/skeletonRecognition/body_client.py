@@ -217,7 +217,7 @@ if __name__ == '__main__':
     else:
         s = connect('kinect', 'Body')
         print 'connected to Body Client'
-    r = None#connect('fusion', 'Body', timeout=False)
+    r = connect('fusion', 'Body', timeout=False)
     if r is not None:
         print 'Connected to fusion server'
 

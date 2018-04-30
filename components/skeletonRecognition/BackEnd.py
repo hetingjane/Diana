@@ -198,7 +198,7 @@ def send_default_values(body_parts, value_to_add= 26):
 
 def check_active_arm(data, rgb):
     dims = 2 if rgb else 3
-    # y_axis = np.array([0, 1]) if rgb else np.array([0, 1, 0])
+    y_axis = np.array([0, 1]) if rgb else np.array([0, 1, 0])
     # ref_y, ref_z = -0.582, 1.6
     SPINE_BASE = 4
     avg = np.mean(data[:, [SPINE_BASE*3, SPINE_BASE*3+1, SPINE_BASE*3+2]], axis=0)
@@ -210,7 +210,7 @@ def check_active_arm(data, rgb):
 
     first_shoulder_elbow = (first_elbow - first_shoulder)/np.linalg.norm((first_elbow - first_shoulder))
     first_elbow_wrist = (first_wrist - first_elbow) / np.linalg.norm((first_wrist - first_elbow))
-    first_shoulder_elbow_wrist = np.degrees(np.arccos(np.dot(first_shoulder_elbow, first_elbow_wrist)))
+    # first_shoulder_elbow_wrist = np.degrees(np.arccos(np.dot(first_shoulder_elbow, first_elbow_wrist)))
 
 
     last_shoulder = data[-1][(0 * dims):(1 * dims)]
@@ -219,12 +219,13 @@ def check_active_arm(data, rgb):
 
     last_shoulder_elbow = (last_elbow - last_shoulder) / np.linalg.norm((last_elbow - last_shoulder))
     last_elbow_wrist = (last_wrist - last_elbow) / np.linalg.norm((last_wrist - last_elbow))
-    last_shoulder_elbow_wrist = np.degrees(np.arccos(np.dot(last_shoulder_elbow, last_elbow_wrist)))
+    # last_shoulder_elbow_wrist = np.degrees(np.arccos(np.dot(last_shoulder_elbow, last_elbow_wrist)))
 
     # print first_shoulder_elbow_wrist, last_shoulder_elbow_wrist
-    # if -30>first_shoulder_elbow_wrist>30 and -30>last_shoulder_elbow_wrist>30:
+    # if 30>first_shoulder_elbow_wrist>-30 and 30>last_shoulder_elbow_wrist>-30:
+    #     return False
+    # else:
     #     return True
-    # else: return False
 
 
     threshold_z = 0.08  # 0.090
