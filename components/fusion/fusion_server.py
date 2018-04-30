@@ -223,10 +223,10 @@ class App:
             # and is in start state, append pointer message contents to the sent message
             if state_machine is bsm.left_continuous_point:
                 if state_machine.is_started():
-                    all_events_to_send.append("P;l,{0:.2f},{1:.2f};{2:.2f},{3:.2f};{4:s}".format(lx, ly, var_l_x, var_l_y, ts))
+                    all_events_to_send.append("P;l,{0:.2f},{1:.2f},{2:.2f},{3:.2f};{4:s}".format(lx, ly, var_l_x, var_l_y, ts))
             elif state_machine is bsm.right_continuous_point:
                 if state_machine.is_started():
-                    all_events_to_send.append("P;r,{0:.2f},{1:.2f};{2:.2f},{3:.2f};{4:s}".format(rx, ry, var_r_x, var_r_y, ts))
+                    all_events_to_send.append("P;r,{0:.2f},{1:.2f},{2:.2f},{3:.2f};{4:s}".format(rx, ry, var_r_x, var_r_y, ts))
             # Else, check if current input caused a transition
             elif changed:
                 # For the special case of binary state machines for left point vec and right point vec
