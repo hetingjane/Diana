@@ -89,7 +89,7 @@ from scipy.signal import savgol_filter
 # following codes get the elbow and wrist information from the kinect sensor
 class Pointing:
     def __init__(self):
-        self.screen_mode = True  # whether to use screen mode or desk mode
+        self.screen_mode = None  # whether it is in screen mode
 
         self.WRISTLEFT = 6  # JointType specified by kinect
         self.WRISTRIGHT = 10
@@ -99,123 +99,124 @@ class Pointing:
 
         self.joint_info = {i: None for i in self.joint_interest_coded}  # contains left/right wrists/elbows coordinates
         self.joint_info_buffer = {i: [] for i in self.joint_interest_coded}
-        self.prev_joint_info = {i: None for i in self.joint_interest_coded}
 
         self.lpoint_buffer = []
         self.rpoint_buffer = []
-        self.lpoint_tmp = (0.0, -0.6)  # temporary left pointing coordinates before final step (offsetting 0.25)
-        self.rpoint_tmp = (0.0, -0.6)  # temporary right pointing coordinates before final step (offsetting 0.25)
-        self.prev_lpoint = (0.0, -0.6)
-        self.prev_rpoint = (0.0, -0.6)
-        self.lpoint = (0.0, -0.6)  # inferred left pointing after offsetting, sent to Brandeis
-        self.rpoint = (0.0, -0.6)  # inferred right pointing after offestting, sent to Brandeis
+        self.lpoint_tmp = (0.0, -0.6)
+        self.rpoint_tmp = (0.0, -0.6)
+        self.lpoint = (0.0, -0.6)  # inferred pointing coordinate on the table from left arm
+        self.rpoint = (0.0, -0.6)  # inferred pointing coordinate on the table from right arm
+
         self.lpoint_var = (0, 0)  # variance of left point, sent to Brandeis
         self.rpoint_var = (0, 0)  # variance of right point, sent to Brandeis
 
-    def get_pointing_main(self, src, pointing_mode='screen',
-                          is_smoothing_joint=True, is_smoothing_point=True):
+    def get_pointing_main(self, src, pointing_mode='screen', is_smoothing_joint=True, is_smoothing_point=True):
         if pointing_mode == 'screen':
             self.screen_mode = True
-            wind_size = 7
         elif pointing_mode == 'desk':
             self.screen_mode = False
-            wind_size = 3
         else:
-            raise ValueError('Pointing mode is not recognized!\n Accepted: screen, desk\n Received: %s' %pointing_mode)
+            raise ValueError('Pointing mode is not recognized!\n Accepted: screen, desk\n Received: %s' % pointing_mode)
 
-        # work on joint first
-        try:
-            if not self._get_wrist_elbow(src):  # if no skeleton received, stop calculation
-                return
-            self._populate_joint_buffer(wind_size)
-            if is_smoothing_joint:
-                self._smoothing_joint_savgol(wind_size, 2)  # savgol filter
-                # self._smoothing_point_weight(10)
-                self._smoothing_joint_mean_median(wind_size, is_median=False)
-            self._get_pointing(screen=self.screen_mode)  # True is coordinates on screen
-        except Exception as e:
-            print(e)
+        if not self._get_wrist_elbow(src):
+            return
 
-        # calculate point next
-        try:
-            # populate point buffer first until buffer is full
-            if len(self.lpoint_buffer) < wind_size - 1 or len(self.rpoint_buffer) < wind_size - 1:
-                self._populate_point_buffer(wind_size)
-                return
-            self._populate_point_buffer(wind_size, remove_outlier_coefficient=None, replace_coefficient=1)
-
-            # after buffer is full, smooth data
-            if is_smoothing_point:
-                # self._smoothing_point_weight(1)
-                # self._smoothing_point_mean_median(is_median=True)
-                self._smoothing_point_savgol(wind_size, 2)
-        except Exception as e:
-            print(e)
-
-        # offsetting point by 0.25 if it's screen mode
-        try:
-            if self.screen_mode:
-                self.lpoint = (self.lpoint_tmp[0]-0.25, self.lpoint_tmp[1])
-                self.rpoint = (self.rpoint_tmp[0]+0.25, self.rpoint_tmp[1])
-            else:
+        if self.screen_mode:
+            try:
+                if is_smoothing_joint:
+                    self._smoothing_joint(11, 2)
+                    self._smoothing_joint_mean(11)
+                self._get_pointing(True)  # True is coordinates on screen
+                if is_smoothing_point:
+                    pass
+                    self._smoothing_point_mean(11)
+                    self._smoothing_point(11, 2)
+                self.lpoint = (self.lpoint_tmp[0] - 0.25, self.lpoint_tmp[1])
+                self.rpoint = (self.rpoint_tmp[0] + 0.25, self.rpoint_tmp[1])
+            except Exception as e:
+                print(e)
+        else:
+            try:
+                self._smoothing_joint_desk(3, 2)
+                self._get_pointing(False)
+                self._smoothing_point(3, 2)
                 self.lpoint, self.rpoint = self.lpoint_tmp, self.rpoint_tmp
-        except Exception as e:
-            print(e)
+            except Exception as e:
+                print(e)
+
+        self.lpoint_var = np.std(self.lpoint_buffer, axis=0)
+        self.rpoint_var = np.std(self.rpoint_buffer, axis=0)
 
     def _get_wrist_elbow(self, src):
-        """
+        '''
         This function retrieves the coordinates for left/right wrists/elbows (4 sets of 3 values: x, y, z)
-        :param src: The decoded frame retrieved from the decode_frame() function
-        """
+        @:param src: decoded frame retrieved from the decode_frame() function
+        '''
         try:
             for i in range(25):
-                if src[(i+1)*9] in self.joint_interest_coded:
-                    self.joint_info[src[(i+1)*9]] = src[(i+1)*9 + 2: (i+2)*9 + 5]
+                if src[(i + 1) * 9] in self.joint_interest_coded:
+                    self.joint_info[src[(i + 1) * 9]] = src[(i + 1) * 9 + 2: (i + 2) * 9 + 5]
             return True
         except IndexError:
             print('Not enough coordinates to unpack')
             return False
 
-    def _populate_joint_buffer(self, window_length, remove_outlier_coefficient=None, replace_coefficient=1):
+    def _smoothing_joint(self, window_length=5, polyorder=2):
         for k, v in self.joint_info_buffer.items():
             if len(v) >= window_length:
                 self.joint_info_buffer[k].pop(0)
                 self.joint_info_buffer[k].append(self.joint_info[k])
-
-                var = np.std(self.joint_info_buffer[k], axis=0)
-                mean = np.mean(self.joint_info_buffer[k], axis=0)
-                if remove_outlier_coefficient is not None:
-                    for i in range(len(self.joint_info_buffer[k])):
-                        if self._is_outlier_joint(self.joint_info_buffer[k][i], mean, var, remove_outlier_coefficient):
-                            self.lpoint_buffer[i] = self._replace_outlier(self.joint_info_buffer[k][i],
-                                                                          mean, var, replace_coefficient)
+                joint_smoothed = savgol_filter(self.joint_info_buffer[k], window_length, polyorder, axis=0).tolist()
+                self.joint_info[k] = joint_smoothed[window_length // 2]
             else:
                 self.joint_info_buffer[k].append(self.joint_info[k])
 
-    def _smoothing_joint_savgol(self, window_length=5, polyorder=2):
+    def _smoothing_joint_mean(self, window_length=5):
         for k, v in self.joint_info_buffer.items():
             if len(v) >= window_length:
-                # joint_smoothed = savgol_filter(self.joint_info_buffer[k], window_length, polyorder, axis=0).tolist()
-                # self.joint_info[k] = joint_smoothed[window_length//2]
-                self.joint_info_buffer[k] = savgol_filter(self.joint_info_buffer[k], window_length, polyorder, axis=0).tolist()
-                self.joint_info[k] = self.joint_info_buffer[k][window_length//2]
-            self.prev_joint_info[k] = self.joint_info[k]
+                self.joint_info_buffer[k].pop(0)
+                self.joint_info_buffer[k].append(self.joint_info[k])
+                self.joint_info[k] = np.mean(self.joint_info_buffer[k], axis=0)
+            else:
+                self.joint_info_buffer[k].append(self.joint_info[k])
 
-    def _smoothing_joint_weight(self, c):
-        for k, v in self.prev_joint_info.items():
-            if v is not None:
-                self.joint_info[k] = (self._weighting(self.joint_info[k][0], self.prev_joint_info[k][0], c),
-                                      self._weighting(self.joint_info[k][1], self.prev_joint_info[k][1], c),
-                                      self._weighting(self.joint_info[k][2], self.prev_joint_info[k][2], c),)
+    def _smoothing_point(self, window_length=5, polyorder=2):
+        '''
+        Smoothing function for left and right pointing coordinates
+        :param window_length:
+        :param polyorder:
+        :return:
+        '''
+        if len(self.lpoint_buffer) >= window_length:
+            self.lpoint_buffer.pop(0)
+            self.lpoint_buffer.append(self.lpoint_tmp)
+            self.lpoint_buffer = savgol_filter(self.lpoint_buffer, window_length, polyorder, axis=0).tolist()
+            self.lpoint_tmp = self.lpoint_buffer[int(window_length / 2)]
+        else:
+            self.lpoint_buffer.append(self.lpoint_tmp)
 
-    def _smoothing_joint_mean_median(self, window_length=5, is_median=True):
-        for k, v in self.joint_info_buffer.items():
-            if len(v) >= window_length:
-                if is_median:
-                    self.joint_info[k] = np.median(self.joint_info_buffer[k], axis=0)
-                else:
-                    self.joint_info[k] = np.mean(self.joint_info_buffer[k], axis=0)
-            self.prev_joint_info[k] = self.joint_info[k]
+        if len(self.rpoint_buffer) >= window_length:
+            self.rpoint_buffer.pop(0)
+            self.rpoint_buffer.append(self.rpoint_tmp)
+            self.rpoint_buffer = savgol_filter(self.rpoint_buffer, window_length, polyorder, axis=0).tolist()
+            self.rpoint_tmp = self.rpoint_buffer[int(window_length / 2)]
+        else:
+            self.rpoint_buffer.append(self.rpoint_tmp)
+
+    def _smoothing_point_mean(self, window_length=5):
+        if len(self.lpoint_buffer) >= window_length:
+            self.lpoint_buffer.pop(0)
+            self.lpoint_buffer.append(self.lpoint_tmp)
+            self.lpoint_tmp = np.mean(self.lpoint_buffer, axis=0)
+        else:
+            self.lpoint_buffer.append(self.lpoint_tmp)
+
+        if len(self.rpoint_buffer) >= window_length:
+            self.rpoint_buffer.pop(0)
+            self.rpoint_buffer.append(self.rpoint_tmp)
+            self.rpoint_tmp = np.mean(self.rpoint_buffer, axis=0)
+        else:
+            self.rpoint_buffer.append(self.rpoint_tmp)
 
     def _get_pointing(self, screen=True):
         lwrist = self.joint_info[self.WRISTLEFT]
@@ -227,8 +228,6 @@ class Pointing:
         self.rpoint_tmp = self._calc_coordinates(rwrist, relbow, screen)
 
     def _calc_coordinates(self, wrist, elbow, screen=True):
-        if wrist is None or elbow is None:
-            raise ValueError('Wrist and elbow coordinates cannot be None!')
         if screen:
             '''
             Both wrist and elbow should contain (x,y,z) coordinates
@@ -251,7 +250,7 @@ class Pointing:
             '''
             Both wrist and elbow should contain (x,y,z) coordinates
             Table plane: y = -0.582
-            Line equation:
+            Line equation: 
             y = (y2-y1)/(x2-x1) * (x-x1) + y1
             z = (z2-z1)/(y2-y1) * (y-y1) + z1
             so:
@@ -266,106 +265,13 @@ class Pointing:
 
             return table_x, table_z
 
-    def _populate_point_buffer(self, window_length, remove_outlier_coefficient=None, replace_coefficient=1):
-        if len(self.lpoint_buffer) >= window_length:
-            self.lpoint_buffer.pop(0)
-            self.lpoint_buffer.append(self.lpoint_tmp)
-            self.lpoint_var = np.std(self.lpoint_buffer, axis=0)
-
-            if remove_outlier_coefficient is not None:
-                lmean = np.mean(self.lpoint_buffer, axis=0)
-                for i in range(len(self.lpoint_buffer)):
-                    is_outlier = self._is_outlier(
-                        self.lpoint_buffer[i], lmean, self.lpoint_var, remove_outlier_coefficient)
-                    if np.any(is_outlier):
-                        self.lpoint_buffer[i] = self._replace_outlier(
-                            self.lpoint_buffer[i], lmean, self.lpoint_var, replace_coefficient, is_outlier)
-        else:
-            self.lpoint_buffer.append(self.lpoint_tmp)
-
-        if len(self.rpoint_buffer) >= window_length:
-            self.rpoint_buffer.pop(0)
-            self.rpoint_buffer.append(self.rpoint_tmp)
-            self.rpoint_var = np.std(self.rpoint_buffer, axis=0)
-
-            if remove_outlier_coefficient is not None:
-                rmean = np.mean(self.rpoint_buffer, axis=0)
-                for i in range(len(self.rpoint_buffer)):
-                    is_outlier = self._is_outlier(
-                        self.rpoint_buffer[i], rmean, self.rpoint_var, remove_outlier_coefficient)
-                    if np.any(is_outlier):
-                        self.rpoint_buffer[i] = self._replace_outlier(
-                            self.rpoint_buffer[i],rmean, self.rpoint_var, replace_coefficient, is_outlier)
-        else:
-            self.rpoint_buffer.append(self.rpoint_tmp)
-
-    def _is_outlier(self, x, mean, var, c):
-        return x[0] > mean[0] + c * var[0] or x[0] < mean[0] - c * var[0], \
-               x[1] > mean[1] + c * var[1] or x[1] < mean[1] - c * var[1]
-
-    def _replace_outlier(self, x, mean, var, c, is_replace):
-        """
-        Get a new point to replace the outlier
-        :param c: How much to move from mean
-        :return:
-        """
-        dist = np.linalg.norm(np.array(x) - np.array(mean))
-        # return mean[0] + (x[0] - mean[0]) / dist * var[0] * c, mean[1] + (x[1] - mean[1]) / dist * var * c
-        tmp = mean + (x - mean) / dist * var * c
-        res = list(x)
-        if is_replace[0]:
-            res[0] = tmp[0]
-        if is_replace[1]:
-            res[1] = tmp[1]
-
-        return res
-
-    def _smoothing_point_savgol(self, window_length=5, polyorder=2):
-        """
-        Smoothing function for left and right pointing coordinates
-        :param window_length:
-        :param polyorder:
-        :return:
-        """
-        # left_smoothed = savgol_filter(self.lpoint_buffer, window_length, polyorder, axis=0).tolist()
-        # self.lpoint_tmp = left_smoothed[int(window_length/2)]
-        #
-        # right_smoothed = savgol_filter(self.rpoint_buffer, window_length, polyorder, axis=0).tolist()
-        # self.rpoint_tmp = right_smoothed[int(window_length/2)]
-
-        # self.lpoint_buffer[int(window_length/2)] = self.lpoint_tmp
-        # self.rpoint_buffer[int(window_length / 2)] = self.rpoint_tmp
-
-        self.lpoint_buffer = savgol_filter(self.lpoint_buffer, window_length, polyorder, axis=0).tolist()
-        self.lpoint_tmp = self.lpoint_buffer[int(window_length/2)]
-
-        self.rpoint_buffer = savgol_filter(self.rpoint_buffer, window_length, polyorder, axis=0).tolist()
-        self.rpoint_tmp = self.rpoint_buffer[int(window_length/2)]
-
-        self.prev_lpoint = self.lpoint_tmp
-        self.prev_rpoint = self.rpoint_tmp
-
-    def _smoothing_point_weight(self, c):
-        self.lpoint_tmp = (self._weighting(self.lpoint_tmp[0], self.prev_lpoint[0], c),
-                           self._weighting(self.lpoint_tmp[1], self.prev_lpoint[1], c))
-        self.rpoint_tmp = (self._weighting(self.rpoint_tmp[0], self.prev_rpoint[0], c),
-                           self._weighting(self.rpoint_tmp[1], self.prev_rpoint[1], c))
-
-    def _smoothing_point_mean_median(self, is_median=True):
-        if is_median:
-            self.lpoint_tmp = np.median(self.lpoint_buffer, axis=0)
-            self.rpoint_tmp = np.median(self.rpoint_buffer, axis=0)
-        else:
-            self.lpoint_tmp = np.mean(self.lpoint_buffer, axis=0)
-            self.rpoint_tmp = np.mean(self.rpoint_buffer, axis=0)
-
-        # self.lpoint_var = np.std(self.lpoint_buffer, axis=0)
-        self.rpoint_var = np.std(self.rpoint_buffer, axis=0)
-
-        self.prev_lpoint = self.lpoint_tmp
-        self.prev_rpoint = self.rpoint_tmp
-
-    def _weighting(self, curr, prev, c):
-        diff = np.abs(curr-prev)
-        w = np.exp(-c*diff)
-        return w*curr + (1-w)*prev
+    def _smoothing_joint_desk(self, window_length=3, polyorder=2):
+        for k, v in self.joint_info_buffer.items():
+            if len(v) >= window_length:
+                self.joint_info_buffer[k].pop(0)
+                self.joint_info_buffer[k].append(self.joint_info[k])
+                self.joint_info_buffer[k] = \
+                    savgol_filter(self.joint_info_buffer[k], window_length, polyorder, axis=0).tolist()
+                self.joint_info[k] = np.mean(self.joint_info_buffer[k], axis=0)
+            else:
+                self.joint_info_buffer[k].append(self.joint_info[k])
