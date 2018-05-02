@@ -371,7 +371,7 @@ if __name__ == '__main__':
         if to_print_result==['blind', 'blind', 'still']:
             pass
         else:
-            print 'Result is: ', result#[7:15], to_print_result
+            print 'Result is: ', to_print_result
 
 
         if r is not None:
