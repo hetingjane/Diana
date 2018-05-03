@@ -7,6 +7,7 @@ from ..fusion.conf.endpoints import connect
 from ..fusion.conf import streams
 from receiveAndShow import Pointing
 
+
 def decode_frame(raw_frame):
     # The format is given according to the following assumption of network data
 
@@ -56,18 +57,6 @@ def recv_skeleton_frame(sock):
     return recv_all(sock, load_size)
 
 
-def validate_arguments(args):
-    if (args.kinect_host is None):
-        print ('No kinect host specified...Exiting from system')
-        sys.exit()
-    if (args.fusion_host is None):
-        print ('Fusion host not specified, taking default None value')
-    else:
-        print 'Fusion host connected to: ', args.fusion_host
-    print 'Pointing mode: ', args.pointing_mode
-
-
-
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -94,9 +83,9 @@ if __name__ == '__main__':
     if rgb:
         s = connect_rgb()
     else:
-        s = connect('kinect', 'Body')
+        s = connect('kinect', kinect_host, 'Body')
         print 'connected to Body Client'
-    r = connect('fusion', 'Body', timeout=False)
+    r = connect('fusion', fusion_host, 'Body')
     if r is not None:
         print 'Connected to fusion server'
 
@@ -149,8 +138,10 @@ if __name__ == '__main__':
             else:engaged = False
 
 
-        if engaged:engaged_bit = 'Engaged'
-        else:engaged_bit = 'Disengaged'
+        if engaged:
+            engaged_bit = 'Engaged'
+        else:
+            engaged_bit = 'Disengaged'
         print engaged_bit
 
 
@@ -287,43 +278,3 @@ if __name__ == '__main__':
         r.close()
 
     sys.exit(0)
-
-
-
-'''
-result = (26, 26, 4)
-if __name__ == '__main__':
-
-    import time
-    import threading
-    import matplotlib.pyplot as plt
-    from matplotlib.animation import FuncAnimation
-    from support.postures import left_arm_motions, right_arm_motions
-
-    class_list = ['emblems', 'motions', 'neutral', 'oscillate', 'still']
-    threading.Thread(target=updateFunction).start()
-
-
-    fig = plt.figure(figsize=(7, 7))
-    ax = fig.add_subplot(111)
-
-    ax.set_title('Label, Confidence')
-    ax.set_xlabel('xlabel')
-    ax.set_ylabel('ylabel')
-    ax.axis([0, 0.5, 0, 0.5])
-
-
-
-    def animate(i):
-        display_result = ', '.join([left_arm_motions[result[0]], right_arm_motions[result[1]], class_list[result[2]]])
-        ax.clear()
-        ax.set_xlim(0, 1)  # width of the table, ie table_x
-        ax.set_ylim(0, 0.6)  # length of the table, ie table_z
-        plt.gca().invert_yaxis()
-        ax.text(0.2, 0.3, display_result, fontsize=15, bbox={'facecolor':'red', 'alpha':0.5, 'pad':10})
-
-
-    ani = FuncAnimation(fig, animate)
-    plt.show()
-
-'''

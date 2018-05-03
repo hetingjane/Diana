@@ -2,6 +2,8 @@
 
 import sys, struct
 import time
+import argparse
+
 import numpy as np
 from collections import deque
 from skimage.transform import resize
@@ -47,6 +49,13 @@ def recv_depth_frame(sock):
 
 
 if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('kinect_host', help='Host name of the machine running Kinect Server')
+    parser.add_argument('--fusion-host', help='Host name of the machine running Kinect Server', default=None)
+
+    args = parser.parse_args()
+
     stream_id = streams.get_stream_id("Head")
 
     gesture_list = ["nod", "shake", "other"]
@@ -56,11 +65,12 @@ if __name__ == '__main__':
 
     gesture_list += ['blind']
 
-    kinect_socket = connect('kinect', "Head")
-    fusion_socket = connect('fusion', "Head")
-
+    kinect_socket = connect('kinect', args.kinect_host, 'Head')
     if kinect_socket is None:
         sys.exit(0)
+
+    fusion_socket = connect('fusion', args.fusion_host, 'Head') if args.fusion_host is not None else None
+
 
     i = 0
     avg_frame_time = 0.0
