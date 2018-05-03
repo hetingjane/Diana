@@ -1,146 +1,6 @@
-'''
-import socket
-src_addr = '129.82.45.252'
-src_port = 9009
-
-stream_id = 512
-
-
-def connect_rgb():
-    """
-    Connect to a specific port
-    """
-
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-    try:
-        sock.connect((src_addr, src_port))
-    except:
-        print "Error connecting to {}:{}".format(src_addr, src_port)
-        return None
-
-    try:
-        print "Sending stream info"
-        sock.sendall(struct.pack('<i', stream_id))
-    except:
-        print "Error: Stream rejected"
-        return None
-
-    print "Successfully connected to host"
-    return sock
-
-def decode_frame_openpose(raw_frame):
-    # The format is given according to the following assumption of network data
-
-    # Expect little endian byte order
-    endianness = "<"
-
-    # [ commonTimestamp | frame type | Tracked body count | Engaged
-    header_format = "qhHf"
-
-    timestamp, frame_type, tracked_body_count, engaged = struct.unpack(endianness + header_format,
-                                                                       raw_frame[:struct.calcsize(header_format)])
-
-    # For each of the 18 joints, the following info is transmitted
-    # [ Position.X | Position.Y | Confidence ]
-    joint_format = "3f"
-
-    frame_format = (joint_format * 18)
-
-    # print "engaged:", engaged
-    # Unpack the raw frame into individual pieces of data as a tuple
-    frame_pieces = struct.unpack(endianness + (frame_format),  # * (0 if abs(engaged) < 0.0001 else 1)),
-                                 raw_frame[struct.calcsize(header_format):])
-
-    decoded = (timestamp, frame_type, tracked_body_count, engaged) + frame_pieces
-    # print "decoded:", decoded
-    return decoded
-
-
-def decode_frame_2(raw_frame):
-    # The format is given according to the following assumption of network data
-
-    # Expect little endian byte order
-    endianness = "<"
-
-    # [ commonTimestamp | frame type | Tracked body count | Engaged
-    header_format = "<54f"
-
-    header_int = struct.unpack(endianness + header_format, raw_frame[:struct.calcsize(header_format)])
-
-    # For each body, a header is transmitted
-    # TrackingId | HandLeftConfidence | HandLeftState | HandRightConfidence | HandRightState ]
-    # body_format = "Q4B"
-
-    # For each of the 25 joints, the following info is transmitted
-    # [ JointType | TrackingState | Position.X | Position.Y | Position.Z | Orientation.W | Orientation.X | Orientation.Y | Orientation.Z ]
-    joint_format = "3f"
-
-    frame_format = joint_format * 18
-
-    # Unpack the raw frame into individual pieces of data as a tuple
-    frame_pieces = struct.unpack(endianness + (frame_format),
-                                 raw_frame[struct.calcsize(header_format):])
-
-    decoded = header_format + frame_pieces
-
-    print "decoded", decoded
-
-    return decoded
-
-
-def decode_frame(raw_frame):
-    # The format is given according to the following assumption of network data
-
-    # Expect little endian byte order
-    endianness = "<"
-
-    # [ commonTimestamp | frame type | Tracked body count | Engaged
-    header_format = "qiBB"
-
-    timestamp, frame_type, tracked_body_count, engaged = struct.unpack(endianness + header_format,
-                                                                       raw_frame[:struct.calcsize(header_format)])
-
-    # For each body, a header is transmitted
-    # TrackingId | HandLeftConfidence | HandLeftState | HandRightConfidence | HandRightState ]
-    body_format = "Q4B"
-
-    # For each of the 25 joints, the following info is transmitted
-    # [ JointType | TrackingState | Position.X | Position.Y | Position.Z | Orientation.W | Orientation.X | Orientation.Y | Orientation.Z ]
-    joint_format = "BB7f"
-
-    frame_format = body_format + (joint_format * 25)
-
-    # Unpack the raw frame into individual pieces of data as a tuple
-    frame_pieces = struct.unpack(endianness + (frame_format * engaged), raw_frame[struct.calcsize(header_format):])
-
-    decoded = (timestamp, frame_type, tracked_body_count, engaged) + frame_pieces
-
-    return decoded
-
-
-def recv_all(sock, size):
-    result = b''
-    while len(result) < size:
-        data = sock.recv(size - len(result))
-        if not data:
-            raise EOFError("Error: Received only {} bytes into {} byte message".format(len(data), size))
-        result += data
-    return result
-
-
-def recv_skeleton_frame(sock):
-    """
-    To read each stream frame from the server
-    """
-    (load_size,) = struct.unpack("<i", recv_all(sock, struct.calcsize("<i")))
-    # print load_size
-    return recv_all(sock, load_size)
-'''
-
-
 import struct
 import sys
+import argparse
 from collections import deque
 from BackEnd import *
 from ..fusion.conf.endpoints import connect
@@ -196,19 +56,38 @@ def recv_skeleton_frame(sock):
     return recv_all(sock, load_size)
 
 
+def validate_arguments(args):
+    if (args.kinect_host is None):
+        print ('No kinect host specified...Exiting from system')
+        sys.exit()
+    if (args.fusion_host is None):
+        print ('Fusion host not specified, taking default None value')
+    else:
+        print 'Fusion host connected to: ', args.fusion_host
+    print 'Pointing mode: ', args.pointing_mode
+
 
 
 
 if __name__ == '__main__':
-    pointing_mode = sys.argv[2]
+    parser = argparse.ArgumentParser()
+    parser.add_argument('kinect', help='Kinect host name', type=str)
+    parser.add_argument('--fusion-host', default=None, help='Fusion host name, default set to None', type=str)
+    parser.add_argument('--pointing-mode', default='screen', help='Pointing mode, default set to screen', type=str)
+
+    args = parser.parse_args()
+    # validate_arguments(args)
+    kinect_host, fusion_host, pointing_mode = args.kinect, args.fusion_host, args.pointing_mode
 
 
     rgb = False
     lstm = False
+    dims = 2 if rgb else 3
     feature_size = 10 if rgb else 21
     logpath = '/s/red/a/nobackup/vision/dkpatil/demo/GRU_5_class/'
     class_list = np.load(logpath+'labels_list.npy')
     print class_list
+
 
 
     # Time the network performance
@@ -243,7 +122,6 @@ if __name__ == '__main__':
     count = 0
 
     wave_flag = False
-
     point = Pointing()
 
 
@@ -257,14 +135,28 @@ if __name__ == '__main__':
         fd = decode_frame(f)
         timestamp, frame_type, body_count, engaged = fd[:4]
 
+
+
+        #Skeleton Box construction
+        #If enagaged skeleton received, we further filter skeleton on x coordinates and update flag
+        if engaged:
+            #Assumption: rgb=False, dimensions available: 3
+            input_data = (timestamp, body_count) + fd[4:]
+            frame_data = np.array(extract_data(input_data, rgb)).reshape((1, -1))
+
+            sb_x = frame_data[0][0]
+            if -0.83<sb_x<0.80:engaged = True
+            else:engaged = False
+
+
         if engaged:engaged_bit = 'Engaged'
-        else: engaged_bit = 'Disengaged'
+        else:engaged_bit = 'Disengaged'
+        print engaged_bit
 
-
-        input_data = (timestamp, body_count) + fd[4:]
 
         if rgb:
             lpoint, rpoint = [0.0, 0.0], [0.0, 0.0]
+            lvar, rvar = [0.0, 0.0], [0.0, 0.0]
         else:
             if wave_flag:
                 point.get_pointing_main(fd, pointing_mode=pointing_mode)
@@ -284,6 +176,7 @@ if __name__ == '__main__':
 
                 # Function rewritten for RGB
                 data = np.vstack([extract_data(frame, rgb) for frame in data_stream])
+
 
                 if wave_flag and lstm:
                     #Processing the GRU Classification for the 15 frame window
@@ -306,6 +199,7 @@ if __name__ == '__main__':
                     pruned_data = prune_joints(data, body_part=body_part, rgb=rgb)
                     active_arm = check_active_arm(pruned_data, rgb=rgb)  # Confirm shoulder-elbow or shoulder-wrist and return respectively
                     # print body_part, 'Active' if active_arm else 'Dangling'
+
 
                     if wave_flag:
                         active_arm = check_active_arm(pruned_data, rgb=rgb) #Confirm shoulder-elbow or shoulder-wrist and return respectively
@@ -378,6 +272,7 @@ if __name__ == '__main__':
             r.sendall(raw_data)
 
 
+
         count += 1
         if count % 100 == 0:
             end_time = time.time()
@@ -392,6 +287,7 @@ if __name__ == '__main__':
         r.close()
 
     sys.exit(0)
+
 
 
 '''
