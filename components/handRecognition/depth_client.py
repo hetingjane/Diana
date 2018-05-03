@@ -1,5 +1,7 @@
 import struct
 import time
+import argparse
+
 from skimage.transform import resize
 import sys
 import numpy as np
@@ -51,7 +53,15 @@ def recv_depth_frame(sock):
 # By default read 100 frames
 if __name__ == '__main__':
 
-    hand = sys.argv[1]
+    parser = argparse.ArgumentParser()
+    parser.add_argument('hand', help='Hand to follow', choices=['LH', 'RH'])
+    parser.add_argument('kinect_host', help='Host name of the machine running Kinect Server')
+    parser.add_argument('--fusion-host', help='Host name of the machine running Kinect Server', default=None)
+
+    args = parser.parse_args()
+
+    hand = args.hand
+
     stream_id = streams.get_stream_id(hand)
     gestures = list(np.load("/s/red/a/nobackup/cwc/hands/real_time_training_data/%s/gesture_list.npy" % hand))
     gestures = [g.replace(".npy", "") for g in gestures]
@@ -61,8 +71,9 @@ if __name__ == '__main__':
     print hand, num_gestures
 
     hand_classfier = RealTimeHandRecognition(hand, num_gestures)
-    kinect_socket = connect('kinect', hand)
-    fusion_socket = connect('fusion', hand)
+    kinect_socket = connect('kinect', args.kinect_host, hand)
+
+    fusion_socket = connect('fusion', args.fusion_host, hand) if args.fusion_host is not None else None
 
     i = 0
     hands_list = []
@@ -83,16 +94,16 @@ if __name__ == '__main__':
             max_index = len(probs)-1
 
         else:
-            hand = np.array(depth_data, dtype=np.float32).reshape((height, width))
-            print hand.shape, posx, posy
-            posz = hand[int(posx), int(posy)]
-            hand -= posz
-            hand /= 150
-            hand = np.clip(hand, -1, 1)
-            hand = resize(hand, (168, 168))
-            hand = hand[20:-20, 20:-20]
-            hand = hand.reshape((1, 128, 128, 1))
-            max_index, probs = hand_classfier.classify(hand)
+            hand_arr = np.array(depth_data, dtype=np.float32).reshape((height, width))
+            print hand_arr.shape, posx, posy
+            posz = hand_arr[int(posx), int(posy)]
+            hand_arr -= posz
+            hand_arr /= 150
+            hand_arr = np.clip(hand_arr, -1, 1)
+            hand_arr = resize(hand_arr, (168, 168))
+            hand_arr = hand_arr[20:-20, 20:-20]
+            hand_arr = hand_arr.reshape((1, 128, 128, 1))
+            max_index, probs = hand_classfier.classify(hand_arr)
 
             probs = list(probs)+[0]
 

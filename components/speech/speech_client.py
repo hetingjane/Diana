@@ -1,4 +1,6 @@
 import sys, struct
+import argparse
+
 from ..fusion.conf.endpoints import connect
 
 # Timestamp | frame type | command_length | command
@@ -44,11 +46,17 @@ def recv_speech_frame(sock):
 
 if __name__ == '__main__':
 
-    k = connect('kinect', 'Speech')
+    parser = argparse.ArgumentParser()
+    parser.add_argument('kinect_host', help='Host name of the machine running Kinect Server')
+    parser.add_argument('--fusion-host', help='Host name of the machine running Kinect Server', default=None)
+
+    args = parser.parse_args()
+
+    k = connect('kinect', args.kinect_host, 'Speech')
     if k is None:
         sys.exit(0)
 
-    f = connect('fusion', 'Speech')
+    f = connect('fusion', args.fusion_host, 'Speech') if args.fusion_host is not None else None
 
     while True:
         try:
