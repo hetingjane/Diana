@@ -117,10 +117,10 @@ do
             fi
             ;;
         "speech")
-            params="$params --tab -e \"ssh -t ${machine} 'sleep $wait_time; cd ${start_dir}; sleep 3; python -m components.speech.speech_client $kinect_host --fusion-host $fusion_host; bash;'\" --title ${i}"
+            params="$params --tab -e \"ssh -t ${machine} 'sleep $wait_time; cd ${start_dir}; python -m components.speech.speech_client $kinect_host --fusion-host $fusion_host; bash;'\" --title ${i}"
             ;;
         "body")
-            params="$params --tab -e \"ssh -t ${machine} 'sleep $wait_time; cd ${start_dir}; sleep 3; export CUDA_VISIBLE_DEVICES=${device}; if [ ! -z ${env_dir} ]; then source ${env_dir}/bin/activate; fi; python -m components.skeletonRecognition.body_client $kinect_host --fusion-host $fusion_host; bash;'\" --title ${i}"
+            params="$params --tab -e \"ssh -t ${machine} 'sleep $wait_time; cd ${start_dir}; export CUDA_VISIBLE_DEVICES=${device}; if [ ! -z ${env_dir} ]; then source ${env_dir}/bin/activate; fi; python -m components.skeletonRecognition.body_client $kinect_host --fusion-host $fusion_host; bash;'\" --title ${i}"
             if [ "$single_machine" = yes ]
             then
                 ((device++))
