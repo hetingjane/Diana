@@ -2,7 +2,7 @@
 
 function print_usage
 {
-    echo -e "\nUsage: start.sh [-h|--help] [-e|--env <virtual_env>] [-c|--conf <machine_specification> default:machines.bak] [-s|--single-machine default:no] [-p|--pointing-mode <table|screen> default:screen] \n"
+    echo -e "\nUsage: start.sh [-h|--help] [-e|--env <virtual_env>] [-c|--conf <machine_specification> default:machines.bak] [-s|--single-machine default:no] [-p|--pointing-mode <desk|screen> default:screen] \n"
 }
     
 # full path to directory where start.sh resides
