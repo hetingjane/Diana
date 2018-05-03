@@ -2,7 +2,7 @@
 
 function print_usage
 {
-    echo -e "\nUsage: start.sh [-h|--help] [-e|--env <virtual_env>] [-c|--conf <machine_specification> default:machines.bak] [-s|--single-machine default:no]\n"
+    echo -e "\nUsage: start.sh [-h|--help] [-e|--env <virtual_env>] [-c|--conf <machine_specification> default:machines.bak] [-s|--single-machine default:multi-machine] [-w|--wait-for-fusion <seconds> default:0]\n"
 }
     
 # full path to directory where start.sh resides
@@ -10,13 +10,14 @@ start_dir=$(dirname "$0")
 start_dir=$(realpath "$start_dir")
 
 # parse arguments with getopt
-my_args=$(getopt -o he:c:s -l help,env:,conf:,single-machine -n 'start.sh' -- "$@")
+my_args=$(getopt -o he:c:sw: -l help,env:,conf:,single-machine,wait-for-fusion: -n 'start.sh' -- "$@")
 eval set -- "$my_args"
 
 # default values
 env_dir=""
 single_machine=no
 machine_spec="$start_dir/machines.bak"
+wait_time=0
 
 while true
 do
@@ -51,6 +52,11 @@ do
             
         -s|--single-machine)
             single_machine=yes ; shift ;;
+            
+        -w|--wait-for-fusion)
+            wait_time="$2"
+            shift 2
+            ;;
         
         --) shift ; break ;;
         
@@ -90,31 +96,31 @@ do
             params="$params --tab -e \"ssh -t ${machine} 'cd ${start_dir}; if [ ! -z ${env_dir} ]; then source ${env_dir}/bin/activate; fi; python -m components.fusion.fusion_server; bash;'\" --title ${i}"
             ;;
         "lh")
-            params="$params --tab -e \"ssh -t ${machine} 'cd ${start_dir}; export CUDA_VISIBLE_DEVICES=${device}; if [ ! -z ${env_dir} ]; then source ${env_dir}/bin/activate; fi; python -m components.handRecognition.depth_client LH $kinect_host --fusion-host $fusion_host; bash;'\" --title ${i}"
+            params="$params --tab -e \"ssh -t ${machine} 'sleep $wait_time; cd ${start_dir}; export CUDA_VISIBLE_DEVICES=${device}; if [ ! -z ${env_dir} ]; then source ${env_dir}/bin/activate; fi; python -m components.handRecognition.depth_client LH $kinect_host --fusion-host $fusion_host; bash;'\" --title ${i}"
             if [ "$single_machine" = yes ]
             then
                 ((device++))
             fi
             ;;
         "rh")
-            params="$params --tab -e \"ssh -t ${machine} 'cd ${start_dir}; export CUDA_VISIBLE_DEVICES=${device}; if [ ! -z ${env_dir} ]; then source ${env_dir}/bin/activate; fi; python -m components.handRecognition.depth_client RH $kinect_host --fusion-host $fusion_host; bash;'\" --title ${i}"
+            params="$params --tab -e \"ssh -t ${machine} 'sleep $wait_time; cd ${start_dir}; export CUDA_VISIBLE_DEVICES=${device}; if [ ! -z ${env_dir} ]; then source ${env_dir}/bin/activate; fi; python -m components.handRecognition.depth_client RH $kinect_host --fusion-host $fusion_host; bash;'\" --title ${i}"
             if [ "$single_machine" = yes ]
             then
                 ((device++))
             fi
             ;;
         "head")
-            params="$params --tab -e \"ssh -t ${machine} 'cd ${start_dir}; export CUDA_VISIBLE_DEVICES=${device}; if [ ! -z ${env_dir} ]; then source ${env_dir}/bin/activate; fi; python -m components.headRecognition.head_client $kinect_host --fusion-host $fusion_host; bash;'\" --title ${i}"
+            params="$params --tab -e \"ssh -t ${machine} 'sleep $wait_time; cd ${start_dir}; export CUDA_VISIBLE_DEVICES=${device}; if [ ! -z ${env_dir} ]; then source ${env_dir}/bin/activate; fi; python -m components.headRecognition.head_client $kinect_host --fusion-host $fusion_host; bash;'\" --title ${i}"
             if [ "$single_machine" = yes ]
             then
                 ((device++))
             fi
             ;;
         "speech")
-            params="$params --tab -e \"ssh -t ${machine} 'cd ${start_dir}; sleep 3; python -m components.speech.speech_client $kinect_host --fusion-host $fusion_host; bash;'\" --title ${i}"
+            params="$params --tab -e \"ssh -t ${machine} 'sleep $wait_time; cd ${start_dir}; sleep 3; python -m components.speech.speech_client $kinect_host --fusion-host $fusion_host; bash;'\" --title ${i}"
             ;;
         "body")
-            params="$params --tab -e \"ssh -t ${machine} 'cd ${start_dir}; sleep 3; export CUDA_VISIBLE_DEVICES=${device}; if [ ! -z ${env_dir} ]; then source ${env_dir}/bin/activate; fi; python -m components.skeletonRecognition.body_client $kinect_host --fusion-host $fusion_host; bash;'\" --title ${i}"
+            params="$params --tab -e \"ssh -t ${machine} 'sleep $wait_time; cd ${start_dir}; sleep 3; export CUDA_VISIBLE_DEVICES=${device}; if [ ! -z ${env_dir} ]; then source ${env_dir}/bin/activate; fi; python -m components.skeletonRecognition.body_client $kinect_host --fusion-host $fusion_host; bash;'\" --title ${i}"
             if [ "$single_machine" = yes ]
             then
                 ((device++))
