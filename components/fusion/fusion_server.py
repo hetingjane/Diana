@@ -229,6 +229,13 @@ class App:
                     all_events_to_send.append("P;r,{0:.2f},{1:.2f},{2:.2f},{3:.2f};{4:s}".format(rx, ry, var_r_x, var_r_y, ts))
             # Else, check if current input caused a transition
             elif changed:
+                # Quick hack to send NEVERMIND in speech channel for stop gesture
+                if state_machine is tsm.nevermind:
+                    if state_machine.is_started():
+                        all_events_to_send.append("S;NEVERMIND;" + ts)
+                    continue
+                # Hack ends
+
                 # For the special case of binary state machines for left point vec and right point vec
                 # append x,y coordinates to state
                 if state_machine is tsm.left_point_vec or state_machine is bsm.left_point_vec:
@@ -292,7 +299,8 @@ brandeis_events = [bsm.engage, bsm.left_continuous_point, bsm.right_continuous_p
                    gsm,
                    tsm.negack, tsm.posack,
                    tsm.push_back, tsm.push_front, tsm.push_left, tsm.push_right,
-                   tsm.right_point_vec, tsm.left_point_vec]
+                   tsm.right_point_vec, tsm.left_point_vec,
+                   tsm.nevermind]
 
 csu_events = brandeis_events + [tsm.unknown, tsm.servo_left, tsm.servo_right]
 
