@@ -7,7 +7,11 @@ posack = TriStateMachine("posack",
                          rules.match_any('rh thumbs up', 'lh thumbs up'))
 
 negack = TriStateMachine("negack",
-                         rules.match_any('rh thumbs down', 'lh thumbs down', 'rh stop', 'lh stop'), 8)
+                         rules.match_any('rh thumbs down', 'lh thumbs down'), 8)
+
+nevermind = TriStateMachine("nevermind",
+                            rules.match_any('rh stop', 'lh stop'), 20)
+
 
 left_point_vec = TriStateMachine("left point",
                                  rules.and_rules(
