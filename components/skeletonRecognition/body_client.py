@@ -94,7 +94,7 @@ if __name__ == '__main__':
     if s is None:
         sys.exit(0)
 
-    window_threshold = 11
+    window_threshold = 15
     body_parts = ['LA', 'RA']
     data_stream = deque([], maxlen=window_threshold)
 
@@ -148,8 +148,6 @@ if __name__ == '__main__':
         else:
             engaged_bit = 'Disengaged'
 
-
-
         if rgb:
             lpoint, rpoint = [0.0, 0.0], [0.0, 0.0]
             lvar, rvar = [0.0, 0.0], [0.0, 0.0]
@@ -172,6 +170,7 @@ if __name__ == '__main__':
 
                 # Function rewritten for RGB
                 data = np.vstack([extract_data(frame, rgb) for frame in data_stream])
+                # data = smooth_data(data, polyorder=2)
 
 
                 if wave_flag and lstm:
