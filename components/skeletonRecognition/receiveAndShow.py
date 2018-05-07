@@ -88,14 +88,28 @@ from scipy.signal import savgol_filter
 
 # following codes get the elbow and wrist information from the kinect sensor
 class Pointing:
-    def __init__(self):
-        self.screen_mode = None  # whether it is in screen mode
+    def __init__(self, pointing_mode='screen'):
+        if pointing_mode == 'screen':
+            self.screen_mode = True
+        elif pointing_mode == 'desk':
+            self.screen_mode = False
+        else:
+            raise ValueError('Pointing mode is not recognized!\n Accepted: screen, desk\n Received: %s' % pointing_mode)
 
-        self.WRISTLEFT = 6  # JointType specified by kinect
-        self.WRISTRIGHT = 10
-        self.ELBOWLEFT = 5
-        self.ELBOWRIGHT = 9
-        self.joint_interest_coded = [self.WRISTLEFT, self.WRISTRIGHT, self.ELBOWLEFT, self.ELBOWRIGHT]
+        if not self.screen_mode:
+            # use this if in desk mode
+            self.WRISTLEFT = 6  # JointType specified by kinect
+            self.WRISTRIGHT = 10
+            self.ELBOWLEFT = 5
+            self.ELBOWRIGHT = 9
+            self.joint_interest_coded = [self.WRISTLEFT, self.WRISTRIGHT, self.ELBOWLEFT, self.ELBOWRIGHT]
+        else:
+            # use this if in screen mode
+            self.HANDTIPLEFT = 21  # JointType specified by kinect
+            self.HANDTIPRIGHT = 23
+            self.SHOULDERLEFT = 4
+            self.SHOULDERRIGHT = 8
+            self.joint_interest_coded = [self.HANDTIPLEFT, self.HANDTIPRIGHT, self.SHOULDERLEFT, self.SHOULDERRIGHT]
 
         self.joint_info = {i: None for i in self.joint_interest_coded}  # contains left/right wrists/elbows coordinates
         self.joint_info_buffer = {i: [] for i in self.joint_interest_coded}
@@ -110,13 +124,7 @@ class Pointing:
         self.lpoint_var = (0, 0)  # variance of left point, sent to Brandeis
         self.rpoint_var = (0, 0)  # variance of right point, sent to Brandeis
 
-    def get_pointing_main(self, src, pointing_mode='screen', is_smoothing_joint=True, is_smoothing_point=True):
-        if pointing_mode == 'screen':
-            self.screen_mode = True
-        elif pointing_mode == 'desk':
-            self.screen_mode = False
-        else:
-            raise ValueError('Pointing mode is not recognized!\n Accepted: screen, desk\n Received: %s' % pointing_mode)
+    def get_pointing_main(self, src, is_smoothing_joint=True, is_smoothing_point=True):
 
         if not self._get_wrist_elbow(src):
             return
@@ -219,13 +227,19 @@ class Pointing:
             self.rpoint_buffer.append(self.rpoint_tmp)
 
     def _get_pointing(self, screen=True):
-        lwrist = self.joint_info[self.WRISTLEFT]
-        rwrist = self.joint_info[self.WRISTRIGHT]
-        lelbow = self.joint_info[self.ELBOWLEFT]
-        relbow = self.joint_info[self.ELBOWRIGHT]
+        if not screen:
+            l_coord1 = self.joint_info[self.WRISTLEFT]
+            r_coord1 = self.joint_info[self.WRISTRIGHT]
+            l_coord2 = self.joint_info[self.ELBOWLEFT]
+            r_coord2 = self.joint_info[self.ELBOWRIGHT]
+        else:
+            l_coord1 = self.joint_info[self.HANDTIPLEFT]
+            r_coord1 = self.joint_info[self.HANDTIPRIGHT]
+            l_coord2 = self.joint_info[self.SHOULDERLEFT]
+            r_coord2 = self.joint_info[self.SHOULDERRIGHT]
 
-        self.lpoint_tmp = self._calc_coordinates(lwrist, lelbow, screen)
-        self.rpoint_tmp = self._calc_coordinates(rwrist, relbow, screen)
+        self.lpoint_tmp = self._calc_coordinates(l_coord1, l_coord2, screen)
+        self.rpoint_tmp = self._calc_coordinates(r_coord1, r_coord2, screen)
 
     def _calc_coordinates(self, wrist, elbow, screen=True):
         if screen:

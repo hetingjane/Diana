@@ -84,15 +84,17 @@ if __name__ == '__main__':
         s = connect_rgb()
     else:
         s = connect('kinect', kinect_host, 'Body')
-        print 'connected to Body Client'
-    r = connect('fusion', fusion_host, 'Body')
-    if r is not None:
-        print 'Connected to fusion server'
+
+    if fusion_host is not None:
+        r = connect('fusion', fusion_host, 'Body')
+    else:
+        r = None
+
 
     if s is None:
         sys.exit(0)
 
-    window_threshold = 15
+    window_threshold = 11
     body_parts = ['LA', 'RA']
     data_stream = deque([], maxlen=window_threshold)
 
@@ -111,7 +113,7 @@ if __name__ == '__main__':
     count = 0
 
     wave_flag = False
-    point = Pointing()
+    point = Pointing(pointing_mode=pointing_mode)
 
 
     while True:
@@ -134,6 +136,9 @@ if __name__ == '__main__':
             frame_data = np.array(extract_data(input_data, rgb)).reshape((1, -1))
 
             sb_x = frame_data[0][0]
+            sb_z = frame_data[0][2]
+
+            # print 'Z value spine base is: ', sb_z
             if -0.83<sb_x<0.80:engaged = True
             else:engaged = False
 
@@ -142,7 +147,7 @@ if __name__ == '__main__':
             engaged_bit = 'Engaged'
         else:
             engaged_bit = 'Disengaged'
-        print engaged_bit
+
 
 
         if rgb:
@@ -150,7 +155,7 @@ if __name__ == '__main__':
             lvar, rvar = [0.0, 0.0], [0.0, 0.0]
         else:
             if wave_flag:
-                point.get_pointing_main(fd, pointing_mode=pointing_mode)
+                point.get_pointing_main(fd)
                 lpoint, rpoint = point.lpoint, point.rpoint
                 lvar, rvar = point.lpoint_var, point.rpoint_var
 
@@ -173,9 +178,9 @@ if __name__ == '__main__':
                     #Processing the GRU Classification for the 15 frame window
                     pruned_data_for_solver = prune_joints(data, body_part='arms', rgb=rgb)
                     if rgb:
-                        assert pruned_data_for_solver.shape == (15, 10)
+                        assert pruned_data_for_solver.shape == (window_threshold, 10)
                     else:
-                        assert pruned_data_for_solver.shape == (15, 21)
+                        assert pruned_data_for_solver.shape == (window_threshold, 21)
 
                     class_label, probabilities = solver.predict(pruned_data_for_solver)
                     # Adding the probability values of 5 class first
@@ -196,11 +201,7 @@ if __name__ == '__main__':
                         active_arm = check_active_arm(pruned_data, rgb=rgb) #Confirm shoulder-elbow or shoulder-wrist and return respectively
 
                         if active_arm:
-                            wave = check_wave_motion(pruned_data, rgb=rgb)
-                            if not wave:
-                                arm_motion_label, motion_encoding, probabilities = calculate_direction(pruned_data, body_part=body_part, rgb=rgb)
-                            else:
-                                arm_motion_label, motion_encoding, probabilities = 'wave', 31, [0]*6
+                            arm_motion_label, motion_encoding, probabilities = calculate_direction(pruned_data, body_part=body_part, rgb=rgb)
                         else:
                             arm_motion_label, motion_encoding, probabilities = 'blind', 32, [0]*6
 
