@@ -138,8 +138,8 @@ if __name__ == '__main__':
             sb_x = frame_data[0][0]
             sb_z = frame_data[0][2]
 
-            # print 'Z value spine base is: ', sb_z
-            if -0.83<sb_x<0.80:engaged = True
+            #Left and right axis threshold
+            if -0.83<sb_x<0.53:engaged = True
             else:engaged = False
 
 
@@ -193,7 +193,7 @@ if __name__ == '__main__':
                 for body_part in body_parts:
                     pruned_data = prune_joints(data, body_part=body_part, rgb=rgb)
                     active_arm = check_active_arm(pruned_data, rgb=rgb)  # Confirm shoulder-elbow or shoulder-wrist and return respectively
-                    # print body_part, 'Active' if active_arm else 'Dangling'
+                    print body_part, 'Active' if active_arm else 'Dangling'
 
 
                     if wave_flag:
@@ -256,12 +256,11 @@ if __name__ == '__main__':
         if to_print_result==['blind', 'blind', 'still']:
             pass
         else:
-            print 'Result is: ', to_print_result
+            print 'Result is: ', engaged_bit, to_print_result
 
 
         if r is not None:
             r.sendall(raw_data)
-
 
 
         count += 1
