@@ -1,92 +1,7 @@
-'''
-# import socket
-# import struct
-# import matplotlib.pyplot as plt
-# import time
-# from matplotlib.animation import FuncAnimation
-# import threading
-
-#src_addr = '129.82.45.102'
-src_addr = '127.0.0.1'
-src_port = 8000
-
-stream_id = 32;
-
-def connect():
-    """
-    Connect to a specific port
-    """
-
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-    try:
-        sock.connect((src_addr, src_port))
-    except:
-        print("Error connecting to {}:{}".format(src_addr, src_port))
-        return None
-    try:
-        print("Sending stream info")
-        sock.sendall(struct.pack('<i', stream_id));
-    except:
-        print("Error: Stream rejected")
-        return None
-    print("Successfully connected to host")
-    return sock
-
-
-def decode_frame(raw_frame):
-    # The format is given according to the following assumption of network data
-
-    # Expect little endian byte order
-    endianness = "<"
-
-    # [ commonTimestamp | frame type | Tracked body count | Engaged
-    header_format = "qiBB"
-
-    timestamp, frame_type, tracked_body_count, engaged = struct.unpack(endianness + header_format, raw_frame[:struct.calcsize(header_format)])
-
-    # For each body, a header is transmitted
-    # TrackingId | HandLeftConfidence | HandLeftState | HandRightConfidence | HandRightState ]
-    body_format = "Q4B"
-
-    # For each of the 25 joints, the following info is transmitted
-    # [ JointType | TrackingState | Position.X | Position.Y | Position.Z | Orientation.W | Orientation.X | Orientation.Y | Orientation.Z ]
-    joint_format = "BB7f"
-
-    frame_format = body_format + (joint_format * 25)
-
-    
-    # Unpack the raw frame into individual pieces of data as a tuple
-    frame_pieces = struct.unpack(endianness + (frame_format * (1 if engaged else 0)), raw_frame[struct.calcsize(header_format):])
-    
-    decoded = (timestamp, frame_type, tracked_body_count, engaged) + frame_pieces
-
-    return decoded
-
-
-def recv_all(sock, size):
-    result = b''
-    while len(result) < size:
-        data = sock.recv(size - len(result))
-        if not data:
-            raise EOFError("Error: Received only {} bytes into {} byte message".format(len(data), size))
-        result += data
-    return result
-
-
-def recv_skeleton_frame(sock):
-    """
-    To read each stream frame from the server
-    """
-    (load_size,) = struct.unpack("<i", recv_all(sock, struct.calcsize("<i")))
-    #print load_size
-    return recv_all(sock, load_size)
-'''
 import numpy as np
 from scipy.signal import savgol_filter
 
 
-# following codes get the elbow and wrist information from the kinect sensor
 class Pointing:
     def __init__(self, pointing_mode='screen'):
         if pointing_mode == 'screen':
@@ -132,13 +47,13 @@ class Pointing:
         if self.screen_mode:
             try:
                 if is_smoothing_joint:
-                    self._smoothing_joint(11, 2)
-                    self._smoothing_joint_mean(11)
+                    self._smoothing_joint(5, 2)
+                    self._smoothing_joint_mean(5)
                 self._get_pointing(True)  # True is coordinates on screen
                 if is_smoothing_point:
                     pass
-                    self._smoothing_point_mean(11)
-                    self._smoothing_point(11, 2)
+                    self._smoothing_point_mean(5)
+                    self._smoothing_point(5, 2)
                 self.lpoint = (self.lpoint_tmp[0] - 0.25, self.lpoint_tmp[1])
                 self.rpoint = (self.rpoint_tmp[0] + 0.25, self.rpoint_tmp[1])
             except Exception as e:
