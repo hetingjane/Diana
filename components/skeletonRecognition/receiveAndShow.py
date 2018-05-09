@@ -38,6 +38,8 @@ class Pointing:
 
         self.lpoint_var = (0, 0)  # variance of left point, sent to Brandeis
         self.rpoint_var = (0, 0)  # variance of right point, sent to Brandeis
+        self.lpoint_stable = False  # whether left hand pointing is stable
+        self.rpoint_stable = False  # whether right hand pointing is stable
 
     def get_pointing_main(self, src, is_smoothing_joint=True, is_smoothing_point=True):
 
@@ -69,6 +71,14 @@ class Pointing:
 
         self.lpoint_var = np.std(self.lpoint_buffer, axis=0)
         self.rpoint_var = np.std(self.rpoint_buffer, axis=0)
+        if np.any((np.amax(self.lpoint_buffer, axis=0) - np.amin(self.lpoint_buffer, axis=0)) > [0.005, 0.005]):
+            self.lpoint_stable = False
+        else:
+            self.lpoint_stable = True
+        if np.any((np.amax(self.rpoint_buffer, axis=0) - np.amin(self.rpoint_buffer, axis=0)) > [0.005, 0.005]):
+            self.rpoint_stable = False
+        else:
+            self.rpoint_stable = True
 
     def _get_wrist_elbow(self, src):
         '''
