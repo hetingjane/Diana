@@ -6,9 +6,7 @@ import Queue
 
 import numpy as np
 
-from .automata import bi_state_machines as bsm
-from .automata import tri_state_machines as tsm
-from .automata.state_machines import GrabStateMachine
+from .automata import machines as psm
 from .fusion_thread import Fusion
 from .remote_thread import Remote
 from . import thread_sync
@@ -146,63 +144,51 @@ class App:
         all_probs = list(np.concatenate((larm_probs, rarm_probs, lhand_probs, rhand_probs, head_probs, body_probs), axis=0))
         return struct.pack("<" + str(len(all_probs)) + "f", *all_probs)
 
-    def _get_pose_vectors(self, low_threshold=0.1, high_threshold=0.5):
-
-        engaged, larm_probs, rarm_probs, lhand_probs, rhand_probs, head_probs, body_probs = self._get_probs()
-
+    def _get_poses(self):
         if streams.is_active("Body"):
             body_msg = self.latest_s_msg["Body"]
             idx_l_arm, idx_r_arm, idx_body = body_msg.data.idx_l_arm, body_msg.data.idx_r_arm, body_msg.data.idx_body
+            idx_engaged = int(body_msg.engaged)
         else:
             idx_l_arm, idx_r_arm, idx_body = len(postures.left_arm_motions) - 1, len(
                 postures.right_arm_motions) - 1, len(postures.body_postures) - 1
+            idx_engaged = int(True)
 
-        hand_labels = np.array(range(len(lhand_probs)))
-        high_lhand_labels = hand_labels[lhand_probs >= high_threshold]
-        low_lhand_labels = hand_labels[np.logical_and(lhand_probs >= low_threshold, lhand_probs < high_threshold)]
-        high_rhand_labels = hand_labels[rhand_probs >= high_threshold]
-        low_rhand_labels = hand_labels[np.logical_and(rhand_probs >= low_threshold, rhand_probs < high_threshold)]
 
-        head_labels = np.array(range(len(head_probs)))
-        high_head_labels = head_labels[head_probs >= high_threshold]
+        pose_l_arm = postures.left_arm_motions[idx_l_arm]
+        pose_r_arm = postures.right_arm_motions[idx_r_arm]
+        pose_body = postures.body_postures[idx_body]
 
-        # High pose uses max probability arm labels, max probability body label
-        # head labels with probabilities in [high_threshold, 1.0],
-        # and hand labels with probabilities in [low_threshold, high_threshold)
-        high_pose = 1 if engaged else 0
-        high_pose |= postures.to_vec[postures.left_arm_motions[idx_l_arm]]
-        high_pose |= postures.to_vec[postures.right_arm_motions[idx_r_arm]]
-        high_pose |= postures.to_vec[postures.body_postures[idx_body]]
+        engaged = postures.engaged[idx_engaged]
 
-        for l in high_lhand_labels:
-            high_pose |= postures.to_vec[postures.left_hand_postures[l]]
-        for l in high_rhand_labels:
-            high_pose |= postures.to_vec[postures.right_hand_postures[l]]
-        for l in high_head_labels:
-            high_pose |= postures.to_vec[postures.head_postures[l]]
+        if streams.is_active("Head"):
+            head_msg = self.latest_s_msg["Head"]
+            idx_head = head_msg.data.idx_head
+        else:
+            idx_head = len(postures.head_postures) - 1
 
-        # Low pose uses max probability arm labels, and max probability body label
-        # no head labels,
-        # and hand labels with probabilities in [low_threshold, high_threshold)
-        low_pose = 1 if engaged else 0
-        low_pose |= postures.to_vec[postures.left_arm_motions[idx_l_arm]]
-        low_pose |= postures.to_vec[postures.right_arm_motions[idx_r_arm]]
-        low_pose |= postures.to_vec[postures.body_postures[idx_body]]
+        pose_head = postures.head_postures[idx_head]
 
-        for l in low_lhand_labels:
-            low_pose |= postures.to_vec[postures.left_hand_postures[l]]
-        for l in low_rhand_labels:
-            low_pose |= postures.to_vec[postures.right_hand_postures[l]]
+        lh_msg = self.latest_s_msg["LH"]
+        lh_idx = lh_msg.data.idx_hand
+        pose_lh = postures.left_hand_postures[lh_idx]
 
-        return engaged, high_pose, low_pose
+        rh_msg = self.latest_s_msg["RH"]
+        rh_idx = rh_msg.data.idx_hand
+        pose_rh = postures.right_hand_postures[rh_idx]
+
+        return engaged, pose_l_arm, pose_r_arm, pose_lh, pose_rh, pose_head, pose_body
 
     def _get_events(self):
 
-        engaged, high_pose, low_pose = self._get_pose_vectors()
+        poses = self._get_poses()
+
         if streams.is_active("Body"):
             body_msg = self.latest_s_msg["Body"]
             lx, ly, rx, ry = body_msg.data.pos_l_x, body_msg.data.pos_l_y, body_msg.data.pos_r_x, body_msg.data.pos_r_y
+            engaged = body_msg.data.engaged
         else:
+            engaged = True
             lx, ly, rx, ry = (float("-inf"),)*4
 
         word = self.latest_s_msg["Speech"].data.command if streams.is_active("Speech") else ""
@@ -214,33 +200,10 @@ class App:
 
         for state_machine in self.state_machines:
             # Input the combined label to the state machine
-            # State machine could be binary or tristate
-            changed = state_machine.input(engaged, high_pose, low_pose)
-            cur_state = state_machine.get_state()
-
-            # If it is the binary state machine for continuous points
-            # and is in start state, append pointer message contents to the sent message
-            if state_machine is bsm.left_continuous_point:
-                if state_machine.is_started():
-                    all_events_to_send.append("P;l,{0:.2f},{1:.2f};{2:s}".format(lx, ly, ts))
-            elif state_machine is bsm.right_continuous_point:
-                if state_machine.is_started():
-                    all_events_to_send.append("P;r,{0:.2f},{1:.2f};{2:s}".format(rx, ry, ts))
-            # Else, check if current input caused a transition
-            elif changed:
-                # For the special case of binary state machines for left point vec and right point vec
-                # append x,y coordinates to state
-                if state_machine is tsm.left_point_vec or state_machine is bsm.left_point_vec:
-                    if state_machine.is_started():
-                        cur_state += ",{0:.2f},{1:.2f}".format(lx, ly)
-                elif state_machine is tsm.right_point_vec or state_machine is bsm.right_point_vec:
-                    if state_machine.is_started():
-                        cur_state += ",{0:.2f},{1:.2f}".format(rx, ry)
-                # Finally create a timestamped message
-                all_events_to_send.insert(0, "G;" + cur_state + ";" + ts)
-
-        if engaged and len(word) > 0:
-            all_events_to_send.append("S;" + word + ";" + ts)
+            changed = state_machine.input(*poses)
+            if changed:
+                cur_state = state_machine.get_full_state()
+                all_events_to_send.append("G;{};{}".format(cur_state, ts))
 
         if not engaged:
             self._clear_synced_data()
@@ -284,16 +247,11 @@ class App:
             thread_sync.gui_events.put(new_ev)
 
 
-gsm = GrabStateMachine()
+#gsm = GrabStateMachine()
 
-brandeis_events = [bsm.engage, bsm.left_continuous_point, bsm.right_continuous_point, bsm.wave,
-                   tsm.count_five, tsm.count_four, tsm.count_three, tsm.count_two, tsm.count_one,
-                   gsm,
-                   tsm.negack, tsm.posack,
-                   tsm.push_back, tsm.push_front, tsm.push_left, tsm.push_right,
-                   tsm.right_point_vec, tsm.left_point_vec]
+brandeis_events = [psm.engage, psm.posack, psm.negack]
 
-csu_events = brandeis_events + [tsm.unknown, tsm.servo_left, tsm.servo_right]
+csu_events = brandeis_events
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

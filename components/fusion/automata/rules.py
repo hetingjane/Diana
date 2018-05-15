@@ -1,172 +1,93 @@
-from ..conf.postures import to_vec, from_vec
-from .counter import Counter
+from abc import ABCMeta, abstractmethod
+from copy import deepcopy
+
+from .threshold import Threshold, ThresholdSpecification
 
 
-class Threshold:
-    def __init__(self, threshold, *names):
-        assert len(names) > 0
-        self._names = set(names)
-        self._counter = Counter(0, min_val=0, max_val=threshold)
+class Rule:
 
-    def input(self, name):
-        if name in self._names:
-            self._counter.inc()
-            if self._counter.at_max():
-                self._counter.reset_to_min()
-                return True
-            return False
-        else:
-            self._counter.reset()
+    __metaclass__ = ABCMeta
 
-    @staticmethod
-    def read_spec(default_threshold, spec):
-        # Assume that `spec` is a list such that an element can be one of these:
-        # 1. just a string `name` which is equivalent to (name, default_threshold)
-        # 2. a tuple in form of (name, threshold)
-        # 3. a tuple in form of (name1, name2, ..., nameN, threshold) to indicated shared threshold
+    def __init__(self, *spec):
+        self._thresholds = ThresholdSpecification.read(*spec)
 
-        read_spec = []
+    @abstractmethod
+    def match(self, *inputs):
+        pass
 
-        for e in spec:
-            if isinstance(e, tuple):
-                if len(e) >= 2:
-                    read_spec.append(Threshold(e[-1], *e[:-1]))
-                else:
-                    raise ValueError("Input specification is invalid")
-            else:
-                read_spec.append(Threshold(default_threshold, e))
+    def reset(self):
+        for threshold in self._thresholds:
+            threshold.reset()
 
-        return read_spec
+    def __repr__(self):
+        return 'Rule contains: ' + ' | '.join(map(str, self._thresholds))
 
 
-class RuleState:
-    def __init__(self, default_threshold, *postures):
-        self._thresholds = Threshold.read_spec(default_threshold, postures)
-
-
-
-
-def match_any(*postures):
-    """
-    Returns a rule to match one or more postures with the input mask that is True when
-    at least one of the postures matches with the input mask, else False
-    :param postures: One or more postures as strings
-    :return: Rule to match the input postures with the input mask
-    """
-    posture_vecs = [to_vec[posture] for posture in postures]
-
-    def f(in_sym):
-        for v in posture_vecs:
-            if (in_sym & v) == v:
+class Any(Rule):
+    def match(self, *inputs):
+        assert len(inputs) > 0
+        for threshold in self._thresholds:
+            result = threshold.input(*inputs)
+            if result == Threshold.TRIGGERED:
+                self.reset()
                 return True
         return False
 
-    return f
 
-
-def match_any_v2(default_threshold=1, *postures):
-
-    state = RuleState(default_threshold, postures)
-
-    def f(in_sym):
-        for p in postures:
-            p_v = to_vec[p]
-            count = state.cur_count(p)
-            if (in_sym & p_v) == p_v:
-                count += 1
-                if count > state.threshold(p):
-                    state.reset()
-                    return True
-            else:
-                count.reset()
-
-        return False
-
-    return f
-
-
-def match_all(*postures):
-    """
-    Returns a rule to match one or more postures with the input mask that is True when
-    all of the postures match with the input mask, else False
-    :param postures: One or more postures as strings
-    :return: Rule to match the input postures with the input mask
-    """
-    posture_vecs = [to_vec[posture] for posture in postures]
-
-    def f(in_sym):
-        for v in posture_vecs:
-            if (in_sym & v) != v:
+class All(Rule):
+    def match(self, *inputs):
+        assert len(inputs) > 0
+        for threshold in self._thresholds:
+            result = threshold.input(*inputs)
+            if result != Threshold.TRIGGERED:
+                self.reset()
                 return False
         return True
 
-    return f
+
+class MetaRule(Rule):
+    def __init__(self, *rules):
+        assert len(rules) > 1
+        self._rules = deepcopy(rules)
+
+    def reset(self):
+        for rule in self._rules:
+            rule.reset()
 
 
-def mismatch_any(*postures):
-    """
-    Returns a rule to match one or more postures with the input mask that is True when
-    at least one of the postures does not match with the input mask, else False
-    :param postures: One or more postures as strings
-    :return: Rule to match the input postures with the input mask
-    """
-
-    posture_vecs = [to_vec[posture] for posture in postures]
-
-    def f(in_sym):
-        for v in posture_vecs:
-            if (in_sym & v) != v:
-                return True
-        return False
-
-    return f
-
-
-def mismatch_all(*postures):
-    """
-    Returns a rule to match one or more postures with the input mask that is True when
-    none of the postures matches with the input mask, else False
-    :param postures: One or more postures as strings
-    :return: Rule to match the input postures with the input mask
-    """
-    posture_vecs = [to_vec[posture] for posture in postures]
-
-    def f(in_sym):
-        for v in posture_vecs:
-            if (in_sym & v) == v:
+class And(MetaRule):
+    def match(self, *inputs):
+        for rule in self._rules:
+            if not rule.match(inputs):
+                self.reset()
                 return False
         return True
 
-    return f
 
-
-# Meta rule for ANDing
-def and_rules(*rules):
-    """
-    Returns a rule that computes the logical AND of the input rules with the input mask
-    :param rules: One or more boolean rules
-    :return: Rule that is logical AND of the input boolean rules
-    """
-    def f(in_sym):
-        for rule in rules:
-            if not rule(in_sym):
-                return False
-        return True
-
-    return f
-
-
-# Meta rule for ORing
-def or_rules(*rules):
-    """
-    Returns a rule that computes the logical OR of the input rules with the input mask
-    :param rules: One or more boolean rules
-    :return: Rule that is logical OR of the input boolean rules
-    """
-    def f(in_sym):
-        for rule in rules:
-            if rule(in_sym):
+class Or(MetaRule):
+    def match(self, *inputs):
+        for rule in self._rules:
+            if rule.match(inputs):
+                self.reset()
                 return True
         return False
 
-    return f
+
+class Not(MetaRule):
+    def __init__(self, rule):
+        MetaRule.__init__(self, [rule])
+
+    def match(self, *inputs):
+        return not self._rules[0].match(inputs)
+
+
+if __name__ == '__main__':
+    posack = Any(('rh tu', 'lh tu', 4), ('s yes', 1))
+    signal = [('rh tu', 'body still'), ('rh tu', 'body still'), ('lh tu', 'body still'), ('lh tu', 'body move front'),
+              ('lh tu', 'body still', 's yes')]
+    res = None
+    for i in signal[:-1]:
+        res = posack.match(*i)
+    assert res is True
+    assert posack.match('body still') is False
+    assert posack.match(*signal[-1]) is True
