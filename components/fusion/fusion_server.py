@@ -6,7 +6,7 @@ import Queue
 
 import numpy as np
 
-from .automata import machines as psm
+from .automata import machines as machines
 from .fusion_thread import Fusion
 from .remote_thread import Remote
 from . import thread_sync
@@ -182,6 +182,7 @@ class App:
     def _get_events(self):
 
         poses = self._get_poses()
+        print(poses)
 
         if streams.is_active("Body"):
             body_msg = self.latest_s_msg["Body"]
@@ -249,7 +250,7 @@ class App:
 
 #gsm = GrabStateMachine()
 
-brandeis_events = [psm.engage, psm.posack, psm.negack]
+brandeis_events = [machines.engage, machines.posack, machines.negack]
 
 csu_events = brandeis_events
 

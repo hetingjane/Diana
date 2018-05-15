@@ -26,7 +26,7 @@ class Threshold:
         If any of them matches, and the count reaches threshold, it is triggered as well as reset
         :param in_names: the input names
         :return: Any of these mutually exclusive outputs:
-                 TRIGGERED, if triggered, therefore also reset
+                 TRIGGERED, if triggered, but not reset automatically
                  MATCHED, if not triggered, but there is a match with the input so not reset
                  NO_MATCH, if there is no match with the input i.e. it is reset
         """
@@ -37,11 +37,7 @@ class Threshold:
         if has_matching_names:
             self._counter.inc()
             triggered = self._counter.at_max()
-            if triggered:
-                self.reset()
-                return Threshold.TRIGGERED
-            else:
-                return Threshold.MATCHED
+            return Threshold.TRIGGERED if triggered else Threshold.MATCHED
         else:
             self.reset()
             return Threshold.NO_MATCH
@@ -50,7 +46,7 @@ class Threshold:
         self._counter.reset_to_min()
 
     def __repr__(self):
-        return "Threshold: {}, {}".format(self._names, self._counter.val())
+        return "Thres({}, {}, {})".format(list(self._names), self._counter.val(), self._counter.max_val())
 
 
 class ThresholdSpecification:
