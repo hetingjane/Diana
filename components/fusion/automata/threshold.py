@@ -1,4 +1,4 @@
-from .counter import Counter
+from components.fusion.automata.counter import Counter
 
 
 class Threshold:
@@ -74,4 +74,5 @@ if __name__ == '__main__':
     assert t.input('body still') == Threshold.NO_MATCH
     assert t.input('rh tu') == Threshold.MATCHED
     assert t.input('lh tu') == Threshold.TRIGGERED
+    t.reset()
     assert t.input('rh tu') == Threshold.MATCHED
