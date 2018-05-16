@@ -46,7 +46,7 @@ class Threshold:
         self._counter.reset_to_min()
 
     def __repr__(self):
-        return "Thres({}, {}, {})".format(list(self._names), self._counter.val(), self._counter.max_val())
+        return "[{}; {}, {}]".format(', '.join(self._names), self._counter.val(), self._counter.max_val())
 
 
 class ThresholdSpecification:

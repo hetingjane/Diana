@@ -20,7 +20,7 @@ class Rule:
             threshold.reset()
 
     def __repr__(self):
-        return '{} ({})'.format(self.__class__.__name__, ' | '.join(map(str, self._thresholds)))
+        return '{}({})'.format(self.__class__.__name__, ' | '.join(map(str, self._thresholds)))
 
 
 class Any(Rule):
@@ -40,7 +40,7 @@ class All(Rule):
         all_triggered = True
         for threshold in self._thresholds:
             result = threshold.input(*inputs)
-            all_triggered = all_triggered and (result != Threshold.TRIGGERED)
+            all_triggered = all_triggered and (result == Threshold.TRIGGERED)
 
         if all_triggered:
             self.reset()
@@ -63,7 +63,7 @@ class MetaRule(Rule):
 class And(MetaRule):
     def __init__(self, *rules):
         assert len(rules) > 1
-        MetaRule.__init__(*rules)
+        MetaRule.__init__(self, *rules)
 
     def match(self, *inputs):
         for rule in self._rules:
@@ -76,7 +76,7 @@ class And(MetaRule):
 class Or(MetaRule):
     def __init__(self, *rules):
         assert len(rules) > 1
-        MetaRule.__init__(*rules)
+        MetaRule.__init__(self, *rules)
 
     def match(self, *inputs):
         for rule in self._rules:
@@ -108,9 +108,6 @@ if __name__ == '__main__':
     point = Any(('rh pf', 'lh pf', 2))
     not_point = Not(point)
 
-    print(point)
-    print(not_point)
-
     signal = [('rh pf', 'body still'), ('lh pf', 'body still')]
     point_res = None
     not_point_res = None
@@ -118,12 +115,13 @@ if __name__ == '__main__':
         point_res = point.match(*i)
         not_point_res = not_point.match(*i)
 
-    assert point_res is True
-    assert not_point_res is False
+    assert point_res is True, point_res
+    assert not_point_res is False, not_point_res
 
     disengage = All(('disengaged', 2))
+    res_disengaged = disengage.match('disengaged')
     print(disengage)
-    assert disengage.match('disengaged') is False
-    print(disengage)
-    assert disengage.match('disengaged') is True
-    print(disengage)
+    assert res_disengaged is False, res_disengaged
+
+    res_disengaged = disengage.match('disengaged')
+    assert res_disengaged is True, res_disengaged

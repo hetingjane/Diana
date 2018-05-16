@@ -1,4 +1,4 @@
-from .rules import Not, Any, All
+from .rules import Not, All, And
 
 
 class StateMachine:
@@ -6,7 +6,7 @@ class StateMachine:
     def __init__(self, prefix, states, states_with_rules, initial_state):
         self._prefix = prefix
 
-        assert set(states_with_rules.keys()).issuperset(set(states))
+        assert set(states_with_rules.keys()) == set(states)
         self._rules = states_with_rules
 
         assert initial_state in self._rules
@@ -54,11 +54,10 @@ class BinaryStateMachine(StateMachine):
 class PoseStateMachine(BinaryStateMachine):
     def __init__(self, prefix, rule):
         BinaryStateMachine.__init__(self, prefix, rule)
-        self._rules['stop'] = Any(
-            self._rules['stop'],
-            All(('disengaged', 1))
-        )
-        self._rules['high'] = All(
+        self._rules['high'] = And(
             self._rules['high'],
             All(('engaged', 1))
+        )
+        self._rules['stop'] = Not(
+            self._rules['high']
         )

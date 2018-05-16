@@ -6,12 +6,12 @@ import Queue
 
 import numpy as np
 
-from .automata import machines as machines
-from .fusion_thread import Fusion
-from .remote_thread import Remote
-from . import thread_sync
-from .conf import streams
-from .conf import postures
+from components.fusion.automata import machines as machines
+from components.fusion.fusion_thread import Fusion
+from components.fusion.remote_thread import Remote
+from components.fusion import thread_sync
+from components.fusion.conf import streams
+from components.fusion.conf import postures
 
 
 class App:
