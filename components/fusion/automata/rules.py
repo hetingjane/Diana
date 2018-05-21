@@ -135,18 +135,18 @@ if __name__ == '__main__':
     import csv
     engage_rule = All(('engaged', 1))
     #posack_rule = Any(('rh thumbs up', 'lh thumbs up', 5), ('speak yes', 1))
-    posack_rule = And(All(('engaged', 1)), Any(('rh thumbs up', 'lh thumbs up', 5), ('speak yes', 1)))
+    #posack_rule = And(All(('engaged', 1)), Any(('rh thumbs up', 'lh thumbs up', 5), ('speak yes', 1)))
+    push_left_rule = All(('rh closed left', 'rh open left', 5), ('ra move left', 5))
+    rules_to_test = [push_left_rule]
 
-    rules_to_test = [posack_rule]
-
-    with open('gestures_prady.csv', 'r') as f:
+    with open('push.csv', 'r') as f:
         f.readline()
         reader = csv.reader(f)
         i = 1
         for row in reader:
             for rule in rules_to_test:
                 result = rule.match(*row)
-                #print(rule)
+                print(rule)
                 if result == Rule.MATCHED:
                     result = 'match'
                 elif result == Rule.IS_FALSE:

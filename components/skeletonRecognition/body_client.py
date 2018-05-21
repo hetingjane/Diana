@@ -80,15 +80,19 @@ if __name__ == '__main__':
     else:
         s = connect('kinect', kinect_host, 'Body')
         print 'connected to Body Client'
-    r = connect('fusion', fusion_host, 'Body')
-    if r is not None:
+
+    if fusion_host is not None:
+        r = connect('fusion', fusion_host, 'Body')
         print 'Connected to fusion server'
+    else:
+        r = None
+
 
     if s is None:
         sys.exit(0)
 
     window_threshold = 15
-    body_parts = ['LA', 'RA']
+    body_parts = ['la', 'ra']
     data_stream = deque([], maxlen=window_threshold)
 
     avg_frame_time = 0.0
@@ -230,8 +234,8 @@ if __name__ == '__main__':
 
         #Debugging mode
         from ..fusion.conf.postures import left_arm_motions, right_arm_motions
-        to_print_result = [left_arm_motions[result[0]], right_arm_motions[result[1]], class_list[result[2]]]
-        if to_print_result==['blind', 'blind', 'still']:
+        to_print_result = [left_arm_motions[result[0]], right_arm_motions[result[1]], 'body '+str(class_list[result[2]])]
+        if to_print_result==['la blind', 'ra blind', 'body still']:
             pass
         else:
             print 'Result is: ', to_print_result

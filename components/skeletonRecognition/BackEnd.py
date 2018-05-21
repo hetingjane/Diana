@@ -22,9 +22,9 @@ def prune_joints(data, body_part, rgb= False):
         base = 2
         if body_part == 'arms':
             joints, offset = [1, 3, 4, 6, 7], range(2)
-        elif body_part == 'RA':
+        elif body_part == 'ra':
             joints, offset = [2, 3, 4], range(2)
-        elif body_part == 'LA':
+        elif body_part == 'la':
             joints, offset = [5, 6, 7], range(2)
         elif body_part == 'head':
             joints, offset = [0, 1, 14, 15, 16, 17], range(2)
@@ -32,9 +32,9 @@ def prune_joints(data, body_part, rgb= False):
         base = 3
         if body_part == 'arms':
             joints, offset = [5, 6, 7, 9, 10, 11, 12], range(3)
-        elif body_part == 'RA':
+        elif body_part == 'ra':
             joints, offset = [8, 9, 10, 11, 0], range(3)
-        elif body_part == 'LA':
+        elif body_part == 'la':
             joints, offset = [4, 5, 6, 7, 0], range(3)
         elif body_part == 'arms_x':
             joints, offset = [5, 6, 7, 9, 10, 11], range(1)
@@ -121,10 +121,10 @@ def check_active_arm(data, rgb):
 
 
 def calculate_direction(data, body_part, rgb):
-    if (body_part=='RA')or(body_part=='LA'):
-        arm_motion_array = right_arm_motions if body_part =='RA' else left_arm_motions
+    if (body_part=='ra')or(body_part=='la'):
+        arm_motion_array = right_arm_motions if body_part =='ra' else left_arm_motions
         direction, probabilities = get_arm_motion(data, rgb)
-        arm_motion_label = body_part + ':' + direction
+        arm_motion_label = body_part + direction
         try:
             motion_encoding = arm_motion_array.index(arm_motion_label)
         except:
