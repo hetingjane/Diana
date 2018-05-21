@@ -1,4 +1,4 @@
-from .rules import Not, All, And
+from .rules import Rule, Not, All, And
 
 
 class StateMachine:
@@ -16,16 +16,22 @@ class StateMachine:
 
     def input(self, *inputs):
         assert len(inputs) > 0
-        changed = False
+        rule_result = Rule.IS_FALSE
 
         for state, rule in self._rules.items():
             if state != self._cur_state:
-                changed = self._rules[state].match(*inputs)
-                if changed:
+                rule_result = self._rules[state].match(*inputs)
+                if rule_result == Rule.IS_TRUE:
+                    self.reset_rule_for(self._cur_state)
                     self._cur_state = state
                     break
+                elif rule_result == Rule.IS_FALSE:
+                    self.reset_rule_for(self._cur_state)
 
-        return changed
+        return rule_result == Rule.IS_TRUE
+
+    def reset_rule_for(self, state):
+        self._rules[state].reset()
 
     def reset(self):
         changed = self._cur_state != self._initial_state
@@ -40,6 +46,9 @@ class StateMachine:
 
     def in_initial_state(self):
         return self._cur_state == self._initial_state
+
+    def __repr__(self):
+        return str(self._rules)
 
 
 class BinaryStateMachine(StateMachine):

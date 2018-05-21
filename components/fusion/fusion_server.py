@@ -3,6 +3,7 @@ import time
 import argparse
 import struct
 import Queue
+import csv
 
 import numpy as np
 
@@ -16,7 +17,7 @@ from components.fusion.conf import postures
 
 class App:
 
-    def __init__(self, state_machines, debug):
+    def __init__(self, state_machines, debug, capture):
         self._start()
 
         # Initialize the state manager
@@ -26,6 +27,14 @@ class App:
         self.skipped = 0
         self.received = 0
         self.debug = debug
+
+        if capture:
+            print("Capture mode ON")
+
+        self.capture_file = open('fusion_incoming.csv', 'w') if capture else None
+        self.capture_csv = csv.writer(self.capture_file) if capture else None
+        if self.capture_csv is not None:
+            self.capture_csv.writerow(['engaged', 'la', 'ra', 'lh', 'rh', 'head', 'body'])
 
     def _stop(self):
         # Stop the fusion thread
@@ -92,6 +101,7 @@ class App:
             while True:
                 self._update()
         except KeyboardInterrupt:
+            self.capture_file.close()
             self._exit()
 
     def _update(self):
@@ -148,12 +158,11 @@ class App:
         if streams.is_active("Body"):
             body_msg = self.latest_s_msg["Body"]
             idx_l_arm, idx_r_arm, idx_body = body_msg.data.idx_l_arm, body_msg.data.idx_r_arm, body_msg.data.idx_body
-            idx_engaged = int(body_msg.engaged)
+            idx_engaged = int(body_msg.data.engaged)
         else:
             idx_l_arm, idx_r_arm, idx_body = len(postures.left_arm_motions) - 1, len(
                 postures.right_arm_motions) - 1, len(postures.body_postures) - 1
             idx_engaged = int(True)
-
 
         pose_l_arm = postures.left_arm_motions[idx_l_arm]
         pose_r_arm = postures.right_arm_motions[idx_r_arm]
@@ -177,12 +186,15 @@ class App:
         rh_idx = rh_msg.data.idx_hand
         pose_rh = postures.right_hand_postures[rh_idx]
 
-        return engaged, pose_l_arm, pose_r_arm, pose_lh, pose_rh, pose_head, pose_body
+        poses = engaged, pose_l_arm, pose_r_arm, pose_lh, pose_rh, pose_head, pose_body
+        if self.capture_csv is not None:
+            self.capture_csv.writerow(poses)
+
+        return poses
 
     def _get_events(self):
 
         poses = self._get_poses()
-        print(poses)
 
         if streams.is_active("Body"):
             body_msg = self.latest_s_msg["Body"]
@@ -250,7 +262,8 @@ class App:
 
 #gsm = GrabStateMachine()
 
-brandeis_events = [machines.engage, machines.posack, machines.negack]
+brandeis_events = [machines.engage, machines.posack, machines.negack, machines.left_point, machines.right_point,
+                   machines.push_left, machines.push_right, machines.push_front]
 
 csu_events = brandeis_events
 
@@ -258,7 +271,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--mode', choices=['csu', 'brandeis'], default='brandeis', type=str,
                         help="the mode in which fusion server is run")
-    parser.add_argument('-D', '--debug', dest='debug_mode', default=False, action='store_true', help='enable the debug mode')
+    parser.add_argument('-d', '--debug', dest='debug_mode', default=False, action='store_true', help='enable the debug mode')
+    parser.add_argument('-c', '--capture', dest='capture_mode', default=False, action='store_true', help='captures incoming data')
     args = parser.parse_args()
 
     if args.mode == 'brandeis':
@@ -270,5 +284,5 @@ if __name__ == '__main__':
     else:
         event_set = None
 
-    a = App(event_set, args.debug_mode)
+    a = App(event_set, args.debug_mode, args.capture_mode)
     a.run()

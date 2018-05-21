@@ -1,15 +1,22 @@
 from abc import ABCMeta, abstractmethod
 from copy import deepcopy
 
-from components.fusion.automata.threshold import Threshold, ThresholdSpecification
+from components.fusion.automata.constraint import Constraint, ConstraintSpecification
 
 
 class Rule:
-
+    """
+    Rule allowing matches with thresholds
+    IMPORTANT: A Rule is never reset automatically
+    """
     __metaclass__ = ABCMeta
 
+    IS_TRUE = 2
+    MATCHED = 1
+    IS_FALSE = 0
+
     def __init__(self, *spec):
-        self._thresholds = ThresholdSpecification.read(*spec)
+        self._thresholds = ConstraintSpecification.read(*spec)
 
     @abstractmethod
     def match(self, *inputs):
@@ -26,26 +33,39 @@ class Rule:
 class Any(Rule):
     def match(self, *inputs):
         assert len(inputs) > 0
+        any_satisfied = False
+        names_matched = False
         for threshold in self._thresholds:
             result = threshold.input(*inputs)
-            if result == Threshold.TRIGGERED:
-                self.reset()
-                return True
-        return False
+            any_satisfied = any_satisfied or (result == Constraint.SATISFIED)
+            names_matched = names_matched or (result in [Constraint.PARTIAL, Constraint.CONTINUE, Constraint.SATISFIED])
+
+        if any_satisfied:
+            return Rule.IS_TRUE
+        elif names_matched:
+            return Rule.MATCHED
+        else:
+            return Rule.IS_FALSE
 
 
 class All(Rule):
     def match(self, *inputs):
         assert len(inputs) > 0
-        all_triggered = True
+        all_satisfied = True
+        names_matched = False
         for threshold in self._thresholds:
             result = threshold.input(*inputs)
-            all_triggered = all_triggered and (result == Threshold.TRIGGERED)
+            if result in [Constraint.PARTIAL, Constraint.CONTINUE, Constraint.SATISFIED]:
+                names_matched = True
+            if result != Constraint.SATISFIED:
+                all_satisfied = False
 
-        if all_triggered:
-            self.reset()
-
-        return all_triggered
+        if all_satisfied:
+            return Rule.IS_TRUE
+        elif names_matched:
+            return Rule.MATCHED
+        else:
+            return Rule.IS_FALSE
 
 
 class MetaRule(Rule):
@@ -66,11 +86,20 @@ class And(MetaRule):
         MetaRule.__init__(self, *rules)
 
     def match(self, *inputs):
+        all_true = True
+        some_matched = False
+
         for rule in self._rules:
-            if not rule.match(*inputs):
-                self.reset()
-                return False
-        return True
+            result = rule.match(*inputs)
+            all_true = all_true and (result == Rule.IS_TRUE)
+            some_matched = some_matched or (result in [Rule.MATCHED, Rule.IS_TRUE])
+
+        if all_true:
+            return Rule.IS_TRUE
+        elif some_matched:
+            return Rule.MATCHED
+        else:
+            return Rule.IS_FALSE
 
 
 class Or(MetaRule):
@@ -79,11 +108,14 @@ class Or(MetaRule):
         MetaRule.__init__(self, *rules)
 
     def match(self, *inputs):
+        some_matched = False
         for rule in self._rules:
-            if rule.match(*inputs):
-                self.reset()
-                return True
-        return False
+            result = rule.match(*inputs)
+            if result == Rule.IS_TRUE:
+                return Rule.IS_TRUE
+            some_matched = some_matched or (result == Rule.MATCHED)
+
+        return Rule.MATCHED if some_matched else Rule.IS_FALSE
 
 
 class Not(MetaRule):
@@ -91,37 +123,35 @@ class Not(MetaRule):
         MetaRule.__init__(self, rule)
 
     def match(self, *inputs):
-        return not self._rules[0].match(*inputs)
+        result = self._rules[0].match(*inputs)
+        if result == Rule.IS_TRUE:
+            return Rule.IS_FALSE
+        elif result == Rule.MATCHED:
+            return Rule.MATCHED
+        elif result == Rule.IS_FALSE:
+            return Rule.IS_TRUE
 
 
 if __name__ == '__main__':
-    posack = Any(('rh tu', 'lh tu', 4), ('s yes', 1))
-    signal = [('rh tu', 'body still'), ('rh tu', 'body still'), ('lh tu', 'body still'), ('lh tu', 'body move front'),
-              ('lh tu', 'body still', 's yes')]
-    res = None
-    for i in signal[:-1]:
-        res = posack.match(*i)
-    assert res is True
-    assert posack.match('body still') is False
-    assert posack.match(*signal[-1]) is True
+    import csv
+    rules_to_test = [And(All(('engaged', 1)), Any(('rh thumbs up', 'lh thumbs up', 5), ('speak yes', 1)))]
+    rules_to_test.append(Not(rules_to_test[0]))
 
-    point = Any(('rh pf', 'lh pf', 2))
-    not_point = Not(point)
+    with open('gestures_prady.csv', 'r') as f:
+        f.readline()
+        reader = csv.reader(f)
+        i = 1
+        for row in reader:
+            print("{}:{}".format(i, ', '.join(row)))
+            for rule in rules_to_test:
+                result = rule.match(*row)
+                if result == Rule.MATCHED:
+                    result = 'match'
+                elif result == Rule.IS_FALSE:
+                    result = 'false'
+                elif result == Rule.IS_TRUE:
+                    result = 'true'
+                print(result)
 
-    signal = [('rh pf', 'body still'), ('lh pf', 'body still')]
-    point_res = None
-    not_point_res = None
-    for i in signal:
-        point_res = point.match(*i)
-        not_point_res = not_point.match(*i)
+            i += 1
 
-    assert point_res is True, point_res
-    assert not_point_res is False, not_point_res
-
-    disengage = All(('disengaged', 2))
-    res_disengaged = disengage.match('disengaged')
-    print(disengage)
-    assert res_disengaged is False, res_disengaged
-
-    res_disengaged = disengage.match('disengaged')
-    assert res_disengaged is True, res_disengaged
