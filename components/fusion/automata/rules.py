@@ -16,33 +16,33 @@ class Rule:
     IS_FALSE = 0
 
     def __init__(self, *spec):
-        self._thresholds = ConstraintSpecification.read(*spec)
+        self._constraints = ConstraintSpecification.read(*spec)
 
     @abstractmethod
     def match(self, *inputs):
         pass
 
     def reset(self):
-        for threshold in self._thresholds:
-            threshold.reset()
+        for constraint in self._constraints:
+            constraint.reset()
 
     def __repr__(self):
-        return '{}({})'.format(self.__class__.__name__, ' | '.join(map(str, self._thresholds)))
+        return '{}({})'.format(self.__class__.__name__, ' | '.join(map(str, self._constraints)))
 
 
 class Any(Rule):
     def match(self, *inputs):
         assert len(inputs) > 0
-        any_satisfied = False
-        names_matched = False
-        for threshold in self._thresholds:
-            result = threshold.input(*inputs)
-            any_satisfied = any_satisfied or (result == Constraint.SATISFIED)
-            names_matched = names_matched or (result in [Constraint.PARTIAL, Constraint.CONTINUE, Constraint.SATISFIED])
+        some_satisfied = False
+        some_names_matched = False
+        for constraint in self._constraints:
+            result = constraint.input(*inputs)
+            some_satisfied = some_satisfied or (result == Constraint.SATISFIED)
+            some_names_matched = some_names_matched or (result in [Constraint.MATCHED_NAMES, Constraint.SATISFIED])
 
-        if any_satisfied:
+        if some_satisfied:
             return Rule.IS_TRUE
-        elif names_matched:
+        elif some_names_matched:
             return Rule.MATCHED
         else:
             return Rule.IS_FALSE
@@ -52,17 +52,15 @@ class All(Rule):
     def match(self, *inputs):
         assert len(inputs) > 0
         all_satisfied = True
-        names_matched = False
-        for threshold in self._thresholds:
-            result = threshold.input(*inputs)
-            if result in [Constraint.PARTIAL, Constraint.CONTINUE, Constraint.SATISFIED]:
-                names_matched = True
-            if result != Constraint.SATISFIED:
-                all_satisfied = False
+        all_names_matched = True
+        for constraint in self._constraints:
+            result = constraint.input(*inputs)
+            all_names_matched = all_names_matched and (result in [Constraint.MATCHED_NAMES, Constraint.SATISFIED])
+            all_satisfied = all_satisfied and (result == Constraint.SATISFIED)
 
         if all_satisfied:
             return Rule.IS_TRUE
-        elif names_matched:
+        elif all_names_matched:
             return Rule.MATCHED
         else:
             return Rule.IS_FALSE
@@ -87,16 +85,16 @@ class And(MetaRule):
 
     def match(self, *inputs):
         all_true = True
-        some_matched = False
+        all_matched = True
 
         for rule in self._rules:
             result = rule.match(*inputs)
             all_true = all_true and (result == Rule.IS_TRUE)
-            some_matched = some_matched or (result in [Rule.MATCHED, Rule.IS_TRUE])
+            all_matched = all_matched and (result in [Rule.MATCHED, Rule.IS_TRUE])
 
         if all_true:
             return Rule.IS_TRUE
-        elif some_matched:
+        elif all_matched:
             return Rule.MATCHED
         else:
             return Rule.IS_FALSE
@@ -113,7 +111,8 @@ class Or(MetaRule):
             result = rule.match(*inputs)
             if result == Rule.IS_TRUE:
                 return Rule.IS_TRUE
-            some_matched = some_matched or (result == Rule.MATCHED)
+            if result == Rule.MATCHED:
+                some_matched = True
 
         return Rule.MATCHED if some_matched else Rule.IS_FALSE
 
@@ -128,30 +127,32 @@ class Not(MetaRule):
             return Rule.IS_FALSE
         elif result == Rule.MATCHED:
             return Rule.MATCHED
-        elif result == Rule.IS_FALSE:
+        else:
             return Rule.IS_TRUE
 
 
 if __name__ == '__main__':
     import csv
-    rules_to_test = [And(All(('engaged', 1)), Any(('rh thumbs up', 'lh thumbs up', 5), ('speak yes', 1)))]
-    rules_to_test.append(Not(rules_to_test[0]))
+    engage_rule = All(('engaged', 1))
+    #posack_rule = Any(('rh thumbs up', 'lh thumbs up', 5), ('speak yes', 1))
+    posack_rule = And(All(('engaged', 1)), Any(('rh thumbs up', 'lh thumbs up', 5), ('speak yes', 1)))
+
+    rules_to_test = [posack_rule]
 
     with open('gestures_prady.csv', 'r') as f:
         f.readline()
         reader = csv.reader(f)
         i = 1
         for row in reader:
-            print("{}:{}".format(i, ', '.join(row)))
             for rule in rules_to_test:
                 result = rule.match(*row)
+                #print(rule)
                 if result == Rule.MATCHED:
                     result = 'match'
                 elif result == Rule.IS_FALSE:
                     result = 'false'
                 elif result == Rule.IS_TRUE:
                     result = 'true'
-                print(result)
-
+            print("{}:{}:{}".format(i, result, ', '.join(row)))
             i += 1
 

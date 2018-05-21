@@ -41,15 +41,16 @@ push_front = PoseStateMachine('push front', rules.Or(
 if __name__ == '__main__':
     import csv
 
-    sm_to_test = [engage, posack, negack, left_point, right_point, push_left, push_right]
+    sm_to_test = [posack]
 
     with open('gestures_prady.csv', 'r') as f:
         reader = csv.DictReader(f)
-        i = 2
+        i = 1
         for row in reader:
-            print("{}:{}".format(i, row.values()))
+            #print("{}:{}".format(i, row.values()))
             for sm in sm_to_test:
                 triggered = sm.input(*row.values())
+                #print(sm)
                 if triggered:
                     print("{}:{}".format(i, sm.get_full_state()))
             i += 1

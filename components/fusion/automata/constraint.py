@@ -6,20 +6,25 @@ class Constraint:
     A constraint to match one or more names with given threshold
     The behavior of the constraint is as follows:
     If the input matches:
-        If the threshold is reached, the constraint is SATISFIED if it wasn't so previously else CONTINUE to be satisfied.
-        Otherwise, the constraint is partially matched (i.e. without the threshold)
+        If the threshold is reached, the constraint is SATISFIED
+        Otherwise, the constraint MATCHED_NAMES
     It the input does not match, the constraint is NOT_SATISFIED and is reset.
     """
 
     NOT_SATISFIED = 0
-    PARTIAL = 1
-    CONTINUE = 2
-    SATISFIED = 3
+    MATCHED_NAMES = 1
+    SATISFIED = 2
 
     def __init__(self, names, threshold):
         assert len(names) > 0
         self._names = set(names)
         self._counter = Counter(0, min_val=0, max_val=threshold)
+
+    def has_matching_names(self, *in_names):
+        for name in in_names:
+            if name in self._names:
+                return True
+        return False
 
     def input(self, *in_names):
         """
@@ -28,23 +33,13 @@ class Constraint:
         If any of them matches, and the count reaches threshold, it is triggered as well as reset
         :param in_names: the input names
         :return: Any of these mutually exclusive outputs:
-                 SATISFIED: the constraint is satisfied but not reset
-                 PARTIAL: the constraint is satisfied in terms of input names but the threshold isn't matched
-                 CONTINUE: the constraint was previously satisfied and current input does not change that.
-                 NOT_SATISFIED: the constraint was not satisfied in terms of matching names
         """
         assert len(in_names) > 0
 
-        has_matching_names = any(map(lambda x: x in self._names, in_names))
-
-        if has_matching_names:
-            prev_satisfied = self._counter.at_max()
-            if prev_satisfied:
-                return Constraint.CONTINUE
-            else:
-                self._counter.inc()
-                satisfied = self._counter.at_max()
-                return Constraint.SATISFIED if satisfied else Constraint.PARTIAL
+        if self.has_matching_names(*in_names):
+            self._counter.inc()
+            satisfied = self._counter.at_max()
+            return Constraint.SATISFIED if satisfied else Constraint.MATCHED_NAMES
         else:
             self.reset()
             return Constraint.NOT_SATISFIED
