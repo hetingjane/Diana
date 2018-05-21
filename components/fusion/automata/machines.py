@@ -15,28 +15,34 @@ left_point = PoseStateMachine('left point', rules.And(
     )
 ))
 
-right_point = PoseStateMachine('left point', rules.And(
-    rules.All(('lh point down', 'lh point right', 'lh point front', 5)),
+right_point = PoseStateMachine('right point', rules.And(
+    rules.All(('rh point down', 'rh point right', 'rh point front', 5)),
     rules.Or(
-        rules.All(('la still', 5)),
+        rules.All(('ra still', 5)),
         rules.All(('speak there', 'speak here', 'speak this', 'speak that', 1))
     )
 ))
 
-push_left = PoseStateMachine('push left', rules.And(
-    rules.Any(('rh closed left', 'rh open left', 5)),
-    rules.All(('ra move left', 5))
-))
+left_point_continuous = PoseStateMachine('left point continuous', rules.All(('lh point down', 'lh point right', 'lh point front', 5)))
 
-push_right = PoseStateMachine('push right', rules.And(
-    rules.Any(('rh closed left', 'rh open left', 5)),
-    rules.All(('ra move left', 5))
-))
+right_point_continuous = PoseStateMachine('right point continuous', rules.All(('rh point down', 'rh point right', 'rh point front', 5)))
+
+push_left = PoseStateMachine('push left', rules.All(('rh closed left', 'rh open left', 5), ('ra move left', 5)))
+
+push_right = PoseStateMachine('push right', rules.All(('lh closed left', 'lh open left', 5), ('la move right', 5)))
 
 push_front = PoseStateMachine('push front', rules.Or(
     rules.All(('rh closed front', 5), ('ra move front', 5)),
     rules.All(('lh closed front', 5), ('la move front', 5))
 ))
+
+push_back = PoseStateMachine('push back', rules.Or(
+    rules.All(('rh open back', 'rh closed back', 5), ('ra move back', 5)),
+    rules.All(('lh open back', 'lh closed back', 5), ('la move back', 5)),
+    rules.All(('rh beckon', 'lh beckon', 5))
+))
+
+wave = PoseStateMachine('wave', rules.Any(('la wave', 'ra wave', 5)))
 
 if __name__ == '__main__':
     import csv

@@ -262,8 +262,11 @@ class App:
 
 #gsm = GrabStateMachine()
 
-brandeis_events = [machines.engage, machines.posack, machines.negack, machines.left_point, machines.right_point,
-                   machines.push_left, machines.push_right, machines.push_front]
+brandeis_events = [machines.engage, machines.wave,
+                   machines.posack, machines.negack,
+                   machines.left_point, machines.right_point,
+                   machines.left_point_continuous, machines.right_point_continuous,
+                   machines.push_left, machines.push_right, machines.push_front, machines.push_back]
 
 csu_events = brandeis_events
 
