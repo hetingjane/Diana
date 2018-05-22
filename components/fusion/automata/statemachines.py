@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from .rules import Rule, Not, All, And
 
 
@@ -60,7 +62,7 @@ class BinaryStateMachine(StateMachine):
         StateMachine.__init__(self, prefix, ['high', 'stop'], states_with_rules, 'stop')
 
     def is_high(self):
-        return self._cur_state == 'high'
+        return self._cur_state == 'high' or 'high' in self._cur_state
 
 
 class OldBinaryStateMachine(StateMachine):
@@ -72,7 +74,7 @@ class OldBinaryStateMachine(StateMachine):
         StateMachine.__init__(self, prefix, ['start', 'stop'], states_with_rules, 'stop')
 
     def is_high(self):
-        return self._cur_state == 'start'
+        return self._cur_state == 'start' or 'start' in self._cur_state
 
 
 class PoseStateMachine(BinaryStateMachine):
