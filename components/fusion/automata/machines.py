@@ -29,7 +29,7 @@ right_point_continuous = PoseStateMachine('right point continuous', rules.All(('
 
 push_left = PoseStateMachine('push left', rules.All(('rh closed left', 'rh open left', 5), ('ra move left', 5)))
 
-push_right = PoseStateMachine('push right', rules.All(('lh closed left', 'lh open left', 5), ('la move right', 5)))
+push_right = PoseStateMachine('push right', rules.All(('lh closed right', 'lh open right', 5), ('la move right', 5)))
 
 push_front = PoseStateMachine('push front', rules.Or(
     rules.All(('rh closed front', 5), ('ra move front', 5)),
@@ -47,9 +47,9 @@ wave = PoseStateMachine('wave', rules.Any(('la wave', 'ra wave', 5)))
 if __name__ == '__main__':
     import csv
 
-    sm_to_test = [posack]
+    sm_to_test = [engage, wave, posack, negack, push_front, push_back, push_left, push_right]
 
-    with open('gestures_prady.csv', 'r') as f:
+    with open('gestures_me.csv', 'r') as f:
         reader = csv.DictReader(f)
         i = 1
         for row in reader:

@@ -206,6 +206,8 @@ class App:
 
         word = self.latest_s_msg["Speech"].data.command if streams.is_active("Speech") else ""
 
+        inputs = poses + (word,) if len(word) > 0 else poses
+
         # More than one output data is possible from multiple state machines
         all_events_to_send = []
 
@@ -213,7 +215,7 @@ class App:
 
         for state_machine in self.state_machines:
             # Input the combined label to the state machine
-            changed = state_machine.input(*poses)
+            changed = state_machine.input(*inputs)
             if changed:
                 cur_state = state_machine.get_full_state()
                 all_events_to_send.append("G;{};{}".format(cur_state, ts))

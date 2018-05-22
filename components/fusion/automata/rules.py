@@ -134,12 +134,13 @@ class Not(MetaRule):
 if __name__ == '__main__':
     import csv
     engage_rule = All(('engaged', 1))
-    #posack_rule = Any(('rh thumbs up', 'lh thumbs up', 5), ('speak yes', 1))
-    #posack_rule = And(All(('engaged', 1)), Any(('rh thumbs up', 'lh thumbs up', 5), ('speak yes', 1)))
-    push_left_rule = All(('rh closed left', 'rh open left', 5), ('ra move left', 5))
-    rules_to_test = [push_left_rule]
+    push_front_rule = And(engage_rule, Or(
+        All(('rh closed front', 5), ('ra move front', 5)),
+        All(('lh closed front', 5), ('la move front', 5))
+    ))
+    rules_to_test = [push_front_rule]
 
-    with open('push.csv', 'r') as f:
+    with open('gestures_dhruva.csv', 'r') as f:
         f.readline()
         reader = csv.reader(f)
         i = 1
@@ -153,6 +154,6 @@ if __name__ == '__main__':
                     result = 'false'
                 elif result == Rule.IS_TRUE:
                     result = 'true'
-            print("{}:{}:{}".format(i, result, ', '.join(row)))
+                print("{}:{}:{}".format(i, result, ', '.join(row)))
             i += 1
 
