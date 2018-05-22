@@ -212,13 +212,28 @@ class App:
         all_events_to_send = []
 
         ts = "{0:.3f}".format(time.time())
+        lx, ly, rx, ry = map(lambda x: "{0:.2f}".format(x), [lx, ly, rx, ry])
 
         for state_machine in self.state_machines:
             # Input the combined label to the state machine
             changed = state_machine.input(*inputs)
-            if changed:
-                cur_state = state_machine.get_full_state()
-                all_events_to_send.append("G;{};{}".format(cur_state, ts))
+            cur_state = state_machine.get_full_state()
+
+            if state_machine is machines.left_point_continuous and state_machine.is_high():
+                all_events_to_send.append("P;l,{},{};{}".format(lx, ly, ts))
+            elif state_machine is machines.right_point_continuous and state_machine.is_high():
+                all_events_to_send.append("P;r,{},{};{}".format(rx, ry, ts))
+
+            elif changed:
+                if state_machine is machines.left_point and state_machine.is_high():
+                    cur_state += ",{},{}".format(lx, ly)
+                elif state_machine is machines.right_point and state_machine.is_high():
+                    cur_state += ",{},{}".format(rx, ry)
+
+                all_events_to_send.insert(0, "G;" + cur_state + ";" + ts)
+
+        if engaged and len(word) > 0 and word not in postures.words:
+            all_events_to_send.append("S;{};{}".format(word, ts))
 
         if not engaged:
             self._clear_synced_data()

@@ -59,6 +59,21 @@ class BinaryStateMachine(StateMachine):
         }
         StateMachine.__init__(self, prefix, ['high', 'stop'], states_with_rules, 'stop')
 
+    def is_high(self):
+        return self._cur_state == 'high'
+
+
+class OldBinaryStateMachine(StateMachine):
+    def __init__(self, prefix, rule):
+        states_with_rules = {
+            'start': rule,
+            'stop': Not(rule)
+        }
+        StateMachine.__init__(self, prefix, ['start', 'stop'], states_with_rules, 'stop')
+
+    def is_high(self):
+        return self._cur_state == 'start'
+
 
 class PoseStateMachine(BinaryStateMachine):
     def __init__(self, prefix, rule):
@@ -69,4 +84,16 @@ class PoseStateMachine(BinaryStateMachine):
         )
         self._rules['stop'] = Not(
             self._rules['high']
+        )
+
+
+class OldPoseStateMachine(OldBinaryStateMachine):
+    def __init__(self, prefix, rule):
+        OldBinaryStateMachine.__init__(self, prefix, rule)
+        self._rules['start'] = And(
+            self._rules['start'],
+            All(('engaged', 1))
+        )
+        self._rules['stop'] = Not(
+            self._rules['start']
         )

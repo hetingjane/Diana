@@ -134,20 +134,25 @@ class Not(MetaRule):
 if __name__ == '__main__':
     import csv
     engage_rule = All(('engaged', 1))
-    push_front_rule = And(engage_rule, Or(
-        All(('rh closed front', 5), ('ra move front', 5)),
-        All(('lh closed front', 5), ('la move front', 5))
-    ))
-    rules_to_test = [push_front_rule]
+    point_rule = And(
+        All(('rh point down', 'rh point right', 'rh point front', 5)),
+        Or(
+            All(('ra still', 5)),
+            All(('speak there', 'speak here', 'speak this', 'speak that', 1))
+        )
+    )
 
-    with open('gestures_dhruva.csv', 'r') as f:
+    point_rule = And(engage_rule, point_rule)
+
+    rules_to_test = [point_rule]
+
+    with open('pointing.csv', 'r') as f:
         f.readline()
         reader = csv.reader(f)
         i = 1
         for row in reader:
             for rule in rules_to_test:
                 result = rule.match(*row)
-                print(rule)
                 if result == Rule.MATCHED:
                     result = 'match'
                 elif result == Rule.IS_FALSE:
@@ -155,5 +160,6 @@ if __name__ == '__main__':
                 elif result == Rule.IS_TRUE:
                     result = 'true'
                 print("{}:{}:{}".format(i, result, ', '.join(row)))
+                print(rule)
             i += 1
 

@@ -1,11 +1,11 @@
-from components.fusion.automata.statemachines import BinaryStateMachine, PoseStateMachine
+from components.fusion.automata.statemachines import BinaryStateMachine, PoseStateMachine, OldPoseStateMachine, OldBinaryStateMachine
 from components.fusion.automata import rules as rules
 
 posack = PoseStateMachine('posack', rules.Any(('rh thumbs up', 'lh thumbs up', 5), ('speak yes', 1)))
 
 negack = PoseStateMachine('negack', rules.Any(('rh thumbs down', 'lh thumbs down', 5), ('speak no', 1)))
 
-engage = BinaryStateMachine('engaged', rules.All(('engaged', 1)))
+engage = OldBinaryStateMachine('engage', rules.All(('engaged', 1)))
 
 left_point = PoseStateMachine('left point', rules.And(
     rules.All(('lh point down', 'lh point right', 'lh point front', 5)),
@@ -23,9 +23,9 @@ right_point = PoseStateMachine('right point', rules.And(
     )
 ))
 
-left_point_continuous = PoseStateMachine('left point continuous', rules.All(('lh point down', 'lh point right', 'lh point front', 5)))
+left_point_continuous = OldPoseStateMachine('left point continuous', rules.All(('lh point down', 'lh point right', 'lh point front', 5)))
 
-right_point_continuous = PoseStateMachine('right point continuous', rules.All(('rh point down', 'rh point right', 'rh point front', 5)))
+right_point_continuous = OldPoseStateMachine('right point continuous', rules.All(('rh point down', 'rh point right', 'rh point front', 5)))
 
 push_left = PoseStateMachine('push left', rules.All(('rh closed left', 'rh open left', 5), ('ra move left', 5)))
 
@@ -42,14 +42,14 @@ push_back = PoseStateMachine('push back', rules.Or(
     rules.All(('rh beckon', 'lh beckon', 5))
 ))
 
-wave = PoseStateMachine('wave', rules.Any(('la wave', 'ra wave', 5)))
+wave = OldPoseStateMachine('wave', rules.Any(('la wave', 'ra wave', 5)))
 
 if __name__ == '__main__':
     import csv
 
-    sm_to_test = [engage, wave, posack, negack, push_front, push_back, push_left, push_right]
+    sm_to_test = [engage, wave, right_point, right_point_continuous, left_point_continuous, left_point]
 
-    with open('gestures_me.csv', 'r') as f:
+    with open('gestures.csv', 'r') as f:
         reader = csv.DictReader(f)
         i = 1
         for row in reader:
