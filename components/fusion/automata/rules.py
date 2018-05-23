@@ -27,7 +27,7 @@ class Rule:
             constraint.reset()
 
     def __repr__(self):
-        return '{}({})'.format(self.__class__.__name__, ' | '.join(map(str, self._constraints)))
+        return '{}({})'.format(self.__class__.__name__, ', '.join(map(str, self._constraints)))
 
 
 class Any(Rule):
@@ -75,7 +75,7 @@ class MetaRule(Rule):
             rule.reset()
 
     def __repr__(self):
-        return '{} ({})'.format(self.__class__.__name__, ' | '.join(map(str, self._rules)))
+        return '({})'.format((' ' + self.__class__.__name__.lower() + ' ').join(map(str, self._rules)))
 
 
 class And(MetaRule):
@@ -146,7 +146,7 @@ if __name__ == '__main__':
 
     rules_to_test = [point_rule]
 
-    with open('pointing.csv', 'r') as f:
+    with open('point.csv', 'r') as f:
         f.readline()
         reader = csv.reader(f)
         i = 1
