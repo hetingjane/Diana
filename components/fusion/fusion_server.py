@@ -233,7 +233,8 @@ class App:
                 all_events_to_send.insert(0, "G;" + cur_state + ";" + ts)
 
         if engaged and len(word) > 0 and word not in postures.words:
-            all_events_to_send.append("S;{};{}".format(word, ts))
+            command = ''.join(word.split()[1:]).upper()
+            all_events_to_send.append("S;{};{}".format(command, ts))
 
         if not engaged:
             self._clear_synced_data()
