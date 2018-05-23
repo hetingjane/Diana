@@ -19,7 +19,7 @@ left_point = PoseStateMachine('left point', rules.And(
 ))
 
 right_point = PoseStateMachine('right point', rules.And(
-    rules.All(('rh point down', 'rh point right', 'rh point front', 5)),
+    rules.All(('rh point down', 'rh point left', 'rh point front', 5)),
     rules.Or(
         rules.All(('ra still', 5)),
         rules.All(('speak there', 'speak here', 'speak this', 'speak that', 1))
