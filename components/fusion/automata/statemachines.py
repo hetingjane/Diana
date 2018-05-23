@@ -1,5 +1,3 @@
-from collections import OrderedDict
-
 from .rules import Rule, Not, All, And
 
 
@@ -8,34 +6,37 @@ class StateMachine:
     def __init__(self, prefix, states, states_with_rules, initial_state):
         self._prefix = prefix
 
-        assert set(states_with_rules.keys()) == set(states)
+        assert set(states_with_rules.keys()) == set(states), "{} != {}".format(set(states_with_rules.keys()), set(states))
         self._rules = states_with_rules
 
-        assert initial_state in self._rules
+        assert initial_state in self._rules, "Initial state {} not found in {}".format(initial_state, self._rules)
         self._initial_state = initial_state
 
         self._cur_state = initial_state
 
     def input(self, *inputs):
-        assert len(inputs) > 0
+        assert len(inputs) > 0, "At least one input must be provided"
         rule_result = Rule.IS_FALSE
 
-        for state, rule in self._rules.items():
-            if state != self._cur_state:
-                rule_result = self._rules[state].match(*inputs)
-                if rule_result == Rule.IS_TRUE:
-                    self.reset_rule_for(self._cur_state)
-                    self._cur_state = state
-                    break
-                elif rule_result == Rule.IS_FALSE:
-                    self.reset_rule_for(self._cur_state)
+        for state, rule in self._rules[self._cur_state].items():
+            rule_result = rule.match(*inputs)
+            if rule_result == Rule.IS_TRUE:
+                rule.reset()
+                self._cur_state = state
+                break
+            elif rule_result == Rule.IS_FALSE:
+                rule.reset()
 
         return rule_result == Rule.IS_TRUE
 
-    def reset_rule_for(self, state):
-        self._rules[state].reset()
+    def reset_rule(self, from_state, to_state):
+        self._rules[from_state][to_state].reset()
 
     def reset(self):
+        # Reset rules in the current state
+        for state in self._rules[self._cur_state]:
+            self.reset_rule(self._cur_state, state)
+        # Transition to initial state
         changed = self._cur_state != self._initial_state
         self._cur_state = self._initial_state
         return changed
@@ -49,15 +50,28 @@ class StateMachine:
     def in_initial_state(self):
         return self._cur_state == self._initial_state
 
+    def get_transitions(self):
+        return [(from_state, to_state) for from_state in self._rules for to_state in self._rules[from_state]]
+
+    def get_rule(self, from_state, to_state):
+        return self._rules[from_state][to_state]
+
+    def set_rule(self, from_state, to_state, new_rule):
+        self._rules[from_state][to_state] = new_rule
+
     def __repr__(self):
-        return str(self._rules)
+        return self.get_full_state() + ": " + str(self._rules[self._cur_state])
 
 
 class BinaryStateMachine(StateMachine):
     def __init__(self, prefix, rule):
         states_with_rules = {
-            'high': rule,
-            'stop': Not(rule)
+            'stop': {
+                'high': rule
+            },
+            'high': {
+                'stop': Not(rule)
+            }
         }
         StateMachine.__init__(self, prefix, ['high', 'stop'], states_with_rules, 'stop')
 
@@ -65,11 +79,27 @@ class BinaryStateMachine(StateMachine):
         return self._cur_state == 'high' or 'high' in self._cur_state
 
 
+class PoseStateMachine(BinaryStateMachine):
+    def __init__(self, prefix, rule):
+        BinaryStateMachine.__init__(self, prefix, rule)
+        self._rules['stop']['high'] = And(
+            self._rules['stop']['high'],
+            All(('engaged', 1))
+        )
+        self._rules['high']['stop'] = Not(
+            self._rules['stop']['high']
+        )
+
+
 class OldBinaryStateMachine(StateMachine):
     def __init__(self, prefix, rule):
         states_with_rules = {
-            'start': rule,
-            'stop': Not(rule)
+            'stop': {
+                'start': rule
+            },
+            'start': {
+                'stop': Not(rule)
+            }
         }
         StateMachine.__init__(self, prefix, ['start', 'stop'], states_with_rules, 'stop')
 
@@ -77,25 +107,13 @@ class OldBinaryStateMachine(StateMachine):
         return self._cur_state == 'start' or 'start' in self._cur_state
 
 
-class PoseStateMachine(BinaryStateMachine):
-    def __init__(self, prefix, rule):
-        BinaryStateMachine.__init__(self, prefix, rule)
-        self._rules['high'] = And(
-            self._rules['high'],
-            All(('engaged', 1))
-        )
-        self._rules['stop'] = Not(
-            self._rules['high']
-        )
-
-
 class OldPoseStateMachine(OldBinaryStateMachine):
     def __init__(self, prefix, rule):
         OldBinaryStateMachine.__init__(self, prefix, rule)
-        self._rules['start'] = And(
-            self._rules['start'],
+        self._rules['stop']['start'] = And(
+            self._rules['stop']['start'],
             All(('engaged', 1))
         )
-        self._rules['stop'] = Not(
-            self._rules['start']
+        self._rules['start']['stop'] = Not(
+            self._rules['stop']['start']
         )

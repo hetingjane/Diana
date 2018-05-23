@@ -277,14 +277,12 @@ class App:
             thread_sync.gui_events.put(new_ev)
 
 
-#gsm = GrabStateMachine()
-
 brandeis_events = [machines.engage, machines.wave,
                    machines.posack, machines.negack, machines.nevermind,
                    machines.left_point, machines.right_point,
                    machines.left_point_continuous, machines.right_point_continuous,
                    machines.push_left, machines.push_right, machines.push_front, machines.push_back,
-                   machines.grab_state_machine]
+                   machines.grab]
 
 csu_events = brandeis_events
 
