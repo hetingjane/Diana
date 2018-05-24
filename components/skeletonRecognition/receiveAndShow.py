@@ -2,6 +2,7 @@ import numpy as np
 from scipy.signal import savgol_filter
 
 
+# following codes get the elbow and wrist information from the kinect sensor
 class Pointing:
     def __init__(self, pointing_mode='screen'):
         if pointing_mode == 'screen':
