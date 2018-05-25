@@ -2,7 +2,7 @@
 
 function print_usage
 {
-    echo -e "\nUsage: start.sh [-h|--help] [-e|--env <virtual_env>] [-c|--conf <machine_specification> default:machines.bak] [-s|--single-machine default:multi-machine] [-w|--wait-for-fusion <seconds> default:0]\n"
+    echo -e "\nUsage: start.sh [-h|--help] [-e|--env <virtual_env>] [-c|--conf <machine_specification> default:machines.bak] [-s|--single-machine default:multi-machine] [-p|--pointing-mode <desk|screen> default:screen] [-w|--wait-for-fusion <seconds> default:0]\n"
 }
     
 # full path to directory where start.sh resides
@@ -10,13 +10,14 @@ start_dir=$(dirname "$0")
 start_dir=$(realpath "$start_dir")
 
 # parse arguments with getopt
-my_args=$(getopt -o he:c:sw: -l help,env:,conf:,single-machine,wait-for-fusion: -n 'start.sh' -- "$@")
+my_args=$(getopt -o he:c:sw:p: -l help,env:,conf:,single-machine,wait-for-fusion:,pointing-mode: -n 'start.sh' -- "$@")
 eval set -- "$my_args"
 
 # default values
 env_dir=""
 single_machine=no
 machine_spec="$start_dir/machines.bak"
+pointing_mode=""
 wait_time=0
 
 while true
@@ -51,13 +52,20 @@ do
             ;;
             
         -s|--single-machine)
-            single_machine=yes ; shift ;;
-            
+            single_machine=yes
+            shift
+            ;;
+
+        -p|--pointing-mode)
+            pointing_mode="$2"
+            shift 2
+            ;;
+
         -w|--wait-for-fusion)
             wait_time="$2"
             shift 2
             ;;
-        
+
         --) shift ; break ;;
         
         *) print_usage ; exit 1 ;;
@@ -65,15 +73,21 @@ do
 done
 
 
-if [ "$env_dir" = "" ]
+if [ -z "$env_dir" ]
 then
     echo "Virtual environment: none (user/system packages)"
 else
     echo "Virtual environment: $env_dir"
 fi
 
+if [ -z "$pointing_mode" ]
+then
+    pointing_mode=screen
+fi
+
 echo "Single machine: $single_machine"
 echo "Machine spec: $machine_spec"
+echo "Pointing mode: $pointing_mode"
 
 echo ""
 

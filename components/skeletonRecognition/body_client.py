@@ -7,6 +7,7 @@ from ..fusion.conf.endpoints import connect
 from ..fusion.conf import streams
 from receiveAndShow import Pointing
 
+
 def decode_frame(raw_frame):
     # The format is given according to the following assumption of network data
 
@@ -61,17 +62,21 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('kinect', help='Kinect host name', type=str)
     parser.add_argument('--fusion-host', default=None, help='Fusion host name, default set to None', type=str)
+    parser.add_argument('--pointing-mode', default='screen', help='Pointing mode, default set to screen', type=str)
 
     args = parser.parse_args()
-    kinect_host, fusion_host = args.kinect, args.fusion_host
+    # validate_arguments(args)
+    kinect_host, fusion_host, pointing_mode = args.kinect, args.fusion_host, args.pointing_mode
 
 
     rgb = False
     lstm = False
+    dims = 2 if rgb else 3
     feature_size = 10 if rgb else 21
     logpath = '/s/red/a/nobackup/vision/dkpatil/demo/GRU_5_class/'
     class_list = np.load(logpath+'labels_list.npy')
     print class_list
+
 
 
     # Time the network performance
@@ -79,10 +84,12 @@ if __name__ == '__main__':
         s = connect_rgb()
     else:
         s = connect('kinect', kinect_host, 'Body')
-        print 'connected to Body Client'
-    r = connect('fusion', fusion_host, 'Body')
-    if r is not None:
-        print 'Connected to fusion server'
+
+    if fusion_host is not None:
+        r = connect('fusion', fusion_host, 'Body')
+    else:
+        r = None
+
 
     if s is None:
         sys.exit(0)
@@ -106,8 +113,7 @@ if __name__ == '__main__':
     count = 0
 
     wave_flag = False
-
-    point = Pointing()
+    point = Pointing(pointing_mode=pointing_mode)
 
 
     while True:
@@ -120,21 +126,40 @@ if __name__ == '__main__':
         fd = decode_frame(f)
         timestamp, frame_type, body_count, engaged = fd[:4]
 
-        if engaged:engaged_bit = 'Engaged'
-        else: engaged_bit = 'Disengaged'
 
 
-        input_data = (timestamp, body_count) + fd[4:]
+        #Skeleton Box construction
+        #If enagaged skeleton received, we further filter skeleton on x coordinates and update flag
+        if engaged:
+            #Assumption: rgb=False, dimensions available: 3
+            input_data = (timestamp, body_count) + fd[4:]
+            frame_data = np.array(extract_data(input_data, rgb)).reshape((1, -1))
+
+            sb_x = frame_data[0][0]
+            sb_z = frame_data[0][2]
+
+            #Left and right axis threshold
+            if -0.83<sb_x<0.53:engaged = True
+            else:engaged = False
+
+
+        if engaged:
+            engaged_bit = 'Engaged'
+        else:
+            engaged_bit = 'Disengaged'
 
         if rgb:
             lpoint, rpoint = [0.0, 0.0], [0.0, 0.0]
+            lvar, rvar = [0.0, 0.0], [0.0, 0.0]
         else:
             if wave_flag:
                 point.get_pointing_main(fd)
                 lpoint, rpoint = point.lpoint, point.rpoint
+                lvar, rvar = point.lpoint_var, point.rpoint_var
 
             else:
                 lpoint, rpoint = [0.0, 0.0], [0.0, 0.0]
+                lvar, rvar = [0.0, 0.0], [0.0, 0.0]
 
 
         if engaged:
@@ -145,14 +170,16 @@ if __name__ == '__main__':
 
                 # Function rewritten for RGB
                 data = np.vstack([extract_data(frame, rgb) for frame in data_stream])
+                # data = smooth_data(data, polyorder=2)
+
 
                 if wave_flag and lstm:
                     #Processing the GRU Classification for the 15 frame window
                     pruned_data_for_solver = prune_joints(data, body_part='arms', rgb=rgb)
                     if rgb:
-                        assert pruned_data_for_solver.shape == (15, 10)
+                        assert pruned_data_for_solver.shape == (window_threshold, 10)
                     else:
-                        assert pruned_data_for_solver.shape == (15, 21)
+                        assert pruned_data_for_solver.shape == (window_threshold, 21)
 
                     class_label, probabilities = solver.predict(pruned_data_for_solver)
                     # Adding the probability values of 5 class first
@@ -163,22 +190,17 @@ if __name__ == '__main__':
                     proba_array.append(probabilities)
 
 
-
-
                 for body_part in body_parts:
                     pruned_data = prune_joints(data, body_part=body_part, rgb=rgb)
                     active_arm = check_active_arm(pruned_data, rgb=rgb)  # Confirm shoulder-elbow or shoulder-wrist and return respectively
-                    # print body_part, active_arm
+                    print body_part, 'Active' if active_arm else 'Dangling'
+
 
                     if wave_flag:
                         active_arm = check_active_arm(pruned_data, rgb=rgb) #Confirm shoulder-elbow or shoulder-wrist and return respectively
 
                         if active_arm:
-                            wave = check_wave_motion(pruned_data, rgb=rgb)
-                            if not wave:
-                                arm_motion_label, motion_encoding, probabilities = calculate_direction(pruned_data, body_part=body_part, rgb=rgb)
-                            else:
-                                arm_motion_label, motion_encoding, probabilities = 'wave', 31, [0]*6
+                            arm_motion_label, motion_encoding, probabilities = calculate_direction(pruned_data, body_part=body_part, rgb=rgb)
                         else:
                             arm_motion_label, motion_encoding, probabilities = 'blind', 32, [0]*6
 
@@ -209,7 +231,7 @@ if __name__ == '__main__':
                 encoding_array, active_arm_array, proba_array = send_default_values(body_parts)
 
 
-            result = collect_all_results(encoding_array, [lpoint, rpoint], proba_array, int(engaged))
+            result = collect_all_results(encoding_array, [lpoint,lvar, rpoint, rvar], proba_array, int(engaged))
             timestamp = list(data_stream)[-1][0]
 
         else:
@@ -217,14 +239,14 @@ if __name__ == '__main__':
             # print 'Disengaged....clearing buffer'
             #Blind (31) when disengaged
             encoding_array, active_arm_array, proba_array = send_default_values(body_parts, value_to_add=32)
-            result = collect_all_results(encoding_array, [lpoint, rpoint], proba_array, int(engaged))
+            result = collect_all_results(encoding_array, [lpoint,lvar, rpoint, rvar], proba_array, int(engaged))
             data_stream.clear()
 
 
-        assert len(result) == 25
+        assert len(result) == 29
         # print 'Length of result is: ', len(result)
         pack_list = [streams.get_stream_id("Body"), timestamp] + result
-        raw_data = struct.pack("<iqiii" + "ff" * 2 + "f" * 5 + "ff" * 6 + 'i', *pack_list)
+        raw_data = struct.pack("<iqiii" + "ffff" * 2 + "f" * 5 + "ff" * 6 + 'i', *pack_list)
 
 
 
@@ -234,7 +256,7 @@ if __name__ == '__main__':
         if to_print_result==['blind', 'blind', 'still']:
             pass
         else:
-            print 'Result is: ', to_print_result
+            print 'Result is: ', engaged_bit, to_print_result
 
 
         if r is not None:
@@ -255,42 +277,3 @@ if __name__ == '__main__':
         r.close()
 
     sys.exit(0)
-
-
-'''
-result = (26, 26, 4)
-if __name__ == '__main__':
-
-    import time
-    import threading
-    import matplotlib.pyplot as plt
-    from matplotlib.animation import FuncAnimation
-    from support.postures import left_arm_motions, right_arm_motions
-
-    class_list = ['emblems', 'motions', 'neutral', 'oscillate', 'still']
-    threading.Thread(target=updateFunction).start()
-
-
-    fig = plt.figure(figsize=(7, 7))
-    ax = fig.add_subplot(111)
-
-    ax.set_title('Label, Confidence')
-    ax.set_xlabel('xlabel')
-    ax.set_ylabel('ylabel')
-    ax.axis([0, 0.5, 0, 0.5])
-
-
-
-    def animate(i):
-        display_result = ', '.join([left_arm_motions[result[0]], right_arm_motions[result[1]], class_list[result[2]]])
-        ax.clear()
-        ax.set_xlim(0, 1)  # width of the table, ie table_x
-        ax.set_ylim(0, 0.6)  # length of the table, ie table_z
-        plt.gca().invert_yaxis()
-        ax.text(0.2, 0.3, display_result, fontsize=15, bbox={'facecolor':'red', 'alpha':0.5, 'pad':10})
-
-
-    ani = FuncAnimation(fig, animate)
-    plt.show()
-
-'''

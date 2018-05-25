@@ -201,9 +201,10 @@ class App:
         engaged, high_pose, low_pose = self._get_pose_vectors()
         if streams.is_active("Body"):
             body_msg = self.latest_s_msg["Body"]
-            lx, ly, rx, ry = body_msg.data.pos_l_x, body_msg.data.pos_l_y, body_msg.data.pos_r_x, body_msg.data.pos_r_y
+            lx, ly, var_l_x, var_l_y = body_msg.data.pos_l_x, body_msg.data.pos_l_y, body_msg.data.var_l_x, body_msg.data.var_l_y
+            rx, ry, var_r_x, var_r_y = body_msg.data.pos_r_x, body_msg.data.pos_r_y, body_msg.data.var_r_x, body_msg.data.var_r_y
         else:
-            lx, ly, rx, ry = (float("-inf"),)*4
+            lx, ly, var_l_x, var_l_y, rx, ry, var_r_x, var_r_y = (float("-inf"),)*8
 
         word = self.latest_s_msg["Speech"].data.command if streams.is_active("Speech") else ""
 
@@ -222,12 +223,19 @@ class App:
             # and is in start state, append pointer message contents to the sent message
             if state_machine is bsm.left_continuous_point:
                 if state_machine.is_started():
-                    all_events_to_send.append("P;l,{0:.2f},{1:.2f};{2:s}".format(lx, ly, ts))
+                    all_events_to_send.append("P;l,{0:.2f},{1:.2f},{2:.2f},{3:.2f};{4:s}".format(lx, ly, var_l_x, var_l_y, ts))
             elif state_machine is bsm.right_continuous_point:
                 if state_machine.is_started():
-                    all_events_to_send.append("P;r,{0:.2f},{1:.2f};{2:s}".format(rx, ry, ts))
+                    all_events_to_send.append("P;r,{0:.2f},{1:.2f},{2:.2f},{3:.2f};{4:s}".format(rx, ry, var_r_x, var_r_y, ts))
             # Else, check if current input caused a transition
             elif changed:
+                # Quick hack to send NEVERMIND in speech channel for stop gesture
+                if state_machine is tsm.nevermind:
+                    if state_machine.is_started():
+                        all_events_to_send.append("S;NEVERMIND;" + ts)
+                    continue
+                # Hack ends
+
                 # For the special case of binary state machines for left point vec and right point vec
                 # append x,y coordinates to state
                 if state_machine is tsm.left_point_vec or state_machine is bsm.left_point_vec:
@@ -291,7 +299,8 @@ brandeis_events = [bsm.engage, bsm.left_continuous_point, bsm.right_continuous_p
                    gsm,
                    tsm.negack, tsm.posack,
                    tsm.push_back, tsm.push_front, tsm.push_left, tsm.push_right,
-                   tsm.right_point_vec, tsm.left_point_vec]
+                   tsm.right_point_vec, tsm.left_point_vec,
+                   tsm.nevermind]
 
 csu_events = brandeis_events + [tsm.unknown, tsm.servo_left, tsm.servo_right]
 
