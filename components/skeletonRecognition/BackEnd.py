@@ -148,7 +148,7 @@ def get_arm_motion(data, rgb):
 
     arm_threshold, keep_ind = get_cumulative_threshold(data[:, 4 * np.arange(3)])#40.0 if rgb else 0.15  #Change this value
     keep_ind = list(chain(*[[j*4+off for off in range(1, 4)] for j in keep_ind]))
-    # print 'Threshold calculated: ', arm_threshold
+
 
     data = data[:, keep_ind]
 
@@ -157,8 +157,6 @@ def get_arm_motion(data, rgb):
 
 
     if data.shape[1]>0:
-        # print 'magnitude of data after preprocessing', magnitude(data)
-
         if magnitude(data) >= arm_threshold:
             # print 'Magnitude threshold satisfied'
             delta = data[-1]-data[0]

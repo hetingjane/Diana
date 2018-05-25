@@ -369,5 +369,3 @@ class PrimalRecognition(Solver):
 class ArmMotionRecogntion(Solver):
     def arm_motion_direction(self, data, body_part):
         pass
-
-

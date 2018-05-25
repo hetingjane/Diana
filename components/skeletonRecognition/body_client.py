@@ -188,14 +188,17 @@ if __name__ == '__main__':
                         active_arm = check_active_arm(pruned_data)  # Confirm shoulder-elbow or shoulder-wrist and return respectively
 
                         if active_arm:
-                            motion_encoding, probabilities = calculate_direction(pruned_data, body_part=body_part,rgb=rgb)
-
-                            # Decide between stable pointing and moving point
-                            # Return still if pointing says still (26 for index and [0]*6 for probabilities)
-                            if body_part == 'LA' and lpoint_stable:
-                                motion_encoding, probabilities = 26, [0] * 6
-                            elif body_part == 'RA' and rpoint_stable:
-                                motion_encoding, probabilities = 26, [0] * 6
+                            wave = check_wave_motion(pruned_data)
+                            if not wave:
+                                motion_encoding, probabilities = calculate_direction(pruned_data, body_part=body_part,rgb=rgb)
+                                # Decide between stable pointing and moving point
+                                # Return still if pointing says still (26 for index and [0]*6 for probabilities)
+                                if body_part == 'LA' and lpoint_stable:
+                                    motion_encoding, probabilities = 26, [0] * 6
+                                elif body_part == 'RA' and rpoint_stable:
+                                    motion_encoding, probabilities = 26, [0] * 6
+                            else:
+                                motion_encoding, probabilities = 31, [0] * 6
                         else:
                             motion_encoding, probabilities = 32, [0] * 6
 
