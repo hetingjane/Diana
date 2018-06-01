@@ -1,13 +1,13 @@
 from abc import ABCMeta, abstractmethod
 from copy import deepcopy
 
-from components.fusion.automata.constraint import Constraint, ConstraintSpecification
+from components.fusion.automata.constraint import Constraint
 
 
 class Rule:
     """
-    Rule allowing matches with thresholds
-    IMPORTANT: A Rule is never reset automatically
+    Rule allowing to check one or more constraint satisfaction
+    IMPORTANT: A Rule is never reset automatically (the constraints are, though)
     """
     __metaclass__ = ABCMeta
 
@@ -16,7 +16,7 @@ class Rule:
     IS_FALSE = 0
 
     def __init__(self, *spec):
-        self._constraints = ConstraintSpecification.read(*spec)
+        self._constraints = Constraint.read(*spec)
 
     @abstractmethod
     def match(self, *inputs):
@@ -31,6 +31,11 @@ class Rule:
 
 
 class Any(Rule):
+    """
+    Any rule is true when any of the underlying constraints is satisfied
+    Any rule is matched when any of the underlying constraints matches the names
+    Any rule is false when none of the underlying constraints matches the names
+    """
     def match(self, *inputs):
         assert len(inputs) > 0
         some_satisfied = False
@@ -49,6 +54,11 @@ class Any(Rule):
 
 
 class All(Rule):
+    """
+    All rule is true when all the constraints are satisfied
+    All rule is matched when some of the constraints are matched
+    All rule is false when none of the constraints is matched
+    """
     def match(self, *inputs):
         assert len(inputs) > 0
         all_satisfied = True
@@ -106,15 +116,19 @@ class Or(MetaRule):
         MetaRule.__init__(self, *rules)
 
     def match(self, *inputs):
+        some_true = False
         some_matched = False
         for rule in self._rules:
             result = rule.match(*inputs)
-            if result == Rule.IS_TRUE:
-                return Rule.IS_TRUE
-            if result == Rule.MATCHED:
-                some_matched = True
+            some_true = some_true or result == Rule.IS_TRUE
+            some_matched = some_matched or result == Rule.MATCHED
 
-        return Rule.MATCHED if some_matched else Rule.IS_FALSE
+        if some_true:
+            return Rule.IS_TRUE
+        elif some_matched:
+            return Rule.MATCHED
+        else:
+            return Rule.IS_FALSE
 
 
 class Not(MetaRule):
@@ -142,17 +156,18 @@ if __name__ == '__main__':
         )
     )
 
-    point_rule = And(engage_rule, point_rule)
+    point_rule = And(point_rule, engage_rule)
 
     rules_to_test = [point_rule]
 
-    with open('point.csv', 'r') as f:
+    with open('speak_and_point.csv', 'r') as f:
         f.readline()
         reader = csv.reader(f)
         i = 1
         for row in reader:
             for rule in rules_to_test:
                 result = rule.match(*row)
+                print(rule)
                 if result == Rule.MATCHED:
                     result = 'match'
                 elif result == Rule.IS_FALSE:
@@ -160,6 +175,5 @@ if __name__ == '__main__':
                 elif result == Rule.IS_TRUE:
                     result = 'true'
                 print("{}:{}:{}".format(i, result, ', '.join(row)))
-                print(rule)
             i += 1
 

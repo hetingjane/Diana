@@ -21,7 +21,7 @@ class StateMachine:
         for state, rule in self._rules[self._cur_state].items():
             rule_result = rule.match(*inputs)
             if rule_result == Rule.IS_TRUE:
-                rule.reset()
+                self.reset_rules(self._cur_state)
                 self._cur_state = state
                 break
             elif rule_result == Rule.IS_FALSE:
@@ -32,10 +32,14 @@ class StateMachine:
     def reset_rule(self, from_state, to_state):
         self._rules[from_state][to_state].reset()
 
+    def reset_rules(self, from_state):
+        for state in self._rules[from_state]:
+            self.reset_rule(from_state, state)
+
     def reset(self):
         # Reset rules in the current state
-        for state in self._rules[self._cur_state]:
-            self.reset_rule(self._cur_state, state)
+        self.reset_rules(self._cur_state)
+
         # Transition to initial state
         changed = self._cur_state != self._initial_state
         self._cur_state = self._initial_state

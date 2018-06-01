@@ -10,20 +10,14 @@ negack = PoseStateMachine('negack', rules.Any(('rh thumbs down', 'lh thumbs down
 
 wave = OldPoseStateMachine('wave', rules.Any(('la wave', 'ra wave', 5)))
 
-left_point = PoseStateMachine('left point', rules.And(
-    rules.All(('lh point down', 'lh point right', 'lh point front', 5)),
-    rules.Or(
-        rules.All(('la still', 5)),
-        rules.All(('speak there', 'speak here', 'speak this', 'speak that', 1))
-    )
+left_point = PoseStateMachine('left point', rules.Or(
+    rules.All(('lh point down', 'lh point right', 'lh point front', 5), ('la still', 5)),
+    rules.All(('lh point down', 'lh point right', 'lh point front', 5), ('speak there', 'speak here', 'speak this', 'speak that', 1))
 ))
 
-right_point = PoseStateMachine('right point', rules.And(
-    rules.All(('rh point down', 'rh point left', 'rh point front', 5)),
-    rules.Or(
-        rules.All(('ra still', 5)),
-        rules.All(('speak there', 'speak here', 'speak this', 'speak that', 1))
-    )
+right_point = PoseStateMachine('right point', rules.Or(
+    rules.All(('rh point down', 'rh point left', 'rh point front', 5), ('ra still', 5)),
+    rules.All(('rh point down', 'rh point left', 'rh point front', 5), ('speak there', 'speak here', 'speak this', 'speak that', 1))
 ))
 
 left_point_continuous = OldPoseStateMachine('left point continuous',
@@ -268,9 +262,10 @@ if __name__ == '__main__':
     import csv
 
     test_sets = [
-        ('others.csv', [engage, wave, posack, negack, push_left, push_right, push_front, push_back]),
-        ('point.csv', [engage, wave, right_point_continuous, right_point, left_point_continuous, left_point]),
-        ('grab.csv', [grab])
+        #('others.csv', [engage, wave, posack, negack, push_left, push_right, push_front, push_back]),
+        #('point.csv', [engage, wave, right_point_continuous, right_point, left_point_continuous, left_point]),
+        ('speak_and_point.csv', [right_point]),
+        #('grab.csv', [grab])
     ]
 
     for g_file, sm_to_test in test_sets:
@@ -282,10 +277,10 @@ if __name__ == '__main__':
             reader = csv.DictReader(f)
             i = 1
             for row in reader:
-                # print("{}:{}".format(i, row.values()))
+                #print("{}:{}".format(i, row.values()))
                 for sm in sm_to_test:
                     triggered = sm.input(*row.values())
-                    # print(sm)
+                    #print("{}:{}".format(i, sm))
                     if triggered:
                         print("{}:{}".format(i, sm.get_full_state()))
                 i += 1

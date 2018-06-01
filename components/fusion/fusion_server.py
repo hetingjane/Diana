@@ -31,10 +31,10 @@ class App:
         if capture:
             print("Capture mode ON")
 
-        self.capture_file = open('fusion_incoming.csv', 'w') if capture else None
+        self.capture_file = open('captured.csv', 'w') if capture else None
         self.capture_csv = csv.writer(self.capture_file) if capture else None
         if self.capture_csv is not None:
-            self.capture_csv.writerow(['engaged', 'la', 'ra', 'lh', 'rh', 'head', 'body'])
+            self.capture_csv.writerow(['engaged', 'la', 'ra', 'lh', 'rh', 'head', 'body', 'speech'])
 
     def _stop(self):
         # Stop the fusion thread
@@ -187,9 +187,6 @@ class App:
         pose_rh = postures.right_hand_postures[rh_idx]
 
         poses = engaged, pose_l_arm, pose_r_arm, pose_lh, pose_rh, pose_head, pose_body
-        if self.capture_csv is not None:
-            self.capture_csv.writerow(poses)
-
         return poses
 
     def _get_events(self):
@@ -206,7 +203,11 @@ class App:
 
         word = self.latest_s_msg["Speech"].data.command if streams.is_active("Speech") else ""
 
+        if self.capture_csv is not None:
+            self.capture_csv.writerow(poses + (word,))
+
         inputs = poses + (word,) if len(word) > 0 else poses
+
 
         # More than one output data is possible from multiple state machines
         all_events_to_send = []
