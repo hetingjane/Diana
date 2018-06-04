@@ -277,11 +277,11 @@ if __name__ == '__main__':
             reader = csv.DictReader(f)
             i = 1
             for row in reader:
-                #print("{}:{}".format(i, row.values()))
+                print("{}:{}".format(i, row.values()))
                 for sm in sm_to_test:
                     triggered = sm.input(*row.values())
-                    #print("{}:{}".format(i, sm))
+                    print("{}:{}".format(i, sm))
                     if triggered:
-                        print("{}:{}".format(i, sm.get_full_state()))
+                        print("\n{}:{}\n".format(i, sm.get_full_state()))
                 i += 1
         print('*' * 20)

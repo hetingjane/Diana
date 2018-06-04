@@ -21,7 +21,7 @@ class Constraint:
 
     def __init__(self, names, threshold):
         assert len(names) > 0
-        self._names = set(names)
+        self._names = frozenset(names)
         self._counter = Counter(0, min_val=0, max_val=threshold)
 
     def _has_matching_names(self, *in_names):
@@ -62,19 +62,30 @@ class Constraint:
         self._counter.reset_to_min()
 
     def __repr__(self):
-        return "[{}; {}, {}]".format(', '.join(self._names), self._counter.val(), self._counter.max_val())
+
+        names = ', '.join(self._names)
+        if len(names) > 12:
+            names = names[:12] + '...'
+        return "[{}; {}, {}]".format(names, self._counter.val(), self._counter.max_val())
 
     @staticmethod
     def read(*spec):
         """
         Reads constraint specification into a list of Constraint objects
-        :param spec: a list such that an element is of the form ( one or more names, threshold)
+        :param spec: a list such that an element is of the form ( one or more names, threshold) or just a string
+        in which case a threshold of 1 is assumed
         :return:
         """
         constraints = []
         for e in spec:
-            constraint = e[-1]
+            # Assume threshold 1 if e is just a string: unicode or otherwise
+            if isinstance(e, basestring):
+                e = (e, 1)
             names = e[:-1]
-            constraints.append(Constraint(names, constraint))
+            threshold = e[-1]
+            constraints.append(Constraint(names, threshold))
 
         return constraints
+
+    def names(self):
+        return list(self._names)
