@@ -144,6 +144,9 @@ class Not(MetaRule):
         else:
             return Rule.IS_TRUE
 
+    def __repr__(self):
+        return "(not {})".format(self._rules[0])
+
 
 if __name__ == '__main__':
     import csv
@@ -174,6 +177,6 @@ if __name__ == '__main__':
                     result = 'false'
                 elif result == Rule.IS_TRUE:
                     result = 'true'
-                print("{}:{}:{}".format(i, result, ', '.join(row)))
+                print("{}:{}:{}\n".format(i, result, ', '.join(row)))
             i += 1
 
