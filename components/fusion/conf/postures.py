@@ -43,5 +43,5 @@ _engage_vec = [ 1 << 0 ]
 _vecs = _engage_vec + [1 << i for i in range(1, len(left_hand_postures + right_hand_postures + left_arm_motions + right_arm_motions + head_postures + body_postures) + 1)]
 _postures = ["engage"] + left_hand_postures + right_hand_postures + left_arm_motions + right_arm_motions + head_postures + body_postures
 
-from_vec = dict(zip(_vecs, _postures))
-to_vec = dict(zip(_postures, _vecs))
+from_vec = dict(list(zip(_vecs, _postures)))
+to_vec = dict(list(zip(_postures, _vecs)))

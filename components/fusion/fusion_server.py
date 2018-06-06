@@ -2,18 +2,18 @@ import sys
 import time
 import argparse
 import struct
-import Queue
+import queue
 
 import numpy as np
 
-from .automata import bi_state_machines as bsm
-from .automata import tri_state_machines as tsm
-from .automata.state_machines import GrabStateMachine
-from .fusion_thread import Fusion
-from .remote_thread import Remote
-from . import thread_sync
-from .conf import streams
-from .conf import postures
+from automata import bi_state_machines as bsm
+from automata import tri_state_machines as tsm
+from automata.state_machines import GrabStateMachine
+from fusion_thread import Fusion
+from remote_thread import Remote
+import thread_sync
+from conf import streams
+from conf import postures
 
 
 class App:
@@ -53,7 +53,7 @@ class App:
         while not_empty:
             try:
                 thread_sync.synced_msgs.get_nowait()
-            except Queue.Empty:
+            except queue.Empty:
                 not_empty = False
 
     def _start(self):
@@ -78,7 +78,7 @@ class App:
         :return: Nothing
         """
         if self.received > 0:
-            print "Skipped percentage: " + str(self.skipped * 100.0 / self.received)
+            print("Skipped percentage: " + str(self.skipped * 100.0 / self.received))
 
     def _exit(self):
         """
@@ -106,17 +106,17 @@ class App:
             # Get synced data without blocking with timeout
             self.latest_s_msg = thread_sync.synced_msgs.get(False, 0.2)
             if self.debug:
-                print "Latest synced message: ", self.latest_s_msg, "\n"
+                print("Latest synced message: ", self.latest_s_msg, "\n")
             #
             self._update_queues()
             self.received += 1
             if thread_sync.synced_msgs.qsize() <= 15:
                 if self.debug:
-                    print "Backlog queue size exceeded limit: {}".format(thread_sync.synced_msgs.qsize())
+                    print("Backlog queue size exceeded limit: {}".format(thread_sync.synced_msgs.qsize()))
             else:
                 self.skipped += 1
-                print "Skipping because backlog too large: {}".format(thread_sync.synced_msgs.qsize())
-        except Queue.Empty:
+                print("Skipping because backlog too large: {}".format(thread_sync.synced_msgs.qsize()))
+        except queue.Empty:
             pass
 
     def _get_probs(self):
@@ -157,13 +157,13 @@ class App:
             idx_l_arm, idx_r_arm, idx_body = len(postures.left_arm_motions) - 1, len(
                 postures.right_arm_motions) - 1, len(postures.body_postures) - 1
 
-        hand_labels = np.array(range(len(lhand_probs)))
+        hand_labels = np.array(list(range(len(lhand_probs))))
         high_lhand_labels = hand_labels[lhand_probs >= high_threshold]
         low_lhand_labels = hand_labels[np.logical_and(lhand_probs >= low_threshold, lhand_probs < high_threshold)]
         high_rhand_labels = hand_labels[rhand_probs >= high_threshold]
         low_rhand_labels = hand_labels[np.logical_and(rhand_probs >= low_threshold, rhand_probs < high_threshold)]
 
-        head_labels = np.array(range(len(head_probs)))
+        head_labels = np.array(list(range(len(head_probs))))
         high_head_labels = head_labels[head_probs >= high_threshold]
 
         # High pose uses max probability arm labels, max probability body label
@@ -262,7 +262,7 @@ class App:
         for e in all_events_to_send:
             ev_type, ev, timestamp = e.split(';')
             if ev_type != 'P':
-                print ev_type.ljust(5) + ev.ljust(30) + timestamp + "\n\n"
+                print(ev_type.ljust(5) + ev.ljust(30) + timestamp + "\n\n")
             raw_events_to_send.append(struct.pack("<i" + str(len(e)) + "s", len(e), e))
 
         return raw_events_to_send
@@ -312,10 +312,10 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if args.mode == 'brandeis':
-        print "Running in Brandeis mode"
+        print("Running in Brandeis mode")
         event_set = brandeis_events
     elif args.mode == 'csu':
-        print "Running in CSU mode"
+        print("Running in CSU mode")
         event_set = csu_events
     else:
         event_set = None

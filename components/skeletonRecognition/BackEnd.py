@@ -5,10 +5,10 @@ from ..fusion.conf.postures import left_arm_motions, right_arm_motions
 
 def extract_data(a, rgb):
     if rgb:
-        base, offset = 3, range(2, 4)
+        base, offset = 3, list(range(2, 4))
         joints_to_consider = np.arange(18)
     else:
-        base, offset = 9, range(9, 12)
+        base, offset = 9, list(range(9, 12))
         joints_to_consider = list(np.arange(12)) + list(np.arange(20, 25))
 
     indices = list(chain(*[[(k * base + j) for j in offset] for k in joints_to_consider]))
@@ -21,25 +21,25 @@ def prune_joints(data, body_part, rgb= False):
     if rgb:
         base = 2
         if body_part == 'arms':
-            joints, offset = [1, 3, 4, 6, 7], range(2)
+            joints, offset = [1, 3, 4, 6, 7], list(range(2))
         elif body_part == 'RA':
-            joints, offset = [2, 3, 4], range(2)
+            joints, offset = [2, 3, 4], list(range(2))
         elif body_part == 'LA':
-            joints, offset = [5, 6, 7], range(2)
+            joints, offset = [5, 6, 7], list(range(2))
         elif body_part == 'head':
-            joints, offset = [0, 1, 14, 15, 16, 17], range(2)
+            joints, offset = [0, 1, 14, 15, 16, 17], list(range(2))
     else:
         base = 3
         if body_part == 'arms':
-            joints, offset = [5, 6, 7, 9, 10, 11, 12], range(3)
+            joints, offset = [5, 6, 7, 9, 10, 11, 12], list(range(3))
         elif body_part == 'RA':
-            joints, offset = [8, 9, 10, 11, 0], range(3)
+            joints, offset = [8, 9, 10, 11, 0], list(range(3))
         elif body_part == 'LA':
-            joints, offset = [4, 5, 6, 7, 0], range(3)
+            joints, offset = [4, 5, 6, 7, 0], list(range(3))
         elif body_part == 'arms_x':
-            joints, offset = [5, 6, 7, 9, 10, 11], range(1)
+            joints, offset = [5, 6, 7, 9, 10, 11], list(range(1))
         elif body_part == 'arms_y':
-            joints, offset = [5, 6, 7, 9, 10, 11], range(1, 2)
+            joints, offset = [5, 6, 7, 9, 10, 11], list(range(1, 2))
 
     indices = list(chain(*[[(k * base + j) for j in offset] for k in joints]))
     return data[:, indices]
@@ -62,9 +62,9 @@ def normalize_by_joint(data, joint_index, rgb, verbose=False):
 
 
     if verbose:
-        print 'data before normalization: ', data
-        print 'mean of the spine joint:', joint
-        print 'data after normalization: ', b
+        print('data before normalization: ', data)
+        print('mean of the spine joint:', joint)
+        print('data after normalization: ', b)
 
     return b
 

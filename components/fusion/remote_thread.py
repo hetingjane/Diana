@@ -2,9 +2,9 @@ import threading
 import socket
 import select
 import sys
-import Queue
+import queue
 
-from .conf.endpoints import serve
+from conf.endpoints import serve
 
 
 class Remote(threading.Thread):
@@ -26,7 +26,7 @@ class Remote(threading.Thread):
         return self._stop.is_set()
 
     def _log(self, msg):
-        print self.id + msg
+        print(self.id + msg)
 
     def run(self):
         remote_sock = serve(self.target)
@@ -69,7 +69,7 @@ class Remote(threading.Thread):
                             if len(outputs) == 0:
                                 self._conn.clear()
                             self._log("{}:{} disconnected".format(client_addr[0], client_addr[1]))
-                except Queue.Empty:
+                except queue.Empty:
                     break
 
         self._log("Stopped")

@@ -3,7 +3,7 @@
 import socket, sys, struct
 import time
 import numpy as np
-from realtime_hand_recognition import RealTimeHandRecognition
+from .realtime_hand_recognition import RealTimeHandRecognition
 import os
 import cv2
 from ..fusion.conf.endpoints import connect
@@ -29,17 +29,17 @@ def connect_rgb(hand):
     try:
         sock.connect((src_addr, src_port))
     except:
-        print "Error connecting to {}:{}".format(src_addr, src_port)
+        print("Error connecting to {}:{}".format(src_addr, src_port))
         return None
 
     try:
-        print "Sending stream info"
+        print("Sending stream info")
         sock.sendall(struct.pack('<i', stream_id))
     except:
-        print "Error: Stream rejected"
+        print("Error: Stream rejected")
         return None
 
-    print "Successfully connected to host"
+    print("Successfully connected to host")
     return sock
     
 
@@ -130,7 +130,7 @@ if __name__ == '__main__':
             if np.sum(image_rgb) == 0:
                 fusion_probs = [0 for _ in range(33)]
                 fusion_probs[0] = 1
-                print timestamp,"blind"
+                print(timestamp,"blind")
 
             else:
                 image_rgb = image_rgb[:,:,[2,1,0]]
@@ -138,7 +138,7 @@ if __name__ == '__main__':
 
                 rgb_max_index, probs = r.classify(image_rgb)
 
-                print timestamp, gesture_list[rgb_max_index]
+                print(timestamp, gesture_list[rgb_max_index])
 
                 fusion_probs = [0 for _ in range(33)]
 
@@ -158,7 +158,7 @@ if __name__ == '__main__':
             i += 1
 
             if i % 100 == 0:
-                print "=" * 100, "FPS", 100 / (time.time() - start_time)
+                print("=" * 100, "FPS", 100 / (time.time() - start_time))
                 start_time = time.time()
 
 

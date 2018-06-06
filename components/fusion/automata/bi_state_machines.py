@@ -1,5 +1,5 @@
-from .state_machines import BinaryStateMachine
-from . import rules
+from automata.state_machines import BinaryStateMachine
+from automata import rules
 
 posack = BinaryStateMachine(["posack start", "posack stop"], {
     "posack stop": {

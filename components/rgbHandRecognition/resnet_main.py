@@ -1,8 +1,8 @@
-from resnet_v2 import resnet_v2_50
+from .resnet_v2 import resnet_v2_50
 import tensorflow as tf
 import os
 import numpy as np
-import resnet_utils
+from . import resnet_utils
 import time
 from image_reader import get_input
 
@@ -17,7 +17,7 @@ hand = FLAGS.hand
 log_root = "/s/red/a/nobackup/cwc/tf/hands_demo_rgb/%s_fine" % hand
 train_dir = "/s/red/a/nobackup/cwc/tf/hands_demo_rgb/%s_fine/train" % hand
 eval_dir = "/s/red/a/nobackup/cwc/tf/hands_demo_rgb/%s_fine/eval" % hand
-print log_root, train_dir, eval_dir
+print(log_root, train_dir, eval_dir)
 
 #eval_batch_count = 250611  # 191231
 
@@ -39,7 +39,7 @@ def train():
 
     with slim.arg_scope(resnet_utils.resnet_arg_scope()):
         logits, end_points = resnet_v2_50(images, 20)
-        print logits, end_points
+        print(logits, end_points)
 
     variables_to_restore = slim.get_variables_to_restore()
 
@@ -87,7 +87,7 @@ def train():
     var = [v for v in tf.model_variables() if "50/conv1" in v.name or "logits" in v.name]
     var_list = sess.run(var)
     for v1, v in zip(var, var_list):
-        print v1.name, v.shape, np.min(v), np.max(v), np.mean(v), np.std(v)
+        print(v1.name, v.shape, np.min(v), np.max(v), np.mean(v), np.std(v))
 
     saver.save(sess, os.path.join(log_root,"model.ckpt"), global_step=global_step_1)
     checkpoint_time = time.time()
@@ -112,7 +112,7 @@ def evaluate():
     images, one_hot_labels = get_input(20, FLAGS.batch_size, FLAGS.mode, FLAGS.hand)
     gesture_list = os.listdir("/s/red/a/nobackup/cwc/hands/rgb_hands_new_frames/s_01")
     gesture_list.sort()
-    print gesture_list
+    print(gesture_list)
 
 
     with slim.arg_scope(resnet_utils.resnet_arg_scope()):
@@ -134,7 +134,7 @@ def evaluate():
     
     checkpoint_list = os.listdir(log_root)
     checkpoint_list=[c.replace(".index","") for c in checkpoint_list if ".index" in c]
-    print checkpoint_list
+    print(checkpoint_list)
 
     precision_list = []
 
@@ -172,7 +172,7 @@ def evaluate():
             total_prediction += predictions.shape[0]
 
             if sample % 40 == 0:
-                print sample, correct_prediction, total_prediction
+                print(sample, correct_prediction, total_prediction)
 	    
 
         gt = np.squeeze(np.vstack(gt_list))
@@ -183,7 +183,7 @@ def evaluate():
         precision = np.mean(np.argmax(gt,axis=1)==np.argmax(pred,axis=1))
 	precision_list.append(precision)
         best_precision = max(precision, best_precision)
-	print gt.shape, pred.shape, precision, best_precision
+	print(gt.shape, pred.shape, precision, best_precision)
 	gt = np.argmax(gt,axis=1)
 	pred = np.argmax(pred,axis=1)
 	'''cm = np.float(confusion_matrix(gt,pred))
@@ -207,7 +207,7 @@ def evaluate():
         summary_writer.flush()
 
         #time.sleep(60)
-    print "Max Precision : ",np.max(precision_list)," Ckpt: ",checkpoint_list[np.argmax(precision_list)]
+    print("Max Precision : ",np.max(precision_list)," Ckpt: ",checkpoint_list[np.argmax(precision_list)])
 
 def forward():
     import random
@@ -216,7 +216,7 @@ def forward():
 
     gesture_list = os.listdir("/s/red/a/nobackup/cwc/hands/rgb_hands_new_frames/s_01")
     gesture_list.sort()
-    print gesture_list
+    print(gesture_list)
 
     #lh_list = np.load("/s/red/a/nobackup/cwc/hands/rgb_test/LH.npy")
     if FLAGS.hand == "RH":
@@ -238,7 +238,7 @@ def forward():
 
     with slim.arg_scope(resnet_utils.resnet_arg_scope()):
         logits, end_points = resnet_v2_50(_standardized_images, 20)
-        print logits, end_points
+        print(logits, end_points)
 
     variables_to_restore = slim.get_variables_to_restore()
 
@@ -257,7 +257,7 @@ def forward():
 	rh_image = rh_image[:,:,[2,1,0]]
         rh_image = cv2.resize(rh_image, (128, 128))
 
-	print rh_image.shape
+	print(rh_image.shape)
 
 	pred_index = sess.run(predictions,feed_dict={_image:rh_image})
 	pred_gesture = gesture_list[pred_index[0]]

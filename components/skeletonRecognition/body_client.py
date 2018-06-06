@@ -2,10 +2,10 @@ import struct
 import sys
 import argparse
 from collections import deque
-from BackEnd import *
+from .BackEnd import *
 from ..fusion.conf.endpoints import connect
 from ..fusion.conf import streams
-from receiveAndShow import Pointing
+from .receiveAndShow import Pointing
 
 
 def decode_frame(raw_frame):
@@ -75,7 +75,7 @@ if __name__ == '__main__':
     feature_size = 10 if rgb else 21
     logpath = '/s/red/a/nobackup/vision/dkpatil/demo/GRU_5_class/'
     class_list = np.load(logpath+'labels_list.npy')
-    print class_list
+    print(class_list)
 
 
 
@@ -102,7 +102,7 @@ if __name__ == '__main__':
 
 
     if lstm:
-        from GRU_classifier import (GRU_RNN, EGGNOGClassifierSlidingWindow)
+        from .GRU_classifier import (GRU_RNN, EGGNOGClassifierSlidingWindow)
         num_classes = 5
         model = GRU_RNN(logs_path=logpath, features=feature_size, n_classes=num_classes)
         solver = EGGNOGClassifierSlidingWindow(model=model, restore_model=True, rgb=rgb, num_classes=num_classes)
@@ -121,7 +121,7 @@ if __name__ == '__main__':
             f = recv_skeleton_frame(s)
 
         except EOFError:
-            print "Disconnected from Kinect Server"
+            print("Disconnected from Kinect Server")
             break
         fd = decode_frame(f)
         timestamp, frame_type, body_count, engaged = fd[:4]
@@ -193,7 +193,7 @@ if __name__ == '__main__':
                 for body_part in body_parts:
                     pruned_data = prune_joints(data, body_part=body_part, rgb=rgb)
                     active_arm = check_active_arm(pruned_data, rgb=rgb)  # Confirm shoulder-elbow or shoulder-wrist and return respectively
-                    print body_part, 'Active' if active_arm else 'Dangling'
+                    print(body_part, 'Active' if active_arm else 'Dangling')
 
 
                     if wave_flag:
@@ -256,7 +256,7 @@ if __name__ == '__main__':
         if to_print_result==['blind', 'blind', 'still']:
             pass
         else:
-            print 'Result is: ', engaged_bit, to_print_result
+            print('Result is: ', engaged_bit, to_print_result)
 
 
         if r is not None:
@@ -266,9 +266,9 @@ if __name__ == '__main__':
         count += 1
         if count % 100 == 0:
             end_time = time.time()
-            print '=' * 30
-            print 'FPS: ', 100.0 / (end_time - start_time)
-            print '=' * 30
+            print('=' * 30)
+            print('FPS: ', 100.0 / (end_time - start_time))
+            print('=' * 30)
             start_time = end_time
             count = 0
 

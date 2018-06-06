@@ -1,4 +1,4 @@
-from ..conf.postures import to_vec
+from conf.postures import to_vec
 
 def match_any(*postures):
     """

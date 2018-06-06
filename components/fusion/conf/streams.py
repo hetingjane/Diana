@@ -25,7 +25,7 @@ def is_valid(stream_name):
 
 
 def is_valid_id(stream_id):
-    return stream_id in _stream_ids.values()
+    return stream_id in list(_stream_ids.values())
 
 
 def is_active(stream_name):
@@ -44,7 +44,7 @@ def get_stream_name(stream_id):
 
 
 def get_stream_names():
-    return _stream_ids.keys()
+    return list(_stream_ids.keys())
 
 
 def get_streams_count():

@@ -51,7 +51,7 @@ class ResNet(object):
         """Build the core model within the graph."""
         with tf.variable_scope('init'):
             x = self._images
-            print x
+            print(x)
             x = self._conv('init_conv', x, 7, 1, 64, self._stride_arr(2))
             #x = tf.nn.max_pool(x, [1, 3, 3, 1], strides=self._stride_arr(2), padding='SAME')
 
@@ -74,28 +74,28 @@ class ResNet(object):
         with tf.variable_scope('unit_1_0'):
             x = res_func(x, filters[0], filters[1], self._stride_arr(strides[0]),
                          activate_before_residual[0])
-        for i in xrange(1, num_residual_units[0]):
+        for i in range(1, num_residual_units[0]):
             with tf.variable_scope('unit_1_%d' % i):
                 x = res_func(x, filters[1], filters[1], self._stride_arr(1), False)
 
         with tf.variable_scope('unit_2_0'):
             x = res_func(x, filters[1], filters[2], self._stride_arr(strides[1]),
                          activate_before_residual[1])
-        for i in xrange(1, num_residual_units[1]):
+        for i in range(1, num_residual_units[1]):
             with tf.variable_scope('unit_2_%d' % i):
                 x = res_func(x, filters[2], filters[2], self._stride_arr(1), False)
 
         with tf.variable_scope('unit_3_0'):
             x = res_func(x, filters[2], filters[3], self._stride_arr(strides[2]),
                          activate_before_residual[2])
-        for i in xrange(1, num_residual_units[2]):
+        for i in range(1, num_residual_units[2]):
             with tf.variable_scope('unit_3_%d' % i):
                 x = res_func(x, filters[3], filters[3], self._stride_arr(1), False)
 
         with tf.variable_scope('unit_4_0'):
             x = res_func(x, filters[3], filters[4], self._stride_arr(strides[3]),
                          activate_before_residual[3])
-        for i in xrange(1, num_residual_units[3]):
+        for i in range(1, num_residual_units[3]):
             with tf.variable_scope('unit_4_%d' % i):
                 x = res_func(x, filters[4], filters[4], self._stride_arr(1), False)
 
@@ -130,7 +130,7 @@ class ResNet(object):
             optimizer = tf.train.MomentumOptimizer(self.lrn_rate, 0.9)
 
         apply_op = optimizer.apply_gradients(
-            zip(grads, trainable_variables),
+            list(zip(grads, trainable_variables)),
             global_step=self.global_step, name='train_step')
 
         train_ops = [apply_op] + self._extra_train_ops

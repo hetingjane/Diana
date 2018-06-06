@@ -15,7 +15,7 @@ eval set -- "$my_args"
 
 # default values
 env_dir=""
-single_machine=no
+single_machine=yes
 machine_spec="$start_dir/machines.bak"
 pointing_mode=""
 wait_time=0
@@ -147,7 +147,7 @@ do
     esac
 done
 
-cmd="xfce4-terminal ${params}"
+cmd="urxvt ${params}"
 cmd=${cmd/--tab/}
 #echo "$cmd"
 eval $cmd

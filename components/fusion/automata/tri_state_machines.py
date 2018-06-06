@@ -1,5 +1,5 @@
-from .state_machines import TriStateMachine
-from . import rules
+from automata.state_machines import TriStateMachine
+from automata import rules
 
 engage = TriStateMachine("engage", rules.match_any('engage'), 1)
 

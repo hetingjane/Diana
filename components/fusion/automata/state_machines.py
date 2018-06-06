@@ -1,4 +1,4 @@
-from . import rules
+from automata import rules
 
 
 class BinaryStateMachine:
@@ -66,7 +66,7 @@ class BinaryStateMachine:
 class TriStateMachine:
 
     _states_arr = ["stop", "low", "high"]
-    _states = dict(zip(_states_arr, range(len(_states_arr))))
+    _states = dict(list(zip(_states_arr, list(range(len(_states_arr))))))
 
     def __init__(self, name, rule, *thresholds):
         self.name = name
@@ -82,7 +82,7 @@ class TriStateMachine:
             thresholds = thresholds
         else:
             raise ValueError("thresholds should match state count {}".format(len(TriStateMachine._states_arr)))
-        self.thresholds = dict(zip(TriStateMachine._states_arr, thresholds))
+        self.thresholds = dict(list(zip(TriStateMachine._states_arr, thresholds)))
         # Counts for transition from each state
         self.cur_val = dict((s, 0) for s in TriStateMachine._states_arr)
 
@@ -144,7 +144,7 @@ class TriStateMachine:
         return self.name
 
     def reset(self):
-        for k in self.cur_val.keys():
+        for k in list(self.cur_val.keys()):
             self.cur_val[k] = 0
         transitioned = False
         if self.cur_state != self.start_state:
@@ -157,16 +157,16 @@ class GrabStateMachine:
 
     _states_arr = ["grab stop", "grab still", "grab move up", "grab move down", "grab move left", "grab move right",
                    "grab move front", "grab move back"]
-    _states = dict(zip(_states_arr, range(len(_states_arr))))
+    _states = dict(list(zip(_states_arr, list(range(len(_states_arr))))))
 
     def __init__(self, thresholds=(8, 8, 2, 2, 2, 2, 2, 2)):
         self.start_state = GrabStateMachine._states['grab stop']
         self.cur_state = self.start_state
         if isinstance(thresholds, int):
             thresholds = (thresholds,) * len(GrabStateMachine._states_arr)
-            self.thresholds = dict(zip(GrabStateMachine._states_arr, thresholds))
+            self.thresholds = dict(list(zip(GrabStateMachine._states_arr, thresholds)))
         elif len(thresholds) == len(GrabStateMachine._states_arr):
-            self.thresholds = dict(zip(GrabStateMachine._states_arr, thresholds))
+            self.thresholds = dict(list(zip(GrabStateMachine._states_arr, thresholds)))
         else:
             raise ValueError(
                 "thresholds must be an integer or a list of size {}".format(len(GrabStateMachine._states_arr)))
@@ -357,12 +357,12 @@ class GrabStateMachine:
             self.thresholds['grab move up'] = val
 
     def _reset_thresholds(self):
-        for k, v in self.orig_thresholds.items():
+        for k, v in list(self.orig_thresholds.items()):
             self.thresholds[k] = v
 
     def reset(self):
         self._reset_thresholds()
-        for k in self.cur_val.keys():
+        for k in list(self.cur_val.keys()):
             self.cur_val[k] = 0
         transitioned = False
         if self.cur_state != self.start_state:
