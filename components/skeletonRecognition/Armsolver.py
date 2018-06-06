@@ -81,9 +81,7 @@ class Solver(object):
 
     def call_recognition(self):
         self.check_enagage()
-
         arm_encoding_list, probability_list = self.build()
-
         pointing_list = self.get_pointing_values()
         self.result = arm_encoding_list + list(chain(*pointing_list)) + list(chain(*probability_list)) + [int(self.engaged)]
 
@@ -125,6 +123,7 @@ class Solver(object):
 
     def get_pointing_values(self):
         if self._wave_flag:
+            self.point.get_pointing_main(self._fd)
             lpoint, rpoint = self.point.lpoint, self.point.rpoint
             lvar, rvar = self.point.lpoint_var, self.point.rpoint_var
             self._lpoint_stable, self._rpoint_stable = self.point.lpoint_stable, self.point.rpoint_stable
@@ -295,7 +294,8 @@ class PrimalRecognition(Solver):
             else:
                 arm_motion_array = left_arm_motions
             direction, probabilities = self.get_arm_motion(data)
-            arm_motion_label = body_part + direction
+
+            arm_motion_label = body_part + ': ' + direction
             try:
                 motion_encoding = arm_motion_array.index(arm_motion_label)
             except:
@@ -347,9 +347,9 @@ class PrimalRecognition(Solver):
                         proba_index = k * 2 + orient_indx
                         proba_array[proba_index] = mag_contrib_in_axis
 
-                direction = ' move ' + ' '.join(orientation)
+                direction = 'move ' + ' '.join(orientation)
             else:
-                direction = ' still'
+                direction = 'still'
         else:
             print ('arm not seen...sending blind value instead')
             direction = ' blind'
