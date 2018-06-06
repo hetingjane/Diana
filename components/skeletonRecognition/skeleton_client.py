@@ -1,12 +1,13 @@
+from __future__ import print_function
+
 import sys
 import time
 import struct
 import argparse
 
-
 from ..fusion.conf import streams
 from ..fusion.conf.endpoints import connect
-from solver import PrimalRecognition
+from Armsolver import PrimalRecognition, ArmMotionRecogntion
 
 def decode_frame(raw_frame):
     # The format is given according to the following assumption of network data
@@ -78,9 +79,7 @@ if __name__ == '__main__':
     if s is None:
         sys.exit(0)
 
-
-    m = PrimalRecognition(pointing_mode)
-
+    m = ArmMotionRecogntion(pointing_mode='screen')
     c = 0
     start_time = time.time()
 
@@ -89,20 +88,20 @@ if __name__ == '__main__':
             f = recv_skeleton_frame(s)
 
         except EOFError:
-            print ("Disconnected from Kinect Server")
+            print("Disconnected from Kinect Server")
             break
         fd = decode_frame(f)
+        
 
         #Pass this to the Recognition object
         m.feed_input(fd)
         result = m.get_result()
         timestamp = m.timestamp
-
+        
 
         display_result = m.printable_result()
         if display_result is not None:
-            print (display_result)
-
+            print (result[:3], display_result)
 
         pack_list = [streams.get_stream_id("Body"), timestamp] + result
         raw_data = struct.pack("<iqiii" + "ffff" * 2 + "f" * 5 + "ff" * 6 + 'i', *pack_list)
@@ -122,4 +121,6 @@ if __name__ == '__main__':
         fusion_socket.close()
 
     sys.exit(0)
+
+
 
