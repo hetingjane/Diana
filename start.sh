@@ -93,7 +93,7 @@ do
             ;;
         "fusion")
             fusion_host=$machine
-            params="$params --tab -e \"ssh -t ${machine} 'cd ${start_dir}; if [ ! -z ${env_dir} ]; then source ${env_dir}/bin/activate; fi; python -m components.fusion.fusion_server -c ; bash;'\" --title ${i}"
+            params="$params --tab -e \"ssh -t ${machine} 'cd ${start_dir}; if [ ! -z ${env_dir} ]; then source ${env_dir}/bin/activate; fi; python -m components.fusion.fusion_server; bash;'\" --title ${i}"
             ;;
         "lh")
             params="$params --tab -e \"ssh -t ${machine} 'sleep $wait_time; cd ${start_dir}; export CUDA_VISIBLE_DEVICES=${device}; if [ ! -z ${env_dir} ]; then source ${env_dir}/bin/activate; fi; python -m components.handRecognition.depth_client LH $kinect_host --fusion-host $fusion_host; bash;'\" --title ${i}"
