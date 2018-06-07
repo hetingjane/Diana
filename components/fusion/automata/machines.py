@@ -21,10 +21,10 @@ right_point = PoseStateMachine('right point', rules.And(
 ))
 
 left_point_continuous = PoseStateMachine('left point continuous',
-                                            rules.All(('lh point down', 'lh point right', 'lh point front', 5)))
+                                         rules.All(('lh point down', 'lh point right', 'lh point front', 5)))
 
 right_point_continuous = PoseStateMachine('right point continuous',
-                                             rules.All(('rh point down', 'rh point right', 'rh point front', 5)))
+                                          rules.All(('rh point down', 'rh point right', 'rh point front', 5)))
 
 push_left = PoseStateMachine('push left', rules.All(('rh closed left', 'rh open left', 5), ('ra move left', 5)))
 
@@ -49,9 +49,8 @@ grab = StateMachine('grab',
                     {
                         'stop': {
                             'start': rules.Or(
-                                rules.All(('rh claw down', 8), ('ra still', 8)),
-                                rules.All(('lh claw down', 8), ('la still', 8)),
-                                rules.All(('speak grab', 1))
+                                rules.All(('rh claw down', 5), ('ra still', 5)),
+                                rules.All(('lh claw down', 5), ('la still', 5))
                             )
                         },
 
