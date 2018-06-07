@@ -1,5 +1,4 @@
 from abc import ABCMeta, abstractmethod
-from copy import deepcopy
 
 from components.fusion.automata.constraint import Constraint
 
@@ -15,11 +14,20 @@ class Rule:
     MATCHED = 1
     IS_FALSE = 0
 
-    def __init__(self, *spec):
+    def __init__(self, *spec, **options):
+        self._spec = spec
         self._constraints = Constraint.read(*spec)
+        invert = options['invert'] if 'invert' in options else False
+        if invert:
+            for constraint in self._constraints:
+                constraint.invert()
 
     @abstractmethod
     def match(self, *inputs):
+        pass
+
+    @abstractmethod
+    def inverted(self):
         pass
 
     def reset(self):
@@ -27,7 +35,11 @@ class Rule:
             constraint.reset()
 
     def __repr__(self):
-        return '{}({})'.format(self.__class__.__name__, ', '.join(map(str, self._constraints)))
+        combined_constraints = ', '.join(map(str, self._constraints))
+        if len(self._constraints) == 1:
+            return combined_constraints
+        else:
+            return '{}({})'.format(self.__class__.__name__, combined_constraints)
 
 
 class Any(Rule):
@@ -36,6 +48,7 @@ class Any(Rule):
     Any rule is matched when any of the underlying constraints matches the names
     Any rule is false when none of the underlying constraints matches the names
     """
+
     def match(self, *inputs):
         assert len(inputs) > 0
         some_satisfied = False
@@ -51,6 +64,9 @@ class Any(Rule):
             return Rule.MATCHED
         else:
             return Rule.IS_FALSE
+
+    def inverted(self):
+        return All(*self._spec, invert=True)
 
 
 class All(Rule):
@@ -75,10 +91,16 @@ class All(Rule):
         else:
             return Rule.IS_FALSE
 
+    def inverted(self):
+        return Any(*self._spec, invert=True)
+
 
 class MetaRule(Rule):
+
+    __metaclass__ = ABCMeta
+
     def __init__(self, *rules):
-        self._rules = deepcopy(rules)
+        self._rules = rules
 
     def reset(self):
         for rule in self._rules:
@@ -109,6 +131,12 @@ class And(MetaRule):
         else:
             return Rule.IS_FALSE
 
+    def inverted(self):
+        rules = []
+        for rule in self._rules:
+            rules.append(rule.inverted())
+        return Or(*rules)
+
 
 class Or(MetaRule):
     def __init__(self, *rules):
@@ -130,38 +158,19 @@ class Or(MetaRule):
         else:
             return Rule.IS_FALSE
 
-
-class Not(MetaRule):
-    def __init__(self, rule):
-        MetaRule.__init__(self, rule)
-
-    def match(self, *inputs):
-        result = self._rules[0].match(*inputs)
-        if result == Rule.IS_TRUE:
-            return Rule.IS_FALSE
-        elif result == Rule.MATCHED:
-            return Rule.MATCHED
-        else:
-            return Rule.IS_TRUE
-
-    def __repr__(self):
-        return "(not {})".format(self._rules[0])
+    def inverted(self):
+        rules = []
+        for rule in self._rules:
+            rules.append(rule.inverted())
+        return And(*rules)
 
 
 if __name__ == '__main__':
     import csv
     engage_rule = All(('engaged', 1))
-    point_rule = And(
-        All(('rh point down', 'rh point right', 'rh point front', 5)),
-        Or(
-            All(('ra still', 5)),
-            All(('speak there', 'speak here', 'speak this', 'speak that', 1))
-        )
-    )
+    disengage_rule = engage_rule.inverted()
 
-    point_rule = And(point_rule, engage_rule)
-
-    rules_to_test = [point_rule]
+    rules_to_test = [engage_rule, disengage_rule]
 
     with open('speak_and_point.csv', 'r') as f:
         f.readline()

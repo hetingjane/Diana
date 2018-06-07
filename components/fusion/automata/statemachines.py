@@ -1,4 +1,4 @@
-from .rules import Rule, Not, All, And
+from .rules import Rule, All, And
 
 
 class StateMachine:
@@ -74,7 +74,7 @@ class BinaryStateMachine(StateMachine):
                 'high': rule
             },
             'high': {
-                'stop': Not(rule)
+                'stop': rule.inverted()
             }
         }
         StateMachine.__init__(self, prefix, ['high', 'stop'], states_with_rules, 'stop')
@@ -90,34 +90,4 @@ class PoseStateMachine(BinaryStateMachine):
             self._rules['stop']['high'],
             All(('engaged', 1))
         )
-        self._rules['high']['stop'] = Not(
-            self._rules['stop']['high']
-        )
-
-
-class OldBinaryStateMachine(StateMachine):
-    def __init__(self, prefix, rule):
-        states_with_rules = {
-            'stop': {
-                'start': rule
-            },
-            'start': {
-                'stop': Not(rule)
-            }
-        }
-        StateMachine.__init__(self, prefix, ['start', 'stop'], states_with_rules, 'stop')
-
-    def is_high(self):
-        return self._cur_state == 'start' or 'start' in self._cur_state
-
-
-class OldPoseStateMachine(OldBinaryStateMachine):
-    def __init__(self, prefix, rule):
-        OldBinaryStateMachine.__init__(self, prefix, rule)
-        self._rules['stop']['start'] = And(
-            self._rules['stop']['start'],
-            All(('engaged', 1))
-        )
-        self._rules['start']['stop'] = Not(
-            self._rules['stop']['start']
-        )
+        self._rules['high']['stop'] = self._rules['stop']['high'].inverted()

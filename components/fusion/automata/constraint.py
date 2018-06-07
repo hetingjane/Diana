@@ -19,21 +19,22 @@ class Constraint:
     MATCHED_NAMES = 1
     SATISFIED = 2
 
-    def __init__(self, names, threshold):
+    def __init__(self, names, threshold, invert=False):
         assert len(names) > 0
         self._names = frozenset(names)
         self._counter = Counter(0, min_val=0, max_val=threshold)
+        self._inverted = invert
 
-    def _has_matching_names(self, *in_names):
+    def _matches(self, *in_names):
         """
-        Check if the input names match with the constraint labels
+        Check if the input names match (or don't match if invert is True) with the constraint labels
         :param in_names: zero or more input names (or labels)
-        :return: True if at least one of the input names is in the constraint labels, else False
+        :return: True if at least one of the input names is in (or not if invert is True) the constraint labels, else False
         """
         for name in in_names:
             if name in self._names:
-                return True
-        return False
+                return False if self._inverted else True
+        return True if self._inverted else False
 
     def input(self, *in_names):
         """
@@ -47,7 +48,7 @@ class Constraint:
         """
         assert len(in_names) > 0
 
-        if self._has_matching_names(*in_names):
+        if self._matches(*in_names):
             self._counter.inc()
             satisfied = self._counter.at_max()
             return Constraint.SATISFIED if satisfied else Constraint.MATCHED_NAMES
@@ -66,7 +67,7 @@ class Constraint:
         names = ', '.join(self._names)
         if len(names) > 12:
             names = names[:12] + '...'
-        return "[{}; {}, {}]".format(names, self._counter.val(), self._counter.max_val())
+        return "{}[{}; {}, {}]".format("not " if self._inverted else "", names, self._counter.val(), self._counter.max_val())
 
     @staticmethod
     def read(*spec):
@@ -89,3 +90,9 @@ class Constraint:
 
     def names(self):
         return list(self._names)
+
+    def is_inverted(self):
+        return self._inverted
+
+    def invert(self):
+        self._inverted = not self._inverted
