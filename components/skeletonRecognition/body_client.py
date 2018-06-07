@@ -58,6 +58,8 @@ def recv_skeleton_frame(sock):
 
 
 
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('kinect', help='Kinect host name', type=str)
@@ -65,8 +67,17 @@ if __name__ == '__main__':
     parser.add_argument('--pointing-mode', default='screen', help='Pointing mode, default set to screen', type=str)
 
     args = parser.parse_args()
-    # validate_arguments(args)
     kinect_host, fusion_host, pointing_mode = args.kinect, args.fusion_host, args.pointing_mode
+
+    s = connect('kinect', kinect_host, 'Body')
+
+    if fusion_host is not None:
+        fusion_socket = connect('fusion', fusion_host, 'Body')
+    else:
+        fusion_socket = None
+
+    if s is None:
+        sys.exit(0)
 
 
     rgb = False
@@ -74,25 +85,9 @@ if __name__ == '__main__':
     dims = 2 if rgb else 3
     feature_size = 10 if rgb else 21
     logpath = '/s/red/a/nobackup/vision/dkpatil/demo/GRU_5_class/'
-    class_list = np.load(logpath+'labels_list.npy')
+    class_list = np.load(logpath + 'labels_list.npy')
     print class_list
 
-
-
-    # Time the network performance
-    if rgb:
-        s = connect_rgb()
-    else:
-        s = connect('kinect', kinect_host, 'Body')
-
-    if fusion_host is not None:
-        r = connect('fusion', fusion_host, 'Body')
-    else:
-        r = None
-
-
-    if s is None:
-        sys.exit(0)
 
     window_threshold = 15
     body_parts = ['LA', 'RA']
@@ -113,7 +108,7 @@ if __name__ == '__main__':
     count = 0
 
     wave_flag = False
-    point = Pointing(pointing_mode=pointing_mode)
+    point = Pointing()
 
 
     while True:
@@ -126,60 +121,54 @@ if __name__ == '__main__':
         fd = decode_frame(f)
         timestamp, frame_type, body_count, engaged = fd[:4]
 
+        input_data = (timestamp, body_count) + fd[4:]
 
-
-        #Skeleton Box construction
-        #If enagaged skeleton received, we further filter skeleton on x coordinates and update flag
         if engaged:
-            #Assumption: rgb=False, dimensions available: 3
+            # Assumption: rgb=False, dimensions available: 3
             input_data = (timestamp, body_count) + fd[4:]
             frame_data = np.array(extract_data(input_data, rgb)).reshape((1, -1))
 
-            sb_x = frame_data[0][0]
-            sb_z = frame_data[0][2]
+            sb_x = frame_data[0][1]
+            sb_z = frame_data[0][3]
 
-            #Left and right axis threshold
-            if -0.83<sb_x<0.53:engaged = True
-            else:engaged = False
+            # Left and right axis threshold
+            if -0.83 < sb_x < 0.80:
+                engaged = True
+            else:
+                engaged = False
+
+        if engaged:engaged_bit = 'Engaged'
+        else: engaged_bit = 'Disengaged'
 
 
-        if engaged:
-            engaged_bit = 'Engaged'
+
+        if wave_flag:
+            point.get_pointing_main(fd)
+            lpoint, rpoint = point.lpoint, point.rpoint
+            lvar, rvar = point.lpoint_var, point.rpoint_var
+            lpoint_stable, rpoint_stable = point.lpoint_stable, point.rpoint_stable
+
         else:
-            engaged_bit = 'Disengaged'
-
-        if rgb:
             lpoint, rpoint = [0.0, 0.0], [0.0, 0.0]
             lvar, rvar = [0.0, 0.0], [0.0, 0.0]
-        else:
-            if wave_flag:
-                point.get_pointing_main(fd)
-                lpoint, rpoint = point.lpoint, point.rpoint
-                lvar, rvar = point.lpoint_var, point.rpoint_var
-
-            else:
-                lpoint, rpoint = [0.0, 0.0], [0.0, 0.0]
-                lvar, rvar = [0.0, 0.0], [0.0, 0.0]
 
 
         if engaged:
             data_stream.extend([input_data])
             if len(data_stream) >= window_threshold:
                 wave_array = []
-                proba_array, encoding_array, motion_label_array, active_arm_array = [], [], [], []
+                proba_array, encoding_array = [], []
 
                 # Function rewritten for RGB
                 data = np.vstack([extract_data(frame, rgb) for frame in data_stream])
-                # data = smooth_data(data, polyorder=2)
-
 
                 if wave_flag and lstm:
                     #Processing the GRU Classification for the 15 frame window
                     pruned_data_for_solver = prune_joints(data, body_part='arms', rgb=rgb)
                     if rgb:
-                        assert pruned_data_for_solver.shape == (window_threshold, 10)
+                        assert pruned_data_for_solver.shape == (15, 10)
                     else:
-                        assert pruned_data_for_solver.shape == (window_threshold, 21)
+                        assert pruned_data_for_solver.shape == (15, 21)
 
                     class_label, probabilities = solver.predict(pruned_data_for_solver)
                     # Adding the probability values of 5 class first
@@ -192,24 +181,31 @@ if __name__ == '__main__':
 
                 for body_part in body_parts:
                     pruned_data = prune_joints(data, body_part=body_part, rgb=rgb)
-                    active_arm = check_active_arm(pruned_data, rgb=rgb)  # Confirm shoulder-elbow or shoulder-wrist and return respectively
-                    print body_part, 'Active' if active_arm else 'Dangling'
-
+                    #active_arm = check_active_arm(pruned_data)  # Confirm shoulder-elbow or shoulder-wrist and return respectively
+                    # print body_part, active_arm
 
                     if wave_flag:
-                        active_arm = check_active_arm(pruned_data, rgb=rgb) #Confirm shoulder-elbow or shoulder-wrist and return respectively
+                        active_arm = check_active_arm(pruned_data)  # Confirm shoulder-elbow or shoulder-wrist and return respectively
 
                         if active_arm:
-                            arm_motion_label, motion_encoding, probabilities = calculate_direction(pruned_data, body_part=body_part, rgb=rgb)
+                            wave = check_wave_motion(pruned_data)
+                            if not wave:
+                                motion_encoding, probabilities = calculate_direction(pruned_data, body_part=body_part,rgb=rgb)
+                                # Decide between stable pointing and moving point
+                                # Return still if pointing says still (26 for index and [0]*6 for probabilities)
+                                if body_part == 'LA' and lpoint_stable:
+                                    motion_encoding, probabilities = 26, [0] * 6
+                                elif body_part == 'RA' and rpoint_stable:
+                                    motion_encoding, probabilities = 26, [0] * 6
+                            else:
+                                motion_encoding, probabilities = 31, [0] * 6
                         else:
-                            arm_motion_label, motion_encoding, probabilities = 'blind', 32, [0]*6
+                            motion_encoding, probabilities = 32, [0] * 6
 
-                        wave_array.append(check_wave_motion(pruned_data, rgb=rgb))
-                        encoding_array.append(motion_encoding), active_arm_array.append(active_arm), \
-                        proba_array.append(probabilities), motion_label_array.append(arm_motion_label)
-
+                        #wave_array.append(check_wave_motion(pruned_data, rgb=rgb))
+                        encoding_array.append(motion_encoding), proba_array.append(probabilities)
                     else:
-                        wave_array.append(check_wave_motion(pruned_data, rgb=rgb))
+                        wave_array.append(check_wave_motion(pruned_data))
 
 
                 # Adding label index of 5 class result
@@ -218,36 +214,33 @@ if __name__ == '__main__':
                     wave_indx = [i for i, j in enumerate(wave_array) if j == True]
                     if not wave_flag:
                         wave_flag = True
-                        encoding_array, active_arm_array, proba_array = send_default_values(body_parts)
+                        encoding_array, proba_array = send_default_values(body_parts)
                     for indx in wave_indx:
                         encoding_array[indx] = 31
                 else:
                     if not wave_flag:
-                        encoding_array, active_arm_array, proba_array = send_default_values(body_parts)
+                        encoding_array, proba_array = send_default_values(body_parts)
 
             else:
-                # print 'buffer not full....sending default values'
-                #Still (26) when engaged but buffer unfilled
-                encoding_array, active_arm_array, proba_array = send_default_values(body_parts)
+                # Still (26) when engaged but buffer unfilled
+                encoding_array, proba_array = send_default_values(body_parts)
 
-
-            result = collect_all_results(encoding_array, [lpoint,lvar, rpoint, rvar], proba_array, int(engaged))
+            result = collect_all_results(encoding_array, [lpoint, lvar, rpoint, rvar], proba_array, int(engaged))
             timestamp = list(data_stream)[-1][0]
 
         else:
             wave_flag = False
             # print 'Disengaged....clearing buffer'
             #Blind (31) when disengaged
-            encoding_array, active_arm_array, proba_array = send_default_values(body_parts, value_to_add=32)
-            result = collect_all_results(encoding_array, [lpoint,lvar, rpoint, rvar], proba_array, int(engaged))
+            encoding_array, proba_array = send_default_values(body_parts, value_to_add=32)
+            result = collect_all_results(encoding_array, [lpoint, lvar, rpoint, rvar], proba_array, int(engaged))
             data_stream.clear()
 
 
+
         assert len(result) == 29
-        # print 'Length of result is: ', len(result)
         pack_list = [streams.get_stream_id("Body"), timestamp] + result
         raw_data = struct.pack("<iqiii" + "ffff" * 2 + "f" * 5 + "ff" * 6 + 'i', *pack_list)
-
 
 
         #Debugging mode
@@ -256,11 +249,11 @@ if __name__ == '__main__':
         if to_print_result==['blind', 'blind', 'still']:
             pass
         else:
-            print 'Result is: ', engaged_bit, to_print_result
+            print 'Result is: ', result[:3], to_print_result
 
 
-        if r is not None:
-            r.sendall(raw_data)
+        if fusion_socket is not None:
+            fusion_socket.sendall(raw_data)
 
 
         count += 1
@@ -273,7 +266,7 @@ if __name__ == '__main__':
             count = 0
 
     s.close()
-    if r is not None:
-        r.close()
+    if fusion_socket is not None:
+        fusion_socket.close()
 
     sys.exit(0)
