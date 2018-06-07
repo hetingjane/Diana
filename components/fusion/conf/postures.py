@@ -40,4 +40,4 @@ body_postures = ['body emblem', 'body motion', 'body neutral', 'body oscillate',
 
 engaged = ['disengaged', 'engaged']
 
-words = ['speak yes', 'speak no', 'speak here', 'speak there', 'speak this', 'speak that', 'speak grab', 'speak nevermind']
+words = ['speak yes', 'speak no', 'speak here', 'speak there', 'speak this', 'speak that', 'speak grab']

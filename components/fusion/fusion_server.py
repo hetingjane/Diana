@@ -220,15 +220,15 @@ class App:
             changed = state_machine.input(*inputs)
             cur_state = state_machine.get_full_state()
 
-            if state_machine is machines.left_point_continuous and state_machine.is_high():
+            if state_machine is machines.left_point_continuous and state_machine.is_started():
                 all_events_to_send.append("P;l,{},{};{}".format(lx, ly, ts))
-            elif state_machine is machines.right_point_continuous and state_machine.is_high():
+            elif state_machine is machines.right_point_continuous and state_machine.is_started():
                 all_events_to_send.append("P;r,{},{};{}".format(rx, ry, ts))
 
             elif changed:
-                if state_machine is machines.left_point and state_machine.is_high():
+                if state_machine is machines.left_point and state_machine.is_started():
                     cur_state += ",{},{}".format(lx, ly)
-                elif state_machine is machines.right_point and state_machine.is_high():
+                elif state_machine is machines.right_point and state_machine.is_started():
                     cur_state += ",{},{}".format(rx, ry)
 
                 all_events_to_send.insert(0, "G;" + cur_state + ";" + ts)

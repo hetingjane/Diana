@@ -12,18 +12,12 @@ wave = PoseStateMachine('wave', rules.Any(('la wave', 'ra wave', 5)))
 
 left_point = PoseStateMachine('left point', rules.And(
     rules.All(('lh point down', 'lh point right', 'lh point front', 5)),
-    rules.Or(
-        rules.All(('la still', 5)),
-        rules.All(('speak there', 'speak here', 'speak this', 'speak that', 1))
-    )
+    rules.Any(('la still', 5), ('speak there', 'speak here', 'speak this', 'speak that', 1))
 ))
 
 right_point = PoseStateMachine('right point', rules.And(
     rules.All(('rh point down', 'rh point left', 'rh point front', 5)),
-    rules.Or(
-        rules.All(('ra still', 5)),
-        rules.All(('speak there', 'speak here', 'speak this', 'speak that', 1))
-    )
+    rules.Any(('ra still', 5), ('speak there', 'speak here', 'speak this', 'speak that', 1))
 ))
 
 left_point_continuous = PoseStateMachine('left point continuous',
@@ -47,207 +41,205 @@ push_back = PoseStateMachine('push back', rules.Or(
     rules.All(('rh beckon', 'lh beckon', 5))
 ))
 
-nevermind = PoseStateMachine('nevermind', rules.Any(
-    ('rh stop', 'lh stop', 20), ('speak nevermind', 1)
-))
+nevermind = PoseStateMachine('nevermind', rules.All(('rh stop', 'lh stop', 20)))
 
 grab = StateMachine('grab',
-                    ['stop', 'high', 'move up high', 'move down high', 'move left high', 'move right high',
-                     'move front high', 'move back high'],
+                    ['stop', 'start', 'move up start', 'move down start', 'move left start', 'move right start',
+                     'move front start', 'move back start'],
                     {
                         'stop': {
-                            'high': rules.Or(
+                            'start': rules.Or(
                                 rules.All(('rh claw down', 8), ('ra still', 8)),
                                 rules.All(('lh claw down', 8), ('la still', 8)),
                                 rules.All(('speak grab', 1))
                             )
                         },
 
-                        'high': {
+                        'start': {
                             'stop': rules.All(('rh claw down', 5), ('lh claw down', 5), invert=True),
-                            'move up high': rules.Or(
+                            'move up start': rules.Or(
                                 rules.All(('rh claw down', 2), ('ra move up', 2)),
                                 rules.All(('lh claw down', 2), ('la move up', 2))
                             ),
-                            'move down high': rules.Or(
+                            'move down start': rules.Or(
                                 rules.All(('rh claw down', 2), ('ra move down', 2)),
                                 rules.All(('lh claw down', 2), ('la move down', 2))
                             ),
-                            'move left high': rules.Or(
+                            'move left start': rules.Or(
                                 rules.All(('rh claw down', 2), ('ra move left', 2)),
                                 rules.All(('lh claw down', 2), ('la move left', 2))
                             ),
-                            'move right high': rules.Or(
+                            'move right start': rules.Or(
                                 rules.All(('rh claw down', 2), ('ra move right', 2)),
                                 rules.All(('lh claw down', 2), ('la move right', 2))
                             ),
-                            'move front high': rules.Or(
+                            'move front start': rules.Or(
                                 rules.All(('rh claw down', 2), ('ra move front', 2)),
                                 rules.All(('lh claw down', 2), ('la move front', 2))
                             ),
-                            'move back high': rules.Or(
+                            'move back start': rules.Or(
                                 rules.All(('rh claw down', 2), ('ra move back', 2)),
                                 rules.All(('lh claw down', 2), ('la move back', 2))
                             )
                         },
-                        'move up high': {
+                        'move up start': {
                             'stop': rules.All(('rh claw down', 5), ('lh claw down', 5), invert=True),
-                            'high': rules.Or(
+                            'start': rules.Or(
                                 rules.All(('rh claw down', 8), ('ra still', 8)),
                                 rules.All(('lh claw down', 8), ('la still', 8))
                             ),
-                            'move down high': rules.Or(
+                            'move down start': rules.Or(
                                 rules.All(('rh claw down', 2), ('ra move down', 8)),
                                 rules.All(('lh claw down', 2), ('la move down', 8))
                             ),
-                            'move left high': rules.Or(
+                            'move left start': rules.Or(
                                 rules.All(('rh claw down', 2), ('ra move left', 2)),
                                 rules.All(('lh claw down', 2), ('la move left', 2))
                             ),
-                            'move right high': rules.Or(
+                            'move right start': rules.Or(
                                 rules.All(('rh claw down', 2), ('ra move right', 2)),
                                 rules.All(('lh claw down', 2), ('la move right', 2))
                             ),
-                            'move front high': rules.Or(
+                            'move front start': rules.Or(
                                 rules.All(('rh claw down', 2), ('ra move front', 2)),
                                 rules.All(('lh claw down', 2), ('la move front', 2))
                             ),
-                            'move back high': rules.Or(
+                            'move back start': rules.Or(
                                 rules.All(('rh claw down', 2), ('ra move back', 2)),
                                 rules.All(('lh claw down', 2), ('la move back', 2))
                             )
                         },
-                        'move down high': {
+                        'move down start': {
                             'stop': rules.All(('rh claw down', 5), ('lh claw down', 5), invert=True),
-                            'high': rules.Or(
+                            'start': rules.Or(
                                 rules.All(('rh claw down', 8), ('ra still', 8)),
                                 rules.All(('lh claw down', 8), ('la still', 8))
                             ),
-                            'move up high': rules.Or(
+                            'move up start': rules.Or(
                                 rules.All(('rh claw down', 2), ('ra move up', 8)),
                                 rules.All(('lh claw down', 2), ('la move up', 8))
                             ),
-                            'move left high': rules.Or(
+                            'move left start': rules.Or(
                                 rules.All(('rh claw down', 2), ('ra move left', 2)),
                                 rules.All(('lh claw down', 2), ('la move left', 2))
                             ),
-                            'move right high': rules.Or(
+                            'move right start': rules.Or(
                                 rules.All(('rh claw down', 2), ('ra move right', 2)),
                                 rules.All(('lh claw down', 2), ('la move right', 2))
                             ),
-                            'move front high': rules.Or(
+                            'move front start': rules.Or(
                                 rules.All(('rh claw down', 2), ('ra move front', 2)),
                                 rules.All(('lh claw down', 2), ('la move front', 2))
                             ),
-                            'move back high': rules.Or(
+                            'move back start': rules.Or(
                                 rules.All(('rh claw down', 2), ('ra move back', 2)),
                                 rules.All(('lh claw down', 2), ('la move back', 2))
                             )
                         },
-                        'move left high': {
+                        'move left start': {
                             'stop': rules.All(('rh claw down', 5), ('lh claw down', 5), invert=True),
-                            'high': rules.Or(
+                            'start': rules.Or(
                                 rules.All(('rh claw down', 8), ('ra still', 8)),
                                 rules.All(('lh claw down', 8), ('la still', 8))
                             ),
-                            'move up high': rules.Or(
+                            'move up start': rules.Or(
                                 rules.All(('rh claw down', 2), ('ra move up', 2)),
                                 rules.All(('lh claw down', 2), ('la move up', 2))
                             ),
-                            'move down high': rules.Or(
+                            'move down start': rules.Or(
                                 rules.All(('rh claw down', 2), ('ra move down', 2)),
                                 rules.All(('lh claw down', 2), ('la move down', 2))
                             ),
-                            'move right high': rules.Or(
+                            'move right start': rules.Or(
                                 rules.All(('rh claw down', 2), ('ra move right', 8)),
                                 rules.All(('lh claw down', 2), ('la move right', 8))
                             ),
-                            'move front high': rules.Or(
+                            'move front start': rules.Or(
                                 rules.All(('rh claw down', 2), ('ra move front', 2)),
                                 rules.All(('lh claw down', 2), ('la move front', 2))
                             ),
-                            'move back high': rules.Or(
+                            'move back start': rules.Or(
                                 rules.All(('rh claw down', 2), ('ra move back', 2)),
                                 rules.All(('lh claw down', 2), ('la move back', 2))
                             )
                         },
-                        'move right high': {
+                        'move right start': {
                             'stop': rules.All(('rh claw down', 5), ('lh claw down', 5), invert=True),
-                            'high': rules.Or(
+                            'start': rules.Or(
                                 rules.All(('rh claw down', 8), ('ra still', 8)),
                                 rules.All(('lh claw down', 8), ('la still', 8))
                             ),
-                            'move up high': rules.Or(
+                            'move up start': rules.Or(
                                 rules.All(('rh claw down', 2), ('ra move up', 2)),
                                 rules.All(('lh claw down', 2), ('la move up', 2))
                             ),
-                            'move down high': rules.Or(
+                            'move down start': rules.Or(
                                 rules.All(('rh claw down', 2), ('ra move down', 2)),
                                 rules.All(('lh claw down', 2), ('la move down', 2))
                             ),
-                            'move left high': rules.Or(
+                            'move left start': rules.Or(
                                 rules.All(('rh claw down', 2), ('ra move left', 8)),
                                 rules.All(('lh claw down', 2), ('la move left', 8))
                             ),
-                            'move front high': rules.Or(
+                            'move front start': rules.Or(
                                 rules.All(('rh claw down', 2), ('ra move front', 2)),
                                 rules.All(('lh claw down', 2), ('la move front', 2))
                             ),
-                            'move back high': rules.Or(
+                            'move back start': rules.Or(
                                 rules.All(('rh claw down', 2), ('ra move back', 2)),
                                 rules.All(('lh claw down', 2), ('la move back', 2))
                             )
                         },
-                        'move front high': {
+                        'move front start': {
                             'stop': rules.All(('rh claw down', 5), ('lh claw down', 5), invert=True),
-                            'high': rules.Or(
+                            'start': rules.Or(
                                 rules.All(('rh claw down', 8), ('ra still', 8)),
                                 rules.All(('lh claw down', 8), ('la still', 8))
                             ),
-                            'move up high': rules.Or(
+                            'move up start': rules.Or(
                                 rules.All(('rh claw down', 2), ('ra move up', 2)),
                                 rules.All(('lh claw down', 2), ('la move up', 2))
                             ),
-                            'move down high': rules.Or(
+                            'move down start': rules.Or(
                                 rules.All(('rh claw down', 2), ('ra move down', 2)),
                                 rules.All(('lh claw down', 2), ('la move down', 2))
                             ),
-                            'move left high': rules.Or(
+                            'move left start': rules.Or(
                                 rules.All(('rh claw down', 2), ('ra move left', 2)),
                                 rules.All(('lh claw down', 2), ('la move left', 2))
                             ),
-                            'move right high': rules.Or(
+                            'move right start': rules.Or(
                                 rules.All(('rh claw down', 2), ('ra move right', 2)),
                                 rules.All(('lh claw down', 2), ('la move right', 2))
                             ),
-                            'move back high': rules.Or(
+                            'move back start': rules.Or(
                                 rules.All(('rh claw down', 2), ('ra move back', 8)),
                                 rules.All(('lh claw down', 2), ('la move back', 8))
                             )
                         },
-                        'move back high': {
+                        'move back start': {
                             'stop': rules.All(('rh claw down', 5), ('lh claw down', 5), invert=True),
-                            'high': rules.Or(
+                            'start': rules.Or(
                                 rules.All(('rh claw down', 8), ('ra still', 8)),
                                 rules.All(('lh claw down', 8), ('la still', 8))
                             ),
-                            'move up high': rules.Or(
+                            'move up start': rules.Or(
                                 rules.All(('rh claw down', 2), ('ra move up', 2)),
                                 rules.All(('lh claw down', 2), ('la move up', 2))
                             ),
-                            'move down high': rules.Or(
+                            'move down start': rules.Or(
                                 rules.All(('rh claw down', 2), ('ra move down', 2)),
                                 rules.All(('lh claw down', 2), ('la move down', 2))
                             ),
-                            'move left high': rules.Or(
+                            'move left start': rules.Or(
                                 rules.All(('rh claw down', 2), ('ra move left', 2)),
                                 rules.All(('lh claw down', 2), ('la move left', 2))
                             ),
-                            'move right high': rules.Or(
+                            'move right start': rules.Or(
                                 rules.All(('rh claw down', 2), ('ra move right', 2)),
                                 rules.All(('lh claw down', 2), ('la move right', 2))
                             ),
-                            'move front high': rules.Or(
+                            'move front start': rules.Or(
                                 rules.All(('rh claw down', 2), ('ra move front', 8)),
                                 rules.All(('lh claw down', 2), ('la move front', 8))
                             )
@@ -270,10 +262,12 @@ if __name__ == '__main__':
 
     test_sets = [
         #('others.csv', [engage, wave, posack, negack, push_left, push_right, push_front, push_back]),
-        #('point.csv', [engage, wave, right_point_continuous, right_point, left_point_continuous, left_point]),
-        ('speak_and_point.csv', [right_point]),
+        ('point.csv', [engage, wave, right_point_continuous, right_point, left_point_continuous, left_point]),
+        #('speak_and_point.csv', [right_point]),
         #('grab.csv', [grab])
     ]
+
+    detailed = False
 
     for g_file, sm_to_test in test_sets:
         print('*' * 20 + '\n')
@@ -284,10 +278,12 @@ if __name__ == '__main__':
             reader = csv.DictReader(f)
             i = 1
             for row in reader:
-                print("{}:{}".format(i, row.values()))
+                if detailed:
+                    print("{}:{}".format(i, row.values()))
                 for sm in sm_to_test:
                     triggered = sm.input(*row.values())
-                    print("{}:{}\n".format(i, sm))
+                    if detailed:
+                        print("{}:{}\n".format(i, sm))
                     if triggered:
                         print("\n{}:{}\n".format(i, sm.get_full_state()))
                 i += 1

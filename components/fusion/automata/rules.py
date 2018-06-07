@@ -44,9 +44,9 @@ class Rule:
 
 class Any(Rule):
     """
-    Any rule is true when any of the underlying constraints is satisfied
-    Any rule is matched when any of the underlying constraints matches the names
-    Any rule is false when none of the underlying constraints matches the names
+    Any rule is true when any of the constraints is satisfied
+    Any rule is matched when some of the constraints are matched
+    Any rule is false when none of the constraints are matched
     """
 
     def match(self, *inputs):
@@ -73,20 +73,20 @@ class All(Rule):
     """
     All rule is true when all the constraints are satisfied
     All rule is matched when some of the constraints are matched
-    All rule is false when none of the constraints is matched
+    All rule is false when none of the constraints are matched
     """
     def match(self, *inputs):
         assert len(inputs) > 0
         all_satisfied = True
-        all_names_matched = True
+        some_names_matched = False
         for constraint in self._constraints:
             result = constraint.input(*inputs)
-            all_names_matched = all_names_matched and (result in [Constraint.MATCHED_NAMES, Constraint.SATISFIED])
+            some_names_matched = some_names_matched or (result in [Constraint.MATCHED_NAMES, Constraint.SATISFIED])
             all_satisfied = all_satisfied and (result == Constraint.SATISFIED)
 
         if all_satisfied:
             return Rule.IS_TRUE
-        elif all_names_matched:
+        elif some_names_matched:
             return Rule.MATCHED
         else:
             return Rule.IS_FALSE
@@ -117,16 +117,16 @@ class And(MetaRule):
 
     def match(self, *inputs):
         all_true = True
-        all_matched = True
+        some_matched = True
 
         for rule in self._rules:
             result = rule.match(*inputs)
             all_true = all_true and (result == Rule.IS_TRUE)
-            all_matched = all_matched and (result in [Rule.MATCHED, Rule.IS_TRUE])
+            some_matched = some_matched or result in [Rule.MATCHED, Rule.IS_TRUE]
 
         if all_true:
             return Rule.IS_TRUE
-        elif all_matched:
+        elif some_matched:
             return Rule.MATCHED
         else:
             return Rule.IS_FALSE
@@ -149,7 +149,7 @@ class Or(MetaRule):
         for rule in self._rules:
             result = rule.match(*inputs)
             some_true = some_true or result == Rule.IS_TRUE
-            some_matched = some_matched or result == Rule.MATCHED
+            some_matched = some_matched or result in [Rule.MATCHED, Rule.IS_TRUE]
 
         if some_true:
             return Rule.IS_TRUE

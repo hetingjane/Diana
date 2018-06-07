@@ -71,23 +71,23 @@ class BinaryStateMachine(StateMachine):
     def __init__(self, prefix, rule):
         states_with_rules = {
             'stop': {
-                'high': rule
+                'start': rule
             },
-            'high': {
+            'start': {
                 'stop': rule.inverted()
             }
         }
-        StateMachine.__init__(self, prefix, ['high', 'stop'], states_with_rules, 'stop')
+        StateMachine.__init__(self, prefix, ['start', 'stop'], states_with_rules, 'stop')
 
-    def is_high(self):
-        return self._cur_state == 'high' or 'high' in self._cur_state
+    def is_started(self):
+        return self._cur_state == 'start' or 'start' in self._cur_state
 
 
 class PoseStateMachine(BinaryStateMachine):
     def __init__(self, prefix, rule):
         BinaryStateMachine.__init__(self, prefix, rule)
-        self._rules['stop']['high'] = And(
-            self._rules['stop']['high'],
+        self._rules['stop']['start'] = And(
+            self._rules['stop']['start'],
             All(('engaged', 1))
         )
-        self._rules['high']['stop'] = self._rules['stop']['high'].inverted()
+        self._rules['start']['stop'] = self._rules['stop']['start'].inverted()
