@@ -129,7 +129,7 @@ def get_direction(axis, sign):
 
 def get_cumulative_threshold(tracked_info):
     joints_to_consider = []
-    threshold_values = [0.017, 0.101, 0.146] #<<<<<<<<<<CHANGE THESE VALUES FOR EVERY JOINT"S SEPARATE VALUE
+    threshold_values = [0.017, 0.101, 0.125]
     n_joints = tracked_info.shape[1]
 
     for i in range(n_joints):
