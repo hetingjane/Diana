@@ -7,6 +7,9 @@ https://arxiv.org/pdf/1605.07146v1.pdf
 from collections import namedtuple
 
 import numpy as np
+import os
+os.environ["CUDA_VISIBLE_DEVICES"]="-1"
+
 import tensorflow as tf
 
 from tensorflow.python.training import moving_averages

@@ -2,7 +2,7 @@ import socket
 import struct
 from collections import namedtuple
 
-from conf import streams
+from . import streams
 
 HostInfo = namedtuple('HostInfo', 'port,can_connect,can_serve')
 

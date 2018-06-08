@@ -4,10 +4,10 @@ import struct
 import threading
 from collections import namedtuple
 
-from conf import streams
-from conf.postures import right_hand_postures, head_postures
-from conf.endpoints import serve
-from thread_sync import synced_msgs
+from .conf import streams
+from .conf.postures import right_hand_postures, head_postures
+from .conf.endpoints import serve
+from .thread_sync import synced_msgs
 
 
 class Fusion(threading.Thread):

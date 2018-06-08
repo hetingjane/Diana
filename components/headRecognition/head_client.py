@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import sys, struct
 import time
 import argparse
@@ -7,6 +5,7 @@ import argparse
 import numpy as np
 from collections import deque
 from skimage.transform import resize
+
 from .realtime_head_recognition import RealTimeHeadRecognition
 from ..fusion.conf.endpoints import connect
 from ..fusion.conf import streams

@@ -6,14 +6,14 @@ import queue
 
 import numpy as np
 
-from automata import bi_state_machines as bsm
-from automata import tri_state_machines as tsm
-from automata.state_machines import GrabStateMachine
-from fusion_thread import Fusion
-from remote_thread import Remote
-import thread_sync
-from conf import streams
-from conf import postures
+from .automata import bi_state_machines as bsm
+from .automata import tri_state_machines as tsm
+from .automata.state_machines import GrabStateMachine
+from .fusion_thread import Fusion
+from .remote_thread import Remote
+from . import thread_sync
+from .conf import streams
+from .conf import postures
 
 
 class App:

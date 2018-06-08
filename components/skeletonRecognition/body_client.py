@@ -73,7 +73,7 @@ if __name__ == '__main__':
     lstm = False
     dims = 2 if rgb else 3
     feature_size = 10 if rgb else 21
-    logpath = '/s/red/a/nobackup/vision/dkpatil/demo/GRU_5_class/'
+    logpath = 'components/log/'
     class_list = np.load(logpath+'labels_list.npy')
     print(class_list)
 

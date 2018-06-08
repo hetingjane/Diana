@@ -1,4 +1,4 @@
-from automata import rules
+from . import rules
 
 
 class BinaryStateMachine:
