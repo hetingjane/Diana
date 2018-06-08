@@ -16,7 +16,7 @@ class Solver(object):
         self._logpath = '/s/red/a/nobackup/vision/dkpatil/demo/GRU_5_class/'
 
 
-        self._LEFT, self._RIGHT = 'LA', 'RA'#'la', 'ra'
+        self._LEFT, self._RIGHT = 'la', 'ra'
         self._body_parts = [self._LEFT, self._RIGHT]
 
 
@@ -73,7 +73,7 @@ class Solver(object):
 
 
         to_print_result = [LA_motion_label,RA_motion_label,classifier_label]
-        if to_print_result == ['blind', 'blind', 'body still']:
+        if to_print_result == ['la blind', 'ra blind', 'body still']:
             return None
         else:
             return to_print_result
@@ -295,7 +295,7 @@ class PrimalRecognition(Solver):
                 arm_motion_array = left_arm_motions
             direction, probabilities = self.get_arm_motion(data)
 
-            arm_motion_label = body_part + ': ' + direction
+            arm_motion_label = body_part + ' ' + direction
             try:
                 motion_encoding = arm_motion_array.index(arm_motion_label)
             except:
@@ -319,17 +319,15 @@ class PrimalRecognition(Solver):
         orientation = []
         axes = 3
 
-        arm_threshold, keep_ind = self.get_cumulative_threshold(data[:, 4 * np.arange(3)])  # 40.0 if rgb else 0.15  #Change this value
+        arm_threshold, keep_ind = 0.15, list(np.arange(1,4))#self.get_cumulative_threshold(data[:, 4 * np.arange(3)])
         keep_ind = list(chain(*[[j * 4 + off for off in range(1, 4)] for j in keep_ind]))
-        #print ('Threshold calculated: ', arm_threshold)
-
         data = data[:, keep_ind]
         rows, cols = data.shape
 
         axis_threshold = self.thresholds_dictionary['axis_threshold']
         proba_array = [0] * 6
 
-        if rows > 0:
+        if cols > 0:
             motion_mag = sum([np.linalg.norm(data[i+1]-data[i]) for i in range(rows-1)])
             if motion_mag >= arm_threshold:
                 delta = data[-1] - data[0]
@@ -396,8 +394,8 @@ class ArmMotionRecogntion(Solver):
             else:
                 probabilities = probabilities[:6]
 
-            #arm_motion_label = body_part + ' ' + direction
-            arm_motion_label = body_part + ': ' + direction
+            arm_motion_label = body_part + ' ' + direction
+
             try:
                 motion_encoding = arm_motion_array.index(arm_motion_label)
             except:
