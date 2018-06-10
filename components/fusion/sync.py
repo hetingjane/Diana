@@ -12,7 +12,7 @@ class Synchronizer:
     Limitations: If some sources generate data faster than the others, eventually they will become out of sync.
     This synchronizer makes no effort to restore synchronization in such a case.
     """
-    def __init__(self, names, history=10, block=False, init_wait=0.001):
+    def __init__(self, names, history=10):
         assert history > 0
         self._max_len = history
         self._qs = dict(zip(names, [deque() for i in range(len(names))]))
@@ -20,56 +20,13 @@ class Synchronizer:
         self._sync_point = None
         self._stale_ts = None
 
-        self._block = block
-        self._init_wait = init_wait
-        self._lagging = dict(zip(names, [False] * len(names)))
-        self._wait_times = dict(zip(names, [None for i in range(len(names))]))
-
     def _warn(self, message):
         print("WARNING: {}: {}".format(self.__class__.__name__, message))
-
-    def _mark_source_fast(self, name):
-        if self._block:
-            self._lagging[name] = False
-            self._wait_times[name] = self._wait_times[name] * 2 if self._wait_times[name] is not None else self._init_wait
-
-    def _mark_source_slow(self, name):
-        if self._block:
-            self._lagging[name] = True
-            self._wait_times[name] = None
-
-    def _induce_lag(self, name):
-        if self._block and self._wait_times[name] is not None:
-            sleep(self._wait_times[name])
-
-    def _reset_wait_times(self):
-        if self._block:
-            for name in self._wait_times:
-                self._reset_wait_time(name)
-
-    def _reset_wait_time(self, name):
-        if self._block:
-            self._lagging[name] = False
-            self._wait_times[name] = None
-
-    def is_lagging(self):
-        for name in self._qs:
-            if self.is_source_lagging(name):
-                return True
-        return False
-
-    def is_source_lagging(self, name):
-        return self._lagging[name]
 
     def feed(self, name, timestamp, data):
         if self._is_stale(timestamp):
             self._warn("'{}' is lagging behind at timestamp {} but stale timestamp is {}".format(name, timestamp, self._stale_ts))
-            self._mark_source_slow(name)
             return
-
-        if self.is_lagging():
-            self._mark_source_fast(name)
-            self._induce_lag(name)
 
         q = self._qs[name]
 
@@ -92,9 +49,6 @@ class Synchronizer:
 
         sync_lost = sync_lost_by_adding or sync_lost_by_removing or sync_lost_by_unavailable_data
         self._sync_point = None if sync_lost else q[0].timestamp
-
-        if self.is_synced():
-            self._reset_wait_times()
 
     def _is_stale(self, timestamp):
         return self._stale_ts is not None and timestamp < self._stale_ts
@@ -254,7 +208,7 @@ if __name__ == '__main__':
         def get_data(self):
             return self._shared_store.get(block=True)
 
-    s = Synchronizer(['body', 'rh', 'lh', 'head', 'speech'], history=10, block=True)
+    s = Synchronizer(['body', 'rh', 'lh', 'head', 'speech'], history=10)
     mcg = MockClients(('body', 29.0), ('rh', 25.0), ('lh', 25.0), ('head', 25.0), ('speech', 30.0))
     mcg.begin()
     while True:
