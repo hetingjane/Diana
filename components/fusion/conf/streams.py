@@ -54,10 +54,6 @@ def get_streams_count():
 def get_active_streams_count():
     return len(_active_streams)
 
+def get_active_stream_names():
+    return _active_streams
 
-def all_connected(connected_streams):
-    """
-    Check if all the streams in active_streams have been connected
-    :return: True if all active streams are connected, False otherwise
-    """
-    return _active_streams.intersection(connected_streams) == _active_streams
