@@ -8,11 +8,10 @@ from .conf import streams
 from .conf.postures import right_hand_postures, head_postures
 from .conf.endpoints import serve
 from .thread_sync import synced_msgs
+from .sync import Synchronizer
 
 
 class Fusion(threading.Thread):
-
-    _connected_clients = {}
 
     Header = namedtuple('Header', ['id', 'timestamp', 'name'])
 
@@ -32,9 +31,9 @@ class Fusion(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
         self.daemon = True
-        self._msgs_received = {}
         self._stop = threading.Event()
-        self._synced = False
+        self._connected_clients = {}
+        self._synchronizer = Synchronizer(streams.get_active_stream_names())
 
     def _recv_all(self, sock, size):
         result = b''
@@ -111,24 +110,6 @@ class Fusion(threading.Thread):
         data = self._read_stream_data(sock, header.id)
         return Fusion.Message(header, data)
 
-    def _set_sync(self, sync_ts):
-        if not self._synced:
-            print("Synchronized at timestamp: " + str(sync_ts))
-            self._synced = True
-            # Remove all older timestamps the instant we find a sync timestamp
-            for t in list(self._msgs_received.keys()):
-                if t < sync_ts:
-                    self._msgs_received.pop(t)
-
-    def _unset_sync(self):
-        if self._synced:
-            print("Synchronization lost.")
-            self._synced = False
-            self._msgs_received.clear()
-
-    def _is_synced(self):
-        return self._synced
-
     def stop(self):
         self._stop.set()
 
@@ -140,27 +121,27 @@ class Fusion(threading.Thread):
             stream_id_bytes = self._recv_all(sock, 4)
             stream_id = struct.unpack('<i', stream_id_bytes)[0]
         except Exception:
-            print("Unable to receive complete stream id. Ignoring the client")
+            print "Unable to receive complete stream id. Ignoring the client"
             sock.close()
-        print("Received stream id. Verifying...")
+        print "Received stream id. Verifying..."
         if streams.is_valid_id(stream_id):
             stream_name = streams.get_stream_name(stream_id)
             if streams.is_active(stream_name):
-                print("Stream is valid and active: {}".format(stream_name))
-                print("Checking if stream is already connected...")
-                if stream_name not in list(self._connected_clients.values()):
-                    print("New stream. Accepting the connection {}:{}".format(addr[0], addr[1]))
+                print "Stream is valid and active: {}".format(stream_name)
+                print "Checking if stream is already connected..."
+                if stream_name not in self._connected_clients.values():
+                    print "New stream. Accepting the connection {}:{}".format(addr[0], addr[1])
                     sock.shutdown(socket.SHUT_WR)
                     self._connected_clients[sock] = stream_name
                     return True
                 else:
-                    print("Stream already exists. Rejecting the connection.")
+                    print "Stream already exists. Rejecting the connection."
                     sock.close()
             else:
-                print("Rejecting inactive stream: {}".format(stream_name))
+                print "Rejecting inactive stream: {}".format(stream_name)
                 sock.close()
         else:
-            print("Rejecting invalid stream with id: {}".format(stream_id))
+            print "Rejecting invalid stream with id: {}".format(stream_id)
             sock.close()
         return False
 
@@ -172,7 +153,7 @@ class Fusion(threading.Thread):
         outputs = []
         excepts = []
 
-        print("Waiting for clients to connect")
+        print "Waiting for clients to connect"
 
         while not self.is_stopped():
             try:
@@ -182,10 +163,9 @@ class Fusion(threading.Thread):
                     try:
                         select.select([sock], [], [], 0)
                     except Exception:
-                        print("Client disconnected.")
+                        print "{} client disconnected".format(self._connected_clients[sock])
                         inputs.remove(sock)
                         self._connected_clients.pop(sock)
-                        self._unset_sync()
                 continue
 
             for s in read_socks:
@@ -198,56 +178,22 @@ class Fusion(threading.Thread):
                     try:
                         msg = self._handle_client(s)
                     except (socket.error, EOFError):
-                        print("Client disconnected.")
+                        print "{} client disconnected".format(self._connected_clients[s])
                         inputs.remove(s)
                         self._connected_clients.pop(s)
-                        self._unset_sync()
                         continue
 
-                    # Read and discard data unless enough clients connect
-                    if streams.all_connected(list(self._connected_clients.values())):
-                        cur_ts = msg.header.timestamp
+                    self._synchronizer.feed(msg.header.name, msg.header.timestamp, msg)
 
-                        # Add data to appropriate timestamp bucket
-                        self._msgs_received.setdefault(cur_ts, []).append(msg)
+                    if self._synchronizer.is_synced():
+                        synced_msgs.put(self._synchronizer.get_synced_data()[1])
 
-                        # Try to sync in presence of this new data
-                        # Will run every time until we are synced
-                        if not self._is_synced():
-                            # Try to find a sync point if it exists
-                            for ts in sorted(self._msgs_received.keys()):
-                                # Weak check for all data received
-                                if len(self._msgs_received[ts]) == streams.get_active_streams_count():
-                                    # This is the sync point
-                                    sync_ts = ts
-                                    self._set_sync(sync_ts)
-                                    break
-                        else:
-                            # Already synced
-                            sync_ts = min(self._msgs_received.keys())
-                            #print "Minimum timestamp: {0}".format(sync_ts)
-                            if len(self._msgs_received[sync_ts]) == streams.get_active_streams_count():
-                                # Create a shared data object representing the synced data
-                                # Indexed by stream type
-                                # Value is the entire decoded frame of that stream type
-                                #print "Timestamp contains all data"
-                                s_msg = {}
-                                for m in self._msgs_received[sync_ts]:
-                                    s_msg[m.header.name] = m
-                                #print "{0:d}, LH: {1:.2f}, {2:.2f}, RH: {3:.2f}, {4:.2f}".format(sync_ts,
-                                # s_msg["Body"].data.pos_l_x, s_msg["Body"].data.pos_l_y,
-                                # s_msg["Body"].data.pos_r_x, s_msg["Body"].data.pos_r_x)
-                                synced_msgs.put(s_msg)
-                                self._msgs_received.pop(sync_ts)
-                            """
-                            else:
-                                found_streams = []
-                                for m in self._msgs_received[sync_ts]:
-                                    found_streams += [m.header.name]
-                                print "Only " + str(len(found_streams)) + " streams were found: " + ",".join(found_streams)
-                            """
+        self._synchronizer.reset()
 
-        print("Stopped network thread")
+        print "Stopped fusion thread"
 
         for s in inputs:
-            s.close()
+            try:
+                s.close()
+            except socket.error:
+                pass

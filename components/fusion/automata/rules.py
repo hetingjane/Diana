@@ -1,105 +1,191 @@
-from ..conf.postures import to_vec
+from abc import ABCMeta, abstractmethod
 
-def match_any(*postures):
+from components.fusion.automata.constraint import Constraint
+
+
+class Rule:
     """
-    Returns a rule to match one or more postures with the input mask that is True when
-    at least one of the postures matches with the input mask, else False
-    :param postures: One or more postures as strings
-    :return: Rule to match the input postures with the input mask
+    Rule allowing to check one or more constraint satisfaction
+    IMPORTANT: A Rule is never reset automatically (the constraints are, though)
     """
-    posture_vecs = [to_vec[posture] for posture in postures]
+    __metaclass__ = ABCMeta
 
-    def f(in_sym):
-        for v in posture_vecs:
-            if (in_sym & v) == v:
-                return True
-        return False
+    IS_TRUE = 2
+    MATCHED = 1
+    IS_FALSE = 0
 
-    return f
+    def __init__(self, *spec, **options):
+        self._spec = spec
+        self._constraints = Constraint.read(*spec)
+        invert = options['invert'] if 'invert' in options else False
+        if invert:
+            for constraint in self._constraints:
+                constraint.invert()
+
+    @abstractmethod
+    def match(self, *inputs):
+        pass
+
+    @abstractmethod
+    def inverted(self):
+        pass
+
+    def reset(self):
+        for constraint in self._constraints:
+            constraint.reset()
+
+    def __repr__(self):
+        combined_constraints = ', '.join(map(str, self._constraints))
+        if len(self._constraints) == 1:
+            return combined_constraints
+        else:
+            return '{}({})'.format(self.__class__.__name__, combined_constraints)
 
 
-def match_all(*postures):
+class Any(Rule):
     """
-    Returns a rule to match one or more postures with the input mask that is True when
-    all of the postures match with the input mask, else False
-    :param postures: One or more postures as strings
-    :return: Rule to match the input postures with the input mask
-    """
-    posture_vecs = [to_vec[posture] for posture in postures]
-
-    def f(in_sym):
-        for v in posture_vecs:
-            if (in_sym & v) != v:
-                return False
-        return True
-
-    return f
-
-
-def mismatch_any(*postures):
-    """
-    Returns a rule to match one or more postures with the input mask that is True when
-    at least one of the postures does not match with the input mask, else False
-    :param postures: One or more postures as strings
-    :return: Rule to match the input postures with the input mask
+    Any rule is true when any of the constraints is satisfied
+    Any rule is matched when some of the constraints are matched
+    Any rule is false when none of the constraints are matched
     """
 
-    posture_vecs = [to_vec[posture] for posture in postures]
+    def match(self, *inputs):
+        assert len(inputs) > 0
+        some_satisfied = False
+        some_names_matched = False
+        for constraint in self._constraints:
+            result = constraint.input(*inputs)
+            some_satisfied = some_satisfied or (result == Constraint.SATISFIED)
+            some_names_matched = some_names_matched or (result in [Constraint.MATCHED_NAMES, Constraint.SATISFIED])
 
-    def f(in_sym):
-        for v in posture_vecs:
-            if (in_sym & v) != v:
-                return True
-        return False
+        if some_satisfied:
+            return Rule.IS_TRUE
+        elif some_names_matched:
+            return Rule.MATCHED
+        else:
+            return Rule.IS_FALSE
 
-    return f
+    def inverted(self):
+        return All(*self._spec, invert=True)
 
 
-def mismatch_all(*postures):
+class All(Rule):
     """
-    Returns a rule to match one or more postures with the input mask that is True when
-    none of the postures matches with the input mask, else False
-    :param postures: One or more postures as strings
-    :return: Rule to match the input postures with the input mask
+    All rule is true when all the constraints are satisfied
+    All rule is matched when some of the constraints are matched
+    All rule is false when none of the constraints are matched
     """
-    posture_vecs = [to_vec[posture] for posture in postures]
+    def match(self, *inputs):
+        assert len(inputs) > 0
+        all_satisfied = True
+        some_names_matched = False
+        for constraint in self._constraints:
+            result = constraint.input(*inputs)
+            some_names_matched = some_names_matched or (result in [Constraint.MATCHED_NAMES, Constraint.SATISFIED])
+            all_satisfied = all_satisfied and (result == Constraint.SATISFIED)
 
-    def f(in_sym):
-        for v in posture_vecs:
-            if (in_sym & v) == v:
-                return False
-        return True
+        if all_satisfied:
+            return Rule.IS_TRUE
+        elif some_names_matched:
+            return Rule.MATCHED
+        else:
+            return Rule.IS_FALSE
 
-    return f
-
-
-# Meta rule for ANDing
-def and_rules(*rules):
-    """
-    Returns a rule that computes the logical AND of the input rules with the input mask
-    :param rules: One or more boolean rules
-    :return: Rule that is logical AND of the input boolean rules
-    """
-    def f(in_sym):
-        for rule in rules:
-            if not rule(in_sym):
-                return False
-        return True
-
-    return f
+    def inverted(self):
+        return Any(*self._spec, invert=True)
 
 
-# Meta rule for ORing
-def or_rules(*rules):
-    """
-    Returns a rule that computes the logical OR of the input rules with the input mask
-    :param rules: One or more boolean rules
-    :return: Rule that is logical OR of the input boolean rules
-    """
-    def f(in_sym):
-        for rule in rules:
-            if rule(in_sym):
-                return True
-        return False
+class MetaRule(Rule):
 
-    return f
+    __metaclass__ = ABCMeta
+
+    def __init__(self, *rules):
+        self._rules = rules
+
+    def reset(self):
+        for rule in self._rules:
+            rule.reset()
+
+    def __repr__(self):
+        return '({})'.format((' ' + self.__class__.__name__.lower() + ' ').join(map(str, self._rules)))
+
+
+class And(MetaRule):
+    def __init__(self, *rules):
+        assert len(rules) > 1
+        MetaRule.__init__(self, *rules)
+
+    def match(self, *inputs):
+        all_true = True
+        some_matched = True
+
+        for rule in self._rules:
+            result = rule.match(*inputs)
+            all_true = all_true and (result == Rule.IS_TRUE)
+            some_matched = some_matched or result in [Rule.MATCHED, Rule.IS_TRUE]
+
+        if all_true:
+            return Rule.IS_TRUE
+        elif some_matched:
+            return Rule.MATCHED
+        else:
+            return Rule.IS_FALSE
+
+    def inverted(self):
+        rules = []
+        for rule in self._rules:
+            rules.append(rule.inverted())
+        return Or(*rules)
+
+
+class Or(MetaRule):
+    def __init__(self, *rules):
+        assert len(rules) > 1
+        MetaRule.__init__(self, *rules)
+
+    def match(self, *inputs):
+        some_true = False
+        some_matched = False
+        for rule in self._rules:
+            result = rule.match(*inputs)
+            some_true = some_true or result == Rule.IS_TRUE
+            some_matched = some_matched or result in [Rule.MATCHED, Rule.IS_TRUE]
+
+        if some_true:
+            return Rule.IS_TRUE
+        elif some_matched:
+            return Rule.MATCHED
+        else:
+            return Rule.IS_FALSE
+
+    def inverted(self):
+        rules = []
+        for rule in self._rules:
+            rules.append(rule.inverted())
+        return And(*rules)
+
+
+if __name__ == '__main__':
+    import csv
+    engage_rule = All(('engaged', 1))
+    disengage_rule = engage_rule.inverted()
+
+    rules_to_test = [engage_rule, disengage_rule]
+
+    with open('speak_and_point.csv', 'r') as f:
+        f.readline()
+        reader = csv.reader(f)
+        i = 1
+        for row in reader:
+            for rule in rules_to_test:
+                result = rule.match(*row)
+                print(rule)
+                if result == Rule.MATCHED:
+                    result = 'match'
+                elif result == Rule.IS_FALSE:
+                    result = 'false'
+                elif result == Rule.IS_TRUE:
+                    result = 'true'
+                print("{}:{}:{}\n".format(i, result, ', '.join(row)))
+            i += 1
+
