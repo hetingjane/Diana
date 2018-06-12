@@ -1,7 +1,7 @@
 import sys, struct
 import argparse
 
-from ..fusion.conf.endpoints import connect
+from components.fusion.conf.endpoints import connect
 
 # Timestamp | frame type | command_length | command
 def decode_frame(raw_frame):

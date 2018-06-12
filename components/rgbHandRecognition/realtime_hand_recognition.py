@@ -8,7 +8,9 @@ slim = tf.contrib.slim
 
 class RealTimeHandRecognition():
     def __init__(self, hands, gestures):
-
+        gpu_config = tf.GPUOptions(per_process_memory_fraction=0.3)
+        self.config = tf.ConfigProto(gpu_options=gpu_config)
+        self.config.gpu_options.allow_growth = True
 
         self._image = tf.placeholder(tf.float32, [128, 128, 3])
 
@@ -37,7 +39,7 @@ class RealTimeHandRecognition():
         self.past_probs = None
 
     def classify(self, data):
-        (predictions) = self.sess.run([self.probabilities_tensor], feed_dict={self._image: data})
+        (predictions) = self.sess.run([self.probabilities_tensor], feed_dict={self._image: data}, config=self.config)
         probs = predictions[0][0]
 
         if self.past_probs is None:

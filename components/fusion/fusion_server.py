@@ -248,6 +248,8 @@ class App:
                 all_events_to_send.insert(0, "G;" + cur_state + ";" + ts)
 
         if engaged and len(word) > 0:
+            if word is not str:
+                word = word.decode()
             all_events_to_send.append("S;" + word + ";" + ts)
 
         if not engaged:
@@ -263,7 +265,7 @@ class App:
             ev_type, ev, timestamp = e.split(';')
             if ev_type != 'P':
                 print(ev_type.ljust(5) + ev.ljust(30) + timestamp + "\n\n")
-            raw_events_to_send.append(struct.pack("<i" + str(len(e)) + "s", len(e), e))
+            raw_events_to_send.append(struct.pack("<i" + str(len(e)) + "s", len(e), e.encode()))
 
         return raw_events_to_send
 

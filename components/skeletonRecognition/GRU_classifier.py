@@ -32,13 +32,19 @@ class GRU_RNN:
 
 
         try:
-            config = tf.ConfigProto(allow_soft_placement=True)
-            config.gpu_options.allow_growth = True
-            self.sess = tf.Session(config= config)
+            gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.2)
+            self.config = tf.ConfigProto(gpu_options=gpu_options)
+            self.config.gpu_options.allow_growth = True
+            self.config.allow_soft_placement=True
+
+            self.sess = tf.Session(config=self.config)
         except:
-            config = tf.ConfigProto(allow_soft_placement=True)
-            config.gpu_options.allow_growth = True
-            self.sess = tf.Session(config= config)
+            gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.2)
+            self.config = tf.ConfigProto(gpu_options=gpu_options)
+            self.config.gpu_options.allow_growth = True
+            self.config.allow_soft_placement=True
+
+            self.sess = tf.Session(config=self.config)
 
         # model saver
         self.saver = tf.train.Saver()
@@ -88,7 +94,7 @@ class EGGNOGClassifierSlidingWindow(object):
         x_data = res[0][np.newaxis, :, :]
         x_data = np.array([x_data[0] for _ in range(self.test_batch_size)])
 
-        pred_val, proba_output = self.model.sess.run( [self.model.predicted_values, self.model.prediction], feed_dict={self.model.x: x_data, self.model.n_frames: n_frame_batch})
+        pred_val, proba_output = self.model.sess.run( [self.model.predicted_values, self.model.prediction], feed_dict={self.model.x: x_data, self.model.n_frames: n_frame_batch}, config=self.config)
         pred_val = int(pred_val[0])
         proba = proba_output[0]
 
