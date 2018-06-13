@@ -8,6 +8,8 @@ import os
 import cv2
 from ..fusion.conf.endpoints import connect
 from ..fusion.conf import streams
+import components.timer
+
 
 src_addr = '129.82.45.252'
 src_port = 9009
@@ -112,7 +114,7 @@ if __name__ == '__main__':
     i = 0
     avg_frame_time = 0.0
 
-    start_time = time.time()
+    start_time = components.timer.safetime()
 
     while True:
         try:
@@ -158,8 +160,8 @@ if __name__ == '__main__':
             i += 1
 
             if i % 100 == 0:
-                print("=" * 100, "FPS", 100 / (time.time() - start_time))
-                start_time = time.time()
+                print("=" * 100, "FPS", 100 / (components.timer.safetime() - start_time))
+                start_time = components.timer.safetime()
 
 
     s.close()

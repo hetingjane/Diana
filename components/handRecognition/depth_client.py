@@ -8,6 +8,8 @@ import numpy as np
 from .realtime_hand_recognition import RealTimeHandRecognition
 from ..fusion.conf.endpoints import connect
 from ..fusion.conf import streams
+import components.timer
+
 
 # timestamp (long) | depth_hands_count(int) | left_hand_height (int) | left_hand_width (int) |
 # right_hand_height (int) | right_hand_width (int)| left_hand_pos_x (float) | left_hand_pos_y (float) | ... |
@@ -79,7 +81,7 @@ if __name__ == '__main__':
     i = 0
     hands_list = []
 
-    start_time = time.time()
+    start_time = components.timer.safetime()
     while True:
         try:
             frame = recv_depth_frame(kinect_socket)
@@ -112,8 +114,8 @@ if __name__ == '__main__':
         i += 1
 
         if i % 100==0:
-            print("="*100, "FPS", 100/(time.time()-start_time))
-            start_time = time.time()
+            print("="*100, "FPS", 100/(components.timer.safetime()-start_time))
+            start_time = components.timer.safetime()
 
         pack_list = [stream_id, timestamp,max_index]+list(probs)
 

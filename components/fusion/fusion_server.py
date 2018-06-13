@@ -2,7 +2,7 @@ import sys
 import time
 import argparse
 import struct
-import Queue
+import queue
 import csv
 
 import numpy as np
@@ -13,7 +13,7 @@ from components.fusion.remote_thread import Remote
 from components.fusion import thread_sync
 from components.fusion.conf import streams
 from components.fusion.conf import postures
-
+import components.timer
 
 class App:
 
@@ -60,7 +60,7 @@ class App:
         while not_empty:
             try:
                 thread_sync.synced_msgs.get_nowait()
-            except Queue.Empty:
+            except queue.Empty:
                 not_empty = False
 
     def _start(self):
@@ -85,7 +85,7 @@ class App:
         :return: Nothing
         """
         if self.received > 0:
-            print "Skipped percentage: " + str(self.skipped * 100.0 / self.received)
+            print(("Skipped percentage: " + str(self.skipped * 100.0 / self.received)))
 
     def _exit(self):
         """
@@ -114,17 +114,17 @@ class App:
             # Get synced data without blocking with timeout
             self.latest_s_msg = thread_sync.synced_msgs.get(False, 0.2)
             if self.debug:
-                print "Latest synced message: ", self.latest_s_msg, "\n"
+                print(("Latest synced message: ", self.latest_s_msg, "\n"))
             #
             self._update_queues()
             self.received += 1
             if thread_sync.synced_msgs.qsize() <= 15:
                 if self.debug:
-                    print "Backlog queue size exceeded limit: {}".format(thread_sync.synced_msgs.qsize())
+                    print(("Backlog queue size exceeded limit: {}".format(thread_sync.synced_msgs.qsize())))
             else:
                 self.skipped += 1
-                print "Skipping because backlog too large: {}".format(thread_sync.synced_msgs.qsize())
-        except Queue.Empty:
+                print(("Skipping because backlog too large: {}".format(thread_sync.synced_msgs.qsize())))
+        except queue.Empty:
             pass
 
     def _get_probs(self):
@@ -212,8 +212,8 @@ class App:
         # More than one output data is possible from multiple state machines
         all_events_to_send = []
 
-        ts = "{0:.3f}".format(time.time())
-        lx, ly, var_l_x, var_l_y, rx, ry, var_r_x, var_r_y = map(lambda x: "{0:.2f}".format(x), [lx, ly, var_l_x, var_l_y, rx, ry, var_r_x, var_r_y])
+        ts = "{0:.3f}".format(components.timer.safetime())
+        lx, ly, var_l_x, var_l_y, rx, ry, var_r_x, var_r_y = ["{0:.2f}".format(x) for x in [lx, ly, var_l_x, var_l_y, rx, ry, var_r_x, var_r_y]]
 
         for state_machine in self.state_machines:
             # Input the combined label to the state machine
@@ -249,7 +249,7 @@ class App:
         for e in all_events_to_send:
             ev_type, ev, timestamp = e.split(';')
             if ev_type != 'P':
-                print ev_type.ljust(5) + ev.ljust(30) + timestamp + "\n\n"
+                print((ev_type.ljust(5) + ev.ljust(30) + timestamp + "\n\n"))
             raw_events_to_send.append(struct.pack("<i" + str(len(e)) + "s", len(e), e))
 
         return raw_events_to_send
@@ -297,10 +297,10 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if args.mode == 'brandeis':
-        print "Running in Brandeis mode"
+        print("Running in Brandeis mode")
         event_set = brandeis_events
     elif args.mode == 'csu':
-        print "Running in CSU mode"
+        print("Running in CSU mode")
         event_set = csu_events
     else:
         event_set = None

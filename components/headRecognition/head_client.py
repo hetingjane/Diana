@@ -9,6 +9,8 @@ from skimage.transform import resize
 from .realtime_head_recognition import RealTimeHeadRecognition
 from ..fusion.conf.endpoints import connect
 from ..fusion.conf import streams
+import components.timer
+
 
 # Timestamp | frame type | width | height | depth_data
 def decode_frame(raw_frame):
@@ -77,16 +79,16 @@ if __name__ == '__main__':
 
 
     index = 0
-    start_time = time.time()
+    start_time = components.timer.safetime()
     window = deque(maxlen=30)
     euclidean_skeleton = deque(maxlen=29)
     prev_skeleton = None
 
     while True:
         try:
-            t_begin = time.time()
+            t_begin = components.timer.safetime()
             f = recv_depth_frame(kinect_socket)
-            t_end = time.time()
+            t_end = components.timer.safetime()
         except:
             break
         #print "Time taken for this frame: {}".format(t_end - t_begin)
@@ -159,8 +161,8 @@ if __name__ == '__main__':
                 fusion_socket.send(bytes)
 
         if index % 100==0:
-            print("="*100, "FPS", 100/(time.time()-start_time))
-            start_time = time.time()
+            print("="*100, "FPS", 100/(components.timer.safetime()-start_time))
+            start_time = components.timer.safetime()
 
     kinect_socket.close()
     if fusion_socket is not None:

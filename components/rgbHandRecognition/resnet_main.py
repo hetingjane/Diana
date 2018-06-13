@@ -5,6 +5,7 @@ import numpy as np
 from . import resnet_utils
 import time
 from image_reader import get_input
+import components.timer
 
 slim = tf.contrib.slim
 
@@ -90,7 +91,7 @@ def train():
         print(v1.name, v.shape, np.min(v), np.max(v), np.mean(v), np.std(v))
 
     saver.save(sess, os.path.join(log_root,"model.ckpt"), global_step=global_step_1)
-    checkpoint_time = time.time()
+    checkpoint_time = components.timer.safetime()
 
     while True:
         _, summary, g_step, loss, accuracy, l_rate = sess.run([train_op, summary_op, global_step_1, total_loss, precision, lr])
@@ -98,9 +99,9 @@ def train():
         if g_step%10 == 0:
             tf.logging.info('Global_step_1: %d, loss: %f, precision: %.2f, lr: %f'%(g_step, loss, accuracy, l_rate))
 
-        if time.time() - checkpoint_time > save_checkpoint_secs:
+        if components.timer.safetime() - checkpoint_time > save_checkpoint_secs:
             saver.save(sess, os.path.join(log_root, "model.ckpt"), global_step=global_step_1)
-            checkpoint_time = time.time()
+            checkpoint_time = components.timer.safetime()
 
         if g_step%save_summaries_steps == 0:
             summary_writer.add_summary(summary, g_step)

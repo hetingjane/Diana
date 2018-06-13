@@ -121,27 +121,27 @@ class Fusion(threading.Thread):
             stream_id_bytes = self._recv_all(sock, 4)
             stream_id = struct.unpack('<i', stream_id_bytes)[0]
         except Exception:
-            print "Unable to receive complete stream id. Ignoring the client"
+            print("Unable to receive complete stream id. Ignoring the client")
             sock.close()
-        print "Received stream id. Verifying..."
+        print("Received stream id. Verifying...")
         if streams.is_valid_id(stream_id):
             stream_name = streams.get_stream_name(stream_id)
             if streams.is_active(stream_name):
-                print "Stream is valid and active: {}".format(stream_name)
-                print "Checking if stream is already connected..."
-                if stream_name not in self._connected_clients.values():
-                    print "New stream. Accepting the connection {}:{}".format(addr[0], addr[1])
+                print("Stream is valid and active: {}".format(stream_name))
+                print("Checking if stream is already connected...")
+                if stream_name not in list(self._connected_clients.values()):
+                    print("New stream. Accepting the connection {}:{}".format(addr[0], addr[1]))
                     sock.shutdown(socket.SHUT_WR)
                     self._connected_clients[sock] = stream_name
                     return True
                 else:
-                    print "Stream already exists. Rejecting the connection."
+                    print("Stream already exists. Rejecting the connection.")
                     sock.close()
             else:
-                print "Rejecting inactive stream: {}".format(stream_name)
+                print("Rejecting inactive stream: {}".format(stream_name))
                 sock.close()
         else:
-            print "Rejecting invalid stream with id: {}".format(stream_id)
+            print("Rejecting invalid stream with id: {}".format(stream_id))
             sock.close()
         return False
 
@@ -153,7 +153,7 @@ class Fusion(threading.Thread):
         outputs = []
         excepts = []
 
-        print "Waiting for clients to connect"
+        print("Waiting for clients to connect")
 
         while not self.is_stopped():
             try:
@@ -163,7 +163,7 @@ class Fusion(threading.Thread):
                     try:
                         select.select([sock], [], [], 0)
                     except Exception:
-                        print "{} client disconnected".format(self._connected_clients[sock])
+                        print("{} client disconnected".format(self._connected_clients[sock]))
                         inputs.remove(sock)
                         self._connected_clients.pop(sock)
                 continue
@@ -178,7 +178,7 @@ class Fusion(threading.Thread):
                     try:
                         msg = self._handle_client(s)
                     except (socket.error, EOFError):
-                        print "{} client disconnected".format(self._connected_clients[s])
+                        print("{} client disconnected".format(self._connected_clients[s]))
                         inputs.remove(s)
                         self._connected_clients.pop(s)
                         continue
@@ -190,7 +190,7 @@ class Fusion(threading.Thread):
 
         self._synchronizer.reset()
 
-        print "Stopped fusion thread"
+        print("Stopped fusion thread")
 
         for s in inputs:
             try:

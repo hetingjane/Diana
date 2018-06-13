@@ -62,21 +62,21 @@ if __name__ == '__main__':
         try:
             frame = recv_speech_frame(k)
         except:
-            print "Unable to receive speech frame"
+            print("Unable to receive speech frame")
             break
         timestamp, frame_type, command = decode_frame(frame)
 
         if len(command) > 0:
-            command = ' '.join(['speak', command.lower()])
-            print timestamp, frame_type, command
-            print "\n\n"
+            command = ' '.join(['speak', command.decode().lower()])
+            print(timestamp, frame_type, command)
+            print("\n\n")
 
         if f is not None:
             try:
                 # Excluding frame size
                 f.sendall(struct.pack("<iqi" + str(len(command)) + "s", frame_type, timestamp, len(command), command))
             except:
-                print "Error: Connection to fusion lost"
+                print("Error: Connection to fusion lost")
                 f.close()
                 f = None
 

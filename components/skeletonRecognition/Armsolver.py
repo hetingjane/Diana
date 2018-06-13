@@ -3,7 +3,7 @@ from itertools import chain
 from collections import deque
 
 from ..fusion.conf.postures import left_arm_motions, right_arm_motions
-from receiveAndShow import Pointing
+from .receiveAndShow import Pointing
 
 
 class Solver(object):
@@ -87,7 +87,7 @@ class Solver(object):
 
 
     def get_skeleton_data(self):
-        base, offset = 9, range(6, 10)
+        base, offset = 9, list(range(6, 10))
         joints_to_consider = list(np.arange(12)) + list(np.arange(20, 25))
 
         indices = list(chain(*[[(k * base + j) for j in offset] for k in joints_to_consider]))
@@ -357,20 +357,20 @@ class PrimalRecognition(Solver):
 class ArmMotionRecogntion(Solver):
     def __init__(self, pointing_mode):
         super(ArmMotionRecogntion, self).__init__(pointing_mode=pointing_mode)
-        from LSTMSolver import RealTimeArmMotionRecognition
-        from Models import Arms_LSTM
+        from .LSTMSolver import RealTimeArmMotionRecognition
+        from .Models import Arms_LSTM
 
         import tensorflow as tf
         g1 = tf.Graph()
         with g1.as_default():
-            print 'Loading Left arm model'
+            print('Loading Left arm model')
             model_left = Arms_LSTM(logs_path="/s/red/a/nobackup/vision/dkpatil/demo/lstm_models/la/", n_hidden=30, n_layers=2)
         self._left_arm_model = RealTimeArmMotionRecognition(model_left)
 
 
         g2 = tf.Graph()
         with g2.as_default():
-            print 'Loading Right arm model'
+            print('Loading Right arm model')
             model_right = Arms_LSTM(logs_path="/s/red/a/nobackup/vision/dkpatil/demo/lstm_models/ra/", n_hidden=30, n_layers=1)
         self._right_arm_model = RealTimeArmMotionRecognition(model_right)
 
