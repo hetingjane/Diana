@@ -116,7 +116,7 @@ class Fusion(threading.Thread):
             print("Synchronized at timestamp: {}".format(sync_ts))
             self._synced = True
             # Remove all older timestamps the instant we find a sync timestamp
-            for t in self._msgs_received.keys():
+            for t in list(self._msgs_received.keys()):
                 if t < sync_ts:
                     self._msgs_received.pop(t)
 
