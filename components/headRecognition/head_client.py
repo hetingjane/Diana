@@ -7,9 +7,10 @@ import argparse
 import numpy as np
 from collections import deque
 from skimage.transform import resize
-from realtime_head_recognition import RealTimeHeadRecognition
+from .realtime_head_recognition import RealTimeHeadRecognition
 from ..fusion.conf.endpoints import connect
 from ..fusion.conf import streams
+
 
 # Timestamp | frame type | width | height | depth_data
 def decode_frame(raw_frame):
@@ -93,7 +94,7 @@ if __name__ == '__main__':
         #print "Time taken for this frame: {}".format(t_end - t_begin)
         avg_frame_time += (t_end - t_begin)
         timestamp, frame_type, width, height, posx, posy, depth_data = decode_frame(f)
-        print timestamp, frame_type, width, height,
+        print(timestamp, frame_type, width, height, end=' ')
 
         curr_skeleton = np.array([posx, posy])
 
@@ -125,13 +126,13 @@ if __name__ == '__main__':
                 gesture_index, probs = head_classifier.classify(new_window)
                 head_movement = np.sum(euclidean_skeleton)
                 probs = list(probs)+[0]
-                print gesture_list[gesture_index], probs[gesture_index], head_movement,
+                print(gesture_list[gesture_index], probs[gesture_index], head_movement, end=' ')
 
                 if head_movement>13: #0.03
                     gesture_index = 2
                     probs = [0,0,1,0]
-                    print gesture_list[gesture_index],
-                print "\n"
+                    print(gesture_list[gesture_index], end=' ')
+                print("\n")
 
                 pack_list = [stream_id, timestamp, gesture_index] + list(probs)
 
@@ -142,7 +143,7 @@ if __name__ == '__main__':
 
             else:
                 pack_list = [stream_id, timestamp, num_gestures] + [0] * num_gestures + [1]
-                print 'Buffer not full'
+                print('Buffer not full')
                 bytes = struct.pack("<iqi" + "f" * (num_gestures + 1), *pack_list)
 
                 if fusion_socket is not None:
@@ -153,14 +154,14 @@ if __name__ == '__main__':
 
         else:
             pack_list = [stream_id, timestamp, num_gestures] + [0] * num_gestures + [1]
-            print 'blind'
+            print('blind')
             bytes = struct.pack("<iqi" + "f" * (num_gestures + 1), *pack_list)
 
             if fusion_socket is not None:
                 fusion_socket.send(bytes)
 
         if index % 100==0:
-            print "="*100, "FPS", 100/(time.time()-start_time)
+            print("="*100, "FPS", 100/(time.time()-start_time))
             start_time = time.time()
 
     kinect_socket.close()

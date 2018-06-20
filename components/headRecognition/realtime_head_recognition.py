@@ -1,7 +1,7 @@
-import resnet_model_half_weights
+from . import resnet_model_half_weights
 import tensorflow as tf
 import numpy as np
-import os
+
 
 class RealTimeHeadRecognition():
     def __init__(self, gestures):
@@ -23,9 +23,9 @@ class RealTimeHeadRecognition():
         sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
         tf.train.start_queue_runners(sess)
         ckpt_state = tf.train.get_checkpoint_state("/s/red/a/nobackup/cwc/tf/heads/head_diff_half_weights/")
-        print 'Loading checkpoint %s', ckpt_state.model_checkpoint_path
+        print('Loading checkpoint {}'.format(ckpt_state.model_checkpoint_path))
         saver.restore(sess, ckpt_state.model_checkpoint_path)
-        print "Loading done"
+        print("Loading done")
 
         self.sess = sess
         self.model = model
