@@ -7,7 +7,7 @@ import argparse
 
 from ..fusion.conf import streams
 from ..fusion.conf.endpoints import connect
-from Armsolver import PrimalRecognition, ArmMotionRecogntion
+from .Armsolver import PrimalRecognition, ArmMotionRecogntion
 
 def decode_frame(raw_frame):
     # The format is given according to the following assumption of network data

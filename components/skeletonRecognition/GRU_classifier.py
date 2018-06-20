@@ -70,13 +70,13 @@ class EGGNOGClassifierSlidingWindow(object):
 
         # Throw an error if there are extra keyword arguments
         if len(kwargs) > 0:
-            extra = ', '.join('"%s"' % k for k in kwargs.keys())
+            extra = ', '.join('"%s"' % k for k in list(kwargs.keys()))
             raise ValueError('Unrecognized arguments %s' % extra)
 
 
         if self.restore_model:
             self.model.saver.restore(self.model.sess, self.model.logs_path)
-            print 'Old model restored from %s' % (self.model.logs_path)
+            print ('Old model restored from %s' % (self.model.logs_path))
 
 
     def predict(self, res):

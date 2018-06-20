@@ -33,17 +33,17 @@ class Arms_LSTM:
             'out': tf.Variable(tf.random_normal([self.n_classes]))
         }
 
-        print '----------Tensor shapes---------'
-        print 'Name of model: ', self._cell_type
-        print 'shape of x is: ', self.x.shape
-        print 'Max length of data is: ', self.max_length
-        print 'shape of n_frames is: ', self.n_frames.shape
-        print 'feature_size is: ', self._feature_size
-        print 'n_hidden units is: ', self.n_hidden
-        print 'classes is: ', self.n_classes
-        print 'batch size is: ', self.batch_size
-        print 'number of layers of stacked MultiRNNCells: ', self.num_layers
-        print '-------------------------------'
+        print ('----------Tensor shapes---------')
+        print ('Name of model: ', self._cell_type)
+        print ('shape of x is: ', self.x.shape)
+        print ('Max length of data is: ', self.max_length)
+        print ('shape of n_frames is: ', self.n_frames.shape)
+        print ('feature_size is: ', self._feature_size)
+        print ('n_hidden units is: ', self.n_hidden)
+        print ('classes is: ', self.n_classes)
+        print ('batch size is: ', self.batch_size)
+        print ('number of layers of stacked MultiRNNCells: ', self.num_layers)
+        print ('-------------------------------')
 
 
         #MAIN LSTM Network
