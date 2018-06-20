@@ -2,7 +2,7 @@ import threading
 import socket
 import select
 import sys
-import Queue
+import queue
 
 from .conf.endpoints import serve
 
@@ -26,7 +26,7 @@ class Remote(threading.Thread):
         return self._stop.is_set()
 
     def _log(self, msg):
-        print self.id + msg
+        print("[ {} ]\t{}".format(self.name, msg))
 
     def run(self):
         remote_sock = serve(self.target)
@@ -60,6 +60,7 @@ class Remote(threading.Thread):
                     data = self.input_queue.get_nowait()
 
                     for ws in write_socks:
+                        client_addr = None
                         try:
                             client_addr = ws.getpeername()
                             ws.sendall(data)
@@ -68,8 +69,11 @@ class Remote(threading.Thread):
                                 outputs.remove(ws)
                             if len(outputs) == 0:
                                 self._conn.clear()
-                            self._log("{}:{} disconnected".format(client_addr[0], client_addr[1]))
-                except Queue.Empty:
+                            if client_addr is not None:
+                                self._log("{}:{} disconnected".format(client_addr[0], client_addr[1]))
+                            else:
+                                self._log("Client disconnected")
+                except queue.Empty:
                     break
 
         self._log("Stopped")

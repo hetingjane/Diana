@@ -37,18 +37,18 @@ def connect(hostrole, hostname, stream_str, timeout=False):
     try:
         sock.connect(addr)
     except socket.error:
-        print "Failed to connect to {} at '{}:{}'".format(hostrole, addr[0], addr[1])
+        print("Failed to connect to {} at '{}:{}'".format(hostrole, addr[0], addr[1]))
         return None
 
     try:
-        print "Sending stream info"
+        print("Sending stream info")
         stream_id = streams.get_stream_id(stream_str)
         sock.sendall(struct.pack('<i', stream_id))
     except socket.error:
-        print "Error: {} refused to accept stream id".format(hostrole)
+        print("Error: {} refused to accept stream id".format(hostrole))
         return None
 
-    print "Successfully connected to {}".format(hostrole)
+    print("Successfully connected to {}".format(hostrole))
     return sock
 
 

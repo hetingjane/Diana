@@ -80,7 +80,7 @@ class Constraint:
         constraints = []
         for e in spec:
             # Assume threshold 1 if e is just a string: unicode or otherwise
-            if isinstance(e, basestring):
+            if isinstance(e, str):
                 e = (e, 1)
             names = e[:-1]
             threshold = e[-1]
