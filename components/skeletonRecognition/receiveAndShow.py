@@ -96,7 +96,7 @@ class Pointing:
             return False
 
     def _smoothing_joint(self, window_length=5, polyorder=2):
-        for k, v in self.joint_info_buffer.items():
+        for k, v in list(self.joint_info_buffer.items()):
             if len(v) >= window_length:
                 self.joint_info_buffer[k].pop(0)
                 self.joint_info_buffer[k].append(self.joint_info[k])
@@ -106,7 +106,7 @@ class Pointing:
                 self.joint_info_buffer[k].append(self.joint_info[k])
 
     def _smoothing_joint_mean(self, window_length=5):
-        for k, v in self.joint_info_buffer.items():
+        for k, v in list(self.joint_info_buffer.items()):
             if len(v) >= window_length:
                 self.joint_info_buffer[k].pop(0)
                 self.joint_info_buffer[k].append(self.joint_info[k])
@@ -206,7 +206,7 @@ class Pointing:
             return table_x, table_z
 
     def _smoothing_joint_desk(self, window_length=3, polyorder=2):
-        for k, v in self.joint_info_buffer.items():
+        for k, v in list(self.joint_info_buffer.items()):
             if len(v) >= window_length:
                 self.joint_info_buffer[k].pop(0)
                 self.joint_info_buffer[k].append(self.joint_info[k])
