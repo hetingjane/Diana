@@ -5,7 +5,7 @@ import argparse
 from skimage.transform import resize
 import sys
 import numpy as np
-from realtime_hand_recognition import RealTimeHandRecognition
+from .realtime_hand_recognition import RealTimeHandRecognition
 from ..fusion.conf.endpoints import connect
 from ..fusion.conf import streams
 
@@ -23,7 +23,7 @@ def decode_frame(raw_frame):
     header = struct.unpack(endianness + header_format, raw_frame[:header_size])
 
     timestamp, frame_type, width, height, posx, posy = header
-    print timestamp, frame_type, width, height, posx, posy
+    print(timestamp, frame_type, width, height, posx, posy)
 
     depth_data_format = str(width * height) + "H"
 
@@ -68,7 +68,7 @@ if __name__ == '__main__':
     num_gestures = len(gestures)
 
     gestures += ['blind']
-    print hand, num_gestures
+    print(hand, num_gestures)
 
     hand_classfier = RealTimeHandRecognition(hand, num_gestures)
     kinect_socket = connect('kinect', args.kinect_host, hand)
@@ -95,7 +95,7 @@ if __name__ == '__main__':
 
         else:
             hand_arr = np.array(depth_data, dtype=np.float32).reshape((height, width))
-            print hand_arr.shape, posx, posy
+            print(hand_arr.shape, posx, posy)
             posz = hand_arr[int(posx), int(posy)]
             hand_arr -= posz
             hand_arr /= 150
@@ -107,11 +107,11 @@ if __name__ == '__main__':
 
             probs = list(probs)+[0]
 
-        print i, timestamp, gestures[max_index], probs[max_index]
+        print(i, timestamp, gestures[max_index], probs[max_index])
         i += 1
 
         if i % 100==0:
-            print "="*100, "FPS", 100/(time.time()-start_time)
+            print("="*100, "FPS", 100/(time.time()-start_time))
             start_time = time.time()
 
         pack_list = [stream_id, timestamp,max_index]+list(probs)
