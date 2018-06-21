@@ -1,45 +1,47 @@
-#!/usr/bin/env python
-
-import socket, sys, struct
+import argparse
+import socket
+import sys
+import struct
 import time
-import numpy as np
-from realtime_hand_recognition import RealTimeHandRecognition
 import os
-import cv2
+
+import numpy as np
+from skimage.transform import resize
+
+from .realtime_hand_recognition import RealTimeHandRecognition
 from ..fusion.conf.endpoints import connect
 from ..fusion.conf import streams
 
-src_addr = '129.82.45.252'
-src_port = 9009
 
-  # lh and rh color stream
-
-
-def connect_rgb(hand):
+def connect_rgb(hostname, hand):
     """
     Connect to a specific port
     """
-    if hand == "LH":
-        stream_id = 1024
-    elif hand =="RH":
-        stream_id = 2048
+
+    if hand == 'LH':
+        sid = 1024
+    elif hand == 'RH':
+        sid = 2048
+    else:
+        raise ValueError("hand must be either 'LH' or 'RH'")
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    host = (hostname, 8000)
 
     try:
-        sock.connect((src_addr, src_port))
-    except:
-        print "Error connecting to {}:{}".format(src_addr, src_port)
+        sock.connect(host)
+    except socket.error:
+        print("Error connecting to {}:{}".format(*host))
         return None
 
     try:
-        print "Sending stream info"
-        sock.sendall(struct.pack('<i', stream_id))
-    except:
-        print "Error: Stream rejected"
+        print("Sending stream info")
+        sock.sendall(struct.pack('<i', sid))
+    except socket.error:
+        print("Error: Stream rejected")
         return None
 
-    print "Successfully connected to host"
+    print("Successfully connected to host")
     return sock
     
 
@@ -84,13 +86,14 @@ def recv_color_frame(sock):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('hand', help='Hand to follow', choices=['LH', 'RH'])
+    parser.add_argument('kinect_host', help='Host name of the machine running Kinect Server')
+    parser.add_argument('--fusion-host', help='Host name of the machine running Kinect Server', default=None)
 
     hand = sys.argv[1]
     stream_id = streams.get_stream_id(hand)
-    if hand == "RH":
-        FRAME_TYPE = 1
-    elif hand == "LH":
-        FRAME_TYPE = 0
+    FRAME_TYPE = 1 if hand == 'RH' else 0
 
     r = RealTimeHandRecognition(hand, 20)
 
@@ -123,22 +126,20 @@ if __name__ == '__main__':
         timestamp, frame_type, width, height, color_data = decode_frame_openpose(f)
 
         if height*width > 0 and frame_type == FRAME_TYPE:
-
-
             image_rgb = np.array(color_data[0:len(color_data)], dtype='uint8').reshape((height, width, 3))
 
             if np.sum(image_rgb) == 0:
                 fusion_probs = [0 for _ in range(33)]
                 fusion_probs[0] = 1
-                print timestamp,"blind"
+                print(timestamp, "blind")
 
             else:
                 image_rgb = image_rgb[:,:,[2,1,0]]
-                image_rgb = cv2.resize(image_rgb, (128, 128))
+                image_rgb = resize(image_rgb, (128, 128))
 
                 rgb_max_index, probs = r.classify(image_rgb)
 
-                print timestamp, gesture_list[rgb_max_index]
+                print(timestamp, gesture_list[rgb_max_index])
 
                 fusion_probs = [0 for _ in range(33)]
 
@@ -146,7 +147,6 @@ if __name__ == '__main__':
                     fusion_probs[fusion_map_dict[index]] = p
 
             max_index = np.argmax(fusion_probs)
-
             #print max_index, rgb_max_index, fusion_map_dict[rgb_max_index]
 
             pack_list = [stream_id, timestamp, max_index] + list(fusion_probs)
@@ -158,9 +158,8 @@ if __name__ == '__main__':
             i += 1
 
             if i % 100 == 0:
-                print "=" * 100, "FPS", 100 / (time.time() - start_time)
+                print("=" * 100, "FPS", 100 / (time.time() - start_time))
                 start_time = time.time()
-
 
     s.close()
     sys.exit(0)
