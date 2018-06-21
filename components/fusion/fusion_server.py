@@ -275,7 +275,7 @@ class App:
 
         if thread_sync.gui_connected.wait(0.0):
             ev_count = struct.pack("<i", len(raw_events_list))
-            new_ev = ev_count + ''.join(raw_events_list) + raw_probs
+            new_ev = ev_count + b''.join(raw_events_list) + raw_probs
             thread_sync.gui_events.put(new_ev)
 
 
