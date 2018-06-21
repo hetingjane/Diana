@@ -10,6 +10,7 @@ _stream_ids = {
 }
 
 _active_streams = frozenset(["LH", "RH", "Body", "Head", "Speech"])
+_streams = frozenset(_stream_ids.keys())
 
 for s in _active_streams:
     if s not in _stream_ids:
@@ -25,7 +26,7 @@ def is_valid(stream_name):
 
 
 def is_valid_id(stream_id):
-    return stream_id in list(_stream_ids.values())
+    return stream_id in _stream_ids.values()
 
 
 def is_active(stream_name):
@@ -44,11 +45,11 @@ def get_stream_name(stream_id):
 
 
 def get_stream_names():
-    return list(_stream_ids.keys())
+    return _streams
 
 
 def get_streams_count():
-    return len(_stream_ids)
+    return len(_streams)
 
 
 def get_active_streams_count():

@@ -183,6 +183,6 @@ if __name__ == '__main__':
                     result = 'false'
                 elif result == Rule.IS_TRUE:
                     result = 'true'
-                print(("{}:{}:{}\n".format(i, result, ', '.join(row))))
+                print("{}:{}:{}\n".format(i, result, ', '.join(row)))
             i += 1
 
