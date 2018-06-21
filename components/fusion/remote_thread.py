@@ -13,7 +13,6 @@ class Remote(threading.Thread):
         threading.Thread.__init__(self)
         self.daemon = True
         self.name = name
-        self.id = "[ " + name + " ]\t"
         self.target = target
         self.input_queue = input_queue
         self._stop = threading.Event()
