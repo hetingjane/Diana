@@ -250,7 +250,7 @@ class App:
             ev_type, ev, timestamp = e.split(';')
             if ev_type != 'P':
                 print(ev_type.ljust(5) + ev.ljust(30) + timestamp + "\n\n")
-            raw_events_to_send.append(struct.pack("<i" + str(len(e)) + "s", len(e), e))
+            raw_events_to_send.append(struct.pack("<i" + str(len(e)) + "s", len(e), e.encode('ascii')))
 
         return raw_events_to_send
 
