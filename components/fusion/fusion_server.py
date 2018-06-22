@@ -94,6 +94,8 @@ class App:
         """
         self._print_summary()
         self._stop()
+        if self.capture_file is not None:
+            self.capture_file.close()
         sys.exit(0)
 
     def run(self):
@@ -101,7 +103,6 @@ class App:
             while True:
                 self._update()
         except KeyboardInterrupt:
-            self.capture_file.close()
             self._exit()
 
     def _update(self):
