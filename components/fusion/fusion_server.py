@@ -111,22 +111,19 @@ class App:
         Also prints debugging messages related to sync queue
         :return:
         """
-        try:
-            # Get synced data without blocking with timeout
-            self.latest_s_msg = thread_sync.synced_msgs.get(False, 0.2)
+        # Get synced data without blocking with timeout
+        self.latest_s_msg = thread_sync.synced_msgs.get(True)
+        if self.debug:
+            print("Latest synced message: {}\n".format(self.latest_s_msg))
+        #
+        self._update_queues()
+        self.received += 1
+        if thread_sync.synced_msgs.qsize() <= 15:
             if self.debug:
-                print("Latest synced message: {}\n".format(self.latest_s_msg))
-            #
-            self._update_queues()
-            self.received += 1
-            if thread_sync.synced_msgs.qsize() <= 15:
-                if self.debug:
-                    print("Backlog queue size exceeded limit: {}".format(thread_sync.synced_msgs.qsize()))
-            else:
-                self.skipped += 1
-                print("Skipping because backlog too large: {}".format(thread_sync.synced_msgs.qsize()))
-        except queue.Empty:
-            pass
+                print("Backlog queue size exceeded limit: {}".format(thread_sync.synced_msgs.qsize()))
+        else:
+            self.skipped += 1
+            print("Skipping because backlog too large: {}".format(thread_sync.synced_msgs.qsize()))
 
     def _get_probs(self):
 
