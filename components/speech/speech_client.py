@@ -25,8 +25,9 @@ def decode_frame(raw_frame):
     command_format = str(command_length) + "s"
     
     command = struct.unpack_from(endianness + command_format, raw_frame, header_size)[0]
+    command = command.decode('ascii')
     
-    return (timestamp, frame_type, command)
+    return timestamp, frame_type, command
 
 
 def recv_all(sock, size):
@@ -78,7 +79,7 @@ if __name__ == '__main__':
         if f is not None:
             try:
                 # Excluding frame size
-                f.sendall(struct.pack("<iqi" + str(len(command)) + "s", frame_type, timestamp, len(command), command))
+                f.sendall(struct.pack("<iqi" + str(len(command)) + "s", frame_type, timestamp, len(command), command.encode('ascii')))
             except socket.error:
                 print("Error: Connection to fusion lost")
                 f.close()

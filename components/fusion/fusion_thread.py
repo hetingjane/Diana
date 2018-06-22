@@ -93,6 +93,7 @@ class Fusion(threading.Thread):
         command_length = struct.unpack(endianness + "i", self._recv_all(sock, 4))[0]
         command_bytes = self._recv_all(sock, command_length)
         command = struct.unpack(endianness + str(command_length) + "s", command_bytes)[0]
+        command = command.decode('ascii')
         return Fusion.SpeechData(command)
 
     def _read_stream_data(self, sock, stream_id):
