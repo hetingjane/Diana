@@ -85,7 +85,7 @@ class App:
         :return: Nothing
         """
         if self.received > 0:
-            print("Skipped percentage: " + str(self.skipped * 100.0 / self.received))
+            print("Skipped {:.2f}%".format(self.skipped * 100.0 / self.received))
 
     def _exit(self):
         """
@@ -114,8 +114,8 @@ class App:
         # Get synced data without blocking with timeout
         self.latest_s_msg = thread_sync.synced_msgs.get(True)
         if self.debug:
-            print("Latest synced message: {}\n".format(self.latest_s_msg))
-        #
+            print("Latest synced message: {}".format(self.latest_s_msg), end='\n\n')
+
         self._update_queues()
         self.received += 1
         if thread_sync.synced_msgs.qsize() <= 15:
@@ -245,9 +245,9 @@ class App:
         all_events_to_send = self._get_events()
 
         for e in all_events_to_send:
-            ev_type, ev, timestamp = e.split(';')
-            if ev_type != 'P':
-                print(ev_type.ljust(5) + ev.ljust(30) + timestamp + "\n\n")
+            ev = e.split(';')
+            if ev[0] != 'P':
+                print('{:5}{:<30}{:>}'.format(*ev))
             raw_events_to_send.append(struct.pack("<i" + str(len(e)) + "s", len(e), e.encode('ascii')))
 
         return raw_events_to_send

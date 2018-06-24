@@ -150,7 +150,7 @@ class Fusion(threading.Thread):
                 print("Stream is valid and active: {}".format(stream_name))
                 print("Checking if stream is already connected...")
                 if stream_name not in self._connected_clients.values():
-                    print("New stream. Accepting the connection {}:{}".format(addr[0], addr[1]))
+                    print("New stream. Accepting the connection {host[0]}:{host[1]}".format(host=addr))
                     sock.shutdown(socket.SHUT_WR)
                     self._connected_clients[sock] = stream_name
                     return True

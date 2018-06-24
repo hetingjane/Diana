@@ -24,8 +24,8 @@ class Remote(threading.Thread):
     def is_stopped(self):
         return self._stop.is_set()
 
-    def _log(self, msg):
-        print("[ {} ]\t{}".format(self.name, msg))
+    def _log(self, text):
+        print("[ {name:^10} ] {txt}".format(name=self.name, txt=text))
 
     def run(self):
         remote_sock = serve(self.target)
