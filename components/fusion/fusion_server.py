@@ -218,10 +218,14 @@ class App:
             changed = state_machine.input(*inputs)
             cur_state = state_machine.get_full_state()
 
-            if state_machine is machines.left_point_continuous and state_machine.is_started():
-                all_events_to_send.append("P;l,{},{},{},{};{}".format(lx, ly, var_l_x, var_l_y, ts))
-            elif state_machine is machines.right_point_continuous and state_machine.is_started():
-                all_events_to_send.append("P;r,{},{},{},{};{}".format(rx, ry, var_r_x, var_r_y, ts))
+            # Intercept continuous point state machines; their events are different
+            if state_machine is machines.left_point_continuous:
+                # Only start states generate events, no stop event is sent, implied by absence
+                if state_machine.is_started():
+                    all_events_to_send.append("P;l,{},{},{},{};{}".format(lx, ly, var_l_x, var_l_y, ts))
+            elif state_machine is machines.right_point_continuous:
+                if state_machine.is_started():
+                    all_events_to_send.append("P;r,{},{},{},{};{}".format(rx, ry, var_r_x, var_r_y, ts))
 
             elif changed:
                 if state_machine is machines.left_point and state_machine.is_started():
