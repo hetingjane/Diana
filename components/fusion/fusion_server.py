@@ -251,7 +251,7 @@ class App:
         for e in all_events_to_send:
             ev = e.split(';')
             if ev[0] != 'P':
-                print('{:5}{:<30}{:>}'.format(*ev))
+                print('{:5}{:<40}{:>}'.format(*ev))
             raw_events_to_send.append(struct.pack("<i" + str(len(e)) + "s", len(e), e.encode('ascii')))
 
         return raw_events_to_send
