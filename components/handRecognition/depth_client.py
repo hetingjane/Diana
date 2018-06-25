@@ -8,8 +8,6 @@ import numpy as np
 from .realtime_hand_recognition import RealTimeHandRecognition
 from ..fusion.conf.endpoints import connect
 from ..fusion.conf import streams
-import components.timer
-
 
 # timestamp (long) | depth_hands_count(int) | left_hand_height (int) | left_hand_width (int) |
 # right_hand_height (int) | right_hand_width (int)| left_hand_pos_x (float) | left_hand_pos_y (float) | ... |
@@ -65,9 +63,8 @@ if __name__ == '__main__':
     hand = args.hand
 
     stream_id = streams.get_stream_id(hand)
-    gestures = list(np.load("components/log/gesture_list_%s.npy" % hand))
-    print(gestures)
-    gestures = [str(g).replace(".npy", "") for g in gestures]
+    gestures = np.load("/s/red/a/nobackup/cwc/hands/real_time_training_data/%s/gesture_list.npy" % hand)
+    gestures = [g.decode('ascii').replace(".npy", "") for g in gestures]
     num_gestures = len(gestures)
 
     gestures += ['blind']
@@ -81,7 +78,7 @@ if __name__ == '__main__':
     i = 0
     hands_list = []
 
-    start_time = components.timer.safetime()
+    start_time = time.time()
     while True:
         try:
             frame = recv_depth_frame(kinect_socket)
@@ -114,8 +111,8 @@ if __name__ == '__main__':
         i += 1
 
         if i % 100==0:
-            print("="*100, "FPS", 100/(components.timer.safetime()-start_time))
-            start_time = components.timer.safetime()
+            print("="*100, "FPS", 100/(time.time()-start_time))
+            start_time = time.time()
 
         pack_list = [stream_id, timestamp,max_index]+list(probs)
 

@@ -3,12 +3,11 @@ from abc import ABCMeta, abstractmethod
 from components.fusion.automata.constraint import Constraint
 
 
-class Rule:
+class Rule(metaclass=ABCMeta):
     """
     Rule allowing to check one or more constraint satisfaction
     IMPORTANT: A Rule is never reset automatically (the constraints are, though)
     """
-    __metaclass__ = ABCMeta
 
     IS_TRUE = 2
     MATCHED = 1
@@ -95,9 +94,7 @@ class All(Rule):
         return Any(*self._spec, invert=True)
 
 
-class MetaRule(Rule):
-
-    __metaclass__ = ABCMeta
+class MetaRule(Rule, metaclass=ABCMeta):
 
     def __init__(self, *rules):
         self._rules = rules

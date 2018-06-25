@@ -1,7 +1,7 @@
 from . import resnet_model_half_weights
 import tensorflow as tf
 import numpy as np
-import os
+
 
 class RealTimeHeadRecognition():
     def __init__(self, gestures):
@@ -20,17 +20,11 @@ class RealTimeHeadRecognition():
         model.build_graph()
         saver = tf.train.Saver()
 
-        gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.2)
-        self.config = tf.ConfigProto(gpu_options=gpu_options)
-        self.config.gpu_options.allow_growth = True
-        self.config.allow_soft_placement=True
-
-        sess = tf.Session(config=self.config)
+        sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
         tf.train.start_queue_runners(sess)
-        # ckpt_state = tf.train.get_checkpoint_state("/s/red/a/nobackup/cwc/tf/heads/head_diff_half_weights/")
-        # print('Loading checkpoint %s', ckpt_state.model_checkpoint_path)
-        # saver.restore(sess, ckpt_state.model_checkpoint_path)
-        saver.restore(sess, r"components\log\head_model.ckpt")
+        ckpt_state = tf.train.get_checkpoint_state("/s/red/a/nobackup/cwc/tf/heads/head_diff_half_weights/")
+        print('Loading checkpoint {}'.format(ckpt_state.model_checkpoint_path))
+        saver.restore(sess, ckpt_state.model_checkpoint_path)
         print("Loading done")
 
         self.sess = sess

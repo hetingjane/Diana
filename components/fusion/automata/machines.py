@@ -266,11 +266,11 @@ if __name__ == '__main__':
         ('grab.csv', [grab])
     ]
 
-    detailed = False
+    detailed = True
 
     for g_file, sm_to_test in test_sets:
-        print('*' * 20 + '\n')
-        print("File: " + g_file + '\n')
+        print('*' * 20)
+        print("\nFile: " + g_file, end='\n\n')
         print('*' * 20)
 
         with open(g_file, 'r') as f:
@@ -278,12 +278,12 @@ if __name__ == '__main__':
             i = 2
             for row in reader:
                 if detailed:
-                    print("{}:{}".format(i, row.values()))
+                    print("{}:{}".format(i, list(row.values())))
                 for sm in sm_to_test:
                     triggered = sm.input(*row.values())
                     if detailed:
-                        print("{}:{}\n".format(i, sm))
+                        print("{}:{}".format(i, sm), end='\n\n')
                     if triggered:
-                        print("\n{}:{}\n".format(i, sm.get_full_state()))
+                        print("\n{}:{}".format(i, sm.get_full_state()), end='\n\n')
                 i += 1
         print('*' * 20)

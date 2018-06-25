@@ -7,7 +7,7 @@ class RealTimeArmMotionRecognition(object):
         self.feature_size = 30
         self.model = model
         self.classes = np.load('/s/red/a/nobackup/vision/dkpatil/demo/lstm_models/labels_list.npy')
-        print 'model restored from ', self.model.logs_path
+        print ('model restored from ', self.model.logs_path)
         self.model.saver.restore(self.model.sess, self.model.logs_path)
 
 
@@ -22,8 +22,8 @@ class RealTimeArmMotionRecognition(object):
             SPINE_BASE, SPINE_SHOULDER = 0, 12
 
         if verbose:
-            print 'Mean of spine base before normalization'
-            print mean_body[SPINE_BASE]
+            print ('Mean of spine base before normalization')
+            print (mean_body[SPINE_BASE])
 
         spine_base = mean_body[SPINE_BASE]
         spine_base = np.tile(spine_base, (frames, n_joints, 1)).reshape((frames, -1))
@@ -32,16 +32,16 @@ class RealTimeArmMotionRecognition(object):
         data -= spine_base
 
         if verbose:
-            print spine_base.shape, norm_dist
+            print (spine_base.shape, norm_dist)
             mean_body = np.mean(data, axis=0).reshape((-1, 3))
-            print 'Mean of spine base after normalization'
-            print mean_body[SPINE_BASE]
+            print ('Mean of spine base after normalization')
+            print (mean_body[SPINE_BASE])
 
         if spine_scaling:
             try:
                 data /= norm_dist
             except:
-                print 'Zero distance between spine base and spine shoulder'
+                print ('Zero distance between spine base and spine shoulder')
         return data
 
 

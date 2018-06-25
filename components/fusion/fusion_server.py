@@ -13,7 +13,7 @@ from components.fusion.remote_thread import Remote
 from components.fusion import thread_sync
 from components.fusion.conf import streams
 from components.fusion.conf import postures
-import components.timer
+
 
 class App:
 
@@ -85,7 +85,7 @@ class App:
         :return: Nothing
         """
         if self.received > 0:
-            print(("Skipped percentage: " + str(self.skipped * 100.0 / self.received)))
+            print("Skipped {:.2f}%".format(self.skipped * 100.0 / self.received))
 
     def _exit(self):
         """
@@ -94,6 +94,8 @@ class App:
         """
         self._print_summary()
         self._stop()
+        if self.capture_file is not None:
+            self.capture_file.close()
         sys.exit(0)
 
     def run(self):
@@ -101,7 +103,6 @@ class App:
             while True:
                 self._update()
         except KeyboardInterrupt:
-            self.capture_file.close()
             self._exit()
 
     def _update(self):
@@ -110,22 +111,19 @@ class App:
         Also prints debugging messages related to sync queue
         :return:
         """
-        try:
-            # Get synced data without blocking with timeout
-            self.latest_s_msg = thread_sync.synced_msgs.get(False, 0.2)
+        # Get synced data without blocking with timeout
+        self.latest_s_msg = thread_sync.synced_msgs.get(True)
+        if self.debug:
+            print("Latest synced message: {}".format(self.latest_s_msg), end='\n\n')
+
+        self._update_queues()
+        self.received += 1
+        if thread_sync.synced_msgs.qsize() <= 15:
             if self.debug:
-                print(("Latest synced message: ", self.latest_s_msg, "\n"))
-            #
-            self._update_queues()
-            self.received += 1
-            if thread_sync.synced_msgs.qsize() <= 15:
-                if self.debug:
-                    print(("Backlog queue size exceeded limit: {}".format(thread_sync.synced_msgs.qsize())))
-            else:
-                self.skipped += 1
-                print(("Skipping because backlog too large: {}".format(thread_sync.synced_msgs.qsize())))
-        except queue.Empty:
-            pass
+                print("Backlog queue size exceeded limit: {}".format(thread_sync.synced_msgs.qsize()))
+        else:
+            self.skipped += 1
+            print("Skipping because backlog too large: {}".format(thread_sync.synced_msgs.qsize()))
 
     def _get_probs(self):
 
@@ -212,7 +210,7 @@ class App:
         # More than one output data is possible from multiple state machines
         all_events_to_send = []
 
-        ts = "{0:.3f}".format(components.timer.safetime())
+        ts = "{0:.3f}".format(time.time())
         lx, ly, var_l_x, var_l_y, rx, ry, var_r_x, var_r_y = ["{0:.2f}".format(x) for x in [lx, ly, var_l_x, var_l_y, rx, ry, var_r_x, var_r_y]]
 
         for state_machine in self.state_machines:
@@ -220,10 +218,14 @@ class App:
             changed = state_machine.input(*inputs)
             cur_state = state_machine.get_full_state()
 
-            if state_machine is machines.left_point_continuous and state_machine.is_started():
-                all_events_to_send.append("P;l,{},{},{},{};{}".format(lx, ly, var_l_x, var_l_y, ts))
-            elif state_machine is machines.right_point_continuous and state_machine.is_started():
-                all_events_to_send.append("P;r,{},{},{},{};{}".format(rx, ry, var_r_x, var_r_y, ts))
+            # Intercept continuous point state machines; their events are different
+            if state_machine is machines.left_point_continuous:
+                # Only start states generate events, no stop event is sent, implied by absence
+                if state_machine.is_started():
+                    all_events_to_send.append("P;l,{},{},{},{};{}".format(lx, ly, var_l_x, var_l_y, ts))
+            elif state_machine is machines.right_point_continuous:
+                if state_machine.is_started():
+                    all_events_to_send.append("P;r,{},{},{},{};{}".format(rx, ry, var_r_x, var_r_y, ts))
 
             elif changed:
                 if state_machine is machines.left_point and state_machine.is_started():
@@ -247,10 +249,10 @@ class App:
         all_events_to_send = self._get_events()
 
         for e in all_events_to_send:
-            ev_type, ev, timestamp = e.split(';')
-            if ev_type != 'P':
-                print((ev_type.ljust(5) + ev.ljust(30) + timestamp + "\n\n"))
-            raw_events_to_send.append(struct.pack("<i" + str(len(e)) + "s", len(e), e))
+            ev = e.split(';')
+            if ev[0] != 'P':
+                print('{:5}{:<40}{:>}'.format(*ev))
+            raw_events_to_send.append(struct.pack("<i" + str(len(e)) + "s", len(e), e.encode('ascii')))
 
         return raw_events_to_send
 
@@ -275,7 +277,7 @@ class App:
 
         if thread_sync.gui_connected.wait(0.0):
             ev_count = struct.pack("<i", len(raw_events_list))
-            new_ev = ev_count + ''.join(raw_events_list) + raw_probs
+            new_ev = ev_count + b''.join(raw_events_list) + raw_probs
             thread_sync.gui_events.put(new_ev)
 
 

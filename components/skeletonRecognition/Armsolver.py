@@ -363,14 +363,14 @@ class ArmMotionRecogntion(Solver):
         import tensorflow as tf
         g1 = tf.Graph()
         with g1.as_default():
-            print('Loading Left arm model')
+            print ('Loading Left arm model')
             model_left = Arms_LSTM(logs_path="/s/red/a/nobackup/vision/dkpatil/demo/lstm_models/la/", n_hidden=30, n_layers=2)
         self._left_arm_model = RealTimeArmMotionRecognition(model_left)
 
 
         g2 = tf.Graph()
         with g2.as_default():
-            print('Loading Right arm model')
+            print ('Loading Right arm model')
             model_right = Arms_LSTM(logs_path="/s/red/a/nobackup/vision/dkpatil/demo/lstm_models/ra/", n_hidden=30, n_layers=1)
         self._right_arm_model = RealTimeArmMotionRecognition(model_right)
 
