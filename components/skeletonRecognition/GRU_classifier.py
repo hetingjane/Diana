@@ -30,14 +30,14 @@ class GRU_RNN:
         self.prediction = tf.nn.softmax(self.outputs)
         self.predicted_values = tf.argmax(self.prediction, 1)
 
+        gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.15)
+        config = tf.ConfigProto(gpu_options=gpu_options)
+        config.gpu_options.allow_growth = True
+        config.allow_soft_placement = True
 
         try:
-            config = tf.ConfigProto(allow_soft_placement=True)
-            config.gpu_options.allow_growth = True
             self.sess = tf.Session(config= config)
         except:
-            config = tf.ConfigProto(allow_soft_placement=True)
-            config.gpu_options.allow_growth = True
             self.sess = tf.Session(config= config)
 
         # model saver
