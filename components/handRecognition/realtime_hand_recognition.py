@@ -22,9 +22,11 @@ class RealTimeHandRecognition():
 
         sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
         tf.train.start_queue_runners(sess)
-        ckpt_state = tf.train.get_checkpoint_state("/s/red/a/nobackup/cwc/tf/hands_demo_1/%s"%hands)
-        print('Loading checkpoint {}'.format(ckpt_state.model_checkpoint_path))
-        saver.restore(sess, ckpt_state.model_checkpoint_path)
+        # this is unnecessary, since we just want the latest ckpt file
+        # ckpt_state = tf.train.get_checkpoint_state(r"C:\Users\cwc\Desktop\portable\RealTime\components\log\%s_model"%hands)
+        # print('Loading checkpoint %s', ckpt_state.model_checkpoint_path)
+        # saver.restore(sess, ckpt_state.model_checkpoint_path)
+        saver.restore(sess, r"components\log\%s_model.ckpt"%hands)
 
         self.sess = sess
         self.model = model

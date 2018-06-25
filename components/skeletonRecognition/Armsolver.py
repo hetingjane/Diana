@@ -13,7 +13,8 @@ class Solver(object):
 
         self._window_threshold = 15
         self._feature_size = 10 if self._rgb else 21
-        self._logpath = '/s/red/a/nobackup/vision/dkpatil/demo/GRU_5_class/'
+        self._logpath = 'components/log/'
+
 
 
         self._LEFT, self._RIGHT = 'la', 'ra'

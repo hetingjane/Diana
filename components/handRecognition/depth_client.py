@@ -63,8 +63,8 @@ if __name__ == '__main__':
     hand = args.hand
 
     stream_id = streams.get_stream_id(hand)
-    gestures = np.load("/s/red/a/nobackup/cwc/hands/real_time_training_data/%s/gesture_list.npy" % hand)
-    gestures = [g.decode('ascii').replace(".npy", "") for g in gestures]
+    gestures = list(np.load("components/log/gesture_list_%s.npy" % hand))
+    gestures = [str(g).replace(".npy", "") for g in gestures]
     num_gestures = len(gestures)
 
     gestures += ['blind']
