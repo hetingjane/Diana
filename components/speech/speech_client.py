@@ -3,6 +3,7 @@ import argparse
 import socket
 
 from ..fusion.conf.endpoints import connect
+from components import timer
 
 
 # Timestamp | frame type | command_length | command
@@ -84,6 +85,9 @@ if __name__ == '__main__':
                 print("Error: Connection to fusion lost")
                 f.close()
                 f = None
+                break
+
+        timer.wait(FPS=30)
 
     k.close()
     if f is not None:

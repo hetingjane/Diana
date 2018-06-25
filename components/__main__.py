@@ -5,7 +5,7 @@ ksim = subprocess.Popen("F:\\portable\\KSIM\\KSIM\\bin\\Release\\KSIM.exe --list
 print("starting FUSION")
 fusion = os.system("start cmd /c python.exe -m components.fusion.fusion_server --mode brandeis")
 print("starting BODY")
-body = os.system("start cmd /c python -m components.skeletonRecognition.body_client --fusion-host localhost localhost")
+body = os.system("start cmd /c python -m components.skeletonRecognition.skeleton_client --fusion-host localhost localhost")
 print("starting SPEECH")
 speech = os.system("start cmd /c python -m components.speech.speech_client --fusion-host localhost localhost")
 print("starting HEAD")

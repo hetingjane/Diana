@@ -11,6 +11,7 @@ from .realtime_head_recognition import RealTimeHeadRecognition
 from ..fusion.conf.endpoints import connect
 from ..fusion.conf import streams
 
+from components import timer
 
 # Timestamp | frame type | width | height | depth_data
 def decode_frame(raw_frame):
@@ -163,6 +164,8 @@ if __name__ == '__main__':
         if index % 100==0:
             print("="*100, "FPS", 100/(time.time()-start_time))
             start_time = time.time()
+
+        timer.wait(FPS=30)
 
     kinect_socket.close()
     if fusion_socket is not None:

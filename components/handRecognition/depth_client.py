@@ -9,6 +9,8 @@ from .realtime_hand_recognition import RealTimeHandRecognition
 from ..fusion.conf.endpoints import connect
 from ..fusion.conf import streams
 
+from components import timer
+
 # timestamp (long) | depth_hands_count(int) | left_hand_height (int) | left_hand_width (int) |
 # right_hand_height (int) | right_hand_width (int)| left_hand_pos_x (float) | left_hand_pos_y (float) | ... |
 # left_hand_depth_data ([left_hand_width * left_hand_height]) |
@@ -120,6 +122,8 @@ if __name__ == '__main__':
 
         if fusion_socket is not None:
             fusion_socket.send(bytes)
+
+        timer.wait(FPS=30)
 
     kinect_socket.close()
     if fusion_socket is not None:

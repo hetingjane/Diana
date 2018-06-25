@@ -9,6 +9,8 @@ from ..fusion.conf import streams
 from ..fusion.conf.endpoints import connect
 from .Armsolver import PrimalRecognition, ArmMotionRecogntion
 
+from components import timer
+
 def decode_frame(raw_frame):
     # The format is given according to the following assumption of network data
 
@@ -115,6 +117,8 @@ if __name__ == '__main__':
             print ('FPS: ', 100.0 / (time.time() - start_time))
             print ('=' * 30)
             start_time = time.time()
+
+        timer.wait(FPS=30)
 
     s.close()
     if fusion_socket is not None:
