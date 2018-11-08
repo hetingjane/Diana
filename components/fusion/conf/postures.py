@@ -36,8 +36,6 @@ right_arm_motions = ['ra move right', 'ra move left', 'ra move up', 'ra move dow
 
 head_postures = ['head nod', 'head shake', 'head other', 'head blind']
 
-body_postures = ['body emblem', 'body motion', 'body neutral', 'body oscillate', 'body still']
-
 engaged = ['disengaged', 'engaged']
 
 words = ['speak yes', 'speak no', 'speak here', 'speak there', 'speak this', 'speak that']
