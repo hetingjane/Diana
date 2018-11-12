@@ -94,3 +94,16 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.gitignore.io/api/unity,macos,windows
+
+# Custom rules for project template as described in STRUCTURE.md
+
+# Ignore everything directly under Assets/
+/Assets/*
+# But not the _Core subdirectory
+!/Assets/_Core/
+!/Assets/_Core.meta
+
+# Selectively un-ignore subdirectories of StreamingAssets, Gizmos, and Plugins
+# !/Assets/StreamingAssets/
+# !/Assets/Gizmos/
+# !/Assets/Plugins/
