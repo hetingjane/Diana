@@ -8,47 +8,35 @@ import numpy as np
 from .realtime_hand_recognition import RealTimeHandRecognition
 from ..fusion.conf.endpoints import connect
 from ..fusion.conf import streams
+from ..fusion.conf import decode
 
+"""
 # timestamp (long) | depth_hands_count(int) | left_hand_height (int) | left_hand_width (int) |
 # right_hand_height (int) | right_hand_width (int)| left_hand_pos_x (float) | left_hand_pos_y (float) | ... |
 # left_hand_depth_data ([left_hand_width * left_hand_height]) |
 # right_hand_depth_data ([right_hand_width * right_hand_height])
-def decode_frame(raw_frame):
-    # Expect network byte order
+"""
+
+def decode_content(raw_frame, offset):
+    """
+    raw_frame: frame starting from 4 to end (4 for length field)
+    offset: index where header ends; header is header_l, timestamp, frame_type
+    """
     endianness = "<"
 
-    # In each frame, a header is transmitted
-    header_format = "qiiiff"
-    header_size = struct.calcsize(endianness + header_format)
-    header = struct.unpack(endianness + header_format, raw_frame[:header_size])
+    content_header_format = "iiff"  # width, height, posx, posy
+    content_header_size = struct.calcsize(endianness + content_header_format)
+    content_header = struct.unpack_from(endianness + content_header_format, raw_frame, offset)
 
-    timestamp, frame_type, width, height, posx, posy = header
-    print(timestamp, frame_type, width, height, posx, posy)
+    width, height, posx, posy = content_header
+    #print(width, height, posx, posy)
 
     depth_data_format = str(width * height) + "H"
-
-    depth_data = struct.unpack_from(endianness + depth_data_format, raw_frame, header_size)
-
-    return (timestamp, frame_type, width, height, posx, posy, list(depth_data))
-
-
-def recv_all(sock, size):
-    result = b''
-    while len(result) < size:
-        data = sock.recv(size - len(result))
-        if not data:
-            raise EOFError("Error: Received only {} bytes into {} byte message".format(len(data), size))
-        result += data
-    return result
-
-
-def recv_depth_frame(sock):
-    """
-    Experimental function to read each stream frame from the server
-    """
-    (frame_size,) = struct.unpack("<i", recv_all(sock, 4))
-    return recv_all(sock, frame_size)
-
+    depth_data = struct.unpack_from(endianness + depth_data_format, raw_frame, offset + content_header_size)
+    
+    offset = offset + content_header_size + struct.calcsize(endianness + depth_data_format)  # new offset from where tail starts
+    return (width, height, posx, posy, list(depth_data)), offset
+    
 
 # By default read 100 frames
 if __name__ == '__main__':
@@ -81,14 +69,14 @@ if __name__ == '__main__':
     start_time = time.time()
     while True:
         try:
-            frame = recv_depth_frame(kinect_socket)
+            (timestamp, frame_type), (width, height, posx, posy, depth_data), (writer_data,) = decode.read_frame(kinect_socket, decode_content)
+            print("timestamp, frame_type", timestamp, frame_type)
+            print("width, height, posx, posy", width, height, posx, posy)
+            print("writer_data", writer_data)
+            
         except KeyboardInterrupt:
            break
-        except:
-            continue
-
-        timestamp, frame_type, width, height, posx, posy, depth_data = decode_frame(frame)
-
+        
         if posx == -1 and posy == -1:
             probs = [0]*num_gestures+[1]
             max_index = len(probs)-1
