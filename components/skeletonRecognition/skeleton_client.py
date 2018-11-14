@@ -8,17 +8,20 @@ import argparse
 from ..fusion.conf import streams
 from ..fusion.conf.endpoints import connect
 from .Armsolver import PrimalRecognition, ArmMotionRecogntion
+from ..fusion.conf import decode
 
-def decode_frame(raw_frame):
-    # The format is given according to the following assumption of network data
-
-    # Expect little endian byte order
+def decode_content(raw_frame, offset):
+    """
+    raw_frame: frame starting from 4 to end (4 for length field)
+    offset: index where header ends; header is header_l, timestamp, frame_type
+    """
     endianness = "<"
 
-    # [ commonTimestamp | frame type | Tracked body count | Engaged
-    header_format = "qiBB"
+    content_header_format = "BB"  # Tracked body count | Engaged
+    content_header_size = struct.calcsize(endianness + content_header_format)
+    content_header = struct.unpack_from(endianness + content_header_format, raw_frame, offset)
 
-    timestamp, frame_type, tracked_body_count, engaged = struct.unpack(endianness + header_format,raw_frame[:struct.calcsize(header_format)])
+    tracked_body_count, engaged = content_header
 
     # For each body, a header is transmitted
     # TrackingId | HandLeftConfidence | HandLeftState | HandRightConfidence | HandRightState ]
@@ -31,33 +34,14 @@ def decode_frame(raw_frame):
     frame_format = body_format + (joint_format * 25)
 
     # Unpack the raw frame into individual pieces of data as a tuple
-    frame_pieces = struct.unpack(endianness + (frame_format * engaged), raw_frame[struct.calcsize(header_format):])
-
-    decoded = (timestamp, frame_type, tracked_body_count, engaged) + frame_pieces
-
-    return decoded
-
-
-def recv_all(sock, size):
-    result = b''
-    while len(result) < size:
-        data = sock.recv(size - len(result))
-        if not data:
-            raise EOFError("Error: Received only {} bytes into {} byte message".format(len(data), size))
-        result += data
-    return result
-
-
-def recv_skeleton_frame(sock):
-    """
-    To read each stream frame from the server
-    """
-    (load_size,) = struct.unpack("<i", recv_all(sock, struct.calcsize("<i")))
-    # print load_size
-    return recv_all(sock, load_size)
-
-
-
+    frame_pieces = struct.unpack_from(endianness + (frame_format * engaged), raw_frame, offset + content_header_size)
+    
+    #decoded = (tracked_body_count, engaged) + frame_pieces
+    decoded = (tracked_body_count, engaged, frame_pieces)
+    offset = offset + content_header_size + struct.calcsize(endianness + frame_format * engaged)  # new offset from where tail starts
+    return decoded, offset
+    
+    
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('kinect', help='Kinect host name', type=str)
@@ -85,15 +69,16 @@ if __name__ == '__main__':
 
     while True:
         try:
-            f = recv_skeleton_frame(s)
-
+            (timestamp, frame_type), (tracked_body_count, engaged, frame_pieces), (writer_data,) = decode.read_frame(s, decode_content)
+            print("timestamp, frame_type", timestamp, frame_type)
+            print("tracked_body_count, engaged", tracked_body_count, engaged)
+            print("writer_data", writer_data)
         except EOFError:
             print("Disconnected from Kinect Server")
             break
-        fd = decode_frame(f)
         
-
         #Pass this to the Recognition object
+        fd = (timestamp, frame_type, tracked_body_count, engaged) + frame_pieces
         m.feed_input(fd)
         result = m.get_result()
         timestamp = m.timestamp
