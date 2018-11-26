@@ -28,7 +28,11 @@ right_point_continuous = PoseStateMachine('right point continuous',
 
 push_left = PoseStateMachine('push left', rules.All(('rh closed left', 'rh open left', 5), ('ra move left', 5)))
 
+push_servo_left = PoseStateMachine('push servo left', rules.All(('rh closed left', 'rh open left', 5), ('ra servo', 5)))
+
 push_right = PoseStateMachine('push right', rules.All(('lh closed right', 'lh open right', 5), ('la move right', 5)))
+
+push_servo_right = PoseStateMachine('push servo right', rules.All(('lh closed right', 'lh open right', 5), ('la servo', 5)))
 
 push_front = PoseStateMachine('push front', rules.Or(
     rules.All(('rh closed front', 5), ('ra move front', 5)),

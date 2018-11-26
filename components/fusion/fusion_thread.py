@@ -16,9 +16,8 @@ class Fusion(threading.Thread):
 
     Header = namedtuple('Header', ['id', 'timestamp', 'name'])
 
-    BodyData = namedtuple('BodyData', ['idx_l_arm', 'idx_r_arm', 'idx_body',
+    BodyData = namedtuple('BodyData', ['idx_l_arm', 'idx_r_arm',
                                        'pos_l_x', 'pos_l_y', 'var_l_x', 'var_l_y', 'pos_r_x', 'pos_r_y', 'var_r_x', 'var_r_y',
-                                       'p_emblem', 'p_motion', 'p_neutral', 'p_oscillate', 'p_still',
                                        'p_l_arm', 'p_r_arm',
                                        'engaged'])
     HandData = namedtuple('HandData', ['idx_hand', 'probabilities', 'hand_type'])
@@ -55,17 +54,17 @@ class Fusion(threading.Thread):
         return Fusion.Header(*header_data)
 
     def _read_body_data(self, sock):
-        # Left Max Index, Right Max Index, Body Max Index
+        # Left Max Index, Right Max Index
         # Left point x, y, var_x, var_y, Right point x, y, var_x, var_y
-        # 5 probabilities (emblem, motion, neutral, oscillate, still),
-        # 6 probabilities for move left, right, up, down, front, back * 2, Engage (1/0)
-        data_format = "<" + "iii" + "4f" * 2 + "5f" + "6f" * 2 + "i"
+        # 8 probabilities for move left, right, up, down, front, back, still, servo * 2
+        # Engage (1/0)
+        data_format = "<" + "ii" + "4f" * 2 + "8f" * 2 + "i"
         raw_data = self._recv_all(sock, struct.calcsize(data_format))
         body_data = struct.unpack(data_format, raw_data)
-        larm_probs = body_data[-13:-7]
-        rarm_probs = body_data[-7:-1]
+        larm_probs = body_data[-17:-9]
+        rarm_probs = body_data[-9:-1]
         engaged = body_data[-1] == 1
-        body_data = body_data[:-13] + (larm_probs, rarm_probs, engaged)
+        body_data = body_data[:-17] + (larm_probs, rarm_probs, engaged)
         return Fusion.BodyData(*body_data)
 
     def _read_hands_data(self, sock, hand):

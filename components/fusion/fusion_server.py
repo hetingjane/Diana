@@ -34,7 +34,7 @@ class App:
         self.capture_file = open('captured.csv', 'w') if capture else None
         self.capture_csv = csv.writer(self.capture_file) if capture else None
         if self.capture_csv is not None:
-            self.capture_csv.writerow(['engaged', 'la', 'ra', 'lh', 'rh', 'head', 'body', 'speech'])
+            self.capture_csv.writerow(['engaged', 'la', 'ra', 'lh', 'rh', 'head', 'speech'])
 
     def _stop(self):
         # Stop the fusion thread
@@ -131,12 +131,9 @@ class App:
             body_msg = self.latest_s_msg["Body"]
             engaged = body_msg.data.engaged
             larm_probs, rarm_probs = np.array(body_msg.data.p_l_arm), np.array(body_msg.data.p_r_arm)
-            body_probs = np.array([body_msg.data.p_emblem, body_msg.data.p_motion, body_msg.data.p_neutral,
-                               body_msg.data.p_oscillate, body_msg.data.p_still])
         else:
             engaged = True
-            larm_probs, rarm_probs = np.zeros(6), np.zeros(6)
-            body_probs = np.zeros(5)
+            larm_probs, rarm_probs = np.zeros(8), np.zeros(8)
 
         lhand_probs = np.array(self.latest_s_msg["LH"].data.probabilities) \
             if streams.is_active("LH") else np.zeros(len(postures.left_hand_postures))
@@ -145,26 +142,24 @@ class App:
         head_probs = np.array(self.latest_s_msg["Head"].data.probabilities) \
             if streams.is_active("Head") else np.zeros(len(postures.head_postures))
 
-        return engaged, larm_probs, rarm_probs, lhand_probs, rhand_probs, head_probs, body_probs
+        return engaged, larm_probs, rarm_probs, lhand_probs, rhand_probs, head_probs
 
     def _prepare_probs(self):
-        engaged, larm_probs, rarm_probs, lhand_probs, rhand_probs, head_probs, body_probs = self._get_probs()
-        all_probs = list(np.concatenate((larm_probs, rarm_probs, lhand_probs, rhand_probs, head_probs, body_probs), axis=0))
+        engaged, larm_probs, rarm_probs, lhand_probs, rhand_probs, head_probs = self._get_probs()
+        all_probs = list(np.concatenate((larm_probs, rarm_probs, lhand_probs, rhand_probs, head_probs), axis=0))
         return struct.pack("<" + str(len(all_probs)) + "f", *all_probs)
 
     def _get_poses(self):
         if streams.is_active("Body"):
             body_msg = self.latest_s_msg["Body"]
-            idx_l_arm, idx_r_arm, idx_body = body_msg.data.idx_l_arm, body_msg.data.idx_r_arm, body_msg.data.idx_body
+            idx_l_arm, idx_r_arm = body_msg.data.idx_l_arm, body_msg.data.idx_r_arm
             idx_engaged = int(body_msg.data.engaged)
         else:
-            idx_l_arm, idx_r_arm, idx_body = len(postures.left_arm_motions) - 1, len(
-                postures.right_arm_motions) - 1, len(postures.body_postures) - 1
+            idx_l_arm, idx_r_arm = len(postures.left_arm_motions) - 1, len(postures.right_arm_motions) - 1
             idx_engaged = int(True)
 
         pose_l_arm = postures.left_arm_motions[idx_l_arm]
         pose_r_arm = postures.right_arm_motions[idx_r_arm]
-        pose_body = postures.body_postures[idx_body]
 
         engaged = postures.engaged[idx_engaged]
 
@@ -184,7 +179,7 @@ class App:
         rh_idx = rh_msg.data.idx_hand
         pose_rh = postures.right_hand_postures[rh_idx]
 
-        poses = engaged, pose_l_arm, pose_r_arm, pose_lh, pose_rh, pose_head, pose_body
+        poses = engaged, pose_l_arm, pose_r_arm, pose_lh, pose_rh, pose_head
         return poses
 
     def _get_events(self):
@@ -282,7 +277,7 @@ brandeis_events = [machines.engage, machines.wave,
                    machines.left_point, machines.right_point,
                    machines.left_point_continuous, machines.right_point_continuous,
                    machines.push_left, machines.push_right, machines.push_front, machines.push_back,
-                   machines.grab]
+                   machines.grab, machines.push_servo_left, machines.push_servo_right]
 
 csu_events = brandeis_events
 
