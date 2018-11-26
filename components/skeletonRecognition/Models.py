@@ -6,7 +6,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 
 class Arms_LSTM:
-    def __init__(self, logs_path, cell_type='lstm', n_hidden=30, n_classes=7, batch_size=1, features=30, n_layers=1):
+    def __init__(self, logs_path, cell_type='lstm', n_hidden=30, n_classes=8, batch_size=1, features=15, n_layers=2):
 
         self.logs_path = logs_path
         self.n_hidden = n_hidden
@@ -51,9 +51,9 @@ class Arms_LSTM:
             cell_out = tf.contrib.rnn.MultiRNNCell([self.get_cell() for _ in range(self.num_layers)])
             init_state = cell_out.zero_state(self.batch_size, tf.float32)
 
-            with tf.variable_scope("LSTM") as vs:
-                outputs, state = tf.nn.dynamic_rnn(cell_out, self.x, sequence_length=self.n_frames, dtype=tf.float32, time_major=False, initial_state=init_state)
-                self.cell_output, self.cell_state = outputs, state
+            outputs, state = tf.nn.dynamic_rnn(cell_out, self.x, sequence_length=self.n_frames, dtype=tf.float32, time_major=False, initial_state=init_state)
+            self.cell_output, self.cell_state = outputs, state
+
             output = []
             for i in range(self.batch_size):
                 output.append(tf.matmul(outputs[i], self.weights['out']) + self.biases['out'])

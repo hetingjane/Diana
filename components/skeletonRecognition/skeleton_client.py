@@ -79,7 +79,8 @@ if __name__ == '__main__':
     if s is None:
         sys.exit(0)
 
-    m = PrimalRecognition(pointing_mode='screen')
+    # m = PrimalRecognition(pointing_mode='screen')
+    m = ArmMotionRecogntion(pointing_mode='screen')
     c = 0
     start_time = time.time()
 
@@ -104,7 +105,7 @@ if __name__ == '__main__':
             print (result[:3], display_result)
 
         pack_list = [streams.get_stream_id("Body"), timestamp] + result
-        raw_data = struct.pack("<iqiii" + "ffff" * 2 + "f" * 5 + "ff" * 6 + 'i', *pack_list)
+        raw_data = struct.pack("<iqii" + "ffff" * 2 + "ff" * 8 + 'i', *pack_list)
 
         if fusion_socket is not None:
             fusion_socket.sendall(raw_data)
