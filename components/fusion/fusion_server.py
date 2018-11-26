@@ -277,7 +277,7 @@ brandeis_events = [machines.engage, machines.wave,
                    machines.left_point, machines.right_point,
                    machines.left_point_continuous, machines.right_point_continuous,
                    machines.push_left, machines.push_right, machines.push_front, machines.push_back,
-                   machines.grab]
+                   machines.grab, machines.push_servo_left, machines.push_servo_right]
 
 csu_events = brandeis_events
 
