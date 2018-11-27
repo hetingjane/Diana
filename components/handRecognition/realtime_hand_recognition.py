@@ -1,6 +1,9 @@
-from . import hands_resnet_model
+import os
+
 import tensorflow as tf
 import numpy as np
+
+from . import hands_resnet_model
 
 
 class RealTimeHandRecognition():
@@ -22,7 +25,8 @@ class RealTimeHandRecognition():
 
         sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
         tf.train.start_queue_runners(sess)
-        ckpt_state = tf.train.get_checkpoint_state("/s/red/a/nobackup/cwc/tf/hands_demo_1/%s"%hands)
+        print(os.path.abspath('./models/{}'.format(hands)))
+        ckpt_state = tf.train.get_checkpoint_state(os.path.abspath('./models/{}'.format(hands)))
         print('Loading checkpoint {}'.format(ckpt_state.model_checkpoint_path))
         saver.restore(sess, ckpt_state.model_checkpoint_path)
 

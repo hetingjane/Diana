@@ -1,6 +1,7 @@
 import struct
 import time
 import argparse
+import os
 
 from skimage.transform import resize
 import sys
@@ -63,7 +64,7 @@ if __name__ == '__main__':
     hand = args.hand
 
     stream_id = streams.get_stream_id(hand)
-    gestures = np.load("/s/red/a/nobackup/cwc/hands/real_time_training_data/%s/gesture_list.npy" % hand)
+    gestures = np.load(os.path.abspath('./data/labels_{}.npy'.format(hand)))
     gestures = [g.decode('ascii').replace(".npy", "") for g in gestures]
     num_gestures = len(gestures)
 

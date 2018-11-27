@@ -22,7 +22,7 @@ class RealTimeHeadRecognition():
 
         sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
         tf.train.start_queue_runners(sess)
-        ckpt_state = tf.train.get_checkpoint_state("/s/red/a/nobackup/cwc/tf/heads/head_diff_half_weights/")
+        ckpt_state = tf.train.get_checkpoint_state("./models/head")
         print('Loading checkpoint {}'.format(ckpt_state.model_checkpoint_path))
         saver.restore(sess, ckpt_state.model_checkpoint_path)
         print("Loading done")
