@@ -1,4 +1,5 @@
 import numpy as np
+import os
 
 class RealTimeArmMotionRecognition(object):
     def __init__(self, model):
@@ -6,7 +7,7 @@ class RealTimeArmMotionRecognition(object):
         self.batch_size = 1
         self.feature_size = 15
         self.model = model
-        self.classes = np.load('/s/red/a/nobackup/vision/dkpatil/demo/lstm_models/servo/labels_list.npy')
+        self.classes = np.load(os.path.abspath('./data/labels_body.npy'))
         print ('Classes are: ', self.classes)
         print ('model restored from ', self.model.logs_path)
         self.model.saver.restore(self.model.sess, self.model.logs_path)
