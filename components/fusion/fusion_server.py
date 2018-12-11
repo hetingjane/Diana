@@ -195,12 +195,12 @@ class App:
             lx, ly, var_l_x, var_l_y, rx, ry, var_r_x, var_r_y = (float("-inf"),)*8
             engaged = True
 
-        word = self.latest_s_msg["Speech"].data.command if streams.is_active("Speech") else ""
+        command = self.latest_s_msg["Speech"].data.command if streams.is_active("Speech") else ""
 
         if self.capture_csv is not None:
-            self.capture_csv.writerow(poses + (word,))
+            self.capture_csv.writerow(poses + (command,))
 
-        inputs = poses + (word,) if len(word) > 0 else poses
+        inputs = poses + (command,) if len(command) > 0 else poses  # command in new language model won't work with SMs
 
         # More than one output data is possible from multiple state machines
         all_events_to_send = []
@@ -226,8 +226,7 @@ class App:
 
                 all_events_to_send.insert(0, "G;" + cur_state + ";" + ts)
 
-        if engaged and len(word) > 0 and word not in postures.words:
-            command = ''.join(word.split()[1:]).upper()
+        if engaged and len(command) > 0:
             all_events_to_send.append("S;{};{}".format(command, ts))
 
         if not engaged:

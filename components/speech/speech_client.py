@@ -72,7 +72,6 @@ if __name__ == '__main__':
         timestamp, frame_type, command = decode_frame(frame)
 
         if len(command) > 0:
-            command = ' '.join(['speak', command.lower()])
             print(timestamp, frame_type, command)
             print("\n\n")
 
