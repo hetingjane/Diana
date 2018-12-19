@@ -3,52 +3,31 @@ import argparse
 import socket
 
 from ..fusion.conf.endpoints import connect
-
+from ..fusion.conf import decode
 
 # Timestamp | frame type | command_length | command
-def decode_frame(raw_frame):
-    
-    # Expect little endian byte order
+
+def decode_content(raw_frame, offset):
+    """
+    raw_frame: frame starting from 4 to end (4 for length)
+    offset: index where header ends  # header is header_l, timestamp, frame_type
+    """
     endianness = "<"
 
-    # In each frame, a header is transmitted
-    # Timestamp | frame type | command_length
-    header_format = "qii"
-    
-    header_size = struct.calcsize(endianness + header_format)
-    header = struct.unpack(endianness + header_format, raw_frame[:header_size])
+    content_header_format = "i"  # command_length
+    content_header_size = struct.calcsize(endianness + content_header_format)
+    content_header, = struct.unpack_from(endianness + content_header_format, raw_frame, offset)
 
-    timestamp, frame_type, command_length = header
-    
-    #print timestamp, frame_type, command_length
-    
+    command_length = content_header
     command_format = str(command_length) + "s"
     
-    command = struct.unpack_from(endianness + command_format, raw_frame, header_size)[0]
+    command = struct.unpack_from(endianness + command_format, raw_frame, offset + content_header_size)[0]
     command = command.decode('ascii')
     
-    return timestamp, frame_type, command
-
-
-def recv_all(sock, size):
-    result = b''
-    while len(result) < size:
-        data = sock.recv(size - len(result))
-        if not data:
-            raise EOFError("Error: Received only {} bytes into {} byte message".format(len(data), size))
-        result += data
-    return result
-
-
-def recv_speech_frame(sock):
-    """
-    Read each speech frame from the server
-    """
-    (frame_size,) = struct.unpack("<i", recv_all(sock, 4))
-    #print frame_size
-    return recv_all(sock, frame_size) 
+    offset = offset + content_header_size + struct.calcsize(endianness + command_format)  # new offset from where tail starts
+    return (command_length, command), offset
     
-
+    
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
@@ -65,12 +44,12 @@ if __name__ == '__main__':
 
     while True:
         try:
-            frame = recv_speech_frame(k)
+            (timestamp, frame_type), (command_length, command), (writer_data,) = decode.read_frame(k, decode_content)
+            print("writer_data", writer_data)
         except socket.error:
             print("Unable to receive speech frame")
             break
-        timestamp, frame_type, command = decode_frame(frame)
-
+		
         if len(command) > 0:
             print(timestamp, frame_type, command)
             print("\n\n")
