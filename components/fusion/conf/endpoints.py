@@ -43,7 +43,7 @@ def connect(hostrole, hostname, stream_str, timeout=False):
     try:
         print("Sending stream info")
         stream_id = streams.get_stream_id(stream_str)
-        sock.sendall(struct.pack('<i', stream_id))
+        sock.sendall(struct.pack('<iBi', 5, 1, stream_id))
     except socket.error:
         print("Error: {} refused to accept stream id".format(hostrole))
         return None
