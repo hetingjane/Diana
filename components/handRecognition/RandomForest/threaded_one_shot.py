@@ -1,18 +1,20 @@
 import threading
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 NEW_GESTURE_INDEX = 50
 
 
 class OneShot(threading.Thread):
-    def __init__(self, hand_type, hand_classfier, forest, one_shot_queue, global_lock):
+    def __init__(self, hand_type, hand_classfier, forest, one_shot_queue, global_lock, is_test=False):
         threading.Thread.__init__(self)
         self.hand_type = hand_type
         self.hand_classfier = hand_classfier
         self.forest = forest  # random forest instance
         self.one_shot_queue = one_shot_queue
         self.global_lock = global_lock
+        self.is_test = is_test  # whether it is testing; should save reference images if is_test
 
         # Find out the corresponding kinect v2 joint index of the hand
         if self.hand_type == 'RH':
@@ -51,29 +53,38 @@ class OneShot(threading.Thread):
             self.receiving_frames = True
         if not self.receiving_frames:
             return
-        if self._is_gesture(hand_arr) and not self.skip_frame:
-            self.ref_frames.append(hand_arr)
-            self.palm_centers.append(skeleton_arr[self.palm_coordinates_ind_start:self.palm_coordinates_ind_end])
-            if len(self.palm_centers) > self.buffer_length:
-                self.ref_frames.pop(0)
-                self.palm_centers.pop(0)
+        if self._is_gesture(hand_arr):
+            if not self.skip_frame:
+                self.ref_frames.append(hand_arr)
+                self.palm_centers.append(skeleton_arr[self.palm_coordinates_ind_start:self.palm_coordinates_ind_end])
 
-                # Assumes the start time of learning is when the hand stops moving. This is determined by the palm
-                # center buffer variance, which needs to be smaller than certain threshold.
-                if self._palm_center_buffer_variance() < self.moving_variance_threshold:
-                    # Start to learn, stop receiving frames
-                    self.receiving_frames = False
-                    # Get feature vectors
-                    new_features = []
-                    for each_hand_arr in self.ref_frames:
-                        new_features.append(self.hand_classfier.classify(each_hand_arr)[0])
-                    # learning finished, reset variables
-                    self.ref_frames = []
-                    self.palm_centers = []
-                    self.global_lock.acquire()
-                    self.forest.add_new(new_features, [NEW_GESTURE_INDEX] * len(new_features))
-                    self.forest.is_ready = True
-                    self.global_lock.release()
+                print(self.receiving_frames, len(self.palm_centers))
+                if len(self.palm_centers) > self.buffer_length:
+                    self.ref_frames.pop(0)
+                    self.palm_centers.pop(0)
+
+                    # Assumes the start time of learning is when the hand stops moving. This is determined by the palm
+                    # center buffer variance, which needs to be smaller than certain threshold.
+                    if self._palm_center_buffer_variance() < self.moving_variance_threshold:
+                        # Start to learn, stop receiving frames
+                        self.receiving_frames = False
+                        # Get feature vectors
+                        new_features = []
+                        for i, each_hand_arr in enumerate(self.ref_frames):
+                            new_features.append(self.hand_classfier.classify(each_hand_arr)[0])
+                            if self.is_test:
+                                img_name = "/s/red/a/nobackup/vision/jason/DraperLab/Demo/reference_imgs/%d.png" % i
+                                plt.imsave(img_name, np.squeeze(each_hand_arr))
+                        # learning finished, reset variables
+                        self.ref_frames = []
+                        self.palm_centers = []
+                        # add reference features to forest
+                        self.global_lock.acquire()
+                        print('ADDING...')
+                        self.forest.add_new(new_features, [NEW_GESTURE_INDEX] * len(new_features))
+                        print('ADDING FINISHED...')
+                        self.forest.is_ready = True
+                        self.global_lock.release()
 
         else:
             """
@@ -94,6 +105,7 @@ class OneShot(threading.Thread):
         :param hand_arr: hand image aray
         :return: A boolean about whether the hand is performing a gesture
         """
+        hand_arr = np.squeeze(hand_arr)
         return np.sum([hand_arr[i, j] > self.pixel_intensity_threshold for i in [0, -1] for j in [0, -1]]) >= 3
 
     def _palm_center_buffer_variance(self):

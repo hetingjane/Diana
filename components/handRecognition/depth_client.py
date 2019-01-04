@@ -97,7 +97,7 @@ def load_forest(hand_type):
     load_path = '/s/red/a/nobackup/vision/jason/forest/%s_forest.pickle' % hand_type
     print('Loading random forest checkpoint: %s' % load_path)
     f = open(load_path, 'rb')
-    forest = pickle.load(f)
+    forest = pickle.load(f, encoding='latin1')
     f.close()
 
     # status variables are used for one-shot learning
@@ -128,10 +128,16 @@ def preprocess_hand_arr(hand_arr, posx, posy):
 
 
 def find_label_sync(forest, feature):
+    """
+    :param forest:
+    :param feature: Only one feature is accepted here
+    :return:
+    """
     label_index, dist = None, None
-    if global_lock.acquire(blocking=False) and forest.is_ready:
+    if forest.is_ready:
         label_index, dist = forest.find_nn(feature)
-        global_lock.release()
+        label_index = label_index[0]
+        dist = dist[0]
     return label_index, dist
 
 
@@ -162,7 +168,8 @@ if __name__ == '__main__':
     one_shot_queue = queue.Queue()
     forest = load_forest(hand)
     learn_status = False  # whether to learn
-    one_shot_thread = OneShot(hand, hand_classfier, forest, one_shot_queue, global_lock)
+    one_shot_thread = OneShot(hand, hand_classfier, forest, one_shot_queue, global_lock, True)
+    one_shot_thread.start()
 
     i = 0
     hands_list = []
@@ -176,7 +183,8 @@ if __name__ == '__main__':
                 decode.read_frame(kinect_socket_body, decode_content_body)
             # print("timestamp, frame_type", timestamp, frame_type)
             # print("width, height, posx, posy", width, height, posx, posy)
-            # print("writer_data", writer_data)
+            if writer_data_hand != b'':
+                print("writer_data", writer_data_hand)
             
         except KeyboardInterrupt:
            break
@@ -184,7 +192,7 @@ if __name__ == '__main__':
         if not engaged:
             continue
 
-        if writer_data_hand == 'learn':
+        if writer_data_hand == b'learn':
             global_lock.acquire()
             forest.is_fresh = False
             forest.is_ready = False
@@ -206,22 +214,26 @@ if __name__ == '__main__':
             one_shot_queue.put((hand_arr, frame_pieces, learn_status))
 
             feature = hand_classfier.classify(hand_arr)
-            found_index, dist = find_label_sync(forest, feature)
-            if found_index is not None:
-                probs[max_index] = (0.5 - dist[0] / 2046.0)  # feature vector has a dimension of 1024, so dist[0]/1023/2
+            max_index, dist = find_label_sync(forest, feature)
+            if max_index is not None:
+                probs[max_index] = (0.5 - dist / 2046.0)  # feature vector has a dimension of 1024, so dist[0]/1023/2
 
             probs = list(probs)+[0]
 
-        print(i, timestamp, gestures[max_index], probs[max_index])
+        if max_index is not None:
+            print(i, timestamp, gestures[max_index], probs[max_index])
+        else:
+            print('Learning...')
+        # print(forest.is_ready)
         i += 1
 
-        if i % 100==0:
-            print("="*100, "FPS", 100/(time.time()-start_time))
-            start_time = time.time()
+        # if i % 100==0:
+        #     print("="*100, "FPS", 100/(time.time()-start_time))
+        #     start_time = time.time()
 
-        pack_list = [stream_id, timestamp,max_index]+list(probs)
+        # pack_list = [stream_id, timestamp,max_index]+list(probs)
 
-        bytes = struct.pack("<iqi"+"f"*(num_gestures+1), *pack_list)
+        # bytes = struct.pack("<iqi"+"f"*(num_gestures+1), *pack_list)
 
         if fusion_socket is not None:
             fusion_socket.send(bytes)
