@@ -6,13 +6,13 @@ import queue
 
 
 class OneShotWorker(threading.Thread):
-    def __init__(self, hand_type, hand_classfier, forest_status, load_forest_event, one_shot_queue, new_gesture_index,
+    def __init__(self, hand_type, hand_classfier, forest_status, event_vars, one_shot_queue, new_gesture_index,
                  global_lock, is_test=False):
         threading.Thread.__init__(self)
         self.hand_type = hand_type
         self.hand_classfier = hand_classfier
         self.forest_status = forest_status
-        self.load_forest_event = load_forest_event
+        self.event_vars = event_vars
         self.one_shot_queue = one_shot_queue
         self.new_gesture_index = new_gesture_index
         self.global_lock = global_lock
@@ -40,7 +40,7 @@ class OneShotWorker(threading.Thread):
 
     def run(self):
         while True:
-            if self.load_forest_event.is_set():
+            if self.event_vars.load_forest_event.is_set():
                 self.load_forest()
             # hand_arr, skeleton_arr, start_learn = self.one_shot_queue.get()
             try:
@@ -79,6 +79,7 @@ class OneShotWorker(threading.Thread):
                     if self._palm_center_buffer_variance() < self.moving_variance_threshold:
                         # Start to learn, stop receiving frames
                         self.receiving_frames = False
+                        self.event_vars.learn_initialize_event.set()
                         # Get feature vectors
                         new_features = []
                         for i, each_hand_arr in enumerate(self.ref_frames):
@@ -96,6 +97,7 @@ class OneShotWorker(threading.Thread):
                         self.forest.add_new(new_features, [self.new_gesture_index] * len(new_features))
                         print('ADDING FINISHED...')
                         self.forest_status.is_ready = True
+                        self.event_vars.learn_complete_event.set()
                         self.global_lock.release()
 
         else:
@@ -105,8 +107,13 @@ class OneShotWorker(threading.Thread):
             self.continous_no_gesture_frame_count += 1
             if self.continous_no_gesture_frame_count > self.no_action_threshold:
                 self.receiving_frames = False
-                self.forest_status.is_ready = True
                 self.continous_no_gesture_frame_count = 0
+
+                self.global_lock.acquire()
+                self.forest_status.is_ready = True
+                self.event_vars.learn_no_action_event.set()
+                self.global_lock.release()
+
             self.ref_frames = []
             self.palm_centers = []
 
@@ -152,7 +159,7 @@ class OneShotWorker(threading.Thread):
 
         self.forest_status.is_fresh = True  # whether the forest is a fresh copy
         self.forest_status.is_ready = True  # whether the forest is ready to be used for classification
-        self.load_forest_event.clear()
+        self.event_vars.load_forest_event.clear()
 
         self.global_lock.release()
 

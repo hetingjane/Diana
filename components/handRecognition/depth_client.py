@@ -1,11 +1,8 @@
 import struct
 import time
 import argparse
-import os
-import pickle
 import threading
 import queue
-import _thread
 
 from skimage.transform import resize
 import sys
@@ -28,6 +25,16 @@ class ForestStatus:
     def __init__(self):
         self.is_fresh = True  # whether the forest is a fresh copy
         self.is_ready = False  # whether the forest is ready to be used for classification
+
+
+class EventVars:
+    __slots__ = ('load_forest_event', 'learn_no_action_event', 'learn_initialize_event', 'learn_complete_event')
+
+    def __init__(self):
+        self.load_forest_event = threading.Event()  # signals whether to reload a fresh copy of forest
+        self.learn_no_action_event = threading.Event()  # whether learning process exits due to no valid gestures
+        self.learn_initialize_event = threading.Event()  # whether learning process is initiated
+        self.learn_complete_event = threading.Event()  # whether learning process is finished
 
 
 """
@@ -145,32 +152,32 @@ if __name__ == '__main__':
 
     hand_classfier = RealTimeHandRecognition(hand, num_gestures)
 
-    kinect_socket_hand = connect('kinect', args.kinect_host, hand)
-    kinect_socket_body = connect('kinect', args.kinect_host, 'Body')
+    kinect_socket = connect('kinect', args.kinect_host, (hand, 'Body'))
     fusion_socket = connect('fusion', args.fusion_host, hand) if args.fusion_host is not None else None
 
     # One-shot learning code.
     # forest status variables
     forest_status = ForestStatus()
     one_shot_queue = queue.Queue()  # The one-shot learning code reads from the queue to process.
+    event_vars = EventVars()  # event variables used for communication between threads
     new_gesture_index = num_gestures + 1  # refers to 'grab cup'
-    load_forest_event = threading.Event()  # signals whether to reload a fresh copy of forest
-    one_shot_worker = OneShotWorker(hand, hand_classfier, forest_status, load_forest_event, one_shot_queue,
+    one_shot_worker = OneShotWorker(hand, hand_classfier, forest_status, event_vars, one_shot_queue,
                                     new_gesture_index, global_lock, is_test=False)
     one_shot_worker.start()
-    load_forest_event.set()
+    event_vars.load_forest_event.set()
     learn_status = False  # whether to learn, record learning status received from kinect server
 
     # i = 0
+    status_to_fusion = 0  # a status integer sent to fusion
     hands_list = []
 
     start_time = time.time()
     while True:
         try:
-            (timestamp, frame_type), (width, height, posx, posy, depth_data), (writer_data_hand,) = \
-                decode.read_frame(kinect_socket_hand, decode_content_hand)
             (timestamp, frame_type), (tracked_body_count, engaged, frame_pieces), (writer_data_body,) = \
-                decode.read_frame(kinect_socket_body, decode_content_body)
+                decode.read_frame(kinect_socket, decode_content_body)
+            (timestamp, frame_type), (width, height, posx, posy, depth_data), (writer_data_hand,) = \
+                decode.read_frame(kinect_socket, decode_content_hand)
             # print("timestamp, frame_type", timestamp, frame_type)
             # print("width, height, posx, posy", width, height, posx, posy)
             if writer_data_hand != b'':
@@ -184,7 +191,7 @@ if __name__ == '__main__':
                 global_lock.acquire()
                 forest_status.is_ready = False
                 forest_status.is_fresh = True
-                load_forest_event.set()
+                event_vars.load_forest_event.set()
                 global_lock.release()
             continue
 
@@ -224,15 +231,30 @@ if __name__ == '__main__':
         #     print("="*100, "FPS", 100/(time.time()-start_time))
         #     start_time = time.time()
 
-        pack_list = [stream_id, timestamp, max_index]+list(probs)
+        status_to_fusion = 0
+        if event_vars.learn_no_action_event.is_set():
+            # if the hand does not perform any valid gesture, exit without learning
+            status_to_fusion = 3
+            event_vars.learn_no_action_event.clear()
 
-        bytes = struct.pack("<iqi"+"f"*(num_gestures+1), *pack_list)
+        if event_vars.learn_complete_event.is_set():
+            # if the learning process successfully completes
+            status_to_fusion = 2
+            event_vars.learn_complete_event.clear()
+
+        if event_vars.learn_initialize_event.is_set():
+            # learning process is initialized but has not finished
+            status_to_fusion = 1
+            event_vars.learn_initialize_event.clear()
+
+        pack_list = [stream_id, timestamp, max_index, status_to_fusion]+list(probs)
+
+        bytes = struct.pack("<iqii"+"f"*(num_gestures+2), *pack_list)
 
         if fusion_socket is not None:
             fusion_socket.send(bytes)
 
-    kinect_socket_hand.close()
-    kinect_socket_body.close()
+    kinect_socket.close()
     if fusion_socket is not None:
         fusion_socket.close()
     sys.exit(0)
