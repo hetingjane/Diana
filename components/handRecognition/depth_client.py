@@ -167,7 +167,6 @@ if __name__ == '__main__':
     event_vars.load_forest_event.set()
     learn_status = False  # whether to learn, record learning status received from kinect server
 
-    # i = 0
     status_to_fusion = 0  # a status integer sent to fusion
     hands_list = []
 
@@ -180,8 +179,8 @@ if __name__ == '__main__':
                 decode.read_frame(kinect_socket, decode_content_hand)
             # print("timestamp, frame_type", timestamp, frame_type)
             # print("width, height, posx, posy", width, height, posx, posy)
-            if writer_data_hand != b'':
-                print("writer_data", writer_data_hand)
+            # if writer_data_hand != b'':
+            #     print("writer_data", writer_data_hand)
             
         except KeyboardInterrupt:
            break
@@ -193,7 +192,6 @@ if __name__ == '__main__':
                 forest_status.is_fresh = True
                 event_vars.load_forest_event.set()
                 global_lock.release()
-            continue
 
         if writer_data_hand == b'learn':
             global_lock.acquire()
@@ -224,12 +222,6 @@ if __name__ == '__main__':
             print(timestamp, gestures[max_index], probs[max_index])
         else:
             print('Forest Not Ready...')
-        # print(forest.is_ready)
-        # i += 1
-
-        # if i % 100==0:
-        #     print("="*100, "FPS", 100/(time.time()-start_time))
-        #     start_time = time.time()
 
         status_to_fusion = 0
         if event_vars.learn_no_action_event.is_set():
