@@ -1,18 +1,20 @@
 import threading
 import numpy as np
 import matplotlib.pyplot as plt
+import pickle
+import queue
 
 
-NEW_GESTURE_INDEX = 50
-
-
-class OneShot(threading.Thread):
-    def __init__(self, hand_type, hand_classfier, forest, one_shot_queue, global_lock, is_test=False):
+class OneShotWorker(threading.Thread):
+    def __init__(self, hand_type, hand_classfier, forest_status, load_forest_event, one_shot_queue, new_gesture_index,
+                 global_lock, is_test=False):
         threading.Thread.__init__(self)
         self.hand_type = hand_type
         self.hand_classfier = hand_classfier
-        self.forest = forest  # random forest instance
+        self.forest_status = forest_status
+        self.load_forest_event = load_forest_event
         self.one_shot_queue = one_shot_queue
+        self.new_gesture_index = new_gesture_index
         self.global_lock = global_lock
         self.is_test = is_test  # whether it is testing; should save reference images if is_test
 
@@ -25,18 +27,27 @@ class OneShot(threading.Thread):
         self.palm_coordinates_ind_start = self.palm_ind*9 + 7
         self.palm_coordinates_ind_end = self.palm_ind*9 + 10
 
+        self.forest = None  # random forest instance
         self.receiving_frames = False  # Only start to receive frames when a signal is sent from kinect server
         self.skip_frame = 0  # skip some frames to maximize variance in learning input, use this variable to keep track
         self.pixel_intensity_threshold = 0.4  # used in self._is_gesture()
-        self.buffer_length = 10  # determines the number of frames in the buffer
+        self.buffer_length = 30  # determines the number of frames in the buffer (3 seconds of gapped frames)
         self.moving_variance_threshold = 0.001  # used in self._can_start(), starts learning when the arm stops moving
+        self.continous_no_gesture_frame_count = 0
+        self.no_action_threshold = 120  # if there are no gestures for continous 5 seconds, do not learn for this hand
         self.ref_frames = []  # a buffer list of frames to learn
         self.palm_centers = []  # a buffer list of palm center coordinates
 
     def run(self):
         while True:
-            hand_arr, skeleton_arr, start_learn = self.one_shot_queue.get(block=True, timeout=None)
-            self.add_frame(hand_arr, skeleton_arr, start_learn)
+            if self.load_forest_event.is_set():
+                self.load_forest()
+            # hand_arr, skeleton_arr, start_learn = self.one_shot_queue.get()
+            try:
+                hand_arr, skeleton_arr, start_learn = self.one_shot_queue.get(block=True, timeout=2)
+                self.add_frame(hand_arr, skeleton_arr, start_learn)
+            except queue.Empty:
+                pass
 
     def add_frame(self, hand_arr, skeleton_arr, start_learn):
         """
@@ -58,7 +69,7 @@ class OneShot(threading.Thread):
                 self.ref_frames.append(hand_arr)
                 self.palm_centers.append(skeleton_arr[self.palm_coordinates_ind_start:self.palm_coordinates_ind_end])
 
-                print(self.receiving_frames, len(self.palm_centers))
+                # print(self.receiving_frames, len(self.palm_centers))
                 if len(self.palm_centers) > self.buffer_length:
                     self.ref_frames.pop(0)
                     self.palm_centers.pop(0)
@@ -81,15 +92,21 @@ class OneShot(threading.Thread):
                         # add reference features to forest
                         self.global_lock.acquire()
                         print('ADDING...')
-                        self.forest.add_new(new_features, [NEW_GESTURE_INDEX] * len(new_features))
+                        self.forest_status.is_fresh = False
+                        self.forest.add_new(new_features, [self.new_gesture_index] * len(new_features))
                         print('ADDING FINISHED...')
-                        self.forest.is_ready = True
+                        self.forest_status.is_ready = True
                         self.global_lock.release()
 
         else:
             """
             In current frame, the hand is still next to body. Proceed without processing and reset buffer
             """
+            self.continous_no_gesture_frame_count += 1
+            if self.continous_no_gesture_frame_count > self.no_action_threshold:
+                self.receiving_frames = False
+                self.forest_status.is_ready = True
+                self.continous_no_gesture_frame_count = 0
             self.ref_frames = []
             self.palm_centers = []
 
@@ -120,3 +137,20 @@ class OneShot(threading.Thread):
 
     def _image_augmentation(self):
         pass
+
+    def load_forest(self):
+        self.global_lock.acquire()
+
+        load_path = '/s/red/a/nobackup/vision/jason/forest/%s_forest.pickle' % self.hand_type
+        print('Loading random forest checkpoint: %s' % load_path)
+        f = open(load_path, 'rb')
+        self.forest = pickle.load(f, encoding='latin1')
+        f.close()
+
+        self.forest_status.is_fresh = True  # whether the forest is a fresh copy
+        self.forest_status.is_ready = True  # whether the forest is ready to be used for classification
+        self.load_forest_event.clear()
+
+        self.global_lock.release()
+
+        print('%s forest loaded!' % self.hand_type)

@@ -5,6 +5,7 @@ import os
 import pickle
 import threading
 import queue
+import _thread
 
 from skimage.transform import resize
 import sys
@@ -13,11 +14,21 @@ from .realtime_hand_recognition import RealTimeHandRecognition
 from ..fusion.conf.endpoints import connect
 from ..fusion.conf import streams
 from ..fusion.conf import decode
+from ..fusion.conf import postures
 
 from . import RandomForest
-from .RandomForest.threaded_one_shot import OneShot
+from .RandomForest.threaded_one_shot import OneShotWorker
 
 global_lock = threading.Lock()
+
+
+class ForestStatus:
+    __slots__ = ('is_fresh', 'is_ready')
+
+    def __init__(self):
+        self.is_fresh = True  # whether the forest is a fresh copy
+        self.is_ready = False  # whether the forest is ready to be used for classification
+
 
 """
 # timestamp (long) | depth_hands_count(int) | left_hand_height (int) | left_hand_width (int) |
@@ -25,7 +36,6 @@ global_lock = threading.Lock()
 # left_hand_depth_data ([left_hand_width * left_hand_height]) |
 # right_hand_depth_data ([right_hand_width * right_hand_height])
 """
-
 def decode_content_hand(raw_frame, offset):
     """
     raw_frame: frame starting from 4 to end (4 for length field)
@@ -89,32 +99,6 @@ def parse_argument():
     return parser.parse_args()
 
 
-def load_forest(hand_type):
-    """
-    Load random forest classifier from disk
-    :return: loaded forest
-    """
-    load_path = '/s/red/a/nobackup/vision/jason/forest/%s_forest.pickle' % hand_type
-    print('Loading random forest checkpoint: %s' % load_path)
-    f = open(load_path, 'rb')
-    forest = pickle.load(f, encoding='latin1')
-    f.close()
-
-    # status variables are used for one-shot learning
-    forest.is_fresh = True  # whether the forest is a fresh copy
-    # forest.is_learning = False  # whether the forest is taking images for learning
-    forest.is_ready = True  # whether the forest is ready to be used for classification
-
-    print('%s forest loaded!' % hand_type)
-
-    return forest
-
-
-# def conditional_load_forest(hand_type, engaged):
-#     global_lock.acquire()
-#     if
-
-
 def preprocess_hand_arr(hand_arr, posx, posy):
     posz = hand_arr[int(posx), int(posy)]
     hand_arr -= posz
@@ -127,14 +111,14 @@ def preprocess_hand_arr(hand_arr, posx, posy):
     return hand_arr
 
 
-def find_label_sync(forest, feature):
+def find_label_sync(forest, forest_status, feature):
     """
     :param forest:
     :param feature: Only one feature is accepted here
     :return:
     """
     label_index, dist = None, None
-    if forest.is_ready:
+    if forest_status.is_ready:
         label_index, dist = forest.find_nn(feature)
         label_index = label_index[0]
         dist = dist[0]
@@ -152,10 +136,11 @@ if __name__ == '__main__':
     stream_id = streams.get_stream_id(hand)
 
     # load gesture labels
-    gestures = np.load(os.path.abspath('./data/labels_{}.npy'.format(hand)))
-    gestures = [g.decode('ascii').replace(".npy", "") for g in gestures]
-    num_gestures = len(gestures)
-    gestures += ['blind']
+    gestures = postures.right_hand_postures if hand == 'RH' else postures.left_hand_postures
+    # gestures = np.load(os.path.abspath('./data/labels_{}.npy'.format(hand)))
+    # gestures = [g.decode('ascii').replace(".npy", "") for g in gestures]
+    num_gestures = len(gestures) - 2  # 'blind' and 'grab cup' were not originally trained with ResNet
+    # gestures += ['blind']
     print(hand, num_gestures)
 
     hand_classfier = RealTimeHandRecognition(hand, num_gestures)
@@ -164,14 +149,19 @@ if __name__ == '__main__':
     kinect_socket_body = connect('kinect', args.kinect_host, 'Body')
     fusion_socket = connect('fusion', args.fusion_host, hand) if args.fusion_host is not None else None
 
-    # One-shot learning code. The one-shot learning code reads from the queue to process.
-    one_shot_queue = queue.Queue()
-    forest = load_forest(hand)
-    learn_status = False  # whether to learn
-    one_shot_thread = OneShot(hand, hand_classfier, forest, one_shot_queue, global_lock, True)
-    one_shot_thread.start()
+    # One-shot learning code.
+    # forest status variables
+    forest_status = ForestStatus()
+    one_shot_queue = queue.Queue()  # The one-shot learning code reads from the queue to process.
+    new_gesture_index = num_gestures + 1  # refers to 'grab cup'
+    load_forest_event = threading.Event()  # signals whether to reload a fresh copy of forest
+    one_shot_worker = OneShotWorker(hand, hand_classfier, forest_status, load_forest_event, one_shot_queue,
+                                    new_gesture_index, global_lock, True)
+    one_shot_worker.start()
+    load_forest_event.set()
+    learn_status = False  # whether to learn, record learning status received from kinect server
 
-    i = 0
+    # i = 0
     hands_list = []
 
     start_time = time.time()
@@ -190,22 +180,27 @@ if __name__ == '__main__':
            break
 
         if not engaged:
+            if not forest_status.is_fresh:
+                global_lock.acquire()
+                forest_status.is_ready = False
+                forest_status.is_fresh = True
+                load_forest_event.set()
+                global_lock.release()
             continue
 
         if writer_data_hand == b'learn':
             global_lock.acquire()
-            forest.is_fresh = False
-            forest.is_ready = False
+            forest_status.is_ready = False
             global_lock.release()
             learn_status = True
         else:
             learn_status = False
 
-        probs = [0] * num_gestures  # probabilities to send to fusion
+        probs = [0] * (num_gestures + 2)  # probabilities to send to fusion, including 'bland' and 'grab cup'
 
         if posx == -1 and posy == -1:
-            probs += [1]
-            max_index = len(probs)-1
+            max_index = len(probs) - 2  # max_index refers to 'blind'
+            probs[max_index] = 1
         else:
             hand_arr = np.array(depth_data, dtype=np.float32).reshape((height, width))
             hand_arr = preprocess_hand_arr(hand_arr, posx, posy)
@@ -214,26 +209,24 @@ if __name__ == '__main__':
             one_shot_queue.put((hand_arr, frame_pieces, learn_status))
 
             feature = hand_classfier.classify(hand_arr)
-            max_index, dist = find_label_sync(forest, feature)
+            max_index, dist = find_label_sync(one_shot_worker.forest, forest_status, feature)
             if max_index is not None:
                 probs[max_index] = (0.5 - dist / 2046.0)  # feature vector has a dimension of 1024, so dist[0]/1023/2
 
-            probs = list(probs)+[0]
-
         if max_index is not None:
-            print(i, timestamp, gestures[max_index], probs[max_index])
+            print(timestamp, gestures[max_index], probs[max_index])
         else:
-            print('Learning...')
+            print('Forest Not Ready...')
         # print(forest.is_ready)
-        i += 1
+        # i += 1
 
         # if i % 100==0:
         #     print("="*100, "FPS", 100/(time.time()-start_time))
         #     start_time = time.time()
 
-        # pack_list = [stream_id, timestamp,max_index]+list(probs)
+        pack_list = [stream_id, timestamp, max_index]+list(probs)
 
-        # bytes = struct.pack("<iqi"+"f"*(num_gestures+1), *pack_list)
+        bytes = struct.pack("<iqi"+"f"*(num_gestures+1), *pack_list)
 
         if fusion_socket is not None:
             fusion_socket.send(bytes)
