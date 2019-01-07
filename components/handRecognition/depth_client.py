@@ -156,7 +156,7 @@ if __name__ == '__main__':
     new_gesture_index = num_gestures + 1  # refers to 'grab cup'
     load_forest_event = threading.Event()  # signals whether to reload a fresh copy of forest
     one_shot_worker = OneShotWorker(hand, hand_classfier, forest_status, load_forest_event, one_shot_queue,
-                                    new_gesture_index, global_lock, True)
+                                    new_gesture_index, global_lock, is_test=False)
     one_shot_worker.start()
     load_forest_event.set()
     learn_status = False  # whether to learn, record learning status received from kinect server

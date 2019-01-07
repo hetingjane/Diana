@@ -136,6 +136,9 @@ class OneShotWorker(threading.Thread):
         return np.std(distances)
 
     def _image_augmentation(self):
+        """
+        May use this for image augmentation more variance in reference images for one shot learning
+        """
         pass
 
     def load_forest(self):
