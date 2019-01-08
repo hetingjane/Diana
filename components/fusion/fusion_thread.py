@@ -20,7 +20,7 @@ class Fusion(threading.Thread):
                                        'pos_l_x', 'pos_l_y', 'var_l_x', 'var_l_y', 'pos_r_x', 'pos_r_y', 'var_r_x', 'var_r_y',
                                        'p_l_arm', 'p_r_arm',
                                        'engaged'])
-    HandData = namedtuple('HandData', ['idx_hand', 'probabilities', 'hand_type'])
+    HandData = namedtuple('HandData', ['idx_hand', 'learning_state', 'probabilities', 'hand_type'])
 
     HeadData = namedtuple('HeadData', ['idx_head', 'probabilities'])
 
@@ -68,8 +68,8 @@ class Fusion(threading.Thread):
         return Fusion.BodyData(*body_data)
 
     def _read_hands_data(self, sock, hand):
-        # Max Index, Probabilities
-        data_format = "<" + "i" + "f" * len(right_hand_postures)
+        # Max Index, Learning state, Probabilities
+        data_format = "<" + "ii" + "f" * len(right_hand_postures)
         raw_data = self._recv_all(sock, struct.calcsize(data_format))
         hand_data = struct.unpack(data_format, raw_data)
         if hand == 'LH':
@@ -78,7 +78,7 @@ class Fusion(threading.Thread):
             hand_type = 'right'
         else:
             raise ValueError('hand must be either LH or RH: ' + hand)
-        return Fusion.HandData(hand_data[0], hand_data[1:], hand_type)
+        return Fusion.HandData(hand_data[0], hand_data[1], hand_data[2:], hand_type)
 
     def _read_head_data(self, sock):
         data_format = "<" + "i" + "f" * len(head_postures)
@@ -137,12 +137,17 @@ class Fusion(threading.Thread):
 
     def _accept_stream(self, sock, addr):
         try:
-            stream_id_bytes = self._recv_all(sock, 4)
-            stream_id = struct.unpack('<i', stream_id_bytes)[0]
+            stream_reg_len, = struct.unpack('<i', self._recv_all(sock, 4))
+            client_type, stream_id = struct.unpack('<Bi', self._recv_all(sock, stream_reg_len))
         except Exception:
-            print("Unable to receive complete stream id. Ignoring the client")
-            sock.close()
-        print("Received stream id. Verifying...")
+            print("Unable to receive registration data for stream. Ignoring the client")
+            return False
+
+        print("Received stream registration request. Verifying...")
+        if client_type != 1:
+            print("Only recognizers are allowed to connect to fusion. Here, client type is {0}. Rejecting the connection".format(client_type))
+            return False
+
         if streams.is_valid_id(stream_id):
             stream_name = streams.get_stream_name(stream_id)
             if streams.is_active(stream_name):
@@ -155,13 +160,11 @@ class Fusion(threading.Thread):
                     return True
                 else:
                     print("Stream already exists. Rejecting the connection")
-                    sock.close()
             else:
                 print("Rejecting inactive stream: {}".format(stream_name))
-                sock.close()
         else:
             print("Rejecting invalid stream with id: {}".format(stream_id))
-            sock.close()
+
         return False
 
     def run(self):
@@ -194,6 +197,8 @@ class Fusion(threading.Thread):
                     # 1 is for the server socket
                     if self._accept_stream(client_sock, client_addr):
                         inputs += [client_sock]
+                    else:
+                        client_sock.close()
                 else:
                     try:
                         msg = self._handle_client(s)
