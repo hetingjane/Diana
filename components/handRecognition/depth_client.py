@@ -8,6 +8,7 @@ from skimage.transform import resize
 import sys
 import numpy as np
 from .realtime_hand_recognition import RealTimeHandRecognition
+from ..skeletonRecognition.skeleton_client import decode_content as decode_content_body
 from ..fusion.conf.endpoints import connect
 from ..fusion.conf import streams
 from ..fusion.conf import decode
@@ -64,39 +65,6 @@ def decode_content_hand(raw_frame, offset):
     return (width, height, posx, posy, list(depth_data)), offset
 
 
-def decode_content_body(raw_frame, offset):
-    """
-    raw_frame: frame starting from 4 to end (4 for length field)
-    offset: index where header ends; header is header_l, timestamp, frame_type
-    """
-    endianness = "<"
-
-    content_header_format = "BB"  # Tracked body count | Engaged
-    content_header_size = struct.calcsize(endianness + content_header_format)
-    content_header = struct.unpack_from(endianness + content_header_format, raw_frame, offset)
-
-    tracked_body_count, engaged = content_header
-
-    # For each body, a header is transmitted
-    # TrackingId | HandLeftConfidence | HandLeftState | HandRightConfidence | HandRightState ]
-    body_format = "Q4B"
-
-    # For each of the 25 joints, the following info is transmitted
-    # [ JointType | TrackingState | Position.X | Position.Y | Position.Z | Orientation.W | Orientation.X | Orientation.Y | Orientation.Z ]
-    joint_format = "BB7f"
-
-    frame_format = body_format + (joint_format * 25)
-
-    # Unpack the raw frame into individual pieces of data as a tuple
-    frame_pieces = struct.unpack_from(endianness + (frame_format * engaged), raw_frame, offset + content_header_size)
-
-    # decoded = (tracked_body_count, engaged) + frame_pieces
-    decoded = (tracked_body_count, engaged, frame_pieces)
-    offset = offset + content_header_size + struct.calcsize(
-        endianness + frame_format * engaged)  # new offset from where tail starts
-    return decoded, offset
-
-
 def parse_argument():
     parser = argparse.ArgumentParser()
     parser.add_argument('hand', help='Hand to follow', choices=['LH', 'RH'])
@@ -144,10 +112,7 @@ if __name__ == '__main__':
 
     # load gesture labels
     gestures = postures.right_hand_postures if hand == 'RH' else postures.left_hand_postures
-    # gestures = np.load(os.path.abspath('./data/labels_{}.npy'.format(hand)))
-    # gestures = [g.decode('ascii').replace(".npy", "") for g in gestures]
     num_gestures = len(gestures) - 2  # 'blind' and 'grab cup' were not originally trained with ResNet
-    # gestures += ['blind']
     print(hand, num_gestures)
 
     hand_classfier = RealTimeHandRecognition(hand, num_gestures)
@@ -167,7 +132,7 @@ if __name__ == '__main__':
     event_vars.load_forest_event.set()
     learn_status = False  # whether to learn, record learning status received from kinect server
 
-    status_to_fusion = 0  # a status integer sent to fusion
+    frame_count = 0
     hands_list = []
 
     start_time = time.time()
@@ -221,19 +186,24 @@ if __name__ == '__main__':
         if max_index is not None:
             print(timestamp, gestures[max_index], probs[max_index])
         else:
+            # set the max_index to blind when the forest is not ready, although should not be used
+            max_index = len(probs) - 2
             print('Forest Not Ready...')
 
-        status_to_fusion = 0
+        frame_count += 1
+        if frame_count % 100 == 0:
+            print("="*100, "FPS", 100/(time.time()-start_time))
+            start_time = time.time()
+
+        status_to_fusion = 0  # a status integer sent to fusion
         if event_vars.learn_no_action_event.is_set():
             # if the hand does not perform any valid gesture, exit without learning
             status_to_fusion = 3
             event_vars.learn_no_action_event.clear()
-
         if event_vars.learn_complete_event.is_set():
             # if the learning process successfully completes
             status_to_fusion = 2
             event_vars.learn_complete_event.clear()
-
         if event_vars.learn_initialize_event.is_set():
             # learning process is initialized but has not finished
             status_to_fusion = 1
