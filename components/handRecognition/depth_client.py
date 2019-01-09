@@ -1,53 +1,24 @@
 import struct
 import time
 import argparse
-import threading
-import queue
 
-from skimage.transform import resize
 import sys
-import numpy as np
-from .realtime_hand_recognition import RealTimeHandRecognition
 from ..skeletonRecognition.skeleton_client import decode_content as decode_content_body
+from .base_classifier import BaseClassifier
+from .one_shot_classifier import OneShotClassifier
 from ..fusion.conf.endpoints import connect
 from ..fusion.conf import streams
 from ..fusion.conf import decode
-from ..fusion.conf import postures
-
-from . import RandomForest
-from .RandomForest.threaded_one_shot import OneShotWorker
-
-global_lock = threading.Lock()
 
 
-class ForestStatus:
-    __slots__ = ('is_fresh', 'is_ready')
-
-    def __init__(self):
-        self.is_fresh = True  # whether the forest is a fresh copy
-        self.is_ready = False  # whether the forest is ready to be used for classification
-
-
-class EventVars:
-    __slots__ = ('load_forest_event', 'learn_no_action_event', 'learn_initialize_event', 'learn_complete_event')
-
-    def __init__(self):
-        self.load_forest_event = threading.Event()  # signals whether to reload a fresh copy of forest
-        self.learn_no_action_event = threading.Event()  # whether learning process exits due to no valid gestures
-        self.learn_initialize_event = threading.Event()  # whether learning process is initiated
-        self.learn_complete_event = threading.Event()  # whether learning process is finished
-
-
-"""
-# timestamp (long) | depth_hands_count(int) | left_hand_height (int) | left_hand_width (int) |
-# right_hand_height (int) | right_hand_width (int)| left_hand_pos_x (float) | left_hand_pos_y (float) | ... |
-# left_hand_depth_data ([left_hand_width * left_hand_height]) |
-# right_hand_depth_data ([right_hand_width * right_hand_height])
-"""
 def decode_content_hand(raw_frame, offset):
     """
-    raw_frame: frame starting from 4 to end (4 for length field)
-    offset: index where header ends; header is header_l, timestamp, frame_type
+    :param raw_frame: frame starting from 4 to end (4 for length field)
+    :param offset: index where header ends; header is header_l, timestamp, frame_type
+    # timestamp (long) | depth_hands_count(int) | left_hand_height (int) | left_hand_width (int) |
+    # right_hand_height (int) | right_hand_width (int)| left_hand_pos_x (float) | left_hand_pos_y (float) | ... |
+    # left_hand_depth_data ([left_hand_width * left_hand_height]) |
+    # right_hand_depth_data ([right_hand_width * right_hand_height])
     """
     endianness = "<"
 
@@ -70,69 +41,27 @@ def parse_argument():
     parser.add_argument('hand', help='Hand to follow', choices=['LH', 'RH'])
     parser.add_argument('kinect_host', help='Host name of the machine running Kinect Server')
     parser.add_argument('--fusion-host', help='Host name of the machine running Fusion Server', default=None)
+    parser.add_argument('--enable-one-shot', help='Start client in one-shot learning mode', action='store_true')
 
     return parser.parse_args()
-
-
-def preprocess_hand_arr(hand_arr, posx, posy):
-    posz = hand_arr[int(posx), int(posy)]
-    hand_arr -= posz
-    hand_arr /= 150
-    hand_arr = np.clip(hand_arr, -1, 1)
-    hand_arr = resize(hand_arr, (168, 168))
-    hand_arr = hand_arr[20:-20, 20:-20]
-    hand_arr = hand_arr.reshape((1, 128, 128, 1))
-
-    return hand_arr
-
-
-def find_label_sync(forest, forest_status, feature):
-    """
-    :param forest:
-    :param feature: Only one feature is accepted here
-    :return:
-    """
-    label_index, dist = None, None
-    if forest_status.is_ready:
-        label_index, dist = forest.find_nn(feature)
-        label_index = label_index[0]
-        dist = dist[0]
-    return label_index, dist
 
 
 if __name__ == '__main__':
 
     args = parse_argument()
-
-    sys.modules['RandomForest'] = RandomForest  # to load the pickle file
-
     hand = args.hand
 
     stream_id = streams.get_stream_id(hand)
 
-    # load gesture labels
-    gestures = postures.right_hand_postures if hand == 'RH' else postures.left_hand_postures
-    num_gestures = len(gestures) - 2  # 'blind' and 'grab cup' were not originally trained with ResNet
-    print(hand, num_gestures)
-
-    hand_classfier = RealTimeHandRecognition(hand, num_gestures)
+    if args.enable_one_shot:
+        classifier = OneShotClassifier(hand, stream_id)
+    else:
+        classifier = BaseClassifier(hand, stream_id)
 
     kinect_socket = connect('kinect', args.kinect_host, (hand, 'Body'))
     fusion_socket = connect('fusion', args.fusion_host, hand) if args.fusion_host is not None else None
 
-    # One-shot learning code.
-    # forest status variables
-    forest_status = ForestStatus()
-    one_shot_queue = queue.Queue()  # The one-shot learning code reads from the queue to process.
-    event_vars = EventVars()  # event variables used for communication between threads
-    new_gesture_index = num_gestures + 1  # refers to 'grab cup'
-    one_shot_worker = OneShotWorker(hand, hand_classfier, forest_status, event_vars, one_shot_queue,
-                                    new_gesture_index, global_lock, is_test=False)
-    one_shot_worker.start()
-    event_vars.load_forest_event.set()
-    learn_status = False  # whether to learn, record learning status received from kinect server
-
-    frame_count = 0
+    frame_count = 0  # To calculate the fps
     hands_list = []
 
     start_time = time.time()
@@ -142,76 +71,17 @@ if __name__ == '__main__':
                 decode.read_frame(kinect_socket, decode_content_body)
             (timestamp, frame_type), (width, height, posx, posy, depth_data), (writer_data_hand,) = \
                 decode.read_frame(kinect_socket, decode_content_hand)
-            # print("timestamp, frame_type", timestamp, frame_type)
-            # print("width, height, posx, posy", width, height, posx, posy)
-            # if writer_data_hand != b'':
-            #     print("writer_data", writer_data_hand)
-            
         except KeyboardInterrupt:
-           break
-
-        if not engaged:
-            if not forest_status.is_fresh:
-                global_lock.acquire()
-                forest_status.is_ready = False
-                forest_status.is_fresh = True
-                event_vars.load_forest_event.set()
-                global_lock.release()
-
-        if writer_data_hand == b'learn':
-            global_lock.acquire()
-            forest_status.is_ready = False
-            global_lock.release()
-            learn_status = True
-        else:
-            learn_status = False
-
-        probs = [0] * (num_gestures + 2)  # probabilities to send to fusion, including 'bland' and 'grab cup'
-
-        if posx == -1 and posy == -1:
-            max_index = len(probs) - 2  # max_index refers to 'blind'
-            probs[max_index] = 1
-        else:
-            hand_arr = np.array(depth_data, dtype=np.float32).reshape((height, width))
-            hand_arr = preprocess_hand_arr(hand_arr, posx, posy)
-            # print(hand_arr.shape, posx, posy)
-
-            one_shot_queue.put((hand_arr, frame_pieces, learn_status))
-
-            feature = hand_classfier.classify(hand_arr)
-            max_index, dist = find_label_sync(one_shot_worker.forest, forest_status, feature)
-            if max_index is not None:
-                probs[max_index] = (0.5 - dist / 2046.0)  # feature vector has a dimension of 1024, so dist[0]/1023/2
-
-        if max_index is not None:
-            print(timestamp, gestures[max_index], probs[max_index])
-        else:
-            # set the max_index to blind when the forest is not ready, although should not be used
-            max_index = len(probs) - 2
-            print('Forest Not Ready...')
+            break
 
         frame_count += 1
-        if frame_count % 100 == 0:
+        if frame_count == 100:
             print("="*100, "FPS", 100/(time.time()-start_time))
             start_time = time.time()
+            frame_count = 0
 
-        status_to_fusion = 0  # a status integer sent to fusion
-        if event_vars.learn_no_action_event.is_set():
-            # if the hand does not perform any valid gesture, exit without learning
-            status_to_fusion = 3
-            event_vars.learn_no_action_event.clear()
-        if event_vars.learn_complete_event.is_set():
-            # if the learning process successfully completes
-            status_to_fusion = 2
-            event_vars.learn_complete_event.clear()
-        if event_vars.learn_initialize_event.is_set():
-            # learning process is initialized but has not finished
-            status_to_fusion = 1
-            event_vars.learn_initialize_event.clear()
-
-        pack_list = [stream_id, timestamp, max_index, status_to_fusion]+list(probs)
-
-        bytes = struct.pack("<iqii"+"f"*(num_gestures+2), *pack_list)
+        bytes = classifier.get_bytes(timestamp, width, height, posx, posy, depth_data, writer_data_hand, engaged,
+                                     frame_pieces)
 
         if fusion_socket is not None:
             fusion_socket.send(bytes)

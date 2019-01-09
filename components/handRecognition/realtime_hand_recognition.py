@@ -6,7 +6,7 @@ import numpy as np
 from . import hands_resnet_model
 
 
-class RealTimeHandRecognition():
+class RealTimeHandRecognition:
     def __init__(self, hands, gestures):
 
         hps = hands_resnet_model.HParams(batch_size=1,
@@ -34,6 +34,26 @@ class RealTimeHandRecognition():
         self.model = model
 
         self.past_probs = None
+
+    def classify(self, data):
+        (predictions) = self.sess.run([self.model.predictions], feed_dict={self.model._images: data})
+        probs = predictions[0][0]
+
+        if self.past_probs is None:
+            self.past_probs = probs
+        else:
+            self.past_probs = (self.past_probs+probs)/2
+
+        max_prediction = np.argmax(self.past_probs)
+        return max_prediction, self.past_probs
+
+
+class RealTimeHandRecognitionOneShot(RealTimeHandRecognition):
+    """
+    Overloaded class specific for one-shot learning. Only generate feature vectors.
+    """
+    def __init__(self, hands, gestures):
+        RealTimeHandRecognition.__init__(self, hands, gestures)
 
     def classify(self, data):
         (feature) = self.sess.run([self.model.fc_x], feed_dict={self.model._images: data})
