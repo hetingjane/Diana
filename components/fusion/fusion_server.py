@@ -271,6 +271,22 @@ class App:
             thread_sync.gui_events.put(new_ev)
 
 
+def create_one_shot_learning_events():
+    from .automata.statemachines import PoseStateMachine
+    from .automata.rules import All
+    one_shot_learning_events = []
+    for hand in ['lh', 'rh']:
+        for i in range(1, 6):
+            gesture_name = ' '.join([hand, 'new gesture', str(i)])
+            if hand == 'lh':
+                assert gesture_name in postures.left_hand_postures
+            elif hand == 'rh':
+                assert gesture_name in postures.right_hand_postures
+
+            one_shot_learning_events.append(PoseStateMachine(gesture_name, All((gesture_name, 5))))
+    return one_shot_learning_events
+
+
 brandeis_events = [machines.engage, machines.wave,
                    machines.posack, machines.negack, machines.nevermind,
                    machines.left_point, machines.right_point,
@@ -278,7 +294,11 @@ brandeis_events = [machines.engage, machines.wave,
                    machines.push_left, machines.push_right, machines.push_front, machines.push_back,
                    machines.grab, machines.push_servo_left, machines.push_servo_right]
 
+brandeis_events += create_one_shot_learning_events()
+
 csu_events = brandeis_events
+
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
