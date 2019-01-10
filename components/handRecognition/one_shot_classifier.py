@@ -38,6 +38,7 @@ class OneShotClassifier(BaseClassifier):
         self.one_shot_queue = queue.Queue()  # The one-shot learning code reads from the queue to process.
         self.event_vars = EventVars()  # event variables used for communication between threads
         self.new_gesture_index = 32  # refers to 'new gesture 1', increments after every new gesture is learned
+        self.taught_gesture_index = 36  # refers to 'taught gesture 1', increments after every new gesture is learned
 
         self.one_shot_worker = OneShotWorker(self.hand, self.hand_recognition, self.forest_status, self.event_vars,
                                              self.one_shot_queue, self.global_lock, is_test=False)
@@ -50,6 +51,7 @@ class OneShotClassifier(BaseClassifier):
         if not engaged:
             if not self.forest_status.is_fresh:
                 self.global_lock.acquire()
+                self.taught_gesture_index = 36
                 self.forest_status.is_ready = False
                 self.forest_status.is_fresh = True
                 self.event_vars.load_forest_event.set()
@@ -88,7 +90,7 @@ class OneShotClassifier(BaseClassifier):
         """
         max_index, dist = len(self.probs) - 1, 1  # default is blind
         if self.learning:
-            max_index = len(self.probs) - 3  # refers to posture 'learning'
+            max_index = 35  # refers to posture 'learning'
             dist = 1
         if self.event_vars.learn_no_action_event.is_set():
             # learning failed, forest should be ready so find the label again
@@ -102,7 +104,9 @@ class OneShotClassifier(BaseClassifier):
         if self.event_vars.learn_complete_event.is_set():
             # the learning process successfully completes
             self.learning = False
-            max_index = len(self.probs) - 2  # refers to posture 'learned'
+            max_index = self.taught_gesture_index  # refers to posture 'learned'
+            print([max_index, self.gestures[max_index]]*100)
+            self.taught_gesture_index += 1
             dist = 1
             self.event_vars.learn_complete_event.clear()
 
