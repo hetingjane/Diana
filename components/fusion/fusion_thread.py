@@ -20,7 +20,7 @@ class Fusion(threading.Thread):
                                        'pos_l_x', 'pos_l_y', 'var_l_x', 'var_l_y', 'pos_r_x', 'pos_r_y', 'var_r_x', 'var_r_y',
                                        'p_l_arm', 'p_r_arm',
                                        'engaged'])
-    HandData = namedtuple('HandData', ['idx_hand', 'learning_state', 'probabilities', 'hand_type'])
+    HandData = namedtuple('HandData', ['idx_hand', 'probabilities', 'hand_type'])
 
     HeadData = namedtuple('HeadData', ['idx_head', 'probabilities'])
 
@@ -68,8 +68,8 @@ class Fusion(threading.Thread):
         return Fusion.BodyData(*body_data)
 
     def _read_hands_data(self, sock, hand):
-        # Max Index, Learning state, Probabilities
-        data_format = "<" + "ii" + "f" * len(right_hand_postures)
+        # Max Index, Probabilities
+        data_format = "<" + "i" + "f" * len(right_hand_postures)
         raw_data = self._recv_all(sock, struct.calcsize(data_format))
         hand_data = struct.unpack(data_format, raw_data)
         if hand == 'LH':
@@ -78,7 +78,7 @@ class Fusion(threading.Thread):
             hand_type = 'right'
         else:
             raise ValueError('hand must be either LH or RH: ' + hand)
-        return Fusion.HandData(hand_data[0], hand_data[1], hand_data[2:], hand_type)
+        return Fusion.HandData(hand_data[0], hand_data[1:], hand_type)
 
     def _read_head_data(self, sock):
         data_format = "<" + "i" + "f" * len(head_postures)
