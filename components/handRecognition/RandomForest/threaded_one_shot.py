@@ -14,7 +14,7 @@ class OneShotWorker(threading.Thread):
         self.forest_status = forest_status
         self.event_vars = event_vars
         self.one_shot_queue = one_shot_queue
-        self.new_gesture_index = 32
+        self.new_gesture_index = 32  # the first new gesture, increment when a new gesture is learned
         self.global_lock = global_lock
         self.is_test = is_test  # whether it is testing; should save reference images if is_test
 
@@ -159,6 +159,7 @@ class OneShotWorker(threading.Thread):
 
         self.forest_status.is_fresh = True  # whether the forest is a fresh copy
         self.forest_status.is_ready = True  # whether the forest is ready to be used for classification
+        self.new_gesture_index = 32  # reset the index
         self.event_vars.load_forest_event.clear()
 
         self.global_lock.release()
