@@ -43,6 +43,25 @@ push_back = PoseStateMachine('push back', rules.Or(
 
 nevermind = PoseStateMachine('nevermind', rules.All(('rh stop', 'lh stop', 20)))
 
+teaching = StateMachine('teaching',
+                        ['stop', 'start', 'succeeded'],
+                        {
+                            'stop': {
+                                'start': rules.Any(('rh teaching', 5), ('lh teaching', 5))
+                            },
+
+                            'start': {
+                                # Stop when neither teaching nor taught for 1 frame for both hands
+                                'stop': rules.All(('rh teaching', 1), ('rh taught', 1), ('lh teaching', 1), ('lh taught', 1), invert=True),
+                                'succeeded': rules.Any(('rh taught', 1), ('lh taught', 1))
+                            },
+
+                            'succeeded': {
+                                'stop': rules.Always()
+                            },
+                        },
+                        'stop')
+
 grab = StateMachine('grab',
                     ['stop', 'start', 'move up start', 'move down start', 'move left start', 'move right start',
                      'move front start', 'move back start'],
