@@ -6,7 +6,7 @@ import queue
 
 
 class OneShotWorker(threading.Thread):
-    def __init__(self, hand_type, hand_classfier, forest_status, event_vars, one_shot_queue, new_gesture_index,
+    def __init__(self, hand_type, hand_classfier, forest_status, event_vars, one_shot_queue,
                  global_lock, is_test=False):
         threading.Thread.__init__(self)
         self.hand_type = hand_type
@@ -14,7 +14,7 @@ class OneShotWorker(threading.Thread):
         self.forest_status = forest_status
         self.event_vars = event_vars
         self.one_shot_queue = one_shot_queue
-        self.new_gesture_index = new_gesture_index
+        self.new_gesture_index = 32
         self.global_lock = global_lock
         self.is_test = is_test  # whether it is testing; should save reference images if is_test
 
@@ -79,7 +79,6 @@ class OneShotWorker(threading.Thread):
                     if self._palm_center_buffer_variance() < self.moving_variance_threshold:
                         # Start to learn, stop receiving frames
                         self.receiving_frames = False
-                        self.event_vars.learn_initialize_event.set()
                         # Get feature vectors
                         new_features = []
                         for i, each_hand_arr in enumerate(self.ref_frames):
@@ -97,6 +96,7 @@ class OneShotWorker(threading.Thread):
                         self.forest.add_new(new_features, [self.new_gesture_index] * len(new_features))
                         print('ADDING FINISHED...')
                         self.forest_status.is_ready = True
+                        self.new_gesture_index += 1
                         self.event_vars.learn_complete_event.set()
                         self.global_lock.release()
 

@@ -14,35 +14,32 @@ class BaseClassifier:
 
         # load gesture labels
         self.gestures = postures.right_hand_postures if self.hand == 'RH' else postures.left_hand_postures
-        self.num_gestures = len(self.gestures) - 2  # 'blind' and 'grab cup' were not originally trained with ResNet
+        self.num_gestures = 32  # this is the number of gestures trained with ResNet
         print(self.hand, self.num_gestures)
+        self.probs = None  # probs sent to fusion, recalculate for each frame
 
         self.hand_recognition = self._get_hand_recognition()
 
     def get_bytes(self, timestamp, width, height, posx, posy, depth_data, writer_data_hand, engaged, frame_pieces):
-
-        max_index, probs = \
+        self.probs = [0 for i in range(len(self.gestures))]
+        max_index = \
             self._process(timestamp, width, height, posx, posy, depth_data, writer_data_hand, engaged, frame_pieces)
 
-        status_to_fusion = self._get_status_to_fusion()
+        pack_list = [self.stream_id, timestamp, max_index] + list(self.probs)
 
-        pack_list = [self.stream_id, timestamp, max_index, status_to_fusion] + list(probs)
-
-        return struct.pack("<iqii" + "f" * (self.num_gestures + 2), *pack_list)
+        return struct.pack("<iqi" + "f" * len(self.probs), *pack_list)
 
     def _process(self, timestamp, width, height, posx, posy, depth_data, writer_data_hand, engaged, frame_pieces):
-        # probabilities to send to fusion, including 'bland' and 'grab cup'
-        result_probs = [0 for i in range(self.num_gestures + 2)]
         if posx == -1 and posy == -1:
-            max_index = len(result_probs) - 2  # max_index refers to 'blind'
-            result_probs[max_index] = 1
+            max_index = len(self.probs) - 1  # max_index refers to 'blind'
+            self.probs[max_index] = 1
         else:
             hand_arr = self._preprocess_hand_arr(depth_data, posx, posy, height, width)
-            max_index, probs = self.hand_recognition.classify(hand_arr)
-            result_probs[:-2] = probs
+            max_index, new_probs = self.hand_recognition.classify(hand_arr)
+            self.probs[:len(new_probs)] = new_probs
 
-        print(timestamp, self.gestures[max_index], result_probs[max_index])
-        return max_index, result_probs
+        print(timestamp, self.gestures[max_index], self.probs[max_index])
+        return max_index
 
     def _get_hand_recognition(self):
         return RealTimeHandRecognition(self.hand, self.num_gestures)
@@ -58,7 +55,3 @@ class BaseClassifier:
         hand_arr = hand_arr.reshape((1, 128, 128, 1))
 
         return hand_arr
-
-    def _get_status_to_fusion(self):
-        return 0
-
