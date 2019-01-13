@@ -20,7 +20,7 @@ class RealTimeHeadRecognition():
         model.build_graph()
         saver = tf.train.Saver()
 
-        gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.15)
+        gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.3)
         self.config = tf.ConfigProto(gpu_options=gpu_options)
         self.config.gpu_options.allow_growth = True
         self.config.allow_soft_placement = True

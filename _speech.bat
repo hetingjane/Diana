@@ -1,0 +1,1 @@
+start cmd /c C:\Users\david\Anaconda3\python -m components.speech.speech_client --fusion-host localhost localhost

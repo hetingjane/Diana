@@ -1,0 +1,1 @@
+start cmd /c C:\Users\david\Anaconda3\python -m components.handRecognition.depth_client --fusion-host localhost LH localhost
