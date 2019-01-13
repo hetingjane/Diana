@@ -9,7 +9,7 @@ _stream_ids = {
     "Head": 0x100   # 256
 }
 
-_active_streams = frozenset(["LH", "RH", "Body", "Head", "Speech"])
+_active_streams = frozenset(["LH", "RH", "Body", "Speech"])
 _streams = frozenset(_stream_ids.keys())
 
 for s in _active_streams:
