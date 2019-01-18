@@ -4,7 +4,7 @@ import numpy as np
 
 
 class RealTimeHandRecognition():
-    def __init__(self, hands, gestures):
+    def __init__(self, gestures):
 
         hps = hands_resnet_model.HParams(batch_size=1,
                                          num_classes=gestures,
@@ -20,25 +20,23 @@ class RealTimeHandRecognition():
         model.build_graph()
         saver = tf.train.Saver()
 
-        gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.3)
+        gpu_options = tf.GPUOptions()
         self.config = tf.ConfigProto(gpu_options=gpu_options)
         self.config.gpu_options.allow_growth = True
         self.config.allow_soft_placement = True
 
         sess = tf.Session(config=self.config)
         tf.train.start_queue_runners(sess)
-        # this is unnecessary, since we just want the latest ckpt file
-        # ckpt_state = tf.train.get_checkpoint_state(r"C:\Users\cwc\Desktop\portable\RealTime\components\log\%s_model"%hands)
-        # print('Loading checkpoint %s', ckpt_state.model_checkpoint_path)
-        # saver.restore(sess, ckpt_state.model_checkpoint_path)
-        saver.restore(sess, r"components\log\%s_model.ckpt"%hands)
+        saver.restore(sess, r"components\log\RH_model.ckpt")
 
         self.sess = sess
         self.model = model
 
         self.past_probs = None
 
-    def classify(self, data):
+    def classify(self, data, flip):
+        if flip:
+            data = np.flipud(data)
         (predictions) = self.sess.run([self.model.predictions], feed_dict={self.model._images: data})
         probs = predictions[0][0]
 

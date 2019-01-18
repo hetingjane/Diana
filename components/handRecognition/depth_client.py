@@ -52,81 +52,89 @@ def recv_depth_frame(sock):
     return recv_all(sock, frame_size)
 
 
+def decode_and_send_frame(frame, gestures, stream_id, fusion_socket, flip):
+    print('decoding frame')
+    timestamp, frame_type, width, height, posx, posy, depth_data = decode_frame(frame)
+
+    if posx == -1 and posy == -1:
+        probs = [0] * num_gestures + [1]
+        max_index = len(probs) - 1
+        print("can't find hand")
+
+    else:
+        hand_arr = np.array(depth_data, dtype=np.float32).reshape((height, width))
+        print(hand_arr.shape, posx, posy)
+        posz = hand_arr[int(posx), int(posy)]
+        hand_arr -= posz
+        hand_arr /= 150
+        hand_arr = np.clip(hand_arr, -1, 1)
+        hand_arr = resize(hand_arr, (168, 168))
+        hand_arr = hand_arr[20:-20, 20:-20]
+        hand_arr = hand_arr.reshape((1, 128, 128, 1))
+        print('classifying frame')
+        max_index, probs = hand_classfier.classify(hand_arr, flip)
+
+        probs = list(probs) + [0]
+
+    print(i, timestamp, gestures[max_index], probs[max_index])
+
+    pack_list = [stream_id, timestamp, max_index] + list(probs)
+
+    bytes = struct.pack("<iqi" + "f" * (num_gestures + 1), *pack_list)
+
+    if fusion_socket is not None:
+        fusion_socket.send(bytes)
+
+
 # By default read 100 frames
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('hand', help='Hand to follow', choices=['LH', 'RH'])
-    parser.add_argument('kinect_host', help='Host name of the machine running Kinect Server')
-    parser.add_argument('--fusion-host', help='Host name of the machine running Kinect Server', default=None)
+    parser.add_argument('--kinect_host', '-k', help='Host name of the machine running Kinect Server')
+    parser.add_argument('--fusion-host', '-f', help='Host name of the machine running Kinect Server', default=None)
 
     args = parser.parse_args()
 
-    hand = args.hand
+    RH_stream_id = streams.get_stream_id("RH")
+    LH_stream_id = streams.get_stream_id("LH")
+    RH_gestures = list(np.load("components/log/gesture_list_RH.npy"))
+    RH_gestures = [str(g).replace(".npy", "") for g in RH_gestures]
+    LH_gestures = list(np.load("components/log/gesture_list_LH.npy"))
+    LH_gestures = [str(g).replace(".npy", "") for g in LH_gestures]
+    num_gestures = len(RH_gestures)
 
-    stream_id = streams.get_stream_id(hand)
-    gestures = list(np.load("components/log/gesture_list_%s.npy" % hand))
-    gestures = [str(g).replace(".npy", "") for g in gestures]
-    num_gestures = len(gestures)
+    RH_gestures += ['blind']
+    LH_gestures += ['blind']
 
-    gestures += ['blind']
-    print(hand, num_gestures)
+    hand_classfier = RealTimeHandRecognition(num_gestures)
+    RH_kinect_socket = connect('kinect', args.kinect_host, "RH")
+    LH_kinect_socket = connect('kinect', args.kinect_host, "LH")
 
-    hand_classfier = RealTimeHandRecognition(hand, num_gestures)
-    kinect_socket = connect('kinect', args.kinect_host, hand)
-
-    fusion_socket = connect('fusion', args.fusion_host, hand) if args.fusion_host is not None else None
-
+    RH_fusion_socket = connect('fusion', args.fusion_host, "RH") if args.fusion_host is not None else None
+    LH_fusion_socket = connect('fusion', args.fusion_host, "LH") if args.fusion_host is not None else None
+    print('connected to fusion and kinect')
     i = 0
     hands_list = []
-
-    start_time = time.time()
     while True:
         try:
-            frame = recv_depth_frame(kinect_socket)
+            print('receiving frames')
+            RH_frame = recv_depth_frame(RH_kinect_socket)
+            LH_frame = recv_depth_frame(LH_kinect_socket)
         except KeyboardInterrupt:
            break
         except:
             continue
 
-        timestamp, frame_type, width, height, posx, posy, depth_data = decode_frame(frame)
-
-        if posx == -1 and posy == -1:
-            probs = [0]*num_gestures+[1]
-            max_index = len(probs)-1
-
-        else:
-            hand_arr = np.array(depth_data, dtype=np.float32).reshape((height, width))
-            print(hand_arr.shape, posx, posy)
-            posz = hand_arr[int(posx), int(posy)]
-            hand_arr -= posz
-            hand_arr /= 150
-            hand_arr = np.clip(hand_arr, -1, 1)
-            hand_arr = resize(hand_arr, (168, 168))
-            hand_arr = hand_arr[20:-20, 20:-20]
-            hand_arr = hand_arr.reshape((1, 128, 128, 1))
-            max_index, probs = hand_classfier.classify(hand_arr)
-
-            probs = list(probs)+[0]
-
-        print(i, timestamp, gestures[max_index], probs[max_index])
-        i += 1
-
-        if i % 100==0:
-            print("="*100, "FPS", 100/(time.time()-start_time))
-            start_time = time.time()
-
-        pack_list = [stream_id, timestamp,max_index]+list(probs)
-
-        bytes = struct.pack("<iqi"+"f"*(num_gestures+1), *pack_list)
-
-        if fusion_socket is not None:
-            fusion_socket.send(bytes)
-
+        decode_and_send_frame(RH_frame, RH_gestures, RH_stream_id, RH_fusion_socket, flip=False)
+        decode_and_send_frame(LH_frame, LH_gestures, LH_stream_id, LH_fusion_socket, flip=True)
         timer.wait(FPS=30)
 
-    kinect_socket.close()
-    if fusion_socket is not None:
-        fusion_socket.close()
+    RH_kinect_socket.close()
+    LH_kinect_socket.close()
+    if RH_fusion_socket is not None:
+        RH_fusion_socket.close()
+    if LH_fusion_socket is not None:
+        LH_fusion_socket.close()
+
     sys.exit(0)
 
