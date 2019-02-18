@@ -4,6 +4,8 @@ from components.fusion.automata import rules as rules
 
 engage = BinaryStateMachine('engage', rules.All(('engaged', 1)))
 
+attentive = BinaryStateMachine('attentive', rules.All(('attentive', 5)))
+
 posack = PoseStateMachine('posack', rules.Any(('rh thumbs up', 'lh thumbs up', 5)))
 
 negack = PoseStateMachine('negack', rules.Any(('rh thumbs down', 'lh thumbs down', 5)))

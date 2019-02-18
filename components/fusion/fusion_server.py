@@ -285,7 +285,7 @@ class App:
             thread_sync.gui_events.put(new_ev)
 
 
-brandeis_events = [machines.engage, machines.wave,
+brandeis_events = [machines.engage, machines.wave, machines.attentive,
                    machines.posack, machines.negack, machines.nevermind,
                    machines.left_point, machines.right_point,
                    machines.left_point_continuous, machines.right_point_continuous,
