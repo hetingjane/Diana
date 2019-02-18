@@ -34,7 +34,7 @@ class App:
         self.capture_file = open('captured.csv', 'w') if capture else None
         self.capture_csv = csv.writer(self.capture_file) if capture else None
         if self.capture_csv is not None:
-            self.capture_csv.writerow(['engaged', 'la', 'ra', 'lh', 'rh', 'head', 'speech'])
+            self.capture_csv.writerow(['engaged', 'attentive', 'la', 'ra', 'lh', 'rh', 'head', 'speech'])
 
     def _stop(self):
         # Stop the fusion thread
@@ -142,32 +142,42 @@ class App:
         head_probs = np.array(self.latest_s_msg["Head"].data.probabilities) \
             if streams.is_active("Head") else np.zeros(len(postures.head_postures))
 
-        return engaged, larm_probs, rarm_probs, lhand_probs, rhand_probs, head_probs
+        emotion_probs = np.array(self.latest_s_msg["Emotion"].data.probabilities) \
+            if streams.is_active("Emotion") else np.ones(1) # Assume full attention if no attention stream
+
+        return engaged, larm_probs, rarm_probs, lhand_probs, rhand_probs, head_probs, emotion_probs
 
     def _prepare_probs(self):
-        engaged, larm_probs, rarm_probs, lhand_probs, rhand_probs, head_probs = self._get_probs()
-        all_probs = list(np.concatenate((larm_probs, rarm_probs, lhand_probs, rhand_probs, head_probs), axis=0))
+        engaged, larm_probs, rarm_probs, lhand_probs, rhand_probs, head_probs, emotion_probs = self._get_probs()
+        all_probs = list(np.concatenate((larm_probs, rarm_probs, lhand_probs, rhand_probs, head_probs, emotion_probs), axis=0))
         return struct.pack("<" + str(len(all_probs)) + "f", *all_probs)
 
-    def _get_poses(self):
+    def _get_inputs(self):
         if streams.is_active("Body"):
             body_msg = self.latest_s_msg["Body"]
             idx_l_arm, idx_r_arm = body_msg.data.idx_l_arm, body_msg.data.idx_r_arm
             idx_engaged = int(body_msg.data.engaged)
         else:
-            idx_l_arm, idx_r_arm = len(postures.left_arm_motions) - 1, len(postures.right_arm_motions) - 1
-            idx_engaged = int(True)
+            idx_l_arm, idx_r_arm, idx_engaged = -1, -1, -1
 
         pose_l_arm = postures.left_arm_motions[idx_l_arm]
         pose_r_arm = postures.right_arm_motions[idx_r_arm]
 
         engaged = postures.engaged[idx_engaged]
 
+        if streams.is_active("Emotion"):
+            emo_msg = self.latest_s_msg["Emotion"]
+            idx_attentive = int(emo_msg.data.attentive)
+        else:
+            idx_attentive = -1
+
+        attentive = postures.attentive[idx_attentive]
+
         if streams.is_active("Head"):
             head_msg = self.latest_s_msg["Head"]
             idx_head = head_msg.data.idx_head
         else:
-            idx_head = len(postures.head_postures) - 1
+            idx_head = -1
 
         pose_head = postures.head_postures[idx_head]
 
@@ -179,12 +189,23 @@ class App:
         rh_idx = rh_msg.data.idx_hand
         pose_rh = postures.right_hand_postures[rh_idx]
 
-        poses = engaged, pose_l_arm, pose_r_arm, pose_lh, pose_rh, pose_head
-        return poses
+        inputs = engaged, attentive, pose_l_arm, pose_r_arm, pose_lh, pose_rh, pose_head
+        return inputs
 
     def _get_events(self):
 
-        poses = self._get_poses()
+        inputs = self._get_inputs()
+
+        if streams.is_active("Speech"):
+            command = self.latest_s_msg["Speech"].data.command # command in new language model won't work with SMs
+        else:
+            command = ""
+
+        if len(command) > 0:
+            inputs += (command,)
+
+        if self.capture_csv is not None:
+            self.capture_csv.writerow(inputs + (command,))
 
         if streams.is_active("Body"):
             body_msg = self.latest_s_msg["Body"]
@@ -194,13 +215,6 @@ class App:
         else:
             lx, ly, var_l_x, var_l_y, rx, ry, var_r_x, var_r_y = (float("-inf"),)*8
             engaged = True
-
-        command = self.latest_s_msg["Speech"].data.command if streams.is_active("Speech") else ""
-
-        if self.capture_csv is not None:
-            self.capture_csv.writerow(poses + (command,))
-
-        inputs = poses + (command,) if len(command) > 0 else poses  # command in new language model won't work with SMs
 
         # More than one output data is possible from multiple state machines
         all_events_to_send = []

@@ -1,15 +1,16 @@
 _stream_ids = {
-    "Color": 0x2,   # 2
-    "Speech": 0x4,  # 4
-    "Audio": 0x8,   # 8
-    "Depth": 0x10,  # 16
-    "Body": 0x20,   # 32
-    "LH": 0x40,     # 64
-    "RH": 0x80,     # 128
-    "Head": 0x100   # 256
+    "Color": 0x2,       # 2
+    "Speech": 0x4,      # 4
+    "Audio": 0x8,       # 8
+    "Depth": 0x10,      # 16
+    "Body": 0x20,       # 32
+    "LH": 0x40,         # 64
+    "RH": 0x80,         # 128
+    "Head": 0x100,      # 256
+    "Emotion": 0x200    # 512
 }
 
-_active_streams = frozenset(["LH", "RH", "Body", "Head", "Speech"])
+_active_streams = frozenset(["LH", "RH", "Body", "Head", "Speech", "Emotion"])
 _streams = frozenset(_stream_ids.keys())
 
 for s in _active_streams:
