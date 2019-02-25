@@ -39,9 +39,9 @@ def is_active_id(stream_id):
 
 
 def get_stream_name(stream_id):
-    for st in _stream_ids:
-        if _stream_ids[st] & stream_id != 0:
-            return st
+    for sname, sid in _stream_ids.items():
+        if sid & stream_id != 0:
+            return sname
     raise KeyError("Invalid stream type")
 
 
