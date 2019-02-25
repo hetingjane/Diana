@@ -40,7 +40,7 @@ def is_active_id(stream_id):
 
 def get_stream_name(stream_id):
     for sname, sid in _stream_ids.items():
-        if sid & stream_id != 0:
+        if stream_id == sid:
             return sname
     raise KeyError("Invalid stream type")
 
