@@ -57,7 +57,10 @@ if __name__ == '__main__':
         if f is not None:
             try:
                 # Excluding frame size
-                f.sendall(struct.pack("<iqi" + str(len(command)) + "s", frame_type, timestamp, len(command), command.encode('ascii')))
+                raw_data = struct.pack("<iqi" + str(len(command)) + "s", frame_type, timestamp, len(command), command.encode('ascii'))
+                f.sendall(struct.pack("<i", len(raw_data)))
+                f.sendall(raw_data)
+
             except socket.error:
                 print("Error: Connection to fusion lost")
                 f.close()

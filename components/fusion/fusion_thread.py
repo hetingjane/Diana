@@ -47,13 +47,20 @@ class Fusion(threading.Thread):
         return result
 
     def _read_stream_header(self, sock):
-        # ID, Timestamp
-        header_format = "<iq"
+        # Length, ID, Timestamp
+        header_format = "<iiq"
         stream_header = self._recv_all(sock, struct.calcsize(header_format))
         header_data = struct.unpack(header_format, stream_header)
-        stream_name = streams.get_stream_name(header_data[0])
+        _, header_id, ts = header_data
+        try:
+            stream_name = streams.get_stream_name(header_id)
+        except KeyError:
+            print("Invalid stream id: {}".format(header_id))
+            sock.close()
+            return
+
         header_data += (stream_name,)
-        return Fusion.Header(*header_data)
+        return Fusion.Header(*header_data[1:])
 
     def _read_body_data(self, sock):
         # Left Max Index, Right Max Index
