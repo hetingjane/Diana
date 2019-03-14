@@ -1,1 +1,0 @@
-C:\\Users\\david\\Desktop\\portable\\KSIM\\KSIM\\bin\\Release\\KSIM.exe --listen m

@@ -1,1 +1,0 @@
-start cmd /c C:\Users\david\Anaconda3\python -m components.fusion.fusion_server --mode brandeis
