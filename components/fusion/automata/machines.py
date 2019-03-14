@@ -4,21 +4,17 @@ from components.fusion.automata import rules as rules
 
 engage = BinaryStateMachine('engage', rules.All(('engaged', 1)))
 
-posack = PoseStateMachine('posack', rules.Any(('rh thumbs up', 'lh thumbs up', 5), ('speak yes', 1)))
+posack = PoseStateMachine('posack', rules.Any(('rh thumbs up', 'lh thumbs up', 5)))
 
-negack = PoseStateMachine('negack', rules.Any(('rh thumbs down', 'lh thumbs down', 5), ('speak no', 1)))
+negack = PoseStateMachine('negack', rules.Any(('rh thumbs down', 'lh thumbs down', 5)))
 
 wave = PoseStateMachine('wave', rules.Any(('la wave', 'ra wave', 5)))
 
-left_point = PoseStateMachine('left point', rules.And(
-    rules.All(('lh point down', 'lh point right', 'lh point front', 5)),
-    rules.Any(('la still', 5), ('speak there', 'speak here', 'speak this', 'speak that', 1))
-))
+left_point = PoseStateMachine('left point',
+                              rules.All(('lh point down', 'lh point right', 'lh point front', 5), ('la still', 5)))
 
-right_point = PoseStateMachine('right point', rules.And(
-    rules.All(('rh point down', 'rh point left', 'rh point front', 5)),
-    rules.Any(('ra still', 5), ('speak there', 'speak here', 'speak this', 'speak that', 1))
-))
+right_point = PoseStateMachine('right point',
+                               rules.All(('rh point down', 'rh point left', 'rh point front', 5), ('ra still', 5)))
 
 left_point_continuous = PoseStateMachine('left point continuous',
                                          rules.All(('lh point down', 'lh point right', 'lh point front', 5)))
@@ -28,7 +24,11 @@ right_point_continuous = PoseStateMachine('right point continuous',
 
 push_left = PoseStateMachine('push left', rules.All(('rh closed left', 'rh open left', 5), ('ra move left', 5)))
 
+push_servo_left = PoseStateMachine('push servo left', rules.All(('rh closed left', 'rh open left', 5), ('ra servo', 5)))
+
 push_right = PoseStateMachine('push right', rules.All(('lh closed right', 'lh open right', 5), ('la move right', 5)))
+
+push_servo_right = PoseStateMachine('push servo right', rules.All(('lh closed right', 'lh open right', 5), ('la servo', 5)))
 
 push_front = PoseStateMachine('push front', rules.Or(
     rules.All(('rh closed front', 5), ('ra move front', 5)),

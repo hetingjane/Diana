@@ -23,7 +23,7 @@ left_arm_motions = ['la move right', 'la move left', 'la move up', 'la move down
                     'la move down front', 'la move right up back', 'la move right up front',
                     'la move right down back', 'la move right down front', 'la move left up back',
                     'la move left up front', 'la move left down back', 'la move left down front', 'la still',
-                    'la apart x', 'la together x', 'la apart y', 'la together y', 'la wave', 'la blind']
+                    'la apart x', 'la together x', 'la apart y', 'la together y', 'la servo', 'la wave', 'la blind']
 
 right_arm_motions = ['ra move right', 'ra move left', 'ra move up', 'ra move down', 'ra move back',
                      'ra move front', 'ra move right up', 'ra move right down', 'ra move right back',
@@ -32,11 +32,9 @@ right_arm_motions = ['ra move right', 'ra move left', 'ra move up', 'ra move dow
                      'ra move down front', 'ra move right up back', 'ra move right up front',
                      'ra move right down back', 'ra move right down front', 'ra move left up back',
                      'ra move left up front', 'ra move left down back', 'ra move left down front', 'ra still',
-                     'ra apart x', 'ra together x', 'ra apart y', 'ra together y', 'ra wave', 'ra blind']
+                     'ra apart x', 'ra together x', 'ra apart y', 'ra together y', 'ra servo', 'ra wave', 'ra blind']
 
 head_postures = ['head nod', 'head shake', 'head other', 'head blind']
-
-body_postures = ['body emblem', 'body motion', 'body neutral', 'body oscillate', 'body still']
 
 engaged = ['disengaged', 'engaged']
 
