@@ -12,6 +12,7 @@ t_0 = safetime()
 
 # this call waits so that it occurs a maximum of "fps" times per second
 def wait(FPS):
+    return
     global t_0
     max_d_t = 1 / FPS
     t_1 = safetime()
