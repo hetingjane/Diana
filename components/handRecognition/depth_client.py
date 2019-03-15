@@ -112,9 +112,9 @@ if __name__ == '__main__':
 
     start_time = time.time()
     while True:
-        if not recv_process_reply(RH_fusion_socket, RH_kinect_socket, RH_gestures, RH_stream_id, 'RH', flip=False):
-            break
         if not recv_process_reply(LH_fusion_socket, LH_kinect_socket, LH_gestures, LH_stream_id, 'LH', flip=True):
+            break
+        if not recv_process_reply(RH_fusion_socket, RH_kinect_socket, RH_gestures, RH_stream_id, 'RH', flip=False):
             break
 
         print()
