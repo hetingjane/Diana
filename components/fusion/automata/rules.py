@@ -94,6 +94,22 @@ class All(Rule):
         return Any(*self._spec, invert=True)
 
 
+class Always(Rule):
+    def match(self, *inputs):
+        return Rule.IS_TRUE
+
+    def inverted(self):
+        return Never(*self._spec)
+
+
+class Never(Rule):
+    def match(self, *inputs):
+        return Rule.IS_FALSE
+
+    def inverted(self):
+        return Always(*self._spec)
+
+
 class MetaRule(Rule, metaclass=ABCMeta):
 
     def __init__(self, *rules):
