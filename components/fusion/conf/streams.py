@@ -6,7 +6,6 @@ _stream_ids = {
     "Body": 0x20,   # 32
     "LH": 0x40,     # 64
     "RH": 0x80,     # 128
-    "Head": 0x100   # 256
 }
 
 _active_streams = frozenset(["LH", "RH", "Body", "Speech"])
@@ -41,6 +40,7 @@ def get_stream_name(stream_id):
     for st in _stream_ids:
         if _stream_ids[st] & stream_id != 0:
             return st
+        print('stream', st, stream_id)
     raise KeyError("Invalid stream type")
 
 

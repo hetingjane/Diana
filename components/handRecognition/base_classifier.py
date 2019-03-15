@@ -4,41 +4,38 @@ import numpy as np
 from skimage.transform import resize
 
 from .realtime_hand_recognition import RealTimeHandRecognition
-from ..fusion.conf import postures
+from ..fusion.conf.streams import get_stream_name
 
 
 class BaseClassifier:
-    def __init__(self, hand, stream_id):
+    def __init__(self, hand):
         self.hand = hand
-        self.stream_id = stream_id
 
-        # load gesture labels
-        self.gestures = postures.right_hand_postures if self.hand == 'RH' else postures.left_hand_postures
         self.num_gestures = 32  # this is the number of gestures trained with ResNet
         print(self.hand, self.num_gestures)
         self.probs = None  # probs sent to fusion, recalculate for each frame
 
         self.hand_recognition = self._get_hand_recognition()
 
-    def get_bytes(self, timestamp, width, height, posx, posy, depth_data, writer_data_hand, engaged, frame_pieces):
-        self.probs = [0 for i in range(len(self.gestures))]
+    def get_bytes(self, timestamp, width, height, posx, posy, depth_data, writer_data_hand, engaged, frame_pieces, stream_id, gestures, flip):
+        self.probs = [0 for i in range(len(gestures))]
         max_index = \
-            self._process(timestamp, width, height, posx, posy, depth_data, writer_data_hand, engaged, frame_pieces)
+            self._process(timestamp, width, height, posx, posy, depth_data, writer_data_hand, engaged, frame_pieces, gestures, stream_id, flip)
 
-        pack_list = [self.stream_id, timestamp, max_index] + list(self.probs)
+        pack_list = [stream_id, timestamp, max_index] + list(self.probs)
 
         return struct.pack("<iqi" + "f" * len(self.probs), *pack_list)
 
-    def _process(self, timestamp, width, height, posx, posy, depth_data, writer_data_hand, engaged, frame_pieces):
+    def _process(self, timestamp, width, height, posx, posy, depth_data, writer_data_hand, engaged, frame_pieces, gestures, stream_id, flip):
         if posx == -1 and posy == -1:
             max_index = len(self.probs) - 1  # max_index refers to 'blind'
             self.probs[max_index] = 1
         else:
             hand_arr = self._preprocess_hand_arr(depth_data, posx, posy, height, width)
-            max_index, new_probs = self.hand_recognition.classify(hand_arr)
+            max_index, new_probs = self.hand_recognition.classify(hand_arr, flip)
             self.probs[:len(new_probs)] = new_probs
 
-        print(timestamp, self.gestures[max_index], self.probs[max_index])
+        print(get_stream_name(stream_id), gestures[max_index], '{:.2}'.format(float(self.probs[max_index])), end='\t')
         return max_index
 
     def _get_hand_recognition(self):

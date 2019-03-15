@@ -1,7 +1,7 @@
 import struct
 import time
 import argparse
-
+import numpy as np
 import sys
 from ..skeletonRecognition.skeleton_client import decode_content as decode_content_body
 from .base_classifier import BaseClassifier
@@ -36,55 +36,24 @@ def decode_content_hand(raw_frame, offset):
     return (width, height, posx, posy, list(depth_data)), offset
 
 
-def recv_process_reply(classifier, engaged, fusion_socket, kinect_socket, gestures, stream_id, name, flip):
-    try:
-        (timestamp, frame_type), (width, height, posx, posy, depth_data), (writer_data,) = decode.read_frame(
-            kinect_socket, decode_content)
-        #print("timestamp, frame_type", timestamp, frame_type)
-        #print("width, height, posx, posy", width, height, posx, posy)
-        #print("writer_data", writer_data)
-
-    except KeyboardInterrupt:
-        return False
-
-    if posx == -1 and posy == -1:
-        probs = [0.0] * num_gestures + [1.0]
-        max_index = len(probs) - 1
-
-    else:
-        hand_arr = np.array(depth_data, dtype=np.float32).reshape((height, width))
-        #print(hand_arr.shape, posx, posy)
-        posz = hand_arr[int(posx), int(posy)]
-        hand_arr -= posz
-        hand_arr /= 150
-        hand_arr = np.clip(hand_arr, -1, 1)
-        hand_arr = resize(hand_arr, (168, 168))
-        hand_arr = hand_arr[20:-20, 20:-20]
-        hand_arr = hand_arr.reshape((1, 128, 128, 1))
-        max_index, probs = hand_classfier.classify(hand_arr, flip)
-
-        probs = list(probs) + [0.0]
-
-    print(name, gestures[max_index], '{:.2}'.format(probs[max_index]), end='\t')
-
-    msg = classifier.get_bytes(timestamp, width, height, posx, posy, depth_data, writer_data_hand, engaged,
-                                 frame_pieces)
-
-    if fusion_socket is not None:
-        fusion_socket.send(msg)
-
-    return True
-
-
 def parse_argument():
     parser = argparse.ArgumentParser()
-    parser.add_argument('hand', help='Hand to follow', choices=['LH', 'RH'])
-    parser.add_argument('kinect_host', help='Host name of the machine running Kinect Server')
-    parser.add_argument('--fusion-host', help='Host name of the machine running Fusion Server', default=None)
-    parser.add_argument('--enable-one-shot', help='Start client in one-shot learning mode', action='store_true')
+    parser.add_argument('--kinect_host', help='Host name of the machine running Kinect Server', default='localhost')
+    parser.add_argument('--fusion-host', help='Host name of the machine running Fusion Server', default='localhost')
+    parser.add_argument('--enable-one-shot', help='Start client in one-shot learning mode', action='store_true', default=True)
 
     return parser.parse_args()
 
+
+def recv_decode_send(kinect_socket, fusion_socket, classifier, stream_id, gestures, flip):
+    _, (_, engaged, frame_pieces), _ = \
+        decode.read_frame(kinect_socket, decode_content_body)
+    (timestamp, frame_type), (width, height, posx, posy, depth_data), (writer_data_hand,) = \
+        decode.read_frame(kinect_socket, decode_content_hand)
+    msg = classifier.get_bytes(timestamp, width, height, posx, posy, depth_data,
+                                  writer_data_hand, engaged, frame_pieces, stream_id, gestures, flip)
+    if fusion_socket is not None:
+        fusion_socket.send(msg)
 
 # By default read 100 frames
 if __name__ == '__main__':
@@ -93,44 +62,37 @@ if __name__ == '__main__':
 
     RH_stream_id = streams.get_stream_id("RH")
     LH_stream_id = streams.get_stream_id("LH")
+
     RH_gestures = list(np.load("components/log/gesture_list_RH.npy"))
     RH_gestures = [str(g).replace(".npy", "") for g in RH_gestures]
+    RH_gestures += ['blind']
+
     LH_gestures = list(np.load("components/log/gesture_list_LH.npy"))
     LH_gestures = [str(g).replace(".npy", "") for g in LH_gestures]
-    num_gestures = len(RH_gestures)
-
-    RH_gestures += ['blind']
     LH_gestures += ['blind']
 
-    RH_kinect_socket = connect('kinect', args.kinect_host, "RH")
-    LH_kinect_socket = connect('kinect', args.kinect_host, "LH")
+    RH_kinect_socket = connect('kinect', args.kinect_host, ("RH", "Body"))
+    LH_kinect_socket = connect('kinect', args.kinect_host, ("LH", "Body"))
 
     RH_fusion_socket = connect('fusion', args.fusion_host, "RH") if args.fusion_host is not None else None
     LH_fusion_socket = connect('fusion', args.fusion_host, "LH") if args.fusion_host is not None else None
 
     if args.enable_one_shot:
-        LH_classifier = OneShotClassifier(hand, LH_stream_id)
-        RH_classifier = OneShotClassifier(hand, RH_stream_id)
+        classifier = OneShotClassifier("RH")
     else:
-        LH_classifier = BaseClassifier(hand, LH_stream_id)
-        RH_classifier = BaseClassifier(hand, RH_stream_id)
+        classifier = BaseClassifier("RH")
 
     i = 0
 
     start_time = time.time()
     while True:
         try:
-            (timestamp, frame_type), (tracked_body_count, engaged, frame_pieces), (writer_data_body,) = \
-                decode.read_frame(kinect_socket, decode_content_body)
+            recv_decode_send(LH_kinect_socket, LH_fusion_socket, classifier, LH_stream_id, LH_gestures, flip=True)
+            recv_decode_send(RH_kinect_socket, RH_fusion_socket, classifier, RH_stream_id, RH_gestures, flip=False)
+            print()
         except KeyboardInterrupt:
             break
 
-        if not recv_process_reply(classifier, engaged, LH_fusion_socket, LH_kinect_socket, LH_gestures, LH_stream_id, 'LH', flip=True):
-            break
-        if not recv_process_reply(classifier, engaged, RH_fusion_socket, RH_kinect_socket, RH_gestures, RH_stream_id, 'RH', flip=False):
-            break
-
-        print()
         i += 1
 
         if i % 100 == 0:
