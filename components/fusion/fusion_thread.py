@@ -202,11 +202,13 @@ class Fusion(threading.Thread):
                 else:
                     try:
                         msg = self._handle_client(s)
-                    except (socket.error, EOFError):
-                        print("Client disconnected")
+                    except (socket.error, EOFError, streams.InvalidStreamError) as ex:
+                        print(ex)
+                        print("Disconnecting client...")
                         inputs.remove(s)
                         self._connected_clients.pop(s)
                         self._unset_sync()
+                        print("Disconnected")
                         continue
 
                     # Read and discard data unless enough clients connect

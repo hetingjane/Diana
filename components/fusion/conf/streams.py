@@ -37,11 +37,10 @@ def is_active_id(stream_id):
 
 
 def get_stream_name(stream_id):
-    for st in _stream_ids:
-        if _stream_ids[st] & stream_id != 0:
-            return st
-        print('stream', st, stream_id)
-    raise KeyError("Invalid stream type")
+    for sname, sid in _stream_ids.items():
+        if stream_id == sid:
+            return sname
+    raise InvalidStreamError("Invalid stream id: {}".format(stream_id))
 
 
 def get_stream_names():
@@ -62,3 +61,7 @@ def all_connected(connected_streams):
     :return: True if all active streams are connected, False otherwise
     """
     return _active_streams.intersection(connected_streams) == _active_streams
+
+
+class InvalidStreamError(Exception):
+    pass
