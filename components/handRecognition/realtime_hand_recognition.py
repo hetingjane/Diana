@@ -30,7 +30,7 @@ class RealTimeHandRecognition:
 
         sess = tf.Session(config=self.config)
         tf.train.start_queue_runners(sess)
-        saver.restore(sess, r"components\log\RH_model.ckpt")
+        saver.restore(sess, r"components/log/RH_model.ckpt")
 
         self.sess = sess
         self.model = model
