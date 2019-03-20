@@ -63,19 +63,20 @@ if __name__ == '__main__':
     RH_stream_id = streams.get_stream_id("RH")
     LH_stream_id = streams.get_stream_id("LH")
 
-    RH_gestures = list(np.load("components/log/gesture_list_RH.npy"))
-    RH_gestures = [str(g).replace(".npy", "") for g in RH_gestures]
-    RH_gestures += ['blind']
+    from ..fusion.conf.postures import left_hand_postures, right_hand_postures
 
-    LH_gestures = list(np.load("components/log/gesture_list_LH.npy"))
-    LH_gestures = [str(g).replace(".npy", "") for g in LH_gestures]
-    LH_gestures += ['blind']
+    RH_gestures = right_hand_postures
+    LH_gestures = left_hand_postures
 
     RH_kinect_socket = connect('kinect', args.kinect_host, ("RH", "Body"))
     LH_kinect_socket = connect('kinect', args.kinect_host, ("LH", "Body"))
 
     RH_fusion_socket = connect('fusion', args.fusion_host, "RH") if args.fusion_host is not None else None
     LH_fusion_socket = connect('fusion', args.fusion_host, "LH") if args.fusion_host is not None else None
+
+    if RH_kinect_socket is None or LH_kinect_socket is None or RH_fusion_socket is None or LH_fusion_socket is None:
+        print("connection could not be established")
+        exit(-1)
 
     if args.enable_one_shot:
         classifier = OneShotClassifier("RH")
