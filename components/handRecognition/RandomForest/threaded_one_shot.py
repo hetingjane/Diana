@@ -82,7 +82,10 @@ class OneShotWorker(threading.Thread):
                         # Get feature vectors
                         new_features = []
                         for i, each_hand_arr in enumerate(self.ref_frames):
-                            new_features.append(self.hand_classfier.classify(each_hand_arr)[0])
+                            if self.hand_type == "RH":
+                                new_features.append(self.hand_classfier.classify(each_hand_arr, flip=False)[0])
+                            else:
+                                new_features.append(self.hand_classfier.classify(each_hand_arr, flip=True)[0])
                             if self.is_test:
                                 img_name = "/s/red/a/nobackup/vision/jason/DraperLab/Demo/reference_imgs/%d.png" % i
                                 plt.imsave(img_name, np.squeeze(each_hand_arr))
@@ -151,7 +154,7 @@ class OneShotWorker(threading.Thread):
     def load_forest(self):
         self.global_lock.acquire()
 
-        load_path = 'models/%s/forest.pickle' % self.hand_type
+        load_path = '../../models/%s/forest.pickle' % self.hand_type
         print('Loading random forest checkpoint: %s' % load_path)
         f = open(load_path, 'rb')
         self.forest = pickle.load(f, encoding='latin1')

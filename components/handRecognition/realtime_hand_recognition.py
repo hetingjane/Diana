@@ -23,14 +23,14 @@ class RealTimeHandRecognition:
         model.build_graph()
         saver = tf.train.Saver()
 
-        gpu_options = tf.GPUOptions()#per_process_gpu_memory_fraction=0.4)
+        gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.4)
         self.config = tf.ConfigProto(gpu_options=gpu_options)
         # self.config.gpu_options.allow_growth = True
         # self.config.allow_soft_placement = True
 
         sess = tf.Session(config=self.config)
         tf.train.start_queue_runners(sess)
-        print(os.path.abspath('./models/{}'.format(hands)))
+        print(os.path.abspath('../../models/{}'.format(hands)))
         ckpt_state = tf.train.get_checkpoint_state(os.path.abspath('../../models/{}'.format(hands)))
         print('Loading checkpoint {}'.format(ckpt_state.model_checkpoint_path))
         saver.restore(sess, ckpt_state.model_checkpoint_path)

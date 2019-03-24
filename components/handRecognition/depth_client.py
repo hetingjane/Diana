@@ -49,15 +49,14 @@ def parse_argument():
     return parser.parse_args()
 
 
-def read_process_send(hand, kinect_socket, body_kinect_socket, fusion_socket, classifier, gestures, stream_id):
+def read_process_send(hand, kinect_socket, fusion_socket, classifier, gestures, stream_id, engaged, frame_pieces):
     try:
-        (timestamp, frame_type), (tracked_body_count, engaged, frame_pieces), (writer_data_body,) = \
-            decode.read_frame(body_kinect_socket, decode_content_body)
         (timestamp, frame_type), (width, height, posx, posy, depth_data), (writer_data_hand,) = \
             decode.read_frame(kinect_socket, decode_content_hand)
 
+
         bytes = classifier.get_bytes(timestamp, width, height, posx, posy, depth_data, writer_data_hand, engaged,
-                                 frame_pieces, hand, gestures, stream_id)
+                                frame_pieces, hand, gestures, stream_id)
 
         if fusion_socket is not None:
             fusion_socket.send(bytes)
@@ -89,8 +88,11 @@ def main(args):
 
     start_time = time.time()
     while True:
-        if not read_process_send("LH", LH_kinect_socket, body_kinect_socket, LH_fusion_socket, classifier, LH_gestures, LH_stream_id)\
-                or not read_process_send("RH", RH_kinect_socket, body_kinect_socket, RH_fusion_socket, classifier, RH_gestures, RH_stream_id):
+        _, (_, engaged, frame_pieces), _ = \
+            decode.read_frame(body_kinect_socket, decode_content_body)
+
+        if not read_process_send("LH", LH_kinect_socket, LH_fusion_socket, classifier, LH_gestures, LH_stream_id, engaged, frame_pieces)\
+                or not read_process_send("RH", RH_kinect_socket, RH_fusion_socket, classifier, RH_gestures, RH_stream_id, engaged, frame_pieces):
             break
 
         print()

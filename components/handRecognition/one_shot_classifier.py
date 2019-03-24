@@ -40,9 +40,12 @@ class OneShotClassifier(BaseClassifier):
         self.new_gesture_index = 32  # refers to 'new gesture 1', increments after every new gesture is learned
         self.taught_gesture_index = 36  # refers to 'taught gesture 1', increments after every new gesture is learned
 
-        self.one_shot_worker = OneShotWorker("RH", self.hand_recognition, self.forest_status, self.event_vars,
+        self.RH_one_shot_worker = OneShotWorker("RH", self.hand_recognition, self.forest_status, self.event_vars,
                                              self.one_shot_queue, self.global_lock, is_test=False)
-        self.one_shot_worker.start()
+        self.RH_one_shot_worker.start()
+        self.LH_one_shot_worker = OneShotWorker("LH", self.hand_recognition, self.forest_status, self.event_vars,
+                                             self.one_shot_queue, self.global_lock, is_test=False)
+        self.LH_one_shot_worker.start()
         self.event_vars.load_forest_event.set()
         self.learning = False  # whether the system is learning gesture
 
@@ -75,7 +78,7 @@ class OneShotClassifier(BaseClassifier):
                 feature = self.hand_recognition.classify(hand_arr, flip=False)
             else:
                 feature = self.hand_recognition.classify(hand_arr, flip=True)
-            max_index, dist = self._find_label(feature)
+            max_index, dist = self._find_label(feature, gestures, hand)
             self.probs[max_index] = dist
 
         print('{:<20}'.format(gestures[max_index]), '{:.3}'.format(float(self.probs[max_index])), end='\t')
@@ -85,7 +88,7 @@ class OneShotClassifier(BaseClassifier):
     def _get_hand_recognition(self):
         return RealTimeHandRecognitionOneShot("RH", self.num_gestures)
 
-    def _find_label(self, feature):
+    def _find_label(self, feature, gestures, hand):
         """
         The sequence of the 4 if statements are extremely important
         :param feature: Only one feature is accepted here
@@ -99,8 +102,12 @@ class OneShotClassifier(BaseClassifier):
             # learning failed, forest should be ready so find the label again
             self.learning = False
             self.event_vars.learn_no_action_event.clear()
-        if self.forest_status.is_ready:
-            max_index, dist = self.one_shot_worker.forest.find_nn(feature)
+        if self.forest_status.is_ready \
+                and self.RH_one_shot_worker.forest is not None and self.LH_one_shot_worker.forest is not None:
+            if hand == "RH":
+                max_index, dist = self.RH_one_shot_worker.forest.find_nn(feature)
+            else:
+                max_index, dist = self.LH_one_shot_worker.forest.find_nn(feature)
             max_index = max_index[0]
             # feature vector has a dimension of 1024, so dist[0]/1023/2 is the probability
             dist = (0.5 - dist[0] / 2046.0)
