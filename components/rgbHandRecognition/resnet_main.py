@@ -123,7 +123,7 @@ def evaluate():
     saver = tf.train.Saver()
     summary_writer = tf.summary.FileWriter(eval_dir)
 
-    gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.3)
+    gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.4)
     config = tf.ConfigProto(gpu_options=gpu_options)
     config.gpu_options.allow_growth = True
     config.allow_soft_placement = True

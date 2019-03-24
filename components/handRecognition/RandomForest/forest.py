@@ -89,7 +89,7 @@ class Forest:
         for t in self.trees:
             t.add_new(samples_norm, labels)
 
-    def find_nn(self, samples):
+    def find_nn(self, samples):  #TODO use multithreaded NN algorithm (numpy/scikit)
         """
         :param samples: A set of samples that need to find their labels
         :return:        The predicted label and distance for each sample

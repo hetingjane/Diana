@@ -78,7 +78,12 @@ class Fusion(threading.Thread):
             hand_type = 'right'
         else:
             raise ValueError('hand must be either LH or RH: ' + hand)
-        return Fusion.HandData(hand_data[0], hand_data[1:], hand_type)
+        data = Fusion.HandData(hand_data[0], hand_data[1:], hand_type)
+        # import numpy as np
+        # if hand == "RH":
+        #     max_idx = np.argmax(hand_data[1:])
+        #     print(right_hand_postures[max_idx], hand_data[1:][max_idx])
+        return data
 
     def _read_head_data(self, sock):
         data_format = "<" + "i" + "f" * len(head_postures)

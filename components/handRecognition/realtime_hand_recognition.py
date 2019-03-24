@@ -3,7 +3,7 @@ import os
 import tensorflow as tf
 import numpy as np
 
-from . import hands_resnet_model
+import hands_resnet_model
 
 
 class RealTimeHandRecognition:
@@ -23,14 +23,17 @@ class RealTimeHandRecognition:
         model.build_graph()
         saver = tf.train.Saver()
 
-        gpu_options = tf.GPUOptions()
+        gpu_options = tf.GPUOptions()#per_process_gpu_memory_fraction=0.4)
         self.config = tf.ConfigProto(gpu_options=gpu_options)
-        self.config.gpu_options.allow_growth = True
-        self.config.allow_soft_placement = True
+        # self.config.gpu_options.allow_growth = True
+        # self.config.allow_soft_placement = True
 
         sess = tf.Session(config=self.config)
         tf.train.start_queue_runners(sess)
-        saver.restore(sess, r"components/log/RH_model.ckpt")
+        print(os.path.abspath('./models/{}'.format(hands)))
+        ckpt_state = tf.train.get_checkpoint_state(os.path.abspath('../../models/{}'.format(hands)))
+        print('Loading checkpoint {}'.format(ckpt_state.model_checkpoint_path))
+        saver.restore(sess, ckpt_state.model_checkpoint_path)
 
         self.sess = sess
         self.model = model
@@ -59,7 +62,10 @@ class RealTimeHandRecognitionOneShot(RealTimeHandRecognition):
     def __init__(self, hands, gestures):
         RealTimeHandRecognition.__init__(self, hands, gestures)
 
-    def classify(self, data):
+    def classify(self, data, flip):
+        if flip:
+            data = np.flipud(data)
+
         (feature) = self.sess.run([self.model.fc_x], feed_dict={self.model._images: data})
 
         return feature

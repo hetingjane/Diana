@@ -1,13 +1,11 @@
 import threading
 import queue
 import sys
-import numpy as np
 
-from .base_classifier import BaseClassifier
-from .realtime_hand_recognition import RealTimeHandRecognitionOneShot
-from . import RandomForest
-from .RandomForest.threaded_one_shot import OneShotWorker
-from ..fusion.conf.streams import get_stream_name
+from base_classifier import BaseClassifier
+from realtime_hand_recognition import RealTimeHandRecognitionOneShot
+import RandomForest
+from RandomForest.threaded_one_shot import OneShotWorker
 
 sys.modules['RandomForest'] = RandomForest  # to load the pickle file
 
@@ -32,8 +30,8 @@ class EventVars:
 
 class OneShotClassifier(BaseClassifier):
 
-    def __init__(self, hand):
-        BaseClassifier.__init__(self, hand)
+    def __init__(self):
+        BaseClassifier.__init__(self)
 
         self.global_lock = threading.Lock()
         self.forest_status = ForestStatus()
@@ -42,14 +40,14 @@ class OneShotClassifier(BaseClassifier):
         self.new_gesture_index = 32  # refers to 'new gesture 1', increments after every new gesture is learned
         self.taught_gesture_index = 36  # refers to 'taught gesture 1', increments after every new gesture is learned
 
-        self.one_shot_worker = OneShotWorker(self.hand, self.hand_recognition, self.forest_status, self.event_vars,
+        self.one_shot_worker = OneShotWorker("RH", self.hand_recognition, self.forest_status, self.event_vars,
                                              self.one_shot_queue, self.global_lock, is_test=False)
         self.one_shot_worker.start()
         self.event_vars.load_forest_event.set()
         self.learning = False  # whether the system is learning gesture
 
-    def _process(self, timestamp, width, height, posx, posy, depth_data, writer_data_hand, engaged, frame_pieces, gestures, stream_id, flip):
-        
+    def _process(self, timestamp, width, height, posx, posy, depth_data, writer_data_hand, engaged, frame_pieces, hand, gestures):
+
         if not engaged:
             if not self.forest_status.is_fresh:
                 self.global_lock.acquire()
@@ -71,22 +69,23 @@ class OneShotClassifier(BaseClassifier):
         else:
             hand_arr = self._preprocess_hand_arr(depth_data, posx, posy, height, width)
 
-            if flip:
-                hand_arr = np.flipud(hand_arr)
             self.one_shot_queue.put((hand_arr, frame_pieces, writer_data_hand == b'learn'))
 
-            feature = self.hand_recognition.classify(hand_arr)
-            max_index, dist = self._find_label(feature, gestures)
+            if hand == "RH":
+                feature = self.hand_recognition.classify(hand_arr, flip=False)
+            else:
+                feature = self.hand_recognition.classify(hand_arr, flip=True)
+            max_index, dist = self._find_label(feature)
             self.probs[max_index] = dist
 
-        print(get_stream_name(stream_id), gestures[max_index], '{:.2}'.format(float(self.probs[max_index])), end='\t')
+        print('{:<20}'.format(gestures[max_index]), '{:.3}'.format(float(self.probs[max_index])), end='\t')
 
         return max_index
 
     def _get_hand_recognition(self):
-        return RealTimeHandRecognitionOneShot(self.hand, self.num_gestures)
+        return RealTimeHandRecognitionOneShot("RH", self.num_gestures)
 
-    def _find_label(self, feature, gestures):
+    def _find_label(self, feature):
         """
         The sequence of the 4 if statements are extremely important
         :param feature: Only one feature is accepted here
@@ -109,7 +108,7 @@ class OneShotClassifier(BaseClassifier):
             # the learning process successfully completes
             self.learning = False
             max_index = self.taught_gesture_index  # refers to posture 'learned'
-            print([max_index, gestures[max_index]]*100)
+            print([max_index, gestures[max_index]] * 100)
             self.taught_gesture_index += 1
             dist = 1
             self.event_vars.learn_complete_event.clear()
