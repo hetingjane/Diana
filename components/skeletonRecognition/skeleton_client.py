@@ -63,8 +63,8 @@ if __name__ == '__main__':
     if s is None:
         sys.exit(0)
 
-    # m = PrimalRecognition(pointing_mode='screen')
-    m = ArmMotionRecogntion(pointing_mode='screen')
+    m = PrimalRecognition(pointing_mode='screen')
+    #m = ArmMotionRecogntion(pointing_mode='screen')
     c = 0
     start_time = time.time()
 

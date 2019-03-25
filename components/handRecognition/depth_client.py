@@ -109,3 +109,7 @@ def main(args):
         RH_fusion_socket.close()
     if LH_fusion_socket is not None:
         LH_fusion_socket.close()
+
+if __name__ == "__main__":
+    args = parse_argument()
+    main(args)
