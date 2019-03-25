@@ -3,7 +3,7 @@ import os
 import tensorflow as tf
 import numpy as np
 
-import hands_resnet_model
+from . import hands_resnet_model
 
 
 class RealTimeHandRecognition:

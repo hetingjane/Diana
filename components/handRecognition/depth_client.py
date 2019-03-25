@@ -5,10 +5,10 @@ import argparse
 import sys
 
 from components.fusion.conf import postures
-from components.handRecognition.realtime_hand_recognition import RealTimeHandRecognition
+from components.handRecognition.realtime_hand_recognition import RealTimeHandRecognition, RealTimeHandRecognitionOneShot
 from components.skeletonRecognition.skeleton_client import decode_content as decode_content_body
-from base_classifier import BaseClassifier
-from one_shot_classifier import OneShotClassifier
+from components.handRecognition.base_classifier import BaseClassifier
+from components.handRecognition.one_shot_classifier import OneShotClassifier
 from components.fusion.conf.endpoints import connect
 from components.fusion.conf import streams
 from components.fusion.conf import decode
@@ -69,10 +69,15 @@ def read_process_send(hand, kinect_socket, fusion_socket, classifier, gestures, 
 def main(args):
     if args.disable_one_shot:
         print('running base classifier')
-        classifier = BaseClassifier()
+        recognizer = RealTimeHandRecognition("RH", 32)
+        classifier_LH = BaseClassifier(recognizer, "LH")
+        classifier_RH = BaseClassifier(recognizer, "RH")
     else:
         print('running one-shot classifier')
-        classifier = OneShotClassifier()
+        recognizer = RealTimeHandRecognitionOneShot("RH", 32)
+        classifier_LH = OneShotClassifier(recognizer, "LH")
+        import time; time.sleep(10)
+        classifier_RH = OneShotClassifier(recognizer, "RH")
 
     RH_kinect_socket = connect('kinect', args.kinect_host, "RH")
     LH_kinect_socket = connect('kinect', args.kinect_host, "LH")
@@ -86,13 +91,15 @@ def main(args):
 
     frame_count = 0  # To calculate the fps
 
+
+
     start_time = time.time()
     while True:
         _, (_, engaged, frame_pieces), _ = \
             decode.read_frame(body_kinect_socket, decode_content_body)
 
-        if not read_process_send("LH", LH_kinect_socket, LH_fusion_socket, classifier, LH_gestures, LH_stream_id, engaged, frame_pieces)\
-                or not read_process_send("RH", RH_kinect_socket, RH_fusion_socket, classifier, RH_gestures, RH_stream_id, engaged, frame_pieces):
+        if not read_process_send("LH", LH_kinect_socket, LH_fusion_socket, classifier_LH, LH_gestures, LH_stream_id, engaged, frame_pieces)\
+                or not read_process_send("RH", RH_kinect_socket, RH_fusion_socket, classifier_RH, RH_gestures, RH_stream_id, engaged, frame_pieces):
             break
 
         print()
