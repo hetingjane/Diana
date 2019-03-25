@@ -76,7 +76,7 @@ def main(args):
         print('running one-shot classifier')
         recognizer = RealTimeHandRecognitionOneShot("RH", 32)
         classifier_LH = OneShotClassifier(recognizer, "LH")
-        import time; time.sleep(10)
+        import time; time.sleep(1)
         classifier_RH = OneShotClassifier(recognizer, "RH")
 
     RH_kinect_socket = connect('kinect', args.kinect_host, "RH")

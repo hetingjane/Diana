@@ -105,7 +105,7 @@ class OneShotWorker(threading.Thread):
                         self.event_vars.learn_complete_event.set()
                         self.global_lock.release()
                     else:
-                        #print(self.hand_type, 'waiting for palm to stabilize')
+                        pass#print(self.hand_type, 'waiting for palm to stabilize')
 
         else:
             """
