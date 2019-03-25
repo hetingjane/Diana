@@ -1,27 +1,27 @@
 import struct
 import time
 import argparse
-import os
 
-from skimage.transform import resize
 import sys
-import numpy as np
-from .realtime_hand_recognition import RealTimeHandRecognition
-from ..fusion.conf.endpoints import connect
-from ..fusion.conf import streams
-from ..fusion.conf import decode
 
-"""
-# timestamp (long) | depth_hands_count(int) | left_hand_height (int) | left_hand_width (int) |
-# right_hand_height (int) | right_hand_width (int)| left_hand_pos_x (float) | left_hand_pos_y (float) | ... |
-# left_hand_depth_data ([left_hand_width * left_hand_height]) |
-# right_hand_depth_data ([right_hand_width * right_hand_height])
-"""
+from components.fusion.conf import postures
+from components.handRecognition.realtime_hand_recognition import RealTimeHandRecognition, RealTimeHandRecognitionOneShot
+from components.skeletonRecognition.skeleton_client import decode_content as decode_content_body
+from components.handRecognition.base_classifier import BaseClassifier
+from components.handRecognition.one_shot_classifier import OneShotClassifier
+from components.fusion.conf.endpoints import connect
+from components.fusion.conf import streams
+from components.fusion.conf import decode
 
-def decode_content(raw_frame, offset):
+
+def decode_content_hand(raw_frame, offset):
     """
-    raw_frame: frame starting from 4 to end (4 for length field)
-    offset: index where header ends; header is header_l, timestamp, frame_type
+    :param raw_frame: frame starting from 4 to end (4 for length field)
+    :param offset: index where header ends; header is header_l, timestamp, frame_type
+    # timestamp (long) | depth_hands_count(int) | left_hand_height (int) | left_hand_width (int) |
+    # right_hand_height (int) | right_hand_width (int)| left_hand_pos_x (float) | left_hand_pos_y (float) | ... |
+    # left_hand_depth_data ([left_hand_width * left_hand_height]) |
+    # right_hand_depth_data ([right_hand_width * right_hand_height])
     """
     endianness = "<"
 
@@ -30,88 +30,93 @@ def decode_content(raw_frame, offset):
     content_header = struct.unpack_from(endianness + content_header_format, raw_frame, offset)
 
     width, height, posx, posy = content_header
-    #print(width, height, posx, posy)
+    # print(width, height, posx, posy)
 
     depth_data_format = str(width * height) + "H"
     depth_data = struct.unpack_from(endianness + depth_data_format, raw_frame, offset + content_header_size)
-    
-    offset = offset + content_header_size + struct.calcsize(endianness + depth_data_format)  # new offset from where tail starts
+
+    offset = offset + content_header_size + struct.calcsize(
+        endianness + depth_data_format)  # new offset from where tail starts
     return (width, height, posx, posy, list(depth_data)), offset
-    
 
-# By default read 100 frames
-if __name__ == '__main__':
 
+def parse_argument():
     parser = argparse.ArgumentParser()
-    parser.add_argument('hand', help='Hand to follow', choices=['LH', 'RH'])
-    parser.add_argument('kinect_host', help='Host name of the machine running Kinect Server')
-    parser.add_argument('--fusion-host', help='Host name of the machine running Kinect Server', default=None)
+    parser.add_argument('--kinect_host', help='Host name of the machine running Kinect Server', default="localhost")
+    parser.add_argument('--fusion-host', help='Host name of the machine running Fusion Server', default="localhost")
+    parser.add_argument('--disable-one-shot', help='Disable one-shot learning mode', action='store_true', default=False)
 
-    args = parser.parse_args()
+    return parser.parse_args()
 
-    hand = args.hand
 
-    stream_id = streams.get_stream_id(hand)
-    gestures = np.load(os.path.abspath('./data/labels_{}.npy'.format(hand)))
-    gestures = [g.decode('ascii').replace(".npy", "") for g in gestures]
-    num_gestures = len(gestures)
+def read_process_send(hand, kinect_socket, fusion_socket, classifier, gestures, stream_id, engaged, frame_pieces):
+    try:
+        (timestamp, frame_type), (width, height, posx, posy, depth_data), (writer_data_hand,) = \
+            decode.read_frame(kinect_socket, decode_content_hand)
 
-    gestures += ['blind']
-    print(hand, num_gestures)
 
-    hand_classfier = RealTimeHandRecognition(hand, num_gestures)
-    kinect_socket = connect('kinect', args.kinect_host, hand)
-
-    fusion_socket = connect('fusion', args.fusion_host, hand) if args.fusion_host is not None else None
-
-    i = 0
-    hands_list = []
-
-    start_time = time.time()
-    while True:
-        try:
-            (timestamp, frame_type), (width, height, posx, posy, depth_data), (writer_data,) = decode.read_frame(kinect_socket, decode_content)
-            print("timestamp, frame_type", timestamp, frame_type)
-            print("width, height, posx, posy", width, height, posx, posy)
-            print("writer_data", writer_data)
-            
-        except KeyboardInterrupt:
-           break
-        
-        if posx == -1 and posy == -1:
-            probs = [0]*num_gestures+[1]
-            max_index = len(probs)-1
-
-        else:
-            hand_arr = np.array(depth_data, dtype=np.float32).reshape((height, width))
-            print(hand_arr.shape, posx, posy)
-            posz = hand_arr[int(posx), int(posy)]
-            hand_arr -= posz
-            hand_arr /= 150
-            hand_arr = np.clip(hand_arr, -1, 1)
-            hand_arr = resize(hand_arr, (168, 168))
-            hand_arr = hand_arr[20:-20, 20:-20]
-            hand_arr = hand_arr.reshape((1, 128, 128, 1))
-            max_index, probs = hand_classfier.classify(hand_arr)
-
-            probs = list(probs)+[0]
-
-        print(i, timestamp, gestures[max_index], probs[max_index])
-        i += 1
-
-        if i % 100==0:
-            print("="*100, "FPS", 100/(time.time()-start_time))
-            start_time = time.time()
-
-        pack_list = [stream_id, timestamp,max_index]+list(probs)
-
-        bytes = struct.pack("<iqi"+"f"*(num_gestures+1), *pack_list)
+        bytes = classifier.get_bytes(timestamp, width, height, posx, posy, depth_data, writer_data_hand, engaged,
+                                frame_pieces, hand, gestures, stream_id)
 
         if fusion_socket is not None:
             fusion_socket.send(bytes)
+    except KeyboardInterrupt:
+        return False
 
-    kinect_socket.close()
-    if fusion_socket is not None:
-        fusion_socket.close()
-    sys.exit(0)
+    return True
 
+
+def main(args):
+    if args.disable_one_shot:
+        print('running base classifier')
+        recognizer = RealTimeHandRecognition("RH", 32)
+        classifier_LH = BaseClassifier(recognizer, "LH")
+        classifier_RH = BaseClassifier(recognizer, "RH")
+    else:
+        print('running one-shot classifier')
+        recognizer = RealTimeHandRecognitionOneShot("RH", 32)
+        classifier_LH = OneShotClassifier(recognizer, "LH")
+        import time; time.sleep(10)
+        classifier_RH = OneShotClassifier(recognizer, "RH")
+
+    RH_kinect_socket = connect('kinect', args.kinect_host, "RH")
+    LH_kinect_socket = connect('kinect', args.kinect_host, "LH")
+    body_kinect_socket = connect('kinect', args.kinect_host, "Body")
+    RH_fusion_socket = connect('fusion', args.fusion_host, "RH") if args.fusion_host is not None else None
+    LH_fusion_socket = connect('fusion', args.fusion_host, "LH") if args.fusion_host is not None else None
+    RH_gestures = postures.right_hand_postures
+    LH_gestures = postures.left_hand_postures
+    RH_stream_id = streams.get_stream_id("RH")
+    LH_stream_id = streams.get_stream_id("LH")
+
+    frame_count = 0  # To calculate the fps
+
+
+
+    start_time = time.time()
+    while True:
+        _, (_, engaged, frame_pieces), _ = \
+            decode.read_frame(body_kinect_socket, decode_content_body)
+
+        if not read_process_send("LH", LH_kinect_socket, LH_fusion_socket, classifier_LH, LH_gestures, LH_stream_id, engaged, frame_pieces)\
+                or not read_process_send("RH", RH_kinect_socket, RH_fusion_socket, classifier_RH, RH_gestures, RH_stream_id, engaged, frame_pieces):
+            break
+
+        print()
+
+        frame_count += 1
+        if frame_count == 100:
+            print("\n", "=" * 100, "FPS", 100 / (time.time() - start_time))
+            start_time = time.time()
+            frame_count = 0
+
+    RH_kinect_socket.close()
+    LH_kinect_socket.close()
+    if RH_fusion_socket is not None:
+        RH_fusion_socket.close()
+    if LH_fusion_socket is not None:
+        LH_fusion_socket.close()
+
+if __name__ == "__main__":
+    args = parse_argument()
+    main(args)

@@ -6,10 +6,9 @@ _stream_ids = {
     "Body": 0x20,   # 32
     "LH": 0x40,     # 64
     "RH": 0x80,     # 128
-    "Head": 0x100   # 256
 }
 
-_active_streams = frozenset(["LH", "RH", "Body", "Head", "Speech"])
+_active_streams = frozenset(["LH", "RH", "Body", "Speech"])
 _streams = frozenset(_stream_ids.keys())
 
 for s in _active_streams:
@@ -38,10 +37,10 @@ def is_active_id(stream_id):
 
 
 def get_stream_name(stream_id):
-    for st in _stream_ids:
-        if _stream_ids[st] & stream_id != 0:
-            return st
-    raise KeyError("Invalid stream type")
+    for sname, sid in _stream_ids.items():
+        if stream_id == sid:
+            return sname
+    raise InvalidStreamError("Invalid stream id: {}".format(stream_id))
 
 
 def get_stream_names():
@@ -62,3 +61,7 @@ def all_connected(connected_streams):
     :return: True if all active streams are connected, False otherwise
     """
     return _active_streams.intersection(connected_streams) == _active_streams
+
+
+class InvalidStreamError(Exception):
+    pass

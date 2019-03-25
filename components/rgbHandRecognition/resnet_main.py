@@ -123,7 +123,12 @@ def evaluate():
     saver = tf.train.Saver()
     summary_writer = tf.summary.FileWriter(eval_dir)
 
-    sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
+    gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.4)
+    config = tf.ConfigProto(gpu_options=gpu_options)
+    config.gpu_options.allow_growth = True
+    config.allow_soft_placement = True
+
+    sess = tf.Session(config=config)
     tf.train.start_queue_runners(sess)
 
     best_precision = 0.0

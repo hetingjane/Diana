@@ -78,14 +78,12 @@ class Arms_LSTM:
             self.probabilities = prediction
             self.predicted_values = tf.argmax(prediction, 1)
 
-        try:
-            config = tf.ConfigProto(allow_soft_placement=True)
-            config.gpu_options.allow_growth = True
-            self.sess = tf.Session(config= config)
-        except:
-            config = tf.ConfigProto(allow_soft_placement=True)
-            config.gpu_options.allow_growth = True
-            self.sess = tf.Session(config=config)
+        gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.3)
+        self.config = tf.ConfigProto(gpu_options=gpu_options)
+        #self.config.gpu_options.allow_growth = True
+        #self.config.allow_soft_placement = True
+
+        self.sess = tf.Session(config=self.config)
 
         # model saver
         self.saver = tf.train.Saver()

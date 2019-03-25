@@ -15,7 +15,7 @@ eval set -- "$my_args"
 
 # default values
 env_dir=""
-single_machine=no
+single_machine=yes
 machine_spec="$start_dir/machines.bak"
 pointing_mode=""
 wait_time=0
@@ -103,38 +103,38 @@ do
     
     case "$process" in
         "kinect")
-            kinect_host=$machine
+            kinect_param="--kinect-host $machine"
             ;;
         "fusion")
             fusion_param="--fusion-host $machine"
             params="$params --tab -e \"ssh -t ${machine} 'cd ${start_dir}; if [ ! -z ${env_dir} ]; then source ${env_dir}/bin/activate; fi; python3 -m components.fusion.fusion_server; bash;'\" --title ${i}"
             ;;
         "lh")
-            params="$params --tab -e \"ssh -t ${machine} 'sleep $wait_time; cd ${start_dir}; export CUDA_VISIBLE_DEVICES=${device}; if [ ! -z ${env_dir} ]; then source ${env_dir}/bin/activate; fi; python3 -m components.handRecognition.depth_client LH $kinect_host $fusion_param; bash;'\" --title ${i}"
+            params="$params --tab -e \"ssh -t ${machine} 'sleep $wait_time; cd ${start_dir}; export CUDA_VISIBLE_DEVICES=${device}; if [ ! -z ${env_dir} ]; then source ${env_dir}/bin/activate; fi; python3 -m components.handRecognition.depth_client LH $kinect_param $fusion_param; bash;'\" --title ${i}"
             if [ "$single_machine" = yes ]
             then
                 ((device++))
             fi
             ;;
         "rh")
-            params="$params --tab -e \"ssh -t ${machine} 'sleep $wait_time; cd ${start_dir}; export CUDA_VISIBLE_DEVICES=${device}; if [ ! -z ${env_dir} ]; then source ${env_dir}/bin/activate; fi; python3 -m components.handRecognition.depth_client RH $kinect_host $fusion_param; bash;'\" --title ${i}"
+            params="$params --tab -e \"ssh -t ${machine} 'sleep $wait_time; cd ${start_dir}; export CUDA_VISIBLE_DEVICES=${device}; if [ ! -z ${env_dir} ]; then source ${env_dir}/bin/activate; fi; python3 -m components.handRecognition.depth_client RH $kinect_param $fusion_param; bash;'\" --title ${i}"
             if [ "$single_machine" = yes ]
             then
                 ((device++))
             fi
             ;;
         "head")
-            params="$params --tab -e \"ssh -t ${machine} 'sleep $wait_time; cd ${start_dir}; export CUDA_VISIBLE_DEVICES=${device}; if [ ! -z ${env_dir} ]; then source ${env_dir}/bin/activate; fi; python3 -m components.headRecognition.head_client $kinect_host $fusion_param; bash;'\" --title ${i}"
+            params="$params --tab -e \"ssh -t ${machine} 'sleep $wait_time; cd ${start_dir}; export CUDA_VISIBLE_DEVICES=${device}; if [ ! -z ${env_dir} ]; then source ${env_dir}/bin/activate; fi; python3 -m components.headRecognition.head_client $kinect_param $fusion_param; bash;'\" --title ${i}"
             if [ "$single_machine" = yes ]
             then
                 ((device++))
             fi
             ;;
         "speech")
-            params="$params --tab -e \"ssh -t ${machine} 'sleep $wait_time; cd ${start_dir}; python3 -m components.speech.speech_client $kinect_host $fusion_param; bash;'\" --title ${i}"
+            params="$params --tab -e \"ssh -t ${machine} 'sleep $wait_time; cd ${start_dir}; python3 -m components.speech.speech_client $kinect_param $fusion_param; bash;'\" --title ${i}"
             ;;
         "body")
-            params="$params --tab -e \"ssh -t ${machine} 'sleep $wait_time; cd ${start_dir}; export CUDA_VISIBLE_DEVICES=${device}; if [ ! -z ${env_dir} ]; then source ${env_dir}/bin/activate; fi; python3 -m components.skeletonRecognition.skeleton_client $kinect_host $fusion_param; bash;'\" --title ${i}"
+            params="$params --tab -e \"ssh -t ${machine} 'sleep $wait_time; cd ${start_dir}; export CUDA_VISIBLE_DEVICES=${device}; if [ ! -z ${env_dir} ]; then source ${env_dir}/bin/activate; fi; python3 -m components.skeletonRecognition.skeleton_client $kinect_param $fusion_param; bash;'\" --title ${i}"
             if [ "$single_machine" = yes ]
             then
                 ((device++))
@@ -147,7 +147,7 @@ do
     esac
 done
 
-cmd="xfce4-terminal ${params}"
+cmd="urxvt ${params}"
 cmd=${cmd/--tab/}
 #echo "$cmd"
 eval $cmd

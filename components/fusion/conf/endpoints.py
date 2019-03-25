@@ -41,7 +41,7 @@ def connect(hostrole, hostname, stream_strs, timeout=False):
     try:
         sock.connect(addr)
     except socket.error:
-        print("Failed to connect to {} at '{}:{}'".format(hostrole, addr[0], addr[1]))
+        print("Failed to connect to {} at '{host[0]}:{host[1]}'".format(hostrole, host=addr))
         return None
 
     stream_id = 0

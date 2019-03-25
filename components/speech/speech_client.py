@@ -45,7 +45,7 @@ if __name__ == '__main__':
     while True:
         try:
             (timestamp, frame_type), (command_length, command), (writer_data,) = decode.read_frame(k, decode_content)
-            print("writer_data", writer_data)
+            #print("writer_data", writer_data)
         except socket.error:
             print("Unable to receive speech frame")
             break

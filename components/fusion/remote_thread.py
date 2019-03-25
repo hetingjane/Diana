@@ -1,7 +1,6 @@
 import threading
 import socket
-import select
-import sys
+import selectors
 import queue
 
 from .conf.endpoints import serve
@@ -16,7 +15,8 @@ class Remote(threading.Thread):
         self.target = target
         self.input_queue = input_queue
         self._stop = threading.Event()
-        self._conn = conn_event
+        self._connected = conn_event
+        self._sel = selectors.DefaultSelector()
 
     def stop(self):
         self._stop.set()
@@ -24,61 +24,51 @@ class Remote(threading.Thread):
     def is_stopped(self):
         return self._stop.is_set()
 
-    def _log(self, msg):
-        print("[ {} ]\t{}".format(self.name, msg))
+    def _log(self, text):
+        print("[ {name:^10} ] {txt}".format(name=self.name, txt=text))
+
+    def _accept(self, key):
+        try:
+            conn, addr = key.fileobj.accept()
+        except socket.error:
+            print("Error while accepting connection")
+            return
+
+        self._log("Accepted destination {host[0]}:{host[1]}".format(host=addr))
+        self._connected.set()
+        self._sel.register(conn, selectors.EVENT_WRITE, self._send)
+
+    def _send(self, key):
+        conn = key.fileobj
+        try:
+            data = self.input_queue.get_nowait()
+            try:
+                conn.sendall(data)
+            except (socket.error, EOFError):
+                self._connected.clear()
+                self._sel.unregister(conn)
+                conn.close()
+                self._log("Client disconnected")
+        except queue.Empty:
+            pass
 
     def run(self):
         remote_sock = serve(self.target)
         remote_sock.listen(5)
 
-        inputs = [remote_sock]
-        outputs = []
-        excepts = []
+        self._sel.register(remote_sock, selectors.EVENT_READ, data=self._accept)
 
         self._log("Waiting for the destination to connect\n")
 
         while not self.is_stopped():
-            try:
-                read_socks, write_socks, except_socks = select.select(inputs, outputs, excepts, 0.02)
-            except socket.error:
-                # Only input is server socket, so exit if there is a problem
-                self._log("Problem in the server socket. Stopping ...")
-                sys.exit(0)
-
-            for rs in read_socks:
-                if rs is remote_sock:
-                    client_sock, client_addr = rs.accept()
-                    self._log("Accepted destination {}:{}".format(client_addr[0], client_addr[1]))
-                    client_sock.shutdown(socket.SHUT_RD)
-                    outputs += [client_sock]
-                    if not self._conn.is_set():
-                        self._conn.set()
-
-            while True:
-                try:
-                    data = self.input_queue.get_nowait()
-
-                    for ws in write_socks:
-                        client_addr = None
-                        try:
-                            client_addr = ws.getpeername()
-                            ws.sendall(data)
-                        except (socket.error, EOFError):
-                            if ws in outputs:
-                                outputs.remove(ws)
-                            if len(outputs) == 0:
-                                self._conn.clear()
-                            if client_addr is not None:
-                                self._log("{}:{} disconnected".format(client_addr[0], client_addr[1]))
-                            else:
-                                self._log("Client disconnected")
-                except queue.Empty:
-                    break
+            events = self._sel.select()
+            for key, mask in events:
+                handler = key.data
+                handler(key)
 
         self._log("Stopped")
 
-        for s in outputs:
-            s.close()
+        for conn in self._sel.get_map():
+            conn.close()
 
-        remote_sock.close()
-        self._conn.clear()
+        self._connected.clear()
