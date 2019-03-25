@@ -42,21 +42,22 @@ def decode_content_hand(raw_frame, offset):
 
 def parse_argument():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--kinect_host', help='Host name of the machine running Kinect Server', default="localhost")
+    parser.add_argument('--hand', help='Which hand to track (LH, RH, BOTH), default is BOTH', default="BOTH")
+    parser.add_argument('--kinect-host', help='Host name of the machine running Kinect Server', default="localhost")
     parser.add_argument('--fusion-host', help='Host name of the machine running Fusion Server', default="localhost")
     parser.add_argument('--disable-one-shot', help='Disable one-shot learning mode', action='store_true', default=False)
 
     return parser.parse_args()
 
 
-def read_process_send(hand, kinect_socket, fusion_socket, classifier, gestures, stream_id, engaged, frame_pieces):
+def read_process_send(hand, kinect_socket, fusion_socket, classifier, gestures, stream_id, engaged, frame_pieces, flip=False):
     try:
         (timestamp, frame_type), (width, height, posx, posy, depth_data), (writer_data_hand,) = \
             decode.read_frame(kinect_socket, decode_content_hand)
 
 
         bytes = classifier.get_bytes(timestamp, width, height, posx, posy, depth_data, writer_data_hand, engaged,
-                                frame_pieces, hand, gestures, stream_id)
+                                frame_pieces, hand, gestures, stream_id, flip)
 
         if fusion_socket is not None:
             fusion_socket.send(bytes)
@@ -66,56 +67,98 @@ def read_process_send(hand, kinect_socket, fusion_socket, classifier, gestures, 
     return True
 
 
+def print_fps(frame_count, start_time):
+    frame_count += 1
+    if frame_count == 100:
+        print("\n", "=" * 100, "FPS", 100 / (time.time() - start_time))
+        start_time = time.time()
+        frame_count = 0
+
+
 def main(args):
-    if args.disable_one_shot:
-        print('running base classifier')
-        recognizer = RealTimeHandRecognition("RH", 32)
-        classifier_LH = BaseClassifier(recognizer, "LH")
-        classifier_RH = BaseClassifier(recognizer, "RH")
-    else:
-        print('running one-shot classifier')
-        recognizer = RealTimeHandRecognitionOneShot("RH", 32)
-        classifier_LH = OneShotClassifier(recognizer, "LH")
-        import time; time.sleep(1)
-        classifier_RH = OneShotClassifier(recognizer, "RH")
-
-    RH_kinect_socket = connect('kinect', args.kinect_host, "RH")
-    LH_kinect_socket = connect('kinect', args.kinect_host, "LH")
-    body_kinect_socket = connect('kinect', args.kinect_host, "Body")
-    RH_fusion_socket = connect('fusion', args.fusion_host, "RH") if args.fusion_host is not None else None
-    LH_fusion_socket = connect('fusion', args.fusion_host, "LH") if args.fusion_host is not None else None
-    RH_gestures = postures.right_hand_postures
-    LH_gestures = postures.left_hand_postures
-    RH_stream_id = streams.get_stream_id("RH")
-    LH_stream_id = streams.get_stream_id("LH")
-
+    start_time = time.time()
     frame_count = 0  # To calculate the fps
 
+    if args.disable_one_shot:
+        print('running base classifier')
+        HandModel = RealTimeHandRecognition
+        Classifier = BaseClassifier
+    else:
+        print('running one-shot classifier')
+        HandModel = RealTimeHandRecognitionOneShot
+        Classifier = OneShotClassifier
 
+    body_kinect_socket = connect('kinect', args.kinect_host, "Body")
 
-    start_time = time.time()
-    while True:
-        _, (_, engaged, frame_pieces), _ = \
-            decode.read_frame(body_kinect_socket, decode_content_body)
+    if args.hand == "BOTH":
+        print('tracking both hands')
+        RH_model = HandModel("RH", 32)
+        LH_model = RH_model
+        RH_classifier = Classifier(RH_model, "RH")
+        LH_classifier = Classifier(LH_model, "LH")
 
-        if not read_process_send("LH", LH_kinect_socket, LH_fusion_socket, classifier_LH, LH_gestures, LH_stream_id, engaged, frame_pieces)\
-                or not read_process_send("RH", RH_kinect_socket, RH_fusion_socket, classifier_RH, RH_gestures, RH_stream_id, engaged, frame_pieces):
-            break
+        RH_kinect_socket = connect('kinect', args.kinect_host, "RH")
+        LH_kinect_socket = connect('kinect', args.kinect_host, "LH")
+        RH_fusion_socket = connect('fusion', args.fusion_host, "RH") if args.fusion_host is not None else None
+        LH_fusion_socket = connect('fusion', args.fusion_host, "LH") if args.fusion_host is not None else None
 
-        print()
+        RH_gestures = postures.right_hand_postures
+        LH_gestures = postures.left_hand_postures
 
-        frame_count += 1
-        if frame_count == 100:
-            print("\n", "=" * 100, "FPS", 100 / (time.time() - start_time))
-            start_time = time.time()
-            frame_count = 0
+        RH_stream_id = streams.get_stream_id("RH")
+        LH_stream_id = streams.get_stream_id("LH")
 
-    RH_kinect_socket.close()
-    LH_kinect_socket.close()
-    if RH_fusion_socket is not None:
-        RH_fusion_socket.close()
-    if LH_fusion_socket is not None:
-        LH_fusion_socket.close()
+        while True:
+            _, (_, engaged, frame_pieces), _ = \
+                decode.read_frame(body_kinect_socket, decode_content_body)
+
+            if not read_process_send("LH", LH_kinect_socket, LH_fusion_socket, LH_classifier, LH_gestures, LH_stream_id,
+                                     engaged, frame_pieces, flip=True) \
+                    or not read_process_send("RH", RH_kinect_socket, RH_fusion_socket, RH_classifier, RH_gestures,
+                                             RH_stream_id, engaged, frame_pieces):
+                break
+
+            print()
+
+            print_fps(frame_count, start_time)
+
+        RH_kinect_socket.close()
+        LH_kinect_socket.close()
+        if RH_fusion_socket is not None:
+            RH_fusion_socket.close()
+        if LH_fusion_socket is not None:
+            LH_fusion_socket.close()
+    else:
+        print('tracking single hand--', args.hand)
+        model = HandModel(args.hand, 32)
+        classifier = Classifier(model, args.hand)
+
+        kinect_socket = connect('kinect', args.kinect_host, args.hand)
+        fusion_socket = connect('fusion', args.fusion_host, args.hand) if args.fusion_host is not None else None
+
+        if args.hand == "LH":
+            gestures = postures.left_hand_postures
+        else:
+            gestures = postures.right_hand_postures
+
+        stream_id = streams.get_stream_id(args.hand)
+
+        while True:
+            _, (_, engaged, frame_pieces), _ = \
+                decode.read_frame(body_kinect_socket, decode_content_body)
+
+            if not read_process_send(args.hand, kinect_socket, fusion_socket, classifier, gestures, stream_id,
+                                     engaged, frame_pieces):
+                break
+
+            print()
+
+            print_fps(frame_count, start_time)
+
+        kinect_socket.close()
+        if fusion_socket is not None:
+            fusion_socket.close()
+
 
 if __name__ == "__main__":
     args = parse_argument()

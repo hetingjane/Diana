@@ -11,25 +11,22 @@ class BaseClassifier:
         self.hand = hand
         self.hand_recognition = recognizer
 
-    def get_bytes(self, timestamp, width, height, posx, posy, depth_data, writer_data_hand, engaged, frame_pieces, hand, gestures, stream_id):
+    def get_bytes(self, timestamp, width, height, posx, posy, depth_data, writer_data_hand, engaged, frame_pieces, hand, gestures, stream_id, flip):
         self.probs = [0 for i in range(len(gestures))]
         max_index = \
-            self._process(timestamp, width, height, posx, posy, depth_data, writer_data_hand, engaged, frame_pieces, gestures)
+            self._process(timestamp, width, height, posx, posy, depth_data, writer_data_hand, engaged, frame_pieces, gestures, flip)
 
         pack_list = [stream_id, timestamp, max_index] + list(self.probs)
 
         return struct.pack("<iqi" + "f" * len(self.probs), *pack_list)
 
-    def _process(self, timestamp, width, height, posx, posy, depth_data, writer_data_hand, engaged, frame_pieces, gestures):
+    def _process(self, timestamp, width, height, posx, posy, depth_data, writer_data_hand, engaged, frame_pieces, gestures, flip):
         if posx == -1 and posy == -1:
             max_index = len(self.probs) - 1  # max_index refers to 'blind'
             self.probs[max_index] = 1
         else:
             hand_arr = self._preprocess_hand_arr(depth_data, posx, posy, height, width)
-            if self.hand == "RH":
-                max_index, new_probs = self.hand_recognition.classify(hand_arr, flip=False)
-            else:
-                max_index, new_probs = self.hand_recognition.classify(hand_arr, flip=True)
+            max_index, new_probs = self.hand_recognition.classify(hand_arr, flip)
             self.probs[:len(new_probs)] = new_probs
 
         print('{:<20}'.format(gestures[max_index]), '{:.1}'.format(float(self.probs[max_index])), end='\t')

@@ -157,8 +157,8 @@ class OneShotWorker(threading.Thread):
     def load_forest(self):
         self.global_lock.acquire()
 
-        #load_path = '../../models/%s/forest.pickle' % self.hand_type
-        load_path = '../../models/RH/forest.pickle'
+        #load_path = 'models/%s/forest.pickle' % self.hand_type
+        load_path = 'models/%s/forest.pickle' % self.hand_type
         print('Loading random forest checkpoint: %s' % load_path)
         f = open(load_path, 'rb')
         self.forest = pickle.load(f, encoding='latin1')

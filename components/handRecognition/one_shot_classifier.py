@@ -45,7 +45,7 @@ class OneShotClassifier(BaseClassifier):
         self.event_vars.load_forest_event.set()
         self.learning = False  # whether the system is learning gesture
 
-    def _process(self, timestamp, width, height, posx, posy, depth_data, writer_data_hand, engaged, frame_pieces, gestures):
+    def _process(self, timestamp, width, height, posx, posy, depth_data, writer_data_hand, engaged, frame_pieces, gestures, flip):
 
         if not engaged:
             if not self.forest_status.is_fresh:
@@ -70,10 +70,7 @@ class OneShotClassifier(BaseClassifier):
 
             self.one_shot_queue.put((hand_arr, frame_pieces, writer_data_hand == b'learn'))
 
-            if self.hand == "RH":
-                feature = self.hand_recognition.classify(hand_arr, flip=False)
-            else:
-                feature = self.hand_recognition.classify(hand_arr, flip=True)
+            feature = self.hand_recognition.classify(hand_arr, flip)
             max_index, dist = self._find_label(feature, gestures)
             self.probs[max_index] = dist
 

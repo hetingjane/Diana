@@ -47,6 +47,7 @@ if __name__ == '__main__':
     parser.add_argument('--kinect-host', help='Kinect host name', type=str, default='127.0.0.1')
     parser.add_argument('--fusion-host', help='Fusion host name', type=str, default='127.0.0.1')
     parser.add_argument('--pointing-mode', default='screen', help='Pointing mode, default set to screen', type=str)
+    parser.add_argument('--model', help='Choose between backend models for motion recognition, "primal" or "LSTM"', default="LSTM")
 
     args = parser.parse_args()
     kinect_host, fusion_host, pointing_mode = args.kinect_host, args.fusion_host, args.pointing_mode
@@ -63,8 +64,10 @@ if __name__ == '__main__':
     if s is None:
         sys.exit(0)
 
-    m = PrimalRecognition(pointing_mode='screen')
-    #m = ArmMotionRecogntion(pointing_mode='screen')
+    if args.model == "LSTM":
+        m = ArmMotionRecogntion(pointing_mode='screen')
+    else:
+        m = PrimalRecognition(pointing_mode='screen')
     c = 0
     start_time = time.time()
 
