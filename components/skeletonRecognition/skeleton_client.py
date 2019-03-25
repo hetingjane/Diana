@@ -44,12 +44,12 @@ def decode_content(raw_frame, offset):
     
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('kinect', help='Kinect host name', type=str)
-    parser.add_argument('--fusion-host', default=None, help='Fusion host name, default set to None', type=str)
+    parser.add_argument('--kinect-host', help='Kinect host name', type=str, default='127.0.0.1')
+    parser.add_argument('--fusion-host', help='Fusion host name', type=str, default='127.0.0.1')
     parser.add_argument('--pointing-mode', default='screen', help='Pointing mode, default set to screen', type=str)
 
     args = parser.parse_args()
-    kinect_host, fusion_host, pointing_mode = args.kinect, args.fusion_host, args.pointing_mode
+    kinect_host, fusion_host, pointing_mode = args.kinect_host, args.fusion_host, args.pointing_mode
 
 
     s = connect('kinect', kinect_host, 'Body')

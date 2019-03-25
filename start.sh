@@ -109,22 +109,8 @@ do
             fusion_param="--fusion-host $machine"
             params="$params --tab -e \"ssh -t ${machine} 'cd ${start_dir}; if [ ! -z ${env_dir} ]; then source ${env_dir}/bin/activate; fi; python3 -m components.fusion.fusion_server; bash;'\" --title ${i}"
             ;;
-        "lh")
-            params="$params --tab -e \"ssh -t ${machine} 'sleep $wait_time; cd ${start_dir}; export CUDA_VISIBLE_DEVICES=${device}; if [ ! -z ${env_dir} ]; then source ${env_dir}/bin/activate; fi; python3 -m components.handRecognition.depth_client LH $kinect_param $fusion_param; bash;'\" --title ${i}"
-            if [ "$single_machine" = yes ]
-            then
-                ((device++))
-            fi
-            ;;
-        "rh")
-            params="$params --tab -e \"ssh -t ${machine} 'sleep $wait_time; cd ${start_dir}; export CUDA_VISIBLE_DEVICES=${device}; if [ ! -z ${env_dir} ]; then source ${env_dir}/bin/activate; fi; python3 -m components.handRecognition.depth_client RH $kinect_param $fusion_param; bash;'\" --title ${i}"
-            if [ "$single_machine" = yes ]
-            then
-                ((device++))
-            fi
-            ;;
-        "head")
-            params="$params --tab -e \"ssh -t ${machine} 'sleep $wait_time; cd ${start_dir}; export CUDA_VISIBLE_DEVICES=${device}; if [ ! -z ${env_dir} ]; then source ${env_dir}/bin/activate; fi; python3 -m components.headRecognition.head_client $kinect_param $fusion_param; bash;'\" --title ${i}"
+        "hands")
+            params="$params --tab -e \"ssh -t ${machine} 'sleep $wait_time; cd ${start_dir}; export CUDA_VISIBLE_DEVICES=${device}; if [ ! -z ${env_dir} ]; then source ${env_dir}/bin/activate; fi; python3 -m components.handRecognition.depth_client $kinect_param $fusion_param; bash;'\" --title ${i}"
             if [ "$single_machine" = yes ]
             then
                 ((device++))
@@ -147,7 +133,7 @@ do
     esac
 done
 
-cmd="urxvt ${params}"
+cmd="xfce4-terminal ${params}"
 cmd=${cmd/--tab/}
 #echo "$cmd"
 eval $cmd

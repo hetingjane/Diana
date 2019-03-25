@@ -38,8 +38,8 @@ def decode_content(raw_frame, offset):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('kinect_host', help='Host name of the machine running Kinect Server')
-    parser.add_argument('--fusion-host', help='Host name of the machine running Kinect Server', default=None)
+    parser.add_argument('--kinect_host', help='Host name of the machine running Kinect Server', default='127.0.0.1')
+    parser.add_argument('--fusion-host', help='Host name of the machine running Kinect Server', default='127.0.0.1')
 
     args = parser.parse_args()
 
