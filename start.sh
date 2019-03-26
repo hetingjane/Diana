@@ -143,6 +143,7 @@ do
         "speech")
             eval "tmux send-keys -t diana \"ssh -t ${machine} 'sleep $wait_time; cd ${start_dir}; python3 -m components.speech.speech_client $kinect_param $fusion_param; bash;'\" Enter"
 			eval "tmux select-layout -t diana tiled"
+			eval "tmux split-window -t diana"
             ;;
         "body")
             eval "tmux send-keys -t diana \"ssh -t ${machine} 'sleep $wait_time; cd ${start_dir}; export CUDA_VISIBLE_DEVICES=${device}; if [ ! -z ${env_dir} ]; then source ${env_dir}/bin/activate; fi; python3 -m components.skeletonRecognition.skeleton_client $kinect_param $fusion_param; bash;'\" Enter"
@@ -160,4 +161,7 @@ do
     esac
 done
 
+# now close the last split and attach the session
+tmux send-keys -t diana "exit" Enter
+tmux select-layout -t diana tiled
 tmux attach -t diana
