@@ -128,7 +128,7 @@ def main(args):
     else:
         print('tracking single hand--', args.hand)
         model = HandModel(args.hand, 32)
-        classifier = Classifier(model, args.hand)
+        classifier = Classifier(model, args.hand, lock)
 
         kinect_socket = connect('kinect', args.kinect_host, args.hand) if args.kinect_host is not None else None
         fusion_socket = connect('fusion', args.fusion_host, args.hand) if args.fusion_host is not None else None
