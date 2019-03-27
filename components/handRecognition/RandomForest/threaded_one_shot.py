@@ -28,9 +28,10 @@ class OneShotWorker(threading.Thread):
         # the start and end position of palm center coordinate in decoded body frame
         self.palm_coordinates_ind_start = self.palm_ind*9 + 7
         self.palm_coordinates_ind_end = self.palm_ind*9 + 10
-        self.spine_mid_ind = 0
-        self.spine_mid_coordinates_ind_start = self.spine_mid_ind * 9 + 7
-        self.spine_mid_coordinates_ind_end = self.spine_mid_ind * 9 + 10
+        self.spine_base_ind = 0
+        self.spine_base_Y_ind = self.spine_base_ind * 9 + 8
+        self.spine_mid_ind = 1
+        self.spine_mid_Y_ind = self.spine_mid_ind * 9 + 8
         self.forest = None  # random forest instance
         self.receiving_frames = False  # Only start to receive frames when a signal is sent from kinect server
         self.skip_frame = 0  # skip some frames to maximize variance in learning input, use this variable to keep track
@@ -130,14 +131,16 @@ class OneShotWorker(threading.Thread):
 
     def _is_gesture(self, skeleton_arr):
         """
-        The hand is performing a gesture only if it's above the spine mid. This is not perfect, but good enough.
+        The hand is performing a gesture only if it's above the midpoint between spine base and spine mid.
+        This is not perfect, but good enough.
         :param skeleton: kinect skeleton array
         :param hand: string with either "RH" or "LH"
         :return: A boolean about whether the hand is performing a gesture
         """
-        spine_base_y = skeleton_arr[self.spine_base_coordinates_ind_start+1]
+        spine_base_y = skeleton_arr[self.spine_base_Y_ind]
+        spine_mid_y = skeleton_arr[self.spine_mid_Y_ind]
         hand_y = skeleton_arr[self.palm_coordinates_ind_start+1]
-        return hand_y > spine_base_y
+        return hand_y > spine_base_y + abs(spine_mid_y - spine_base_y) / 2
 
     def _palm_center_buffer_variance(self):
         """
