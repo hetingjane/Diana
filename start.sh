@@ -164,4 +164,5 @@ done
 # now close the last split and attach the session
 tmux send-keys -t diana "exit" Enter
 tmux select-layout -t diana tiled
+tmux set-option -t diana mouse on
 tmux attach -t diana
