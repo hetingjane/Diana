@@ -90,7 +90,7 @@ if __name__ == '__main__':
 
         display_result = m.printable_result()
         if display_result is not None:
-            print (result[:3], display_result)
+            print('{:<16}'.format(display_result[0]), '{:<16}'.format(display_result[1]), '{:<4}'.format(result[0]), '{:<4}'.format(result[1]), '{:.2}'.format(result[2]))
 
         pack_list = [streams.get_stream_id("Body"), timestamp] + result
         raw_data = struct.pack("<iqii" + "ffff" * 2 + "ff" * 8 + 'i', *pack_list)
@@ -100,6 +100,7 @@ if __name__ == '__main__':
 
         c += 1
         if c % 100 == 0:
+            print()
             print ('=' * 30)
             print ('FPS: ', 100.0 / (time.time() - start_time))
             print ('=' * 30)

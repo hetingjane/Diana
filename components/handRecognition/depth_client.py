@@ -1,4 +1,5 @@
 import struct
+import threading
 import time
 import argparse
 
@@ -67,17 +68,10 @@ def read_process_send(hand, kinect_socket, fusion_socket, classifier, gestures, 
     return True
 
 
-def print_fps(frame_count, start_time):
-    frame_count += 1
-    if frame_count == 100:
-        print("\n", "=" * 100, "FPS", 100 / (time.time() - start_time))
-        start_time = time.time()
-        frame_count = 0
-
-
 def main(args):
     start_time = time.time()
     frame_count = 0  # To calculate the fps
+    lock = threading.Lock()
 
     if args.disable_one_shot:
         print('running base classifier')
@@ -93,12 +87,11 @@ def main(args):
     if args.hand == "BOTH":
         print('tracking both hands')
         RH_model = HandModel("RH", 32)
-        LH_model = RH_model
-        RH_classifier = Classifier(RH_model, "RH")
-        LH_classifier = Classifier(LH_model, "LH")
+        RH_classifier = Classifier(RH_model, "RH", lock)
+        LH_classifier = Classifier(RH_model, "LH", lock, flip=True)
 
-        RH_kinect_socket = connect('kinect', args.kinect_host, "RH")
-        LH_kinect_socket = connect('kinect', args.kinect_host, "LH")
+        RH_kinect_socket = connect('kinect', args.kinect_host, "RH") if args.kinect_host is not None else None
+        LH_kinect_socket = connect('kinect', args.kinect_host, "LH") if args.kinect_host is not None else None
         RH_fusion_socket = connect('fusion', args.fusion_host, "RH") if args.fusion_host is not None else None
         LH_fusion_socket = connect('fusion', args.fusion_host, "LH") if args.fusion_host is not None else None
 
@@ -120,7 +113,11 @@ def main(args):
 
             print()
 
-            print_fps(frame_count, start_time)
+            frame_count += 1
+            if frame_count == 100:
+                print("\n", "=" * 100, "FPS", 100 / (time.time() - start_time))
+                start_time = time.time()
+                frame_count = 0
 
         RH_kinect_socket.close()
         LH_kinect_socket.close()
@@ -133,7 +130,7 @@ def main(args):
         model = HandModel(args.hand, 32)
         classifier = Classifier(model, args.hand)
 
-        kinect_socket = connect('kinect', args.kinect_host, args.hand)
+        kinect_socket = connect('kinect', args.kinect_host, args.hand) if args.kinect_host is not None else None
         fusion_socket = connect('fusion', args.fusion_host, args.hand) if args.fusion_host is not None else None
 
         if args.hand == "LH":
@@ -153,7 +150,11 @@ def main(args):
 
             print()
 
-            print_fps(frame_count, start_time)
+            frame_count += 1
+            if frame_count == 100:
+                print("\n", "=" * 40, "FPS", 100 / (time.time() - start_time))
+                start_time = time.time()
+                frame_count = 0
 
         kinect_socket.close()
         if fusion_socket is not None:

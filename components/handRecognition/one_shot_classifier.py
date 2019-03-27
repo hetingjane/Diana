@@ -29,10 +29,10 @@ class EventVars:
 
 class OneShotClassifier(BaseClassifier):
 
-    def __init__(self, recognizer, hand):
-        BaseClassifier.__init__(self, recognizer, hand)
+    def __init__(self, recognizer, hand, lock, flip=False):
+        BaseClassifier.__init__(self, recognizer, hand, lock, flip)
 
-        self.global_lock = threading.Lock()
+        self.global_lock = lock
         self.forest_status = ForestStatus()
         self.one_shot_queue = queue.Queue()  # The one-shot learning code reads from the queue to process.
         self.event_vars = EventVars()  # event variables used for communication between threads
@@ -40,7 +40,7 @@ class OneShotClassifier(BaseClassifier):
         self.taught_gesture_index = 36  # refers to 'taught gesture 1', increments after every new gesture is learned
 
         self.one_shot_worker = OneShotWorker(hand, self.hand_recognition, self.forest_status, self.event_vars,
-                                             self.one_shot_queue, self.global_lock, is_test=False)
+                                             self.one_shot_queue, self.global_lock, flip, is_test=False)
         self.one_shot_worker.start()
         self.event_vars.load_forest_event.set()
         self.learning = False  # whether the system is learning gesture

@@ -30,8 +30,9 @@ class RealTimeHandRecognition:
 
         sess = tf.Session(config=self.config)
         tf.train.start_queue_runners(sess)
-        print(os.path.abspath('./models/{}'.format(hands)))
-        ckpt_state = tf.train.get_checkpoint_state(os.path.abspath('./models/{}'.format(hands)))
+        path = os.path.abspath('./models/{}'.format(hands))
+        print(path)
+        ckpt_state = tf.train.get_checkpoint_state(path)
         print('Loading checkpoint {}'.format(ckpt_state.model_checkpoint_path))
         saver.restore(sess, ckpt_state.model_checkpoint_path)
 

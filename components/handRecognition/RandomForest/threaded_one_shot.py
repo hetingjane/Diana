@@ -3,11 +3,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pickle
 import queue
+import os
+import time
 
 
 class OneShotWorker(threading.Thread):
     def __init__(self, hand_type, hand_classfier, forest_status, event_vars, one_shot_queue,
-                 global_lock, is_test=False):
+                 global_lock, flip, is_test=False):
         threading.Thread.__init__(self)
         self.hand_type = hand_type
         self.hand_classfier = hand_classfier
@@ -26,7 +28,7 @@ class OneShotWorker(threading.Thread):
         # the start and end position of palm center coordinate in decoded body frame
         self.palm_coordinates_ind_start = self.palm_ind*9 + 7
         self.palm_coordinates_ind_end = self.palm_ind*9 + 10
-        self.spine_mid_ind = 1
+        self.spine_mid_ind = 0
         self.spine_mid_coordinates_ind_start = self.spine_mid_ind * 9 + 7
         self.spine_mid_coordinates_ind_end = self.spine_mid_ind * 9 + 10
         self.forest = None  # random forest instance
@@ -39,6 +41,8 @@ class OneShotWorker(threading.Thread):
         self.no_action_threshold = 120  # if there are no gestures for continous 5 seconds, do not learn for this hand
         self.ref_frames = []  # a buffer list of frames to learn
         self.palm_centers = []  # a buffer list of palm center coordinates
+
+        self.flip = flip
 
     def run(self):
         while True:
@@ -84,10 +88,7 @@ class OneShotWorker(threading.Thread):
                         # Get feature vectors
                         new_features = []
                         for i, each_hand_arr in enumerate(self.ref_frames):
-                            if self.hand_type == "RH":
-                                new_features.append(self.hand_classfier.classify(each_hand_arr, flip=False)[0])
-                            else:
-                                new_features.append(self.hand_classfier.classify(each_hand_arr, flip=True)[0])
+                            new_features.append(self.hand_classfier.classify(each_hand_arr, self.flip)[0])
                             if self.is_test:
                                 img_name = "/s/red/a/nobackup/vision/jason/DraperLab/Demo/reference_imgs/%d.png" % i
                                 plt.imsave(img_name, np.squeeze(each_hand_arr))
@@ -134,9 +135,9 @@ class OneShotWorker(threading.Thread):
         :param hand: string with either "RH" or "LH"
         :return: A boolean about whether the hand is performing a gesture
         """
-        spine_mid_y = skeleton_arr[self.spine_mid_coordinates_ind_start+1]
+        spine_base_y = skeleton_arr[self.spine_base_coordinates_ind_start+1]
         hand_y = skeleton_arr[self.palm_coordinates_ind_start+1]
-        return hand_y > spine_mid_y
+        return hand_y > spine_base_y
 
     def _palm_center_buffer_variance(self):
         """
@@ -157,13 +158,15 @@ class OneShotWorker(threading.Thread):
     def load_forest(self):
         self.global_lock.acquire()
 
-        #load_path = 'models/%s/forest.pickle' % self.hand_type
-        load_path = 'models/%s/forest.pickle' % self.hand_type
+        if self.flip:
+            load_hand_type = "RH"
+        else:
+            load_hand_type = self.hand_type
+        load_path = './models/%s/forest.pickle' % load_hand_type
         print('Loading random forest checkpoint: %s' % load_path)
-        f = open(load_path, 'rb')
-        self.forest = pickle.load(f, encoding='latin1')
-        f.close()
 
+        with open(load_path, 'rb') as f:
+            self.forest = pickle.load(f, encoding='latin1')
         self.forest_status.is_fresh = True  # whether the forest is a fresh copy
         self.forest_status.is_ready = True  # whether the forest is ready to be used for classification
         self.new_gesture_index = 32  # reset the index
@@ -171,4 +174,4 @@ class OneShotWorker(threading.Thread):
 
         self.global_lock.release()
 
-        print('%s forest loaded!' % self.hand_type)
+        print('%s forest loaded!' % load_hand_type)

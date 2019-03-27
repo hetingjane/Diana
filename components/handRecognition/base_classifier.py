@@ -4,7 +4,7 @@ import numpy as np
 from skimage.transform import resize
 
 class BaseClassifier:
-    def __init__(self, recognizer, hand):
+    def __init__(self, recognizer, hand, lock, flip=False):
         # load gesture labels
         self.num_gestures = 32  # this is the number of gestures trained with ResNet
         self.probs = None  # probs sent to fusion, recalculate for each frame

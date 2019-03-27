@@ -284,7 +284,7 @@ class ArmMotionRecogntion(Solver):
             except:
                 motion_encoding = 26
 
-            print ('Arm Motion Label :', arm_motion_label, ' motion index: ', motion_encoding)
+            #print ('{:<12}'.format(arm_motion_label), end='')
             return motion_encoding, probabilities
 
         elif (body_part == 'arms_x') or (body_part == 'arms_y'):
