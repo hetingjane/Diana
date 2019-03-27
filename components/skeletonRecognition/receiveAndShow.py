@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.signal import savgol_filter
 
+magic = -0.6
 
 # following codes get the elbow and wrist information from the kinect sensor
 class Pointing:
@@ -32,10 +33,10 @@ class Pointing:
 
         self.lpoint_buffer = []
         self.rpoint_buffer = []
-        self.lpoint_tmp = (0.0, -0.6)
-        self.rpoint_tmp = (0.0, -0.6)
-        self.lpoint = (0.0, -0.6)  # inferred pointing coordinate on the table from left arm
-        self.rpoint = (0.0, -0.6)  # inferred pointing coordinate on the table from right arm
+        self.lpoint_tmp = (0.0, magic)
+        self.rpoint_tmp = (0.0, magic)
+        self.lpoint = (0.0, magic)  # inferred pointing coordinate on the table from left arm
+        self.rpoint = (0.0, magic)  # inferred pointing coordinate on the table from right arm
 
         self.lpoint_var = (0, 0)  # variance of left point, sent to Brandeis
         self.rpoint_var = (0, 0)  # variance of right point, sent to Brandeis
@@ -184,6 +185,7 @@ class Pointing:
             screen_x = elbow[0] - elbow[2] * (elbow[0] - wrist[0]) / (elbow[2] - wrist[2])
             screen_y = elbow[1] - elbow[2] * (elbow[1] - wrist[1]) / (elbow[2] - wrist[2])
 
+            print('******SCREEN X Y', '{:<10.2}'.format(screen_x), '{:<10.2}'.format(screen_y))
             return screen_x, screen_y
         else:
 

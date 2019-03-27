@@ -8,11 +8,10 @@ import time
 
 
 class OneShotWorker(threading.Thread):
-    def __init__(self, hand_type, hand_classfier, forest_status, event_vars, one_shot_queue,
-                 global_lock, flip, is_test=False):
+    def __init__(self, hand_type, forest_status, event_vars, one_shot_queue,
+                 global_lock, is_flipped, is_test=False):
         threading.Thread.__init__(self)
         self.hand_type = hand_type
-        self.hand_classfier = hand_classfier
         self.forest_status = forest_status
         self.event_vars = event_vars
         self.one_shot_queue = one_shot_queue
@@ -43,24 +42,22 @@ class OneShotWorker(threading.Thread):
         self.ref_frames = []  # a buffer list of frames to learn
         self.palm_centers = []  # a buffer list of palm center coordinates
 
-        self.flip = flip
+        self.is_flipped = is_flipped
 
     def run(self):
         while True:
             if self.event_vars.load_forest_event.is_set():
                 self.load_forest()
-            # hand_arr, skeleton_arr, start_learn = self.one_shot_queue.get()
             try:
-                hand_arr, skeleton_arr, start_learn = self.one_shot_queue.get(block=True, timeout=2)
-                self.add_frame(hand_arr, skeleton_arr, start_learn)
+                feature, skeleton_arr, start_learn = self.one_shot_queue.get(block=True, timeout=2)
+                self.add_frame(feature, skeleton_arr, start_learn)
             except queue.Empty:
                 pass
 
-    def add_frame(self, hand_arr, skeleton_arr, start_learn):
+    def add_frame(self, feature, skeleton_arr, start_learn):
         """
         When learning starts, hand depth array and body skeleton array needs to used to extract necessary information
         and stored for further processing.
-        :param hand_arr: hand depth array from self.decode_frame_hand()
         :param skeleton_arr: body skeleton array from self.decode_frame_skeleton()
         :param start_learn: A signal from kinect to indicate whether the learning initiates
         :return: None
@@ -73,7 +70,7 @@ class OneShotWorker(threading.Thread):
             return
         if self._is_gesture(skeleton_arr):
             if not self.skip_frame:
-                self.ref_frames.append(hand_arr)
+                self.ref_frames.append(feature)
                 self.palm_centers.append(skeleton_arr[self.palm_coordinates_ind_start:self.palm_coordinates_ind_end])
 
                 # print(self.receiving_frames, len(self.palm_centers))
@@ -88,11 +85,8 @@ class OneShotWorker(threading.Thread):
                         self.receiving_frames = False
                         # Get feature vectors
                         new_features = []
-                        for i, each_hand_arr in enumerate(self.ref_frames):
-                            new_features.append(self.hand_classfier.classify(each_hand_arr, self.flip)[0])
-                            if self.is_test:
-                                img_name = "/s/red/a/nobackup/vision/jason/DraperLab/Demo/reference_imgs/%d.png" % i
-                                plt.imsave(img_name, np.squeeze(each_hand_arr))
+                        for i, ref_feature in enumerate(self.ref_frames):
+                            new_features.append(ref_feature)
                         # learning finished, reset variables
                         self.ref_frames = []
                         self.palm_centers = []
@@ -133,8 +127,7 @@ class OneShotWorker(threading.Thread):
         """
         The hand is performing a gesture only if it's above the midpoint between spine base and spine mid.
         This is not perfect, but good enough.
-        :param skeleton: kinect skeleton array
-        :param hand: string with either "RH" or "LH"
+        :param skeleton_arr: kinect skeleton array
         :return: A boolean about whether the hand is performing a gesture
         """
         spine_base_y = skeleton_arr[self.spine_base_Y_ind]
@@ -161,7 +154,7 @@ class OneShotWorker(threading.Thread):
     def load_forest(self):
         self.global_lock.acquire()
 
-        if self.flip:
+        if self.is_flipped:
             load_hand_type = "RH"
         else:
             load_hand_type = self.hand_type

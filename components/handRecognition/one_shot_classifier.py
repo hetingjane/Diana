@@ -29,8 +29,8 @@ class EventVars:
 
 class OneShotClassifier(BaseClassifier):
 
-    def __init__(self, recognizer, hand, lock, flip=False):
-        BaseClassifier.__init__(self, recognizer, hand, lock, flip)
+    def __init__(self, hand, lock, is_flipped=False):
+        BaseClassifier.__init__(self, hand, lock, is_flipped)
 
         self.global_lock = lock
         self.forest_status = ForestStatus()
@@ -39,13 +39,13 @@ class OneShotClassifier(BaseClassifier):
         self.new_gesture_index = 32  # refers to 'new gesture 1', increments after every new gesture is learned
         self.taught_gesture_index = 36  # refers to 'taught gesture 1', increments after every new gesture is learned
 
-        self.one_shot_worker = OneShotWorker(hand, self.hand_recognition, self.forest_status, self.event_vars,
-                                             self.one_shot_queue, self.global_lock, flip, is_test=False)
+        self.one_shot_worker = OneShotWorker(hand, self.forest_status, self.event_vars,
+                                             self.one_shot_queue, self.global_lock, is_flipped, is_test=False)
         self.one_shot_worker.start()
         self.event_vars.load_forest_event.set()
         self.learning = False  # whether the system is learning gesture
 
-    def _process(self, timestamp, width, height, posx, posy, depth_data, writer_data_hand, engaged, frame_pieces, gestures, flip):
+    def _process(self, feature, writer_data_hand, engaged, frame_pieces, gestures):
 
         if not engaged:
             if not self.forest_status.is_fresh:
@@ -62,19 +62,9 @@ class OneShotClassifier(BaseClassifier):
             self.global_lock.release()
             self.learning = True  # start learning mode
 
-        if posx == -1 and posy == -1:
-            max_index = len(self.probs) - 1  # max_index refers to 'blind'
-            self.probs[max_index] = 1
-        else:
-            hand_arr = self._preprocess_hand_arr(depth_data, posx, posy, height, width)
-
-            self.one_shot_queue.put((hand_arr, frame_pieces, writer_data_hand == b'learn'))
-
-            feature = self.hand_recognition.classify(hand_arr, flip)
-            max_index, dist = self._find_label(feature, gestures)
-            self.probs[max_index] = dist
-
-        print('{:<20}'.format(gestures[max_index]), '{:.3}'.format(float(self.probs[max_index])), end='\t')
+        self.one_shot_queue.put((feature, frame_pieces, writer_data_hand == b'learn'))
+        max_index, dist = self._find_label(feature, gestures)
+        self.probs[max_index] = dist
 
         return max_index
 

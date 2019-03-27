@@ -14,8 +14,8 @@ class Solver(object):
         self._LEFT, self._RIGHT = 'la', 'ra'
         self._body_parts = [self._LEFT, self._RIGHT]
 
-        self.joints_list = ['SPINE_BASE', 'SPINE_MID', 'NECK', 'HEAD', 'SHOULDER_LEFT', 'ELBOW_LEFT', 'WRIST_LEFT',\
-                       'HAND_LEFT','SHOULDER_RIGHT', 'ELBOW_RIGHT', 'WRIST_RIGHT', 'HAND_RIGHT', 'SPINE_SHOULDER', \
+        self.joints_list = ['SPINE_BASE', 'SPINE_MID', 'NECK', 'HEAD', 'SHOULDER_LEFT', 'ELBOW_LEFT', 'WRIST_LEFT',
+                       'HAND_LEFT','SHOULDER_RIGHT', 'ELBOW_RIGHT', 'WRIST_RIGHT', 'HAND_RIGHT', 'SPINE_SHOULDER',
                             'HAND_TIP_LEFT','THUMB_LEFT', 'HAND_TIP_RIGHT', 'THUMB_RIGHT']
         self.num_joints = 17
 
