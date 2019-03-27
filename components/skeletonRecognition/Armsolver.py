@@ -372,4 +372,3 @@ class PrimalRecognition(Solver):
             direction = ' blind'
         return direction, proba_array
 
-

@@ -74,9 +74,6 @@ if __name__ == '__main__':
     while True:
         try:
             (timestamp, frame_type), (tracked_body_count, engaged, frame_pieces), (writer_data,) = decode.read_frame(s, decode_content)
-            #print("timestamp, frame_type", timestamp, frame_type)
-            #print("tracked_body_count, engaged", tracked_body_count, engaged)
-            #print("writer_data", writer_data)
         except EOFError:
             print("Disconnected from Kinect Server")
             break
