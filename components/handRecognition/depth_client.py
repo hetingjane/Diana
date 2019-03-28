@@ -97,7 +97,7 @@ def can_process(hand, frame_pieces, posx, posy):
     else:
         return False
 
-    if (posx == -1 and posy == -1) or (hand_y <= spine_base_y + abs(spine_mid_y - spine_base_y) / 2):
+    if (posx == -1 and posy == -1) or (hand_y <= spine_base_y ):#+ abs(spine_mid_y - spine_base_y) / 2):
         return False
     return True
 
