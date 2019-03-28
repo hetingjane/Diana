@@ -45,7 +45,7 @@ class OneShotClassifier(BaseClassifier):
         self.event_vars.load_forest_event.set()
         self.learning = False  # whether the system is learning gesture
 
-    def _process(self, feature, writer_data_hand, engaged, frame_pieces, gestures):
+    def _process(self, feature, writer_data_hand, engaged, frame_pieces, gestures, blind):
 
         if not engaged:
             if not self.forest_status.is_fresh:
@@ -63,12 +63,12 @@ class OneShotClassifier(BaseClassifier):
             self.learning = True  # start learning mode
 
         self.one_shot_queue.put((feature, frame_pieces, writer_data_hand == b'learn'))
-        max_index, dist = self._find_label(feature, gestures)
+        max_index, dist = self._find_label(feature, gestures, blind)
         self.probs[max_index] = dist
 
         return max_index
 
-    def _find_label(self, feature, gestures):
+    def _find_label(self, feature, gestures, blind):
         """
         The sequence of the 4 if statements are extremely important
         :param feature: Only one feature is accepted here
@@ -82,7 +82,7 @@ class OneShotClassifier(BaseClassifier):
             # learning failed, forest should be ready so find the label again
             self.learning = False
             self.event_vars.learn_no_action_event.clear()
-        if self.forest_status.is_ready:
+        if self.forest_status.is_ready and not blind:
             max_index, dist = self.one_shot_worker.forest.find_nn(feature)
             max_index = max_index[0]
             # feature vector has a dimension of 1024, so dist[0]/1023/2 is the probability
