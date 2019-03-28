@@ -205,9 +205,13 @@ def main(args):
 
             if can_process(args.hand, frame_pieces, posx, posy):
                 frame = _preprocess_hand_arr(depth_data, posx, posy, height, width)
-                out = model.classify(frame)
-                blind = True
                 model.past_probs = None
+            else:
+                blind = True
+                frame = np.empty((1,128,128,1))
+
+            out = model.classify(frame)
+
 
             if not read_process_send(fusion_socket, classifier, gestures, stream_id, engaged,
                                      frame_pieces, timestamp, writer_data_hand, out, blind):
