@@ -86,12 +86,10 @@ if __name__ == '__main__':
         
 
         display_result = m.printable_result()
-        # if display_result is not None:
-            # print('{:<16}'.format(display_result[0]), '{:<16}'.format(display_result[1]), '{:<4}'.format(result[0]),
-            #       '{:<4}'.format(result[1]), '{:.2}'.format(result[2]),
-            #       #result)
-            #       m.point.lpoint, m.point.rpoint)#, m.point.lpoint_stable, m.point.rpoint_stable, m.point.lpoint_var, m.point.rpoint_var)
-            #       #'{:<5.2}'.format(m.point.lpoint), '{:<5.2}'.format(m.point.rpoint))
+        if display_result is not None:
+            print('LPOINT', '{:> 7.3}'.format(m.point.lpoint[0]), '{:> 7.3}'.format(m.point.lpoint[1]),
+                  'RPOINT', '{:> 7.3}'.format(m.point.rpoint[0]), '{:> 7.3}'.format(m.point.rpoint[1]),
+                  '{:24}'.format(display_result[0]), '{:24}'.format(display_result[1]))
 
         pack_list = [streams.get_stream_id("Body"), timestamp] + result
         raw_data = struct.pack("<iqii" + "ffff" * 2 + "ff" * 8 + 'i', *pack_list)

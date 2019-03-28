@@ -185,7 +185,7 @@ class Pointing:
             screen_x = elbow[0] - elbow[2] * (elbow[0] - wrist[0]) / (elbow[2] - wrist[2])
             screen_y = elbow[1] - elbow[2] * (elbow[1] - wrist[1]) / (elbow[2] - wrist[2])
 
-            print('******SCREEN X Y', '{:<10.2}'.format(screen_x), '{:<10.2}'.format(screen_y))
+            #print('******SCREEN X Y', '{:<10.2}'.format(screen_x), '{:<10.2}'.format(screen_y))
             return screen_x, screen_y
         else:
 
