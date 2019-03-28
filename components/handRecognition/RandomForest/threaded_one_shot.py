@@ -133,7 +133,7 @@ class OneShotWorker(threading.Thread):
         spine_base_y = skeleton_arr[self.spine_base_Y_ind]
         spine_mid_y = skeleton_arr[self.spine_mid_Y_ind]
         hand_y = skeleton_arr[self.palm_coordinates_ind_start+1]
-        return hand_y > spine_base_y# + abs(spine_mid_y - spine_base_y) / 2
+        return hand_y > spine_base_y + abs(spine_mid_y - spine_base_y) / 2
 
     def _palm_center_buffer_variance(self):
         """
