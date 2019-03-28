@@ -114,9 +114,10 @@ class Forest:
         if len(samples_norm.shape) == self.sample_dim:
             # only one sample, add one extra dimension to dim 0
             samples_norm = np.expand_dims(samples_norm, axis=0)
-        for i in range(samples_norm.shape[0]):
-            samples_norm[i] -= np.mean(samples_norm[i])
-            samples_norm[i] /= np.std(samples_norm[i])
+        if len(samples_norm.shape) > 0:
+            for i in range(samples_norm.shape[0]):
+                samples_norm[i] -= np.mean(samples_norm[i])
+                samples_norm[i] /= np.std(samples_norm[i])
 
         return samples_norm
 

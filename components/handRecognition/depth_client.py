@@ -184,7 +184,7 @@ def main(args):
         model = HandModel(args.hand, 32, 1)
         classifier = Classifier(args.hand, lock)
 
-        kinect_socket = connect('kinect', args.kinect_host, ("Body", args.hand)) if args.kinect_host is not None else None
+        kinect_socket = connect('kinect', args.kinect_host, (args.hand, "Body")) if args.kinect_host is not None else None
         fusion_socket = connect('fusion', args.fusion_host, args.hand) if args.fusion_host is not None else None
 
         if args.hand == "LH":
@@ -201,8 +201,7 @@ def main(args):
             _, (_, engaged, frame_pieces), _ = \
                 decode.read_frame(kinect_socket, decode_content_body)
 
-            (timestamp, frame_type), (width, height, posx, posy, depth_data), (
-            writer_data_hand,) = get_frame(kinect_socket)
+            (timestamp, frame_type), (width, height, posx, posy, depth_data), (writer_data_hand,) = get_frame(kinect_socket)
 
             if can_process(args.hand, frame_pieces, posx, posy):
                 frame = _preprocess_hand_arr(depth_data, posx, posy, height, width)
