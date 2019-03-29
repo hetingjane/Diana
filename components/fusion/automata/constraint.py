@@ -63,7 +63,6 @@ class Constraint:
         self._counter.reset_to_min()
 
     def __repr__(self):
-
         names = ', '.join(self._names)
         if len(names) > 12:
             names = names[:12] + '...'

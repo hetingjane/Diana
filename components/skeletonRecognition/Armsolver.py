@@ -14,8 +14,8 @@ class Solver(object):
         self._LEFT, self._RIGHT = 'la', 'ra'
         self._body_parts = [self._LEFT, self._RIGHT]
 
-        self.joints_list = ['SPINE_BASE', 'SPINE_MID', 'NECK', 'HEAD', 'SHOULDER_LEFT', 'ELBOW_LEFT', 'WRIST_LEFT',\
-                       'HAND_LEFT','SHOULDER_RIGHT', 'ELBOW_RIGHT', 'WRIST_RIGHT', 'HAND_RIGHT', 'SPINE_SHOULDER', \
+        self.joints_list = ['SPINE_BASE', 'SPINE_MID', 'NECK', 'HEAD', 'SHOULDER_LEFT', 'ELBOW_LEFT', 'WRIST_LEFT',
+                       'HAND_LEFT','SHOULDER_RIGHT', 'ELBOW_RIGHT', 'WRIST_RIGHT', 'HAND_RIGHT', 'SPINE_SHOULDER',
                             'HAND_TIP_LEFT','THUMB_LEFT', 'HAND_TIP_RIGHT', 'THUMB_RIGHT']
         self.num_joints = 17
 
@@ -284,7 +284,7 @@ class ArmMotionRecogntion(Solver):
             except:
                 motion_encoding = 26
 
-            print ('Arm Motion Label :', arm_motion_label, ' motion index: ', motion_encoding)
+            #print ('{:<12}'.format(arm_motion_label), end='')
             return motion_encoding, probabilities
 
         elif (body_part == 'arms_x') or (body_part == 'arms_y'):
@@ -371,5 +371,4 @@ class PrimalRecognition(Solver):
             print ('arm not seen...sending blind value instead')
             direction = ' blind'
         return direction, proba_array
-
 

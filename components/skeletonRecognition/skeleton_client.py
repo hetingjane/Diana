@@ -44,12 +44,13 @@ def decode_content(raw_frame, offset):
     
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('kinect', help='Kinect host name', type=str)
-    parser.add_argument('--fusion-host', default=None, help='Fusion host name, default set to None', type=str)
+    parser.add_argument('--kinect-host', help='Kinect host name', type=str, default='127.0.0.1')
+    parser.add_argument('--fusion-host', help='Fusion host name', type=str, default='127.0.0.1')
     parser.add_argument('--pointing-mode', default='screen', help='Pointing mode, default set to screen', type=str)
+    parser.add_argument('--model', help='Choose between backend models for motion recognition, "primal" or "LSTM"', default="LSTM")
 
     args = parser.parse_args()
-    kinect_host, fusion_host, pointing_mode = args.kinect, args.fusion_host, args.pointing_mode
+    kinect_host, fusion_host, pointing_mode = args.kinect_host, args.fusion_host, args.pointing_mode
 
 
     s = connect('kinect', kinect_host, 'Body')
@@ -63,17 +64,16 @@ if __name__ == '__main__':
     if s is None:
         sys.exit(0)
 
-    # m = PrimalRecognition(pointing_mode='screen')
-    m = ArmMotionRecogntion(pointing_mode='screen')
+    if args.model == "LSTM":
+        m = ArmMotionRecogntion(pointing_mode='screen')
+    else:
+        m = PrimalRecognition(pointing_mode='screen')
     c = 0
     start_time = time.time()
 
     while True:
         try:
             (timestamp, frame_type), (tracked_body_count, engaged, frame_pieces), (writer_data,) = decode.read_frame(s, decode_content)
-            print("timestamp, frame_type", timestamp, frame_type)
-            print("tracked_body_count, engaged", tracked_body_count, engaged)
-            print("writer_data", writer_data)
         except EOFError:
             print("Disconnected from Kinect Server")
             break
@@ -87,7 +87,9 @@ if __name__ == '__main__':
 
         display_result = m.printable_result()
         if display_result is not None:
-            print (result[:3], display_result)
+            print('LPOINT', '{:> 7.3}'.format(m.point.lpoint[0]), '{:> 7.3}'.format(m.point.lpoint[1]),
+                  'RPOINT', '{:> 7.3}'.format(m.point.rpoint[0]), '{:> 7.3}'.format(m.point.rpoint[1]),
+                  '{:24}'.format(display_result[0]), '{:24}'.format(display_result[1]))
 
         pack_list = [streams.get_stream_id("Body"), timestamp] + result
         raw_data = struct.pack("<iqii" + "ffff" * 2 + "ff" * 8 + 'i', *pack_list)
@@ -98,6 +100,7 @@ if __name__ == '__main__':
 
         c += 1
         if c % 100 == 0:
+            print()
             print ('=' * 30)
             print ('FPS: ', 100.0 / (time.time() - start_time))
             print ('=' * 30)

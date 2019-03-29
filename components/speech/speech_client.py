@@ -31,8 +31,8 @@ def decode_content(raw_frame, offset):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('kinect_host', help='Host name of the machine running Kinect Server')
-    parser.add_argument('--fusion-host', help='Host name of the machine running Kinect Server', default=None)
+    parser.add_argument('--kinect-host', help='Host name of the machine running Kinect Server', default='127.0.0.1')
+    parser.add_argument('--fusion-host', help='Host name of the machine running Kinect Server', default='127.0.0.1')
 
     args = parser.parse_args()
 
@@ -45,7 +45,7 @@ if __name__ == '__main__':
     while True:
         try:
             (timestamp, frame_type), (command_length, command), (writer_data,) = decode.read_frame(k, decode_content)
-            print("writer_data", writer_data)
+            #print("writer_data", writer_data)
         except socket.error:
             print("Unable to receive speech frame")
             break

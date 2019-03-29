@@ -64,7 +64,7 @@ class StateMachine:
         self._rules[from_state][to_state] = new_rule
 
     def __repr__(self):
-        return self.get_full_state() + ": " + str(self._rules[self._cur_state])
+        return '{state}: {transitions}'.format(state=self.get_full_state(), transitions=self._rules[self._cur_state])
 
 
 class BinaryStateMachine(StateMachine):

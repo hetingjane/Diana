@@ -18,7 +18,12 @@ class RealTimeHandRecognition():
             logits_tensor, end_points = resnet_v2_50(self._standardized_images, gestures, False)
 
         saver = tf.train.Saver()
-        sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
+        gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.3)
+        config = tf.ConfigProto(gpu_options=gpu_options)
+        config.gpu_options.allow_growth = True
+        config.allow_soft_placement = True
+
+        sess = tf.Session(config=self.config)
         tf.train.start_queue_runners(sess)
 
         self.probabilities_tensor = end_points['predictions']

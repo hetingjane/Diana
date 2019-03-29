@@ -43,6 +43,52 @@ push_back = PoseStateMachine('push back', rules.Or(
 
 nevermind = PoseStateMachine('nevermind', rules.All(('rh stop', 'lh stop', 20)))
 
+teaching = StateMachine('teaching',
+                        ['stop', 'start', 'succeeded 1', 'succeeded 2', 'succeeded 3', 'succeeded 4', 'succeeded 5', 'succeeded 6'],
+                        {
+                            'stop': {
+                                'start': rules.Any(('rh teaching', 5), ('lh teaching', 5))
+                            },
+
+                            'start': {
+                                # Stop when neither teaching nor taught for 1 frame for both hands
+                                'stop': rules.All(('rh teaching', 1), ('lh teaching', 1),
+                                                  ('rh taught gesture 1', 1), ('rh taught gesture 2', 1), ('rh taught gesture 3', 1),
+                                                  ('lh taught gesture 4', 1), ('lh taught gesture 5', 1), ('lh taught gesture 6', 1), invert=True),
+                                'succeeded 1': rules.All(('rh taught gesture 1', 1)),
+                                'succeeded 2': rules.All(('rh taught gesture 2', 1)),
+                                'succeeded 3': rules.All(('rh taught gesture 3', 1)),
+                                'succeeded 4': rules.All(('lh taught gesture 4', 1)),
+                                'succeeded 5': rules.All(('lh taught gesture 5', 1)),
+                                'succeeded 6': rules.All(('lh taught gesture 6', 1)),
+                            },
+
+                            'succeeded 1': {
+                                'stop': rules.Always()
+                            },
+
+                            'succeeded 2': {
+                                'stop': rules.Always()
+                            },
+
+                            'succeeded 3': {
+                                'stop': rules.Always()
+                            },
+
+                            'succeeded 4': {
+                                'stop': rules.Always()
+                            },
+
+                            'succeeded 5': {
+                                'stop': rules.Always()
+                            },
+
+                            'succeeded 6': {
+                                'stop': rules.Always()
+                            },
+                        },
+                        'stop')
+
 grab = StateMachine('grab',
                     ['stop', 'start', 'move up start', 'move down start', 'move left start', 'move right start',
                      'move front start', 'move back start'],
@@ -286,11 +332,11 @@ if __name__ == '__main__':
         ('grab.csv', [grab])
     ]
 
-    detailed = False
+    detailed = True
 
     for g_file, sm_to_test in test_sets:
-        print('*' * 20 + '\n')
-        print("File: " + g_file + '\n')
+        print('*' * 20)
+        print("\nFile: " + g_file, end='\n\n')
         print('*' * 20)
 
         with open(g_file, 'r') as f:
@@ -298,12 +344,12 @@ if __name__ == '__main__':
             i = 2
             for row in reader:
                 if detailed:
-                    print("{}:{}".format(i, row.values()))
+                    print("{}:{}".format(i, list(row.values())))
                 for sm in sm_to_test:
                     triggered = sm.input(*row.values())
                     if detailed:
-                        print("{}:{}\n".format(i, sm))
+                        print("{}:{}".format(i, sm), end='\n\n')
                     if triggered:
-                        print("\n{}:{}\n".format(i, sm.get_full_state()))
+                        print("\n{}:{}".format(i, sm.get_full_state()), end='\n\n')
                 i += 1
         print('*' * 20)

@@ -85,7 +85,7 @@ class App:
         :return: Nothing
         """
         if self.received > 0:
-            print("Skipped percentage: " + str(self.skipped * 100.0 / self.received))
+            print("Skipped {:.2f}%".format(self.skipped * 100.0 / self.received))
 
     def _exit(self):
         """
@@ -114,8 +114,8 @@ class App:
         # Get synced data without blocking with timeout
         self.latest_s_msg = thread_sync.synced_msgs.get(True)
         if self.debug:
-            print("Latest synced message: {}\n".format(self.latest_s_msg))
-        #
+            print("Latest synced message: {}".format(self.latest_s_msg), end='\n\n')
+
         self._update_queues()
         self.received += 1
         if thread_sync.synced_msgs.qsize() <= 15:
@@ -227,10 +227,14 @@ class App:
             changed = state_machine.input(*inputs)
             cur_state = state_machine.get_full_state()
 
-            if state_machine is machines.left_point_continuous and state_machine.is_started():
-                all_events_to_send.append("P;l,{},{},{},{};{}".format(lx, ly, var_l_x, var_l_y, ts))
-            elif state_machine is machines.right_point_continuous and state_machine.is_started():
-                all_events_to_send.append("P;r,{},{},{},{};{}".format(rx, ry, var_r_x, var_r_y, ts))
+            # Intercept continuous point state machines; their events are different
+            if state_machine is machines.left_point_continuous:
+                # Only start states generate events, no stop event is sent, implied by absence
+                if state_machine.is_started():
+                    all_events_to_send.append("P;l,{},{},{},{};{}".format(lx, ly, var_l_x, var_l_y, ts))
+            elif state_machine is machines.right_point_continuous:
+                if state_machine.is_started():
+                    all_events_to_send.append("P;r,{},{},{},{};{}".format(rx, ry, var_r_x, var_r_y, ts))
 
             elif changed:
                 if state_machine is machines.left_point and state_machine.is_started():
@@ -253,9 +257,9 @@ class App:
         all_events_to_send = self._get_events()
 
         for e in all_events_to_send:
-            ev_type, ev, timestamp = e.split(';')
-            if ev_type != 'P':
-                print(ev_type.ljust(5) + ev.ljust(30) + timestamp + "\n\n")
+            ev = e.split(';')
+            if ev[0] != 'P':
+                print('{:5}{:<40}{:>}'.format(*ev))
             raw_events_to_send.append(struct.pack("<i" + str(len(e)) + "s", len(e), e.encode('ascii')))
 
         return raw_events_to_send
@@ -285,14 +289,38 @@ class App:
             thread_sync.gui_events.put(new_ev)
 
 
+def create_one_shot_learning_events(n):
+    assert n >= 1
+
+    from .automata.statemachines import PoseStateMachine
+    from .automata.rules import All
+
+    one_shot_learning_events = []
+
+    for i in range(n):
+        gesture_name = ' '.join(['rh', 'gesture', str(i + 1)])
+        assert gesture_name in postures.right_hand_postures
+        one_shot_learning_events.append(PoseStateMachine(gesture_name, All((gesture_name, 5))))
+
+    for i in range(n, 2 * n):
+        gesture_name = ' '.join(['lh', 'gesture', str(i + 1)])
+        assert gesture_name in postures.left_hand_postures
+        one_shot_learning_events.append(PoseStateMachine(gesture_name, All((gesture_name, 5))))
+    return one_shot_learning_events
+
+
 brandeis_events = [machines.engage, machines.wave, machines.attentive,
                    machines.posack, machines.negack, machines.nevermind,
                    machines.left_point, machines.right_point,
                    machines.left_point_continuous, machines.right_point_continuous,
                    machines.push_left, machines.push_right, machines.push_front, machines.push_back,
-                   machines.grab, machines.push_servo_left, machines.push_servo_right]
+                   machines.grab, machines.push_servo_left, machines.push_servo_right,
+                   machines.teaching]
+
+brandeis_events += create_one_shot_learning_events(3)
 
 csu_events = brandeis_events
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
