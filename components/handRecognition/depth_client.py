@@ -102,7 +102,7 @@ def can_process(hand, frame_pieces, posx, posy):
 
     active_arm_threshold = 0.16
 
-    if (posx == -1 and posy == -1) or ((hand_y < spine_base_y) and ((spine_base_z-hand_z) < active_arm_threshold)):
+    if (posx == -1 and posy == -1) or ((hand_y < spine_base_y) and ((spine_base_z-hand_z) < active_arm_threshold)) or (spine_base_z < hand_z):
         return False
     return True
 

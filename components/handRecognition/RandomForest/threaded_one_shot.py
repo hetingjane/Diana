@@ -141,7 +141,7 @@ class OneShotWorker(threading.Thread):
         hand_z = skeleton_arr[self.palm_coordinates_ind_start+2]
 
 
-        return ((hand_y > spine_base_y) and ((spine_base_z - hand_z)>self.active_arm_threshold))
+        return ((hand_y > spine_base_y) and ((spine_base_z - hand_z)>self.active_arm_threshold)) or (spine_base_z > hand_z)
 
     def _palm_center_buffer_variance(self):
         """
