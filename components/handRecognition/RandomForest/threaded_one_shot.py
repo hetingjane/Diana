@@ -29,8 +29,12 @@ class OneShotWorker(threading.Thread):
         self.palm_coordinates_ind_end = self.palm_ind*9 + 10
         self.spine_base_ind = 0
         self.spine_base_Y_ind = self.spine_base_ind * 9 + 8
+        self.spine_base_Z_ind = self.spine_base_ind * 9 + 9
         self.spine_mid_ind = 1
         self.spine_mid_Y_ind = self.spine_mid_ind * 9 + 8
+
+        self.active_arm_threshold = 0.16
+
         self.forest = None  # random forest instance
         self.receiving_frames = False  # Only start to receive frames when a signal is sent from kinect server
         self.skip_frame = 0  # skip some frames to maximize variance in learning input, use this variable to keep track
@@ -131,9 +135,13 @@ class OneShotWorker(threading.Thread):
         :return: A boolean about whether the hand is performing a gesture
         """
         spine_base_y = skeleton_arr[self.spine_base_Y_ind]
+        spine_base_z = skeleton_arr[self.spine_base_Z_ind]
         spine_mid_y = skeleton_arr[self.spine_mid_Y_ind]
         hand_y = skeleton_arr[self.palm_coordinates_ind_start+1]
-        return hand_y > spine_base_y + abs(spine_mid_y - spine_base_y) / 2
+        hand_z = skeleton_arr[self.palm_coordinates_ind_start+2]
+
+
+        return ((hand_y > spine_base_y) and ((spine_base_z - hand_z)>self.active_arm_threshold))
 
     def _palm_center_buffer_variance(self):
         """

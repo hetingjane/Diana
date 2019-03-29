@@ -93,11 +93,16 @@ def can_process(hand, frame_pieces, posx, posy):
             hand_ind = 7
         spine_base_y = frame_pieces[spine_base_ind * 9 + 8]
         spine_mid_y = frame_pieces[spine_mid_ind * 9 + 8]
+        spine_base_z = frame_pieces[spine_base_ind * 9 + 9]
+
         hand_y = frame_pieces[hand_ind * 9 + 8]
+        hand_z = frame_pieces[hand_ind * 9 + 9]
     else:
         return False
 
-    if (posx == -1 and posy == -1) or (hand_y <= spine_base_y + abs(spine_mid_y - spine_base_y) / 2):
+    active_arm_threshold = 0.16
+
+    if (posx == -1 and posy == -1) or ((hand_y < spine_base_y) and ((spine_base_z-hand_z) < active_arm_threshold)):
         return False
     return True
 
