@@ -301,6 +301,26 @@ for from_state, to_state in grab.get_transitions():
         new_rule = rules.Or(rules.All(('engaged', 1), invert=True), cur_rule)
     grab.set_rule(from_state, to_state, new_rule)
 
+attentive = StateMachine('', ['attentive stop', 'attentive start', 'inattentive left', 'inattentive right'], {
+    'attentive stop': {
+        'attentive start': rules.All(('engaged', 1), ('attentive', 5))
+    },
+    'attentive start': {
+        'inattentive left': rules.All(('engaged', 1), ('inattentive left', 5)),
+        'inattentive right': rules.All(('engaged', 1), ('inattentive right', 5)),
+        'attentive stop': rules.All(('engaged', 1), invert=True)
+    },
+    'inattentive left': {
+        'attentive start': rules.All(('engaged', 1), ('attentive', 5)),
+        'inattentive right': rules.All(('engaged', 1), ('inattentive right', 5)),
+        'attentive stop': rules.All(('engaged', 1), invert=True)
+    },
+    'inattentive right': {
+        'attentive start': rules.All(('engaged', 1), ('attentive', 5)),
+        'inattentive left': rules.All(('engaged', 1), ('inattentive left', 5)),
+        'attentive stop': rules.All(('engaged', 1), invert=True)
+    }
+}, 'attentive stop')
 
 if __name__ == '__main__':
     import csv

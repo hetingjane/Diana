@@ -121,18 +121,20 @@ if __name__ == '__main__':
 
                 pack_list = [stream_id, timestamp, gesture_index] + list(probs)
 
-                bytes = struct.pack("<iqi" + "f" * (num_gestures+1), *pack_list)
+                raw_data = struct.pack("<iqi" + "f" * (num_gestures+1), *pack_list)
 
                 if fusion_socket is not None:
-                    fusion_socket.send(bytes)
+                    fusion_socket.sendall(struct.pack("<i", len(raw_data)))
+                    fusion_socket.sendall(raw_data)
 
             else:
                 pack_list = [stream_id, timestamp, num_gestures] + [0] * num_gestures + [1]
                 print('Buffer not full')
-                bytes = struct.pack("<iqi" + "f" * (num_gestures + 1), *pack_list)
+                raw_data = struct.pack("<iqi" + "f" * (num_gestures + 1), *pack_list)
 
                 if fusion_socket is not None:
-                    fusion_socket.send(bytes)
+                    fusion_socket.sendall(struct.pack("<i", len(raw_data)))
+                    fusion_socket.sendall(raw_data)
 
 
             index += 1
@@ -140,10 +142,11 @@ if __name__ == '__main__':
         else:
             pack_list = [stream_id, timestamp, num_gestures] + [0] * num_gestures + [1]
             print('blind')
-            bytes = struct.pack("<iqi" + "f" * (num_gestures + 1), *pack_list)
+            raw_data = struct.pack("<iqi" + "f" * (num_gestures + 1), *pack_list)
 
             if fusion_socket is not None:
-                fusion_socket.send(bytes)
+                fusion_socket.sendall(struct.pack("<i", len(raw_data)))
+                fusion_socket.sendall(raw_data)
 
         if index % 100==0:
             print("="*100, "FPS", 100/(time.time()-start_time))

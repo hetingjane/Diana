@@ -48,4 +48,6 @@ head_postures = ['head nod', 'head shake', 'head other', 'head blind']
 
 engaged = ['disengaged', 'engaged']
 
+attentive = ['inattentive left', 'inattentive right', 'attentive']
+
 words = ['speak yes', 'speak no', 'speak here', 'speak there', 'speak this', 'speak that']

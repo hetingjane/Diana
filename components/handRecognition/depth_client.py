@@ -62,7 +62,8 @@ def read_process_send(fusion_socket, classifier, gestures, stream_id, engaged, f
                                      stream_id, classified, blind)
 
         if fusion_socket is not None:
-            fusion_socket.send(bytes)
+            fusion_socket.sendall(struct.pack("<i", len(bytes)))
+            fusion_socket.sendall(bytes)
     except KeyboardInterrupt:
         return False
 
