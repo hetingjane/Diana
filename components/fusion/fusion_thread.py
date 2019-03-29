@@ -105,11 +105,11 @@ class Fusion(threading.Thread):
         return Fusion.SpeechData(command)
 
     def _read_emotion_data(self, sock):
-        data_format = "<" + "f" + "i"
+        data_format = "<" + "i" + "f"
         raw_data = self._recv_all(sock, struct.calcsize(data_format))
         emotion_data = struct.unpack(data_format, raw_data)
-        probabilities = emotion_data[:-1]
-        attentive = emotion_data[-1] == 1
+        probabilities = emotion_data[1:]
+        attentive = emotion_data[0]
         return Fusion.EmotionData(probabilities, attentive)
 
     def _read_stream_data(self, sock, stream_id):
