@@ -22,24 +22,12 @@ left_point_continuous = PoseStateMachine('left point continuous',
 right_point_continuous = PoseStateMachine('right point continuous',
                                           rules.All(('rh point down', 'rh point right', 'rh point front', 5)))
 
-push_left = PoseStateMachine('push left', rules.All(('rh closed left', 'rh open left', 5), ('ra move left', 5)))
-
-push_servo_left = PoseStateMachine('push servo left', rules.All(('rh closed left', 'rh open left', 5), ('ra servo', 5)))
-
-push_right = PoseStateMachine('push right', rules.All(('lh closed right', 'lh open right', 5), ('la move right', 5)))
-
-push_servo_right = PoseStateMachine('push servo right', rules.All(('lh closed right', 'lh open right', 5), ('la servo', 5)))
-
 push_front = PoseStateMachine('push front', rules.Or(
     rules.All(('rh closed front', 5), ('ra move front', 5)),
     rules.All(('lh closed front', 5), ('la move front', 5))
 ))
 
-push_back = PoseStateMachine('push back', rules.Or(
-    rules.All(('rh open back', 'rh closed back', 5), ('ra move back', 5)),
-    rules.All(('lh open back', 'lh closed back', 5), ('la move back', 5)),
-    rules.All(('rh beckon', 'lh beckon', 5))
-))
+servo_back = PoseStateMachine('servo back', rules.All(('rh beckon', 'lh beckon', 8)))
 
 nevermind = PoseStateMachine('nevermind', rules.All(('rh stop', 'lh stop', 20)))
 
@@ -300,6 +288,108 @@ for from_state, to_state in grab.get_transitions():
     else:
         new_rule = rules.Or(rules.All(('engaged', 1), invert=True), cur_rule)
     grab.set_rule(from_state, to_state, new_rule)
+
+push_servo_left = StateMachine('', ['push servo left stop', 'probable servo left', 'probable push left',
+                                     'servo left start', 'push left start',
+                                     'servo left stop', 'push left stop'],
+                                {
+                                    'push servo left stop': {
+                                        'probable servo left': rules.All(('engaged', 1), ('rh closed left', 'rh open left', 5), ('ra servo', 10)),
+                                        'probable push left': rules.All(('engaged', 1), ('rh closed left', 'rh open left', 5), ('ra move left', 5))
+                                    },
+                                    'probable servo left': {
+                                        'servo left start': rules.All(('engaged', 1), ('rh closed left', 'rh open left', 2), ('ra servo', 2)),
+                                        'probable push left': rules.All(('engaged', 1), ('rh closed left', 'rh open left', 3), ('ra move left', 3)),
+                                        'push servo left stop': rules.Or(
+                                            rules.All(('ra servo', 4), ('ra move left', 4), invert=True),
+                                            rules.All(('engaged', 1), invert=True)
+                                        )
+                                    },
+                                    'probable push left': {
+                                        'push left start': rules.And(
+                                            rules.All(('engaged', 1)),
+                                            rules.Or(
+                                                rules.All(('rh closed left', 'rh open left', 5), ('ra still', 5)),
+                                                rules.All(('rh closed left', 'rh open left', 5), invert=True)
+                                            )
+                                        ),
+                                        'servo left start': rules.All(('engaged', 1), ('rh closed left', 'rh open left', 5), ('ra servo', 10)),
+                                        'push servo left stop': rules.Or(
+                                            rules.All(('engaged', 1), invert=True),
+                                            rules.And(
+                                                rules.All(('ra move left', 10), invert=True),
+                                                rules.All(('ra still', 5), invert=True),
+                                                rules.All(('ra servo', 10), invert=True)
+                                            )
+                                        )
+                                    },
+                                    'servo left start': {
+                                        'servo left stop': rules.Or(
+                                            rules.All(('rh closed left', 'rh open left', 6), ('ra servo', 6), invert=True),
+                                            rules.All(('engaged', 1), invert=True)
+                                        )
+                                    },
+                                    'push left start': {
+                                        'push left stop': rules.Always()
+                                    },
+                                    'servo left stop': {
+                                        'push servo left stop': rules.Always()
+                                    },
+                                    'push left stop': {
+                                        'push servo left stop': rules.Always()
+                                    }
+                                }, 'push servo left stop')
+
+push_servo_right = StateMachine('', ['push servo right stop', 'probable servo right', 'probable push right',
+                                     'servo right start', 'push right start',
+                                     'servo right stop', 'push right stop'],
+                                {
+                                    'push servo right stop': {
+                                        'probable servo right': rules.All(('engaged', 1), ('lh closed right', 'lh open right', 5), ('la servo', 10)),
+                                        'probable push right': rules.All(('engaged', 1), ('lh closed right', 'lh open right', 5), ('la move right', 5))
+                                    },
+                                    'probable servo right': {
+                                        'servo right start': rules.All(('engaged', 1), ('lh closed right', 'lh open right', 2), ('la servo', 2)),
+                                        'probable push right': rules.All(('engaged', 1), ('lh closed right', 'lh open right', 3), ('la move right', 3)),
+                                        'push servo right stop': rules.Or(
+                                            rules.All(('la servo', 4), ('la move right', 4), invert=True),
+                                            rules.All(('engaged', 1), invert=True)
+                                        )
+                                    },
+                                    'probable push right': {
+                                        'push right start': rules.And(
+                                            rules.All(('engaged', 1)),
+                                            rules.Or(
+                                                rules.All(('lh closed right', 'lh open right', 5), ('la still', 5)),
+                                                rules.All(('lh closed right', 'lh open right', 5), invert=True)
+                                            )
+                                        ),
+                                        'servo right start': rules.All(('engaged', 1), ('lh closed right', 'lh open right', 5), ('la servo', 10)),
+                                        'push servo right stop': rules.Or(
+                                            rules.All(('engaged', 1), invert=True),
+                                            rules.And(
+                                                rules.All(('la move right', 10), invert=True),
+                                                rules.All(('la still', 5), invert=True),
+                                                rules.All(('la servo', 10), invert=True)
+                                            )
+                                        )
+                                    },
+                                    'servo right start': {
+                                        'servo right stop': rules.Or(
+                                            rules.All(('lh closed right', 'lh open right', 6), ('la servo', 6), invert=True),
+                                            rules.All(('engaged', 1), invert=True)
+                                        )
+                                    },
+                                    'push right start': {
+                                        'push right stop': rules.Always()
+                                    },
+                                    'servo right stop': {
+                                        'push servo right stop': rules.Always()
+                                    },
+                                    'push right stop': {
+                                        'push servo right stop': rules.Always()
+                                    }
+                                }, 'push servo right stop')
 
 
 if __name__ == '__main__':
