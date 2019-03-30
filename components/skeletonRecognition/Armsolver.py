@@ -238,7 +238,7 @@ class ArmMotionRecogntion(Solver):
         g1 = tf.Graph()
         with g1.as_default():
             print ('Loading Left arm model')
-            model_left = Arms_LSTM(logs_path=os.path.abspath('./models/body/la/model.ckpt-0'), n_hidden=30, n_layers=2)
+            model_left = Arms_LSTM(logs_path=os.path.abspath('./models/body/la/model.ckpt-0'), n_hidden=50, n_layers=2)
         self._left_arm_model = RealTimeArmMotionRecognition(model_left)
 
 
