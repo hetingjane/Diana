@@ -45,10 +45,11 @@ class Remote(threading.Thread):
             try:
                 conn.sendall(data)
             except (socket.error, EOFError):
-                self._connected.clear()
                 self._sel.unregister(conn)
                 conn.close()
                 self._log("Client disconnected")
+                if len(self._sel.get_map()) == 0:
+                    self._connected.clear()
         except queue.Empty:
             pass
 
