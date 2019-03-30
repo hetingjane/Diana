@@ -392,6 +392,27 @@ push_servo_right = StateMachine('', ['push servo right stop', 'probable servo ri
                                 }, 'push servo right stop')
 
 
+attentive = StateMachine('', ['attentive stop', 'attentive start', 'inattentive left', 'inattentive right'], {
+    'attentive stop': {
+        'attentive start': rules.All(('engaged', 1), ('attentive', 5))
+    },
+    'attentive start': {
+        'inattentive left': rules.All(('engaged', 1), ('inattentive left', 5)),
+        'inattentive right': rules.All(('engaged', 1), ('inattentive right', 5)),
+        'attentive stop': rules.All(('engaged', 1), invert=True)
+    },
+    'inattentive left': {
+        'attentive start': rules.All(('engaged', 1), ('attentive', 5)),
+        'inattentive right': rules.All(('engaged', 1), ('inattentive right', 5)),
+        'attentive stop': rules.All(('engaged', 1), invert=True)
+    },
+    'inattentive right': {
+        'attentive start': rules.All(('engaged', 1), ('attentive', 5)),
+        'inattentive left': rules.All(('engaged', 1), ('inattentive left', 5)),
+        'attentive stop': rules.All(('engaged', 1), invert=True)
+    }
+}, 'attentive stop')
+
 if __name__ == '__main__':
     import csv
 

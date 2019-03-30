@@ -95,6 +95,7 @@ if __name__ == '__main__':
         raw_data = struct.pack("<iqii" + "ffff" * 2 + "ff" * 8 + 'i', *pack_list)
 
         if fusion_socket is not None:
+            fusion_socket.sendall(struct.pack("<i", len(raw_data)))
             fusion_socket.sendall(raw_data)
 
         c += 1
