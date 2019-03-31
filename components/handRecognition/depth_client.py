@@ -198,7 +198,7 @@ def main(args):
     else:
         print('tracking single hand--', args.hand)
         model = HandModel(args.hand, 32, 1)
-        classifier = Classifier(args.hand, lock)
+        classifier = Classifier(args.hand, lock, blacklist)
 
         kinect_socket = connect('kinect', args.kinect_host, (args.hand, "Body")) if args.kinect_host is not None else None
         fusion_socket = connect('fusion', args.fusion_host, args.hand) if args.fusion_host is not None else None
@@ -226,11 +226,11 @@ def main(args):
                 blind = True
                 frame = np.empty((1,128,128,1))
 
-            out = model.classify(frame)
+            probs, out = model.classify(frame)
 
 
             if not read_process_send(fusion_socket, classifier, gestures, stream_id, engaged,
-                                     frame_pieces, timestamp, writer_data_hand, out, blind):
+                                     frame_pieces, timestamp, writer_data_hand, probs, out, blind):
                 break
 
             print()
