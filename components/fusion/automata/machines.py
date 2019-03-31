@@ -40,12 +40,9 @@ teaching = StateMachine('teaching',
 
                             'start': {
                                 # Stop when neither teaching nor taught for 1 frame for both hands
-                                'failed,other': rules.All(('rh teaching', 1), ('lh teaching', 1),
+                                'stop': rules.All(('rh teaching', 1), ('lh teaching', 1),
                                                   ('rh taught gesture 1', 1), ('rh taught gesture 2', 1), ('rh taught gesture 3', 1),
                                                   ('lh taught gesture 4', 1), ('lh taught gesture 5', 1), ('lh taught gesture 6', 1), invert=True),
-                                'failed,used': rules.Any(('rh teaching failed,used', 1), ('lh teaching failed,used', 1)),
-                                'failed,moved': rules.Any(('rh teaching failed,used', 1), ('lh teaching failed,used', 1)),
-                                'failed,low': rules.Any(('rh teaching failed,used', 1), ('lh teaching failed,used', 1)),
                                 'succeeded 1': rules.All(('rh taught gesture 1', 1)),
                                 'succeeded 2': rules.All(('rh taught gesture 2', 1)),
                                 'succeeded 3': rules.All(('rh taught gesture 3', 1)),

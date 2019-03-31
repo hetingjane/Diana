@@ -105,11 +105,9 @@ class RealTimeHandRecognitionOneShot(RealTimeHandRecognition):
         input = np.empty(input_shape)
         input[0] = np.flipud(data_L)
         input[1] = data_R
-        (features, predictions) = self.sess.run([self.model.fc_x, self.model.predictions], feed_dict={self.model._images: input})
-        LH_feature = features[0]
-        LH_probs = predictions[0]
-        RH_feature = features[1]
-        RH_probs = predictions[1]
+        (feature) = self.sess.run(self.model.fc_x, feed_dict={self.model._images: input})
+        LH_feature = feature[0]
+        RH_feature = feature[1]
 
-        return (LH_probs, LH_feature), (RH_probs, RH_feature)
+        return LH_feature, RH_feature
 
