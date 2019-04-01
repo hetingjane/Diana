@@ -10,7 +10,7 @@ from components.handRecognition.blacklist import get_blacklist
 from components.handRecognition.realtime_hand_recognition import RealTimeHandRecognition, RealTimeHandRecognitionOneShot
 from components.skeletonRecognition.skeleton_client import decode_content as decode_content_body
 from components.handRecognition.base_classifier import BaseClassifier
-from components.handRecognition.one_shot_classifier import OneShotClassifier
+import components.handRecognition.one_shot_classifier
 from components.fusion.conf.endpoints import connect
 from components.fusion.conf import streams
 from components.fusion.conf import decode
@@ -177,9 +177,9 @@ def main(args):
             (LH_probs, LH_out), (RH_probs, RH_out) = RH_model.classifyLR(LH_frame, RH_frame)
 
             if not read_process_send(LH_fusion_socket, LH_classifier, LH_gestures, LH_stream_id, engaged,
-                                     frame_pieces, LH_timestamp, LH_writer_data_hand, LH_probs, LH_out, LH_blind, blacklist) \
+                                     frame_pieces, LH_timestamp, LH_writer_data_hand, LH_probs, LH_out, LH_blind) \
                     or not read_process_send(RH_fusion_socket, RH_classifier, RH_gestures, RH_stream_id, engaged,
-                                             frame_pieces, RH_timestamp, RH_writer_data_hand, RH_probs, RH_out, RH_blind, blacklist):
+                                             frame_pieces, RH_timestamp, RH_writer_data_hand, RH_probs, RH_out, RH_blind):
                 break
 
             print()
