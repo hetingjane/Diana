@@ -47,30 +47,30 @@ if __name__ == '__main__':
     while True:
         try:
             (timestamp, _), (FaceFound, Yaw), _ = decode.read_frame(kinect_socket, decode_content)
-            print("yaw", Yaw)
         except socket.error:
             print("Unable to receive speech frame")
             break
 
+        print("Yaw: {}".format(Yaw))
+
+        if FaceFound == 0:
+            prob = 0.0
+            att = 0
+            print("Face lost")
+        else:
+            prob = 1.0
+            if -25.0 <= Yaw <= 25.0:
+                att = 2
+            elif Yaw > 25.0:
+                att = 0
+            else:
+                att = 1
+
         if fusion_socket is not None:
             try:
-                att = 0
-                prob = 0.0
-                if FaceFound == 0:
-                    print("face lost")
-                if FaceFound == 1:
-                    if Yaw >= -25 and Yaw <= 25:
-                        att = 2
-                    else: 
-                        prob = 1.0
-                        if Yaw > 25:
-                            att = 0
-                        elif Yaw <-25:
-                            att = 1
                 raw_data = struct.pack("<iqif" , emotion_frame_id, timestamp, att, prob)
                 fusion_socket.sendall(struct.pack("<i", len(raw_data)))
                 fusion_socket.sendall(raw_data)
-                            
             except socket.error:
                 print("Error: Connection to fusion lost")
                 fusion_socket.close()
