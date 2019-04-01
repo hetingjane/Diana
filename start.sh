@@ -145,6 +145,11 @@ do
 			eval "tmux select-layout -t diana tiled"
 			eval "tmux split-window -t diana"
             ;;
+	"Emotion")
+            eval "tmux send-keys -t diana \"ssh -t ${machine} 'sleep $wait_time; cd ${start_dir}; python3 -m components.emotion.emotion_client $kinect_param $fusion_param; bash;'\" Enter"
+			eval "tmux select-layout -t diana tiled"
+			eval "tmux split-window -t diana"
+            ;;
         "body")
             eval "tmux send-keys -t diana \"ssh -t ${machine} 'sleep $wait_time; cd ${start_dir}; export CUDA_VISIBLE_DEVICES=${device}; if [ ! -z ${env_dir} ]; then source ${env_dir}/bin/activate; fi; python3 -m components.skeletonRecognition.skeleton_client $kinect_param $fusion_param; bash;'\" Enter"
 			eval "tmux select-layout -t diana tiled"

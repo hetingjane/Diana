@@ -49,7 +49,7 @@ class StateMachine:
         return self._cur_state
 
     def get_full_state(self):
-        return "{} {}".format(self._prefix, self._cur_state)
+        return self._prefix + (" " if len(self._prefix) > 0 else "") + self._cur_state
 
     def in_initial_state(self):
         return self._cur_state == self._initial_state
