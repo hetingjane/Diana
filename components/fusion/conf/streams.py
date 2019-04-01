@@ -9,7 +9,7 @@ _stream_ids = {
     "Emotion": 0x200  # 512
 }
 
-_active_streams = frozenset(["LH", "RH", "Body", "Speech", "Emotion"])
+_active_streams = frozenset(["LH", "RH", "Body", "Speech"])#, "Emotion"])
 
 _streams = frozenset(_stream_ids.keys())
 

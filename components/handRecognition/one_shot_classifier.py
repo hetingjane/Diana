@@ -62,7 +62,8 @@ class OneShotClassifier(BaseClassifier):
             self.global_lock.release()
             self.learning = True  # start learning mode
 
-        self.one_shot_queue.put((feature, frame_pieces, writer_data_hand == b'learn'))
+        if not blind:
+            self.one_shot_queue.put((feature, frame_pieces, writer_data_hand == b'learn'))
         max_index, dist = self._find_label(feature, gestures, blind)
         self.probs[max_index] = dist
 
