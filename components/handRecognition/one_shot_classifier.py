@@ -45,7 +45,7 @@ class OneShotClassifier(BaseClassifier):
         self.event_vars.load_forest_event.set()
         self.learning = False  # whether the system is learning gesture
 
-    def _process(self, feature, writer_data_hand, engaged, frame_pieces, gestures, blind):
+    def _process(self, feature, writer_data_hand, engaged, frame_pieces, probs, gestures, blind):
 
         if not engaged:
             if not self.forest_status.is_fresh:
@@ -63,7 +63,7 @@ class OneShotClassifier(BaseClassifier):
             self.learning = True  # start learning mode
 
         if not blind:
-            self.one_shot_queue.put((feature, frame_pieces, writer_data_hand == b'learn'))
+            self.one_shot_queue.put((feature, frame_pieces, writer_data_hand == b'learn', probs))
         max_index, dist = self._find_label(feature, gestures, blind)
         self.probs[max_index] = dist
 

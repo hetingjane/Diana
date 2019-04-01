@@ -14,6 +14,7 @@ from components.handRecognition.one_shot_classifier import OneShotClassifier
 from components.fusion.conf.endpoints import connect
 from components.fusion.conf import streams
 from components.fusion.conf import decode
+from components.handRecognition.blacklist import get_blacklist
 
 
 def decode_content_hand(raw_frame, offset):
@@ -56,10 +57,10 @@ def get_frame(kinect_socket):
     return decode.read_frame(kinect_socket, decode_content_hand)
 
 
-def read_process_send(fusion_socket, classifier, gestures, stream_id, engaged, frame_pieces, timestamp, writer_data_hand, classified, blind):
+def read_process_send(fusion_socket, classifier, gestures, stream_id, engaged, frame_pieces, timestamp, writer_data_hand, probs, classified, blind):
     try:
         bytes = classifier.get_bytes(timestamp, writer_data_hand, engaged, frame_pieces, gestures,
-                                     stream_id, classified, blind)
+                                     stream_id, probs, classified, blind)
 
         if fusion_socket is not None:
             fusion_socket.sendall(struct.pack("<i", len(bytes)))
@@ -111,6 +112,9 @@ def can_process(hand, frame_pieces, posx, posy):
 def main(args):
     start_time = time.time()
     frame_count = 0  # To calculate the fps
+
+    blacklist = set()
+
     lock = threading.Lock()
 
     if args.disable_one_shot:
@@ -127,6 +131,7 @@ def main(args):
         RH_model = HandModel("RH", 32, 2)
         RH_classifier = Classifier("RH", lock)
         LH_classifier = Classifier("LH", lock, is_flipped=True)
+        blacklist = get_blacklist()
 
         kinect_socket = connect('kinect', args.kinect_host, ("RH", "LH", "Body"))
         RH_fusion_socket = connect('fusion', args.fusion_host, "RH") if args.fusion_host is not None else None
@@ -164,12 +169,12 @@ def main(args):
                 RH_frame = np.empty((1,128,128,1))  # to facilitate forward pass
                 RH_blind = True
 
-            LH_out, RH_out = RH_model.classifyLR(LH_frame, RH_frame)
+            (LH_probs, LH_out), (RH_probs, RH_out) = RH_model.classifyLR(LH_frame, RH_frame)
 
             if not read_process_send(LH_fusion_socket, LH_classifier, LH_gestures, LH_stream_id, engaged,
-                                     frame_pieces, LH_timestamp, LH_writer_data_hand, LH_out, LH_blind) \
+                                     frame_pieces, LH_timestamp, LH_writer_data_hand, LH_probs, LH_out, LH_blind) \
                     or not read_process_send(RH_fusion_socket, RH_classifier, RH_gestures, RH_stream_id, engaged,
-                                             frame_pieces, RH_timestamp, RH_writer_data_hand, RH_out, RH_blind):
+                                             frame_pieces, RH_timestamp, RH_writer_data_hand, RH_probs, RH_out, RH_blind):
                 break
 
             print()
@@ -188,7 +193,7 @@ def main(args):
     else:
         print('tracking single hand--', args.hand)
         model = HandModel(args.hand, 32, 1)
-        classifier = Classifier(args.hand, lock)
+        classifier = Classifier(args.hand, lock, blacklist)
 
         kinect_socket = connect('kinect', args.kinect_host, (args.hand, "Body")) if args.kinect_host is not None else None
         fusion_socket = connect('fusion', args.fusion_host, args.hand) if args.fusion_host is not None else None
@@ -216,11 +221,11 @@ def main(args):
                 blind = True
                 frame = np.empty((1,128,128,1))
 
-            out = model.classify(frame)
+            probs, out = model.classify(frame)
 
 
             if not read_process_send(fusion_socket, classifier, gestures, stream_id, engaged,
-                                     frame_pieces, timestamp, writer_data_hand, out, blind):
+                                     frame_pieces, timestamp, writer_data_hand, probs, out, blind):
                 break
 
             print()

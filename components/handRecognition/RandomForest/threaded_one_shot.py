@@ -53,12 +53,16 @@ class OneShotWorker(threading.Thread):
             if self.event_vars.load_forest_event.is_set():
                 self.load_forest()
             try:
-                feature, skeleton_arr, start_learn = self.one_shot_queue.get(block=True, timeout=2)
-                self.add_frame(feature, skeleton_arr, start_learn)
+                feature, skeleton_arr, start_learn, probs = self.one_shot_queue.get(block=True, timeout=2)
+                self.add_frame(feature, skeleton_arr, start_learn, probs)
             except queue.Empty:
                 pass
 
-    def add_frame(self, feature, skeleton_arr, start_learn):
+    # TODO keep running list of probabilities also
+    # when ready to save new feature, check average vector's argmax. If this belongs to a blacklisted gesture and avg probability is above a threshold (0.7?), reject the gesture
+    # also add other failures (timeout/low, revise current to "other", and think about how to handle "move")
+
+    def add_frame(self, feature, skeleton_arr, start_learn, probs):
         """
         When learning starts, hand depth array and body skeleton array needs to used to extract necessary information
         and stored for further processing.
