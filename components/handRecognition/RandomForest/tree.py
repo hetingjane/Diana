@@ -22,6 +22,9 @@ class Tree:
         for i in inds:
             self.head.add(samples[i], labels[i])
 
+    def refresh(self):
+        pass # TODO
+
     def find_nn_label(self, sample):
         return self.head.find_nearest_neighbor(sample)
 

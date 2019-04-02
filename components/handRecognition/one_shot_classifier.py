@@ -29,8 +29,8 @@ class EventVars:
 
 class OneShotClassifier(BaseClassifier):
 
-    def __init__(self, hand, lock, is_flipped=False):
-        BaseClassifier.__init__(self, hand, lock, is_flipped)
+    def __init__(self, hand, lock, blacklist, is_flipped=False):
+        BaseClassifier.__init__(self, hand, lock, blacklist, is_flipped)
 
         self.global_lock = lock
         self.forest_status = ForestStatus()
@@ -40,12 +40,12 @@ class OneShotClassifier(BaseClassifier):
         self.taught_gesture_index = 36  # refers to 'taught gesture 1', increments after every new gesture is learned
 
         self.one_shot_worker = OneShotWorker(hand, self.forest_status, self.event_vars,
-                                             self.one_shot_queue, self.global_lock, is_flipped, is_test=False)
+                                             self.one_shot_queue, self.global_lock, blacklist, is_flipped, is_test=False)
         self.one_shot_worker.start()
         self.event_vars.load_forest_event.set()
         self.learning = False  # whether the system is learning gesture
 
-    def _process(self, feature, writer_data_hand, engaged, frame_pieces, probs, gestures, blind):
+    def _process(self, feature, writer_data_hand, engaged, frame_pieces, probs, gestures, blind, frame):
 
         if not engaged:
             if not self.forest_status.is_fresh:
@@ -62,10 +62,14 @@ class OneShotClassifier(BaseClassifier):
             self.global_lock.release()
             self.learning = True  # start learning mode
 
-        if not blind:
-            self.one_shot_queue.put((feature, frame_pieces, writer_data_hand == b'learn', probs))
-        max_index, dist = self._find_label(feature, gestures, blind)
-        self.probs[max_index] = dist
+
+        if not engaged:
+            max_index = len(self.probs) - 1  # max_index refers to 'blind'
+            self.probs[max_index] = 1
+        else:
+            self.one_shot_queue.put((feature, frame_pieces, writer_data_hand == b'learn', probs, frame))
+            max_index, dist = self._find_label(feature, gestures, blind)
+            self.probs[max_index] = dist
 
         return max_index
 

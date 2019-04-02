@@ -10,12 +10,14 @@ from components.fusion.conf import postures
 from components.handRecognition.realtime_hand_recognition import RealTimeHandRecognition, RealTimeHandRecognitionOneShot
 from components.skeletonRecognition.skeleton_client import decode_content as decode_content_body
 from components.handRecognition.base_classifier import BaseClassifier
-from components.handRecognition.one_shot_classifier import OneShotClassifier
+import components.handRecognition.one_shot_classifier
 from components.fusion.conf.endpoints import connect
 from components.fusion.conf import streams
 from components.fusion.conf import decode
 from components.handRecognition.blacklist import get_blacklist
 
+active_arm_threshold = 0.16
+pixel_intensity_threshold = 0.4
 
 def decode_content_hand(raw_frame, offset):
     """
@@ -57,10 +59,10 @@ def get_frame(kinect_socket):
     return decode.read_frame(kinect_socket, decode_content_hand)
 
 
-def read_process_send(fusion_socket, classifier, gestures, stream_id, engaged, frame_pieces, timestamp, writer_data_hand, probs, classified, blind):
+def read_process_send(fusion_socket, classifier, gestures, stream_id, engaged, frame_pieces, timestamp, writer_data_hand, probs, classified, blind, frame):
     try:
         bytes = classifier.get_bytes(timestamp, writer_data_hand, engaged, frame_pieces, gestures,
-                                     stream_id, probs, classified, blind)
+                                     stream_id, probs, classified, blind, frame)
 
         if fusion_socket is not None:
             fusion_socket.sendall(struct.pack("<i", len(bytes)))
@@ -84,17 +86,16 @@ def _preprocess_hand_arr(depth_data, posx, posy, height, width):
     return hand_arr
 
 
-def can_process(hand, frame_pieces, posx, posy):
-    # if hands are below midpoint between spine mid and spine base, send blind
+def is_gesture(hand, frame_pieces, posx, posy):
+    """we don't want to process frames when user is not engaged or hands are resting (at/near spine base y or z)"""
+
     if len(frame_pieces) != 0:
         spine_base_ind = 0
-        spine_mid_ind = 1
         if hand == "RH":
             hand_ind = 11
         else:
             hand_ind = 7
         spine_base_y = frame_pieces[spine_base_ind * 9 + 8]
-        spine_mid_y = frame_pieces[spine_mid_ind * 9 + 8]
         spine_base_z = frame_pieces[spine_base_ind * 9 + 9]
 
         hand_y = frame_pieces[hand_ind * 9 + 8]
@@ -102,11 +103,19 @@ def can_process(hand, frame_pieces, posx, posy):
     else:
         return False
 
-    active_arm_threshold = 0.16
 
-    if (posx == -1 and posy == -1) or ((hand_y < spine_base_y) and ((spine_base_z-hand_z) < active_arm_threshold)) or (spine_base_z < hand_z):
+    if (posx == -1 and posy == -1) or \
+            ((hand_y < spine_base_y) and ((spine_base_z-hand_z) < active_arm_threshold)) or \
+            (spine_base_z < hand_z):
         return False
     return True
+
+
+def is_bright(depth_frame):
+    hand_arr = np.squeeze(depth_frame)
+
+    bright_corners = np.sum([hand_arr[i, j] > pixel_intensity_threshold for i in [0, -1] for j in [0, -1]])
+    return bright_corners >= 3
 
 
 def main(args):
@@ -124,14 +133,14 @@ def main(args):
     else:
         print('running one-shot classifier')
         HandModel = RealTimeHandRecognitionOneShot
-        Classifier = OneShotClassifier
+        Classifier = components.handRecognition.one_shot_classifier.OneShotClassifier
 
     if args.hand == "BOTH":
         print('tracking both hands')
         RH_model = HandModel("RH", 32, 2)
-        RH_classifier = Classifier("RH", lock)
-        LH_classifier = Classifier("LH", lock, is_flipped=True)
         blacklist = get_blacklist()
+        RH_classifier = Classifier("RH", lock, blacklist)
+        LH_classifier = Classifier("LH", lock, blacklist, is_flipped=True)
 
         kinect_socket = connect('kinect', args.kinect_host, ("RH", "LH", "Body"))
         RH_fusion_socket = connect('fusion', args.fusion_host, "RH") if args.fusion_host is not None else None
@@ -153,7 +162,7 @@ def main(args):
             (LH_timestamp, LH_frame_type), (LH_width, LH_height, LH_posx, LH_posy, LH_depth_data), (LH_writer_data_hand,) = get_frame(kinect_socket)
             (RH_timestamp, RH_frame_type), (RH_width, RH_height, RH_posx, RH_posy, RH_depth_data), (RH_writer_data_hand,) = get_frame(kinect_socket)
 
-            if can_process("LH", frame_pieces, LH_posx, LH_posy):
+            if is_gesture("LH", frame_pieces, LH_posx, LH_posy):
                 if LH_blind:
                     RH_model.past_probs_L = None  # reset smoothing
                 LH_frame = _preprocess_hand_arr(LH_depth_data, LH_posx, LH_posy, LH_height, LH_width)
@@ -161,7 +170,7 @@ def main(args):
                 LH_frame = np.empty((1,128,128,1))  # to facilitate forward pass
                 LH_blind = True
 
-            if can_process("RH", frame_pieces, RH_posx, RH_posy):
+            if is_gesture("RH", frame_pieces, RH_posx, RH_posy):
                 if RH_blind:
                     RH_model.past_probs_R = None  # reset smoothing
                 RH_frame = _preprocess_hand_arr(RH_depth_data, RH_posx, RH_posy, RH_height, RH_width)
@@ -172,9 +181,9 @@ def main(args):
             (LH_probs, LH_out), (RH_probs, RH_out) = RH_model.classifyLR(LH_frame, RH_frame)
 
             if not read_process_send(LH_fusion_socket, LH_classifier, LH_gestures, LH_stream_id, engaged,
-                                     frame_pieces, LH_timestamp, LH_writer_data_hand, LH_probs, LH_out, LH_blind) \
+                                     frame_pieces, LH_timestamp, LH_writer_data_hand, LH_probs, LH_out, LH_blind, LH_frame) \
                     or not read_process_send(RH_fusion_socket, RH_classifier, RH_gestures, RH_stream_id, engaged,
-                                             frame_pieces, RH_timestamp, RH_writer_data_hand, RH_probs, RH_out, RH_blind):
+                                             frame_pieces, RH_timestamp, RH_writer_data_hand, RH_probs, RH_out, RH_blind, RH_frame):
                 break
 
             print()
@@ -214,7 +223,7 @@ def main(args):
 
             (timestamp, frame_type), (width, height, posx, posy, depth_data), (writer_data_hand,) = get_frame(kinect_socket)
 
-            if can_process(args.hand, frame_pieces, posx, posy):
+            if is_gesture(args.hand, frame_pieces, posx, posy):
                 frame = _preprocess_hand_arr(depth_data, posx, posy, height, width)
                 model.past_probs = None
             else:

@@ -6,10 +6,12 @@ import queue
 import os
 import time
 
+from components.handRecognition.depth_client import is_gesture, is_bright
+
 
 class OneShotWorker(threading.Thread):
     def __init__(self, hand_type, forest_status, event_vars, one_shot_queue,
-                 global_lock, is_flipped, is_test=False):
+                 global_lock, is_flipped, blacklist, is_test=False):
         threading.Thread.__init__(self)
         self.hand_type = hand_type
         self.forest_status = forest_status
@@ -38,7 +40,6 @@ class OneShotWorker(threading.Thread):
         self.forest = None  # random forest instance
         self.receiving_frames = False  # Only start to receive frames when a signal is sent from kinect server
         self.skip_frame = 0  # skip some frames to maximize variance in learning input, use this variable to keep track
-        self.pixel_intensity_threshold = 0.4  # used in self._is_gesture()
         self.buffer_length = 30  # determines the number of frames in the buffer (3 seconds of gapped frames)
         self.moving_variance_threshold = 0.001  # used in self._can_start(), starts learning when the arm stops moving
         self.continous_no_gesture_frame_count = 0
@@ -53,8 +54,8 @@ class OneShotWorker(threading.Thread):
             if self.event_vars.load_forest_event.is_set():
                 self.load_forest()
             try:
-                feature, skeleton_arr, start_learn, probs = self.one_shot_queue.get(block=True, timeout=2)
-                self.add_frame(feature, skeleton_arr, start_learn, probs)
+                feature, skeleton_arr, start_learn, probs, frame = self.one_shot_queue.get(block=True, timeout=2)
+                self.add_frame(feature, skeleton_arr, start_learn, probs, frame)
             except queue.Empty:
                 pass
 
@@ -62,7 +63,7 @@ class OneShotWorker(threading.Thread):
     # when ready to save new feature, check average vector's argmax. If this belongs to a blacklisted gesture and avg probability is above a threshold (0.7?), reject the gesture
     # also add other failures (timeout/low, revise current to "other", and think about how to handle "move")
 
-    def add_frame(self, feature, skeleton_arr, start_learn, probs):
+    def add_frame(self, feature, skeleton_arr, start_learn, probs, depth_frame):
         """
         When learning starts, hand depth array and body skeleton array needs to used to extract necessary information
         and stored for further processing.
@@ -76,7 +77,8 @@ class OneShotWorker(threading.Thread):
             self.receiving_frames = True
         if not self.receiving_frames:
             return
-        if self._is_gesture(skeleton_arr):
+        if is_gesture(self.hand_type, skeleton_arr, 0, 0) and is_bright(depth_frame):
+            print('is gesture and is bright')
             if not self.skip_frame:
                 self.ref_frames.append(feature)
                 self.palm_centers.append(skeleton_arr[self.palm_coordinates_ind_start:self.palm_coordinates_ind_end])
@@ -117,6 +119,7 @@ class OneShotWorker(threading.Thread):
             """
             #print(self.hand_type, "is next to body, resetting")
             self.continous_no_gesture_frame_count += 1
+            print('no gesture count', self.continous_no_gesture_frame_count)
             if self.continous_no_gesture_frame_count > self.no_action_threshold:
                 self.receiving_frames = False
                 self.continous_no_gesture_frame_count = 0
@@ -130,22 +133,6 @@ class OneShotWorker(threading.Thread):
             self.palm_centers = []
 
         self.skip_frame = (self.skip_frame + 1) % 3  # skip every 2 frames to maximize variance in learning input
-
-    def _is_gesture(self, skeleton_arr):
-        """
-        The hand is performing a gesture only if it's above the midpoint between spine base and spine mid.
-        This is not perfect, but good enough.
-        :param skeleton_arr: kinect skeleton array
-        :return: A boolean about whether the hand is performing a gesture
-        """
-        spine_base_y = skeleton_arr[self.spine_base_Y_ind]
-        spine_base_z = skeleton_arr[self.spine_base_Z_ind]
-        spine_mid_y = skeleton_arr[self.spine_mid_Y_ind]
-        hand_y = skeleton_arr[self.palm_coordinates_ind_start+1]
-        hand_z = skeleton_arr[self.palm_coordinates_ind_start+2]
-
-
-        return ((hand_y > spine_base_y) and ((spine_base_z - hand_z)>self.active_arm_threshold)) or (spine_base_z > hand_z)
 
     def _palm_center_buffer_variance(self):
         """
