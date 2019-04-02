@@ -95,9 +95,9 @@ class RealTimeHandRecognitionOneShot(RealTimeHandRecognition):
     def classify(self, data, flip=False):
         if flip:
             data = np.flipud(data)
-        feature = self.sess.run(self.model.fc_x, feed_dict={self.model._images: data})
+        (feature, predictions) = self.sess.run([self.model.fc_x, self.model.predictions], feed_dict={self.model._images: data})
 
-        return feature
+        return feature, predictions
 
     def classifyLR(self, data_L, data_R):
         input_shape = list(data_L.shape)

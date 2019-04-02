@@ -234,7 +234,7 @@ def main(args):
 
 
             if not read_process_send(fusion_socket, classifier, gestures, stream_id, engaged,
-                                     frame_pieces, timestamp, writer_data_hand, probs, out, blind):
+                                     frame_pieces, timestamp, writer_data_hand, probs, out, blind, frame):
                 break
 
             print()
