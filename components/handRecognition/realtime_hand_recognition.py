@@ -56,7 +56,7 @@ class RealTimeHandRecognition:
             self.past_probs = (self.past_probs+probs)/2
 
         max_prediction = np.argmax(self.past_probs)
-        return max_prediction, self.past_probs
+        return self.past_probs, max_prediction
 
     def classifyLR(self, data_L, data_R):
         input_shape = list(data_L.shape)
@@ -97,7 +97,7 @@ class RealTimeHandRecognitionOneShot(RealTimeHandRecognition):
             data = np.flipud(data)
         (feature, predictions) = self.sess.run([self.model.fc_x, self.model.predictions], feed_dict={self.model._images: data})
 
-        return feature, predictions
+        return predictions, feature
 
     def classifyLR(self, data_L, data_R):
         input_shape = list(data_L.shape)
