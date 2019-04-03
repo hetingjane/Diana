@@ -78,7 +78,6 @@ class OneShotWorker(threading.Thread):
         if not self.receiving_frames:
             return
         if is_gesture(self.hand_type, skeleton_arr, 0, 0) and is_bright(depth_frame):
-            print('is gesture and is bright')
             if not self.skip_frame:
                 self.ref_frames.append(feature)
                 self.palm_centers.append(skeleton_arr[self.palm_coordinates_ind_start:self.palm_coordinates_ind_end])
