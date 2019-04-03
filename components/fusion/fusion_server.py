@@ -226,6 +226,8 @@ class App:
             # Input the combined label to the state machine
             changed = state_machine.input(*inputs)
             cur_state = state_machine.get_full_state()
+            if 'probable' in cur_state:
+                continue
 
             # Intercept continuous point state machines; their events are different
             if state_machine is machines.left_point_continuous:
