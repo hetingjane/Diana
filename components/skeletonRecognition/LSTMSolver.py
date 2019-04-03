@@ -12,6 +12,8 @@ class RealTimeArmMotionRecognition(object):
         print ('model restored from ', self.model.logs_path)
         self.model.saver.restore(self.model.sess, self.model.logs_path)
 
+        self._past_probs = None
+
 
     def normalize_data(self, data, verbose=False):
         data = data[:, 3:]
@@ -64,5 +66,15 @@ class RealTimeArmMotionRecognition(object):
             [self.model.predicted_values, self.model.probabilities],
             feed_dict={self.model.x: x_data, self.model.n_frames: n_frame_batch,self.model.keep_prob: 1.0})
 
-        # print 'Predicted value; ', pred_val
-        return self.classes[pred_val[0]], probs[0]
+        # print ('Predicted value before smoothing: ', pred_val)
+        # print ('Probability before: ', probs[0])
+
+        if self._past_probs is None:
+            self._past_probs = probs[0]
+        else:
+            self._past_probs = (self._past_probs+probs[0])/2
+
+        pred_val = np.argmax(self._past_probs)
+        # print ('Predicted value after smoothing; ', pred_val)
+        # print ('Probability after: ', self._past_probs)
+        return self.classes[pred_val], self._past_probs
