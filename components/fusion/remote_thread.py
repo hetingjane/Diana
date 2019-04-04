@@ -48,7 +48,9 @@ class Remote(threading.Thread):
                 self._sel.unregister(conn)
                 conn.close()
                 self._log("Client disconnected")
-                if len(self._sel.get_map()) == 0:
+                # Since server socket is also registered in the selctor
+                # length will be greater than or equal to 1
+                if len(self._sel.get_map()) == 1:
                     self._connected.clear()
         except queue.Empty:
             pass
