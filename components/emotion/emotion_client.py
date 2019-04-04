@@ -33,8 +33,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--kinect-host', help='Host name of the machine running Kinect Server',default='127.0.0.1')
     parser.add_argument('--fusion-host', help='Host name of the machine running Kinect Server', default='127.0.0.1')
+    parser.add_argument('--yaw-threshold', help='The yaw angle threshold triggering inattentive signals, float', default='35')
 
     args = parser.parse_args()
+
+    yaw_threshold = float(args.yaw_threshold)
     
     kinect_socket = connect('kinect', args.kinect_host, 'Face')
     if kinect_socket is None:
@@ -50,7 +53,7 @@ if __name__ == '__main__':
             print("Unable to receive speech frame")
             break
 
-        print('found:', FaceFound, 'engaged:', Engaged, 'attentive:', LookinAway, 'glasses:', WearingGlasses,
+        print('found:', FaceFound, 'engaged:', Engaged, 'lookinaway:', LookinAway, 'glasses:', WearingGlasses,
               'pitch:', '{: 5.1f}'.format(Pitch), 'yaw:', '{: 5.1f}'.format(Yaw), 'roll:', '{: 5.1f}'.format(Roll))
 
         if FaceFound == 0:
@@ -58,9 +61,9 @@ if __name__ == '__main__':
             att = 0
         else:
             prob = 1.0
-            if -25.0 <= Yaw <= 25.0:
+            if -yaw_threshold <= Yaw <= yaw_threshold:
                 att = 2
-            elif Yaw > 25.0:
+            elif Yaw > yaw_threshold:
                 att = 0
             else:
                 att = 1
