@@ -2,9 +2,9 @@ import sys, struct
 import argparse
 import socket
 
-from ..fusion.conf.endpoints import connect
-from ..fusion.conf import decode
-from ..fusion.conf import streams
+from components.fusion.conf.endpoints import connect
+from components.fusion.conf import decode
+from components.fusion.conf import streams
 # Timestamp | frame type | command_length | command
 
 def decode_content(raw_frame, offset):
@@ -19,14 +19,13 @@ def decode_content(raw_frame, offset):
     content_header = struct.unpack_from(endianness + content_header_format, raw_frame, offset)
 
     FaceFound, Engaged, LookinAway, WearingGlasses, Pitch, Yaw, Roll = content_header
-    print(FaceFound, Engaged, LookinAway, WearingGlasses, Pitch, Yaw, Roll)
     
    
     
     offset = offset + content_header_size    # new offset from where tail starts
     
     
-    return (FaceFound, Yaw), offset
+    return (FaceFound, Engaged, LookinAway, WearingGlasses, Pitch, Yaw, Roll), offset
     
     
 if __name__ == '__main__':
@@ -46,17 +45,17 @@ if __name__ == '__main__':
 
     while True:
         try:
-            (timestamp, _), (FaceFound, Yaw), _ = decode.read_frame(kinect_socket, decode_content)
+            (timestamp, _), (FaceFound, Engaged, LookinAway, WearingGlasses, Pitch, Yaw, Roll), _ = decode.read_frame(kinect_socket, decode_content)
         except socket.error:
             print("Unable to receive speech frame")
             break
 
-        print("Yaw: {}".format(Yaw))
+        print('found:', FaceFound, 'engaged:', Engaged, 'attentive:', LookinAway, 'glasses:', WearingGlasses,
+              'pitch:', '{: 5.1f}'.format(Pitch), 'yaw:', '{: 5.1f}'.format(Yaw), 'roll:', '{: 5.1f}'.format(Roll))
 
         if FaceFound == 0:
             prob = 0.0
             att = 0
-            print("Face lost")
         else:
             prob = 1.0
             if -25.0 <= Yaw <= 25.0:

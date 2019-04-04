@@ -118,7 +118,7 @@ class OneShotWorker(threading.Thread):
             """
             #print(self.hand_type, "is next to body, resetting")
             self.continous_no_gesture_frame_count += 1
-            print('no gesture count', self.continous_no_gesture_frame_count)
+            print(self.continous_no_gesture_frame_count, end=' ')
             if self.continous_no_gesture_frame_count > self.no_action_threshold:
                 self.receiving_frames = False
                 self.continous_no_gesture_frame_count = 0
