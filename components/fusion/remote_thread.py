@@ -36,7 +36,7 @@ class Remote(threading.Thread):
 
         self._log("Accepted destination {host[0]}:{host[1]}".format(host=addr))
         self._connected.set()
-        self._sel.register(conn, selectors.EVENT_WRITE, self._send)
+        self._sel.register(conn, selectors.EVENT_WRITE, data=self._send)
 
     def _send(self, key):
         conn = key.fileobj
@@ -48,7 +48,7 @@ class Remote(threading.Thread):
                 self._sel.unregister(conn)
                 conn.close()
                 self._log("Client disconnected")
-                # Since server socket is also registered in the selctor
+                # Since listening socket is also registered in the selector
                 # length will be greater than or equal to 1
                 if len(self._sel.get_map()) == 1:
                     self._connected.clear()
