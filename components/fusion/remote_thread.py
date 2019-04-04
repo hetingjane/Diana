@@ -36,38 +36,52 @@ class Remote(threading.Thread):
 
         self._log("Accepted destination {host[0]}:{host[1]}".format(host=addr))
         self._connected.set()
-        self._sel.register(conn, selectors.EVENT_WRITE, data=self._send)
+        self._sel.register(conn, selectors.EVENT_WRITE)
 
-    def _send(self, key):
+    def _send(self, key, data):
         conn = key.fileobj
         try:
-            data = self.input_queue.get_nowait()
-            try:
-                conn.sendall(data)
-            except (socket.error, EOFError):
-                self._sel.unregister(conn)
-                conn.close()
-                self._log("Client disconnected")
-                # Since listening socket is also registered in the selector
-                # length will be greater than or equal to 1
-                if len(self._sel.get_map()) == 1:
-                    self._connected.clear()
-        except queue.Empty:
-            pass
+            conn.sendall(data)
+        except (socket.error, EOFError):
+            self._sel.unregister(conn)
+            conn.close()
+            self._log("Client disconnected")
+            # Since listening socket is also registered in the selector
+            # length will be greater than or equal to 1
+            if len(self._sel.get_map()) == 1:
+                self._connected.clear()
 
     def run(self):
-        remote_sock = serve(self.target)
-        remote_sock.listen(5)
+        listen_sock = serve(self.target)
+        listen_sock.listen(5)
 
-        self._sel.register(remote_sock, selectors.EVENT_READ, data=self._accept)
+        self._sel.register(listen_sock, selectors.EVENT_READ)
+        listen_key = self._sel.get_key(listen_sock)
 
         self._log("Waiting for the destination to connect\n")
 
+        data = None
+        handled = set()
         while not self.is_stopped():
-            events = self._sel.select()
-            for key, mask in events:
-                handler = key.data
-                handler(key)
+
+            while len(set(self._sel.get_map().values()) - handled) > 0:
+                handled.add(listen_key)
+                events = self._sel.select()
+                if data is None:
+                    try:
+                        data = self.input_queue.get_nowait()
+                    except queue.Empty:
+                        pass
+
+                for key, mask in events:
+                    if mask & selectors.EVENT_READ and key is listen_key:
+                        self._accept(key)
+                    elif mask & selectors.EVENT_WRITE and key not in handled:
+                        if data is not None:
+                            self._send(key, data)
+                            handled.add(key)
+            data = None
+            handled.clear()
 
         self._log("Stopped")
 
