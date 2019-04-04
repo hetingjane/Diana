@@ -72,6 +72,7 @@ class Remote(threading.Thread):
         self._log("Stopped")
 
         for conn in self._sel.get_map():
+            self._sel.unregister(conn)
             conn.close()
 
         self._connected.clear()
