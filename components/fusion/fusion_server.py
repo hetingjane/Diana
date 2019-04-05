@@ -278,14 +278,10 @@ class App:
 
         # Include a check to see if the destination is connected or not
         for e in raw_events_list:
-            if thread_sync.remote_connected.wait(0.0):
+            if thread_sync.remote_connected.is_set():
                 thread_sync.remote_events.put(e)
-        if len(raw_events_list) > 0:
-            #print(len(raw_events_list))
-            #print(raw_events_list)
-            pass
 
-        if thread_sync.gui_connected.wait(0.0):
+        if thread_sync.gui_connected.is_set():
             ev_count = struct.pack("<i", len(raw_events_list))
             new_ev = ev_count + b''.join(raw_events_list) + raw_probs
             thread_sync.gui_events.put(new_ev)
