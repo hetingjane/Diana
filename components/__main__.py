@@ -1,7 +1,7 @@
 import subprocess, time, os
 
 print("starting KSIM")
-ksim = subprocess.Popen(r"..\KSIM\KSIM\bin\x86\Release\KSIM.exe -k")
+ksim = subprocess.Popen(r"..\KSIM\KSIM\bin\x86\Release\KSIM.exe")
 time.sleep(1)
 print("starting FUSION")
 fusion = os.system(r"start cmd /c python -m components.fusion.fusion_server --mode brandeis")
