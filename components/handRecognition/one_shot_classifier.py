@@ -18,19 +18,23 @@ class ForestStatus:
 
 
 class EventVars:
-    __slots__ = ('load_forest_event', 'learn_no_action_event', 'learn_initialize_event', 'learn_complete_event')
+    __slots__ = ('load_forest_event', 'learn_fail_other_event', 'learn_fail_used_event', 'learn_fail_moved_event',
+                 'learn_fail_blind_event', 'learn_initialize_event', 'learn_complete_event')
 
     def __init__(self):
         self.load_forest_event = threading.Event()  # signals whether to reload a fresh copy of forest
-        self.learn_no_action_event = threading.Event()  # whether learning process exits due to no valid gestures
+        self.learn_fail_other_event = threading.Event()  # whether learning process exits due to unknown failure
+        self.learn_fail_used_event = threading.Event()  # whether learning process exits due to gesture in use
+        self.learn_fail_moved_event = threading.Event()  # whether learning process exits due to too much hand movement
+        self.learn_fail_blind_event = threading.Event()  # whether learning process exits due to client blind to hands
         self.learn_initialize_event = threading.Event()  # whether learning process is initiated
         self.learn_complete_event = threading.Event()  # whether learning process is finished
 
 
 class OneShotClassifier(BaseClassifier):
 
-    def __init__(self, hand, lock, blacklist, is_flipped=False):
-        BaseClassifier.__init__(self, hand, lock, blacklist, is_flipped)
+    def __init__(self, hand, lock, gestures, blacklist, is_flipped, known_gesture_threshold):
+        BaseClassifier.__init__(self, hand, lock, gestures, blacklist, is_flipped, known_gesture_threshold)
 
         self.global_lock = lock
         self.forest_status = ForestStatus()
@@ -39,13 +43,13 @@ class OneShotClassifier(BaseClassifier):
         self.new_gesture_index = 32  # refers to 'new gesture 1', increments after every new gesture is learned
         self.taught_gesture_index = 36  # refers to 'taught gesture 1', increments after every new gesture is learned
 
-        self.one_shot_worker = OneShotWorker(hand, self.forest_status, self.event_vars,
-                                             self.one_shot_queue, self.global_lock, blacklist, is_flipped, is_test=False)
+        self.one_shot_worker = OneShotWorker(hand, self.forest_status, self.event_vars, self.one_shot_queue,
+                                             self.global_lock, self.gestures, blacklist, is_flipped, known_gesture_threshold)
         self.one_shot_worker.start()
         self.event_vars.load_forest_event.set()
         self.learning = False  # whether the system is learning gesture
 
-    def _process(self, feature, writer_data_hand, engaged, frame_pieces, probs, gestures, blind, frame):
+    def _process(self, feature, writer_data_hand, engaged, frame_pieces, probs, blind, frame):
 
         if not engaged:
             if not self.forest_status.is_fresh:
@@ -68,7 +72,7 @@ class OneShotClassifier(BaseClassifier):
             self.probs[max_index] = 1
         else:
             self.one_shot_queue.put((feature, frame_pieces, writer_data_hand == b'learn', probs, frame))
-            max_index, dist = self._find_label(feature, gestures, blind)
+            max_index, dist = self._find_label(feature, self.gestures, blind)
             self.probs[max_index] = dist
 
         return max_index
@@ -83,10 +87,26 @@ class OneShotClassifier(BaseClassifier):
         if self.learning:
             max_index = 35  # refers to posture 'learning'
             dist = 1
-        if self.event_vars.learn_no_action_event.is_set():
+        if self.event_vars.learn_fail_used_event.is_set():
             # learning failed, forest should be ready so find the label again
             self.learning = False
-            self.event_vars.learn_no_action_event.clear()
+            self.event_vars.learn_fail_used_event.clear()
+            max_index = 41  # refers to posture 'teaching fail,used'
+        if self.event_vars.learn_fail_moved_event.is_set():
+            # learning failed, forest should be ready so find the label again
+            self.learning = False
+            self.event_vars.learn_fail_moved_event.clear()
+            max_index = 42  # refers to posture 'teaching fail,moved'
+        if self.event_vars.learn_fail_blind_event.is_set():
+            # learning failed, forest should be ready so find the label again
+            self.learning = False
+            self.event_vars.learn_fail_blind_event.clear()
+            max_index = 43  # refers to posture 'teaching fail,blind'
+        if self.event_vars.learn_fail_other_event.is_set():
+            # learning failed, forest should be ready so find the label again
+            self.learning = False
+            self.event_vars.learn_fail_other_event.clear()
+            max_index = 44  # refers to posture 'teaching fail,other'
         if self.forest_status.is_ready and not blind:
             max_index, dist = self.one_shot_worker.forest.find_nn(feature)
             max_index = max_index[0]

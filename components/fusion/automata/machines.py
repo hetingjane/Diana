@@ -32,7 +32,8 @@ servo_back = PoseStateMachine('servo back', rules.All(('rh beckon', 'lh beckon',
 nevermind = PoseStateMachine('nevermind', rules.All(('rh stop', 'lh stop', 20)))
 
 teaching = StateMachine('teaching',
-                        ['stop', 'start', 'succeeded 1', 'succeeded 2', 'succeeded 3', 'succeeded 4', 'succeeded 5', 'succeeded 6'],
+                        ['fail,used', 'fail,moved', 'fail,blind', 'fail,other', 'stop', 'start', 'succeeded 1',
+                         'succeeded 2', 'succeeded 3', 'succeeded 4', 'succeeded 5', 'succeeded 6'],
                         {
                             'stop': {
                                 'start': rules.Any(('rh teaching', 5), ('lh teaching', 5))
@@ -43,6 +44,10 @@ teaching = StateMachine('teaching',
                                 'stop': rules.All(('rh teaching', 1), ('lh teaching', 1),
                                                   ('rh taught gesture 1', 1), ('rh taught gesture 2', 1), ('rh taught gesture 3', 1),
                                                   ('lh taught gesture 4', 1), ('lh taught gesture 5', 1), ('lh taught gesture 6', 1), invert=True),
+                                'fail,used': rules.Any(('rh fail,used', 1), ('lh fail,used', 1)),
+                                'fail,moved': rules.Any(('rh fail,moved', 1), ('lh fail,moved', 1)),
+                                'fail,blind': rules.Any(('rh fail,blind', 1), ('lh fail,blind', 1)),
+                                'fail,other': rules.Any(('rh fail,other', 1), ('lh fail,other', 1)),
                                 'succeeded 1': rules.All(('rh taught gesture 1', 1)),
                                 'succeeded 2': rules.All(('rh taught gesture 2', 1)),
                                 'succeeded 3': rules.All(('rh taught gesture 3', 1)),
@@ -72,6 +77,22 @@ teaching = StateMachine('teaching',
                             },
 
                             'succeeded 6': {
+                                'stop': rules.Always()
+                            },
+
+                            'fail,used': {
+                                'stop': rules.Always()
+                            },
+
+                            'fail,moved': {
+                                'stop': rules.Always()
+                            },
+
+                            'fail,blind': {
+                                'stop': rules.Always()
+                            },
+
+                            'fail,other': {
                                 'stop': rules.Always()
                             },
                         },

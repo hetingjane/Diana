@@ -10,7 +10,8 @@ left_hand_postures = ['lh blank', 'rh hands together', 'lh other', 'lh beckon', 
                       'lh gesture 4', 'lh gesture 5', 'lh gesture 6',
                       'lh teaching',
                       'lh taught gesture 4', 'lh taught gesture 5', 'lh taught gesture 6',
-                      'lh blind']
+                      'lh blind', 'lh teaching fail,used', 'lh teaching fail,moved', 'lh teaching fail,blind',
+                      'lh teaching fail,other']
 
 # Make sure to change depth_client.py after adding a posture
 right_hand_postures = ['rh blank', 'rh hands together', 'rh other', 'rh beckon', 'rh claw down',
@@ -24,7 +25,8 @@ right_hand_postures = ['rh blank', 'rh hands together', 'rh other', 'rh beckon',
                        'rh gesture 1', 'rh gesture 2', 'rh gesture 3',
                        'rh teaching',
                        'rh taught gesture 1', 'rh taught gesture 2', 'rh taught gesture 3',
-                       'rh blind']
+                       'rh blind', 'rh teaching fail,used', 'rh teaching fail,moved', 'rh teaching fail,blind',
+                       'rh teaching fail,other']
 
 left_arm_motions = ['la move right', 'la move left', 'la move up', 'la move down', 'la move back',
                     'la move front', 'la move right up', 'la move right down', 'la move right back',
