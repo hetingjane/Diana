@@ -110,50 +110,48 @@ do
         "fusion")
             fusion_param="--fusion-host $machine"
             eval "tmux send-keys -t diana \"ssh -t ${machine} 'cd ${start_dir}; if [ ! -z ${env_dir} ]; then source ${env_dir}/bin/activate; fi; python3 -m components.fusion.fusion_server; bash;'\" Enter"
-			eval "tmux split-window -t diana"
-			eval "tmux select-layout -t diana tiled"
             ;;
         "hands")
-            eval "tmux send-keys -t diana \"ssh -t ${machine} 'sleep $wait_time; cd ${start_dir}; export CUDA_VISIBLE_DEVICES=${device}; if [ ! -z ${env_dir} ]; then source ${env_dir}/bin/activate; fi; python3 -m components.handRecognition.depth_client $kinect_param $fusion_param; bash;'\" Enter"
-			eval "tmux split-window -t diana"
 			eval "tmux select-layout -t diana tiled"
+            eval "tmux split-window -t diana"
+            eval "tmux send-keys -t diana \"ssh -t ${machine} 'sleep $wait_time; cd ${start_dir}; export CUDA_VISIBLE_DEVICES=${device}; if [ ! -z ${env_dir} ]; then source ${env_dir}/bin/activate; fi; python3 -m components.handRecognition.depth_client $kinect_param $fusion_param; bash;'\" Enter"
             if [ "$single_machine" = yes ]
             then
                 ((device++))
             fi
             ;;
         "RH")
-            eval "tmux send-keys -t diana \"ssh -t ${machine} 'sleep $wait_time; cd ${start_dir}; export CUDA_VISIBLE_DEVICES=${device}; if [ ! -z ${env_dir} ]; then source ${env_dir}/bin/activate; fi; python3 -m components.handRecognition.depth_client --hand RH $kinect_param $fusion_param; bash;'\" Enter"
-			eval "tmux split-window -t diana"
 			eval "tmux select-layout -t diana tiled"
+			eval "tmux split-window -t diana"
+            eval "tmux send-keys -t diana \"ssh -t ${machine} 'sleep $wait_time; cd ${start_dir}; export CUDA_VISIBLE_DEVICES=${device}; if [ ! -z ${env_dir} ]; then source ${env_dir}/bin/activate; fi; python3 -m components.handRecognition.depth_client --hand RH $kinect_param $fusion_param; bash;'\" Enter"
             if [ "$single_machine" = yes ]
             then
                 ((device++))
             fi
             ;;
         "LH")
-            eval "tmux send-keys -t diana \"ssh -t ${machine} 'sleep $wait_time; cd ${start_dir}; export CUDA_VISIBLE_DEVICES=${device}; if [ ! -z ${env_dir} ]; then source ${env_dir}/bin/activate; fi; python3 -m components.handRecognition.depth_client --hand LH $kinect_param $fusion_param; bash;'\" Enter"
-			eval "tmux split-window -t diana"
 			eval "tmux select-layout -t diana tiled"
+			eval "tmux split-window -t diana"
+            eval "tmux send-keys -t diana \"ssh -t ${machine} 'sleep $wait_time; cd ${start_dir}; export CUDA_VISIBLE_DEVICES=${device}; if [ ! -z ${env_dir} ]; then source ${env_dir}/bin/activate; fi; python3 -m components.handRecognition.depth_client --hand LH $kinect_param $fusion_param; bash;'\" Enter"
             if [ "$single_machine" = yes ]
             then
                 ((device++))
             fi
             ;;
         "speech")
-            eval "tmux send-keys -t diana \"ssh -t ${machine} 'sleep $wait_time; cd ${start_dir}; python3 -m components.speech.speech_client $kinect_param $fusion_param; bash;'\" Enter"
 			eval "tmux select-layout -t diana tiled"
 			eval "tmux split-window -t diana"
+            eval "tmux send-keys -t diana \"ssh -t ${machine} 'sleep $wait_time; cd ${start_dir}; python3 -m components.speech.speech_client $kinect_param $fusion_param; bash;'\" Enter"
             ;;
 	"Emotion")
-            eval "tmux send-keys -t diana \"ssh -t ${machine} 'sleep $wait_time; cd ${start_dir}; python3 -m components.emotion.emotion_client $kinect_param $fusion_param; bash;'\" Enter"
 			eval "tmux select-layout -t diana tiled"
 			eval "tmux split-window -t diana"
+            eval "tmux send-keys -t diana \"ssh -t ${machine} 'sleep $wait_time; cd ${start_dir}; python3 -m components.emotion.emotion_client $kinect_param $fusion_param; bash;'\" Enter"
             ;;
         "body")
-            eval "tmux send-keys -t diana \"ssh -t ${machine} 'sleep $wait_time; cd ${start_dir}; export CUDA_VISIBLE_DEVICES=${device}; if [ ! -z ${env_dir} ]; then source ${env_dir}/bin/activate; fi; python3 -m components.skeletonRecognition.skeleton_client $kinect_param $fusion_param; bash;'\" Enter"
 			eval "tmux select-layout -t diana tiled"
 			eval "tmux split-window -t diana"
+            eval "tmux send-keys -t diana \"ssh -t ${machine} 'sleep $wait_time; cd ${start_dir}; export CUDA_VISIBLE_DEVICES=${device}; if [ ! -z ${env_dir} ]; then source ${env_dir}/bin/activate; fi; python3 -m components.skeletonRecognition.skeleton_client $kinect_param $fusion_param; bash;'\" Enter"
             if [ "$single_machine" = yes ]
             then
                 ((device++))
@@ -167,7 +165,6 @@ do
 done
 
 # now close the last split and attach the session
-tmux send-keys -t diana "exit" Enter
-tmux select-layout -t diana tiled
+tmux select-layout -t diana main-vertical
 tmux set-option -t diana mouse on
 tmux attach -t diana
