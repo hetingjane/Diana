@@ -1,14 +1,17 @@
 import threading
 import numpy as np
+import matplotlib.pyplot as plt
 import pickle
 import queue
+import os
+import time
 
 from components.handRecognition.depth_client import is_gesture, is_bright
 
 
 class OneShotWorker(threading.Thread):
     def __init__(self, hand_type, forest_status, event_vars, one_shot_queue,
-                 global_lock, is_flipped, gestures, blacklist, known_gesture_threshold):
+                 global_lock, is_flipped, blacklist, is_test=False):
         threading.Thread.__init__(self)
         self.hand_type = hand_type
         self.forest_status = forest_status
@@ -16,9 +19,7 @@ class OneShotWorker(threading.Thread):
         self.one_shot_queue = one_shot_queue
         self.new_gesture_index = 32  # the first new gesture, increment when a new gesture is learned
         self.global_lock = global_lock
-        self.gestures = gestures
-        self.blacklist = blacklist
-        self.known_gesture_threshold = known_gesture_threshold
+        self.is_test = is_test  # whether it is testing; should save reference images if is_test
 
         # Find out the corresponding kinect v2 joint index of the hand
         if self.hand_type == 'RH':
@@ -43,11 +44,8 @@ class OneShotWorker(threading.Thread):
         self.moving_variance_threshold = 0.001  # used in self._can_start(), starts learning when the arm stops moving
         self.continous_no_gesture_frame_count = 0
         self.no_action_threshold = 120  # if there are no gestures for continous 5 seconds, do not learn for this hand
-        self.palm_movement_frame_threshold = 120  # if there are 5 seconds worth of palm movement, do not learn
-        self.palm_movement_frame_count = 0
         self.ref_frames = []  # a buffer list of frames to learn
         self.palm_centers = []  # a buffer list of palm center coordinates
-        self.ref_probs = []
 
         self.is_flipped = is_flipped
 
@@ -61,17 +59,7 @@ class OneShotWorker(threading.Thread):
             except queue.Empty:
                 pass
 
-
-    def _set_learning_failure(self, event):
-        self.receiving_frames = False
-        self.continous_no_gesture_frame_count = 0
-        self.palm_movement_frame_count = 0
-
-        self.global_lock.acquire()
-        self.forest_status.is_ready = True
-        event.set()
-        self.global_lock.release()
-
+    # TODO keep running list of probabilities also
     # when ready to save new feature, check average vector's argmax. If this belongs to a blacklisted gesture and avg probability is above a threshold (0.7?), reject the gesture
     # also add other failures (timeout/low, revise current to "other", and think about how to handle "move")
 
@@ -83,76 +71,67 @@ class OneShotWorker(threading.Thread):
         :param start_learn: A signal from kinect to indicate whether the learning initiates
         :return: None
         """
-        try:
-            if start_learn:
-                if self.receiving_frames:
-                    raise ValueError("Another learning signal is received before previous learning is finished!")
-                self.receiving_frames = True
-            if not self.receiving_frames:
-                return
-            if is_gesture(self.hand_type, skeleton_arr, 0, 0) and is_bright(depth_frame):
-                if not self.skip_frame:
-                    self.ref_frames.append(feature)
-                    self.palm_centers.append(skeleton_arr[self.palm_coordinates_ind_start:self.palm_coordinates_ind_end])
-                    self.ref_probs.append(probs)
+        if start_learn:
+            if self.receiving_frames:
+                raise ValueError("Another learning signal is received before previous learning is finished!")
+            self.receiving_frames = True
+        if not self.receiving_frames:
+            return
+        if is_gesture(self.hand_type, skeleton_arr, 0, 0) and is_bright(depth_frame):
+            if not self.skip_frame:
+                self.ref_frames.append(feature)
+                self.palm_centers.append(skeleton_arr[self.palm_coordinates_ind_start:self.palm_coordinates_ind_end])
 
-                    # print(self.receiving_frames, len(self.palm_centers))
-                    if len(self.palm_centers) > self.buffer_length:
-                        self.ref_frames.pop(0)
-                        self.palm_centers.pop(0)
-                        self.ref_probs.pop(0)
+                # print(self.receiving_frames, len(self.palm_centers))
+                if len(self.palm_centers) > self.buffer_length:
+                    self.ref_frames.pop(0)
+                    self.palm_centers.pop(0)
 
-                        # Assumes the start time of learning is when the hand stops moving. This is determined by the palm
-                        # center buffer variance, which needs to be smaller than certain threshold.
-                        if self._palm_center_buffer_variance() < self.moving_variance_threshold:
-                            # Start to learn, stop receiving frames
-                            self.receiving_frames = False
-                            # check if current set of 10 frames is already known (>90% avg probability from base classifier)
-                            avg = np.mean(self.ref_probs, axis=1)
-                            best_ind = np.argmax(avg)
-                            if avg[best_ind] > self.known_gesture_threshold and self.gestures[best_ind] in self.blacklist:
-                                self._set_learning_failure(self.event_vars.learn_fail_used_event)
-                            # Get feature vectors
-                            new_features = []
-                            for i, ref_feature in enumerate(self.ref_frames):
-                                new_features.append(ref_feature)
-                                return
-                            # learning finished, reset variables
-                            self.ref_frames = []
-                            self.palm_centers = []
-                            # add reference features to forest
-                            self.global_lock.acquire()
-                            print('ADDING...')
-                            self.forest_status.is_fresh = False
-                            self.forest.add_new(new_features, [self.new_gesture_index] * len(new_features))
-                            print('ADDING FINISHED...')
-                            self.forest_status.is_ready = True
-                            self.new_gesture_index += 1
-                            self.event_vars.learn_complete_event.set()
-                            self.global_lock.release()
-                        else:
-                            self.palm_movement_frame_count += 1
-                            if self.palm_movement_frame_count > self.palm_movement_frame_threshold:
-                                self._set_learning_failure(self.event_vars.learn_fail_moved_event)
-                            pass#print(self.hand_type, 'waiting for palm to stabilize')
+                    # Assumes the start time of learning is when the hand stops moving. This is determined by the palm
+                    # center buffer variance, which needs to be smaller than certain threshold.
+                    if self._palm_center_buffer_variance() < self.moving_variance_threshold:
+                        # Start to learn, stop receiving frames
+                        self.receiving_frames = False
+                        # Get feature vectors
+                        new_features = []
+                        for i, ref_feature in enumerate(self.ref_frames):
+                            new_features.append(ref_feature)
+                        # learning finished, reset variables
+                        self.ref_frames = []
+                        self.palm_centers = []
+                        # add reference features to forest
+                        self.global_lock.acquire()
+                        print('ADDING...')
+                        self.forest_status.is_fresh = False
+                        self.forest.add_new(new_features, [self.new_gesture_index] * len(new_features))
+                        print('ADDING FINISHED...')
+                        self.forest_status.is_ready = True
+                        self.new_gesture_index += 1
+                        self.event_vars.learn_complete_event.set()
+                        self.global_lock.release()
+                    else:
+                        pass#print(self.hand_type, 'waiting for palm to stabilize')
 
-            else:
-                """
-                In current frame, the hand is still next to body. Proceed without processing and reset buffer
-                """
-                #print(self.hand_type, "is next to body, resetting")
-                self.continous_no_gesture_frame_count += 1
-                print(self.continous_no_gesture_frame_count, end=' ')
-                if self.continous_no_gesture_frame_count > self.no_action_threshold:
-                    self._set_learning_failure(self.event_vars.learn_fail_blind_event)
+        else:
+            """
+            In current frame, the hand is still next to body. Proceed without processing and reset buffer
+            """
+            #print(self.hand_type, "is next to body, resetting")
+            self.continous_no_gesture_frame_count += 1
+            print(self.continous_no_gesture_frame_count, end=' ')
+            if self.continous_no_gesture_frame_count > self.no_action_threshold:
+                self.receiving_frames = False
+                self.continous_no_gesture_frame_count = 0
 
-                self.ref_frames = []
-                self.palm_centers = []
+                self.global_lock.acquire()
+                self.forest_status.is_ready = True
+                self.event_vars.learn_no_action_event.set()
+                self.global_lock.release()
 
-            self.skip_frame = (self.skip_frame + 1) % 3  # skip every 2 frames to maximize variance in learning input
-        except Exception as ex:
-            print(ex)
-            self._set_learning_failure(self.event_vars.learn_fail_other_event)
+            self.ref_frames = []
+            self.palm_centers = []
+
+        self.skip_frame = (self.skip_frame + 1) % 3  # skip every 2 frames to maximize variance in learning input
 
     def _palm_center_buffer_variance(self):
         """

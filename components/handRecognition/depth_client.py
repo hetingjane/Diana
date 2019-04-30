@@ -51,7 +51,6 @@ def parse_argument():
     parser.add_argument('--kinect-host', help='Host name of the machine running Kinect Server', default="localhost")
     parser.add_argument('--fusion-host', help='Host name of the machine running Fusion Server', default="localhost")
     parser.add_argument('--disable-one-shot', help='Disable one-shot learning mode', action='store_true', default=False)
-    parser.add_argument('--known-threshold', help='Set probability threshold for disabling known gestures', default='0.9')
 
     return parser.parse_args()
 
@@ -60,9 +59,9 @@ def get_frame(kinect_socket):
     return decode.read_frame(kinect_socket, decode_content_hand)
 
 
-def read_process_send(fusion_socket, classifier, stream_id, engaged, frame_pieces, timestamp, writer_data_hand, probs, classified, blind, frame):
+def read_process_send(fusion_socket, classifier, gestures, stream_id, engaged, frame_pieces, timestamp, writer_data_hand, probs, classified, blind, frame):
     try:
-        bytes = classifier.get_bytes(timestamp, writer_data_hand, engaged, frame_pieces,
+        bytes = classifier.get_bytes(timestamp, writer_data_hand, engaged, frame_pieces, gestures,
                                      stream_id, probs, classified, blind, frame)
 
         if fusion_socket is not None:
@@ -127,8 +126,6 @@ def main(args):
 
     lock = threading.Lock()
 
-    known_gesture_threshold = float(args.known_threshold)
-
     if args.disable_one_shot:
         print('running base classifier')
         HandModel = RealTimeHandRecognition
@@ -142,16 +139,15 @@ def main(args):
         print('tracking both hands')
         RH_model = HandModel("RH", 32, 2)
         blacklist = get_blacklist()
-
-        RH_gestures = postures.right_hand_postures
-        LH_gestures = postures.left_hand_postures
-
-        RH_classifier = Classifier("RH", lock, RH_gestures, blacklist, False, known_gesture_threshold)
-        LH_classifier = Classifier("LH", lock, LH_gestures, blacklist, True, known_gesture_threshold)
+        RH_classifier = Classifier("RH", lock, blacklist)
+        LH_classifier = Classifier("LH", lock, blacklist, is_flipped=True)
 
         kinect_socket = connect('kinect', args.kinect_host, ("RH", "LH", "Body"))
         RH_fusion_socket = connect('fusion', args.fusion_host, "RH") if args.fusion_host is not None else None
         LH_fusion_socket = connect('fusion', args.fusion_host, "LH") if args.fusion_host is not None else None
+
+        RH_gestures = postures.right_hand_postures
+        LH_gestures = postures.left_hand_postures
 
         RH_stream_id = streams.get_stream_id("RH")
         LH_stream_id = streams.get_stream_id("LH")
@@ -184,9 +180,9 @@ def main(args):
 
             (LH_probs, LH_out), (RH_probs, RH_out) = RH_model.classifyLR(LH_frame, RH_frame)
 
-            if not read_process_send(LH_fusion_socket, LH_classifier, LH_stream_id, engaged,
+            if not read_process_send(LH_fusion_socket, LH_classifier, LH_gestures, LH_stream_id, engaged,
                                      frame_pieces, LH_timestamp, LH_writer_data_hand, LH_probs, LH_out, LH_blind, LH_frame) \
-                    or not read_process_send(RH_fusion_socket, RH_classifier, RH_stream_id, engaged,
+                    or not read_process_send(RH_fusion_socket, RH_classifier, RH_gestures, RH_stream_id, engaged,
                                              frame_pieces, RH_timestamp, RH_writer_data_hand, RH_probs, RH_out, RH_blind, RH_frame):
                 break
 
@@ -205,17 +201,16 @@ def main(args):
             LH_fusion_socket.close()
     else:
         print('tracking single hand--', args.hand)
+        model = HandModel(args.hand, 32, 1)
+        classifier = Classifier(args.hand, lock, blacklist)
+
+        kinect_socket = connect('kinect', args.kinect_host, (args.hand, "Body")) if args.kinect_host is not None else None
+        fusion_socket = connect('fusion', args.fusion_host, args.hand) if args.fusion_host is not None else None
 
         if args.hand == "LH":
             gestures = postures.left_hand_postures
         else:
             gestures = postures.right_hand_postures
-
-        model = HandModel(args.hand, 32, 1)
-        classifier = Classifier(args.hand, lock, gestures, blacklist, False, known_gesture_threshold)
-
-        kinect_socket = connect('kinect', args.kinect_host, (args.hand, "Body")) if args.kinect_host is not None else None
-        fusion_socket = connect('fusion', args.fusion_host, args.hand) if args.fusion_host is not None else None
 
         stream_id = streams.get_stream_id(args.hand)
 
@@ -238,7 +233,7 @@ def main(args):
             probs, out = model.classify(frame)
 
 
-            if not read_process_send(fusion_socket, classifier, stream_id, engaged,
+            if not read_process_send(fusion_socket, classifier, gestures, stream_id, engaged,
                                      frame_pieces, timestamp, writer_data_hand, probs, out, blind, frame):
                 break
 
