@@ -98,7 +98,7 @@ $RECYCLE.BIN/
 # Custom rules for project template as described in STRUCTURE.md
 
 # Ignore everything directly under Assets/
-/Assets/*
+#/Assets/*
 # But not the _Core subdirectory
 !/Assets/_Core/
 !/Assets/_Core.meta
@@ -107,3 +107,6 @@ $RECYCLE.BIN/
 # !/Assets/StreamingAssets/
 # !/Assets/Gizmos/
 # !/Assets/Plugins/
+
+# Ignore the Logs
+Logs/
