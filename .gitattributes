@@ -107,3 +107,8 @@
 *.meta linguist-generated
 *.prefab linguist-generated
 *.unity linguist-generated
+
+*.npy filter=lfs diff=lfs merge=lfs -text
+*.ckpt-[0-9]* filter=lfs diff=lfs merge=lfs -text
+*.ckpt-[0-9]*.meta filter=lfs diff=lfs merge=lfs -text
+*.pickle filter=lfs diff=lfs merge=lfs -text

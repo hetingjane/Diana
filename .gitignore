@@ -110,3 +110,11 @@ $RECYCLE.BIN/
 
 # Ignore the Logs
 Logs/
+
+# Realtime ignores
+*.pyc
+.idea/
+*~
+.env/
+env/
+.cache/
