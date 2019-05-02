@@ -1,5 +1,5 @@
 # BlocksWorld
-TODO
+BlocksWorld (new name in progress) is an interactive gesture- and speech-recognizing intelligent agent. See further information [here](https://www.cs.colostate.edu/~draper/CwC.php).
 
 ## Requirements
 - [Unity Standard Assets](https://assetstore.unity.com/packages/essentials/asset-packs/standard-assets-32351)
