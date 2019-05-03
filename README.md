@@ -29,4 +29,4 @@ Options:
 ```
 
 # LFS limitation(s)
-Currently we are using the old gitlab.toucan... server for LFS. This is because github doesn't support files over 2 GB and our random forest files are 3.1 GB. Keep an eye out for alternatives. We could probably shrink the forest model with some work also.
+We are using GitHub for LFS exclusively. This means we cannot host files over 2G. This excludes the hand models ( /RealTime/models/{LH,RH}/forest.pickle). To acquire these now, use [LH](http://www.cs.colostate.edu/~vision/hand_models/LH/forest.pickle) and [RH](http://www.cs.colostate.edu/~vision/hand_models/RH/forest.pickle)
