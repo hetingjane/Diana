@@ -1,0 +1,2 @@
+[remote "origin"]
+	lfsurl = https://gitlab.toucan.cs.colostate.edu/prady/RealTime.git/info/lfs
