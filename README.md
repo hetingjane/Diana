@@ -27,3 +27,6 @@ Options:
                                default: out.grxml)
   -h, --help                 show this message
 ```
+
+# LFS limitation(s)
+Currently we are using the old gitlab.toucan... server for LFS. This is because github doesn't support files over 2 GB and our random forest files are 3.1 GB. Keep an eye out for alternatives. We could probably shrink the forest model with some work also.
