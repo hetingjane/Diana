@@ -7,7 +7,7 @@ Reads:		me:attending (StringValue)
 			user:isSpeaking (BoolValue)
 			me:speech:current (StringValue)
 			me:intent:eyesClosed (BoolValue)
-Writes:		(none)
+Writes:		me:eyes:open (IntValue, 0=closed, 100=wide open)
 */
 
 using System.Collections;
@@ -64,6 +64,7 @@ public class EyeControlModule : ModuleBase {
 		}
 
 		eyePuppet.lidsOpen = Mathf.MoveTowards(eyePuppet.lidsOpen, targetOpenLevel, Time.deltaTime / 0.25f);
+		SetValue("me:eyes:open", Mathf.RoundToInt(eyePuppet.lidsOpen * 100), "eyelid update");
 		
 		// Once the eye is completely closed, reset our target and next open-limit time.
 		if (eyePuppet.lidsOpen <= 0) {
@@ -71,7 +72,7 @@ public class EyeControlModule : ModuleBase {
 			if (holdingEyesClosed) return;	// intentionally holding eyes closed; don't open
 
 			// Open eyes (level depends on alertness)
-			targetOpenLevel = DataStore.GetIntValue("me:alertness") * 0.1f;
+			targetOpenLevel = DataStore.GetIntValue("me:alertness", 7) * 0.1f;
 			
 			// Select next blink interval generally around 5 seconds.  
 			// But we'll blink sooner if speaking, and later if listening.
