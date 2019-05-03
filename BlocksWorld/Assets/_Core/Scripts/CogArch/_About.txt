@@ -1,0 +1,5 @@
+The CogArch folder contains scripts related to our cognitive architecture, most notably:
+
+• DataStore: our blackboard implementation; stores key/value pairs and notifies subscribers of changes.
+
+• ModuleBase: base class for any cognitive module; in general, these read/write data to/from DataStore.
