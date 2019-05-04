@@ -61,6 +61,20 @@ public class DataStore : MonoBehaviour {
 		public static IntValue One = new IntValue(1);		
 	}
 	
+	// Vector3Value: data storage of a Vector3 (i.e. an x,y,z 3-tuple).
+	public class Vector3Value : IValue {
+		public Vector3 val;
+		public Vector3Value(Vector3 inVal) { this.val = inVal; }
+		public string ToString() { return val.ToString(); }
+		public bool Equals(IValue other) { return other is Vector3Value && val == ((Vector3Value)other).val; }
+		public bool IsEmpty() { return false; }
+		
+		// Also for convenience, here are a couple of static instances
+		// that represent 0,0,0 and 1,1,1.  Use them when it's convenient.
+		public static Vector3Value Zero = new Vector3Value(Vector3.zero);
+		public static Vector3Value One = new Vector3Value(Vector3.one);
+	}
+	
 	// Singleton instance of the DataStore class.
 	public static DataStore instance { get; private set; }
 	
