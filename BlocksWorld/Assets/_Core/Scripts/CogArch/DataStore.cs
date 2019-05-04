@@ -97,16 +97,25 @@ public class DataStore : MonoBehaviour {
 		instance = this;
 	}
 
+	//--------------------------------------------------------------------------------
+	#region Instance Interface
+	// Usage note: Most code should never be calling these instance methods; that's
+	// why they have the ugly "I" prefix.  They're here mainly to support unit-testing,
+	// which can't safely use the static methods but instead makes a throw-away
+	// instance just for that purpose.
+	//
+	// All other code, please use the static methods.
+	
 	/// <summary>
 	/// Subscribe to receive a callback whenever the value for a specific key is changed.
 	/// </summary>
 	/// <param name="key">key of interest</param>
 	/// <param name="handler">handler method to invoke when that value is changed</param>
-	public static void Subscribe(string key, ChangeHandler handler) {
+	public void ISubscribe(string key, ChangeHandler handler) {
 		List<ChangeHandler> subscribers;
-		if (!instance.subscriptions.TryGetValue(key, out subscribers)) {
+		if (!subscriptions.TryGetValue(key, out subscribers)) {
 			subscribers = new List<ChangeHandler>();
-			instance.subscriptions[key] = subscribers;
+			subscriptions[key] = subscribers;
 		}
 		subscribers.Add(handler);
 	}
@@ -123,63 +132,63 @@ public class DataStore : MonoBehaviour {
 	/// <param name="module">module causing this change</param>
 	/// <param name="comment">commment from that module, for logging/debugging</param>
 	/// <returns>true if the value was changed, false if it was unchanged</returns>
-	public static bool SetValue(string key, IValue value, ModuleBase module, string comment) {
+	public bool ISetValue(string key, IValue value, ModuleBase module, string comment) {
 		IValue oldVal;
-		if (instance.store.TryGetValue(key, out oldVal) && oldVal.Equals(value)) return false;	// no change
+		if (store.TryGetValue(key, out oldVal) && oldVal.Equals(value)) return false;	// no change
 		
 		// Store the data
-		instance.store[key] = value;
+		store[key] = value;
 		
 		// Log the changes for debugging purposes (if desired)
-		if (instance.logChanges) {
+		if (logChanges) {
 			Debug.Log(string.Format("{0} := {1} ({2}: {3})", key, value.ToString(), module.name, comment), module);
 		}
 		
 		// Invoke the general value-changed event handler
-		instance.onValueChanged.Invoke(key);
+		if (onValueChanged != null) onValueChanged.Invoke(key);
 		
 		// Notify subscribers to this specific key (if any)
 		List<ChangeHandler> subscribers;
-		if (instance.subscriptions.TryGetValue(key, out subscribers)) {
+		if (subscriptions.TryGetValue(key, out subscribers)) {
 			foreach (var handler in subscribers) handler(key, value);
 		}
 		
 		return true;
 	}
-
+	
 	/// <summary>
 	/// Get the IValue reference associated with a given key.
 	/// </summary>
 	/// <param name="key">key of interest</param>
 	/// <returns>value for that key, or null if key is not found</returns>
-	public static IValue GetValue(string key) {
+	public IValue IGetValue(string key) {
 		IValue value;
-		if (instance.store.TryGetValue(key, out value)) return value;
+		if (store.TryGetValue(key, out value)) return value;
 		return null;
 	}
-	
+
 	/// <summary>
 	/// Get a boolean value associated with a given key.
 	/// </summary>
 	/// <param name="key">key of interest</param>
 	/// <param name="defaultValue">value to return if key is not found (or not boolean)</param>
 	/// <returns>value for that key, or defaultValue</returns>
-	public static bool GetBoolValue(string key, bool defaultValue=false) {
+	public bool IGetBoolValue(string key, bool defaultValue=false) {
 		IValue value;
-		if (!instance.store.TryGetValue(key, out value)) return defaultValue;
+		if (!store.TryGetValue(key, out value)) return defaultValue;
 		if (value is BoolValue) return ((BoolValue)value).val;
 		return defaultValue;
 	}
-	
+
 	/// <summary>
 	/// Get an integer value associated with a given key.
 	/// </summary>
 	/// <param name="key">key of interest</param>
 	/// <param name="defaultValue">value to return if key is not found (or not boolean)</param>
 	/// <returns>value for that key, or defaultValue</returns>
-	public static int GetIntValue(string key, int defaultValue=0) {
+	public int IGetIntValue(string key, int defaultValue=0) {
 		IValue value;
-		if (!instance.store.TryGetValue(key, out value)) return defaultValue;
+		if (!store.TryGetValue(key, out value)) return defaultValue;
 		if (value is IntValue) return ((IntValue)value).val;
 		return defaultValue;
 	}
@@ -190,13 +199,93 @@ public class DataStore : MonoBehaviour {
 	/// <param name="key">key of interest</param>
 	/// <param name="defaultValue">value to return if key is not found (or not boolean)</param>
 	/// <returns>value for that key, or defaultValue</returns>
-	public static Vector3 GetVector3Value(string key, Vector3 defaultValue=default(Vector3)) {
+	public Vector3 IGetVector3Value(string key, Vector3 defaultValue=default(Vector3)) {
 		IValue value;
-		if (!instance.store.TryGetValue(key, out value)) return defaultValue;
+		if (!store.TryGetValue(key, out value)) return defaultValue;
 		if (value is Vector3Value) return ((Vector3Value)value).val;
 		return defaultValue;
 	}
+
+	/// <summary>
+	/// Return whether the given key exists in this DataStore, AND
+	/// has a non-empty value.
+	/// </summary>
+	/// <param name="key">key of interest</param>
+	/// <returns>true if key is found; false otherwise</returns>
+	public bool IHasValue(string key) {
+		IValue value;
+		if (!store.TryGetValue(key, out value)) return false;
+		return !value.IsEmpty();
+	}
+
+	#endregion
+	//--------------------------------------------------------------------------------
+	#region Static Interface
 	
+	/// <summary>
+	/// Subscribe to receive a callback whenever the value for a specific key is changed.
+	/// </summary>
+	/// <param name="key">key of interest</param>
+	/// <param name="handler">handler method to invoke when that value is changed</param>
+	public static void Subscribe(string key, ChangeHandler handler) {
+		instance.ISubscribe(key, handler);
+	}
+
+	/// <summary>
+	/// Set the value associated with a key.  Note that if the value is unchanged
+	/// from its previous value, this method does nothing.
+	/// 
+	/// Also note that this method currently must be called only on the main thread.
+	/// (ToDo: make it safe to call from subthreads.)
+	/// </summary>
+	/// <param name="key">string key</param>
+	/// <param name="value">new value</param>
+	/// <param name="module">module causing this change</param>
+	/// <param name="comment">commment from that module, for logging/debugging</param>
+	/// <returns>true if the value was changed, false if it was unchanged</returns>
+	public static bool SetValue(string key, IValue value, ModuleBase module, string comment) {
+		return instance.ISetValue(key, value, module, comment);
+	}
+
+	/// <summary>
+	/// Get the IValue reference associated with a given key.
+	/// </summary>
+	/// <param name="key">key of interest</param>
+	/// <returns>value for that key, or null if key is not found</returns>
+	public static IValue GetValue(string key) {
+		return instance.IGetValue(key);
+	}
+
+	/// <summary>
+	/// Get a boolean value associated with a given key.
+	/// </summary>
+	/// <param name="key">key of interest</param>
+	/// <param name="defaultValue">value to return if key is not found (or not boolean)</param>
+	/// <returns>value for that key, or defaultValue</returns>
+	public static bool GetBoolValue(string key, bool defaultValue=false) {
+		return instance.IGetBoolValue(key, defaultValue);
+	}
+	
+	/// <summary>
+	/// Get an integer value associated with a given key.
+	/// </summary>
+	/// <param name="key">key of interest</param>
+	/// <param name="defaultValue">value to return if key is not found (or not boolean)</param>
+	/// <returns>value for that key, or defaultValue</returns>
+	public static int GetIntValue(string key, int defaultValue=0) {
+		return instance.IGetIntValue(key, defaultValue);
+	}
+	
+	/// <summary>
+	/// Get a Vector3 value associated with a given key.
+	/// </summary>
+	/// <param name="key">key of interest</param>
+	/// <param name="defaultValue">value to return if key is not found (or not boolean)</param>
+	/// <returns>value for that key, or defaultValue</returns>
+	public static Vector3 GetVector3Value(string key, Vector3 defaultValue=default(Vector3)) {
+		return instance.IGetVector3Value(key, defaultValue);
+	}
+
 	/// <summary>
 	/// Return whether the given key exists in this DataStore, AND
 	/// has a non-empty value.
@@ -204,9 +293,63 @@ public class DataStore : MonoBehaviour {
 	/// <param name="key">key of interest</param>
 	/// <returns>true if key is found; false otherwise</returns>
 	public static bool HasValue(string key) {
-		IValue value;
-		if (!instance.store.TryGetValue(key, out value)) return false;
-		return !value.IsEmpty();
+		return instance.IHasValue(key);
 	}
+
+	#endregion
+	//--------------------------------------------------------------------------------
+	#region Unit Test
+	
+	public class UnitTest : QA.UnitTest {
+		string lastChangedKey = null;
+		DataStore.IValue lastChangedValue;
+		int changeCount = 0;
+		
+		void NoteChange(string key, DataStore.IValue value) {
+			lastChangedKey = key;
+			lastChangedValue = value;
+			changeCount++;
+		}
+		
+		protected override void Run() {
+			DataStore ds = new DataStore();
+			ds.logChanges = false;
+			ds.ISubscribe("foo", NoteChange);
+			ds.ISubscribe("bar", NoteChange);
+			
+			AssertFalse(ds.IHasValue("foo"));
+			ds.ISetValue("foo", new IntValue(42), null, "test1");
+			AssertTrue(ds.IHasValue("foo"));
+			AssertEqual(42, ds.IGetIntValue("foo"));
+			AssertEqual(changeCount, 1);
+			AssertEqual(lastChangedKey, "foo");
+			Assert(lastChangedValue is IntValue, "wrong value type");
+			AssertEqual(42, ((IntValue)lastChangedValue).val);
+			
+			AssertFalse(ds.IHasValue("bar"));
+			ds.ISetValue("bar", new StringValue("Hello world!"), null, "test2");
+			AssertTrue(ds.IHasValue("bar"));
+			AssertEqual("Hello world!", ds.IGetValue("bar").ToString());
+			AssertEqual(changeCount, 2);
+			AssertEqual(lastChangedKey, "bar");
+			Assert(lastChangedValue is StringValue, "wrong value type");
+			AssertEqual("Hello world!", ((StringValue)lastChangedValue).val);
+			
+			AssertFalse(ds.IHasValue("baz"));
+			ds.ISetValue("baz", new Vector3Value(Vector3.forward), null, "test3");
+			AssertTrue(ds.IHasValue("baz"));
+			AssertEqual(Vector3.forward, ds.IGetVector3Value("baz"));
+			AssertEqual(changeCount, 2);		// (since we didn't subscribe to "baz")
+			AssertEqual(lastChangedKey, "bar");
+		}
+		
+	}
+	
+	// Static constructor for the main class instantiates the unit test class:
+	static DataStore() {
+		QA.UnitTest.RunUnitTest(new UnitTest());
+	}
+	
+	#endregion  // Unit Test
 
 }
