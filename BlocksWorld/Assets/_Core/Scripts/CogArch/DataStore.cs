@@ -185,6 +185,19 @@ public class DataStore : MonoBehaviour {
 	}
 	
 	/// <summary>
+	/// Get a Vector3 value associated with a given key.
+	/// </summary>
+	/// <param name="key">key of interest</param>
+	/// <param name="defaultValue">value to return if key is not found (or not boolean)</param>
+	/// <returns>value for that key, or defaultValue</returns>
+	public static Vector3 GetVector3Value(string key, Vector3 defaultValue=default(Vector3)) {
+		IValue value;
+		if (!instance.store.TryGetValue(key, out value)) return defaultValue;
+		if (value is Vector3Value) return ((Vector3Value)value).val;
+		return defaultValue;
+	}
+	
+	/// <summary>
 	/// Return whether the given key exists in this DataStore, AND
 	/// has a non-empty value.
 	/// </summary>
