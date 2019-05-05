@@ -181,10 +181,22 @@ public class DataStore : MonoBehaviour {
 	}
 
 	/// <summary>
+	/// Get a string value associated with a given key (converting from other types).
+	/// </summary>
+	/// <param name="key">key of interest</param>
+	/// <param name="defaultValue">value to return if key is not found</param>
+	/// <returns>value for that key, or defaultValue</returns>
+	public string IGetStringValue(string key, string defaultValue=null) {
+		IValue value;
+		if (!store.TryGetValue(key, out value)) return defaultValue;
+		return value.ToString();
+	}
+
+	/// <summary>
 	/// Get an integer value associated with a given key.
 	/// </summary>
 	/// <param name="key">key of interest</param>
-	/// <param name="defaultValue">value to return if key is not found (or not boolean)</param>
+	/// <param name="defaultValue">value to return if key is not found (or not integer)</param>
 	/// <returns>value for that key, or defaultValue</returns>
 	public int IGetIntValue(string key, int defaultValue=0) {
 		IValue value;
@@ -197,7 +209,7 @@ public class DataStore : MonoBehaviour {
 	/// Get a Vector3 value associated with a given key.
 	/// </summary>
 	/// <param name="key">key of interest</param>
-	/// <param name="defaultValue">value to return if key is not found (or not boolean)</param>
+	/// <param name="defaultValue">value to return if key is not found (or not Vector3)</param>
 	/// <returns>value for that key, or defaultValue</returns>
 	public Vector3 IGetVector3Value(string key, Vector3 defaultValue=default(Vector3)) {
 		IValue value;
@@ -267,10 +279,20 @@ public class DataStore : MonoBehaviour {
 	}
 	
 	/// <summary>
+	/// Get a string value associated with a given key (converting from other types).
+	/// </summary>
+	/// <param name="key">key of interest</param>
+	/// <param name="defaultValue">value to return if key is not found</param>
+	/// <returns>value for that key, or defaultValue</returns>
+	public static string GetStringValue(string key, string defaultValue=null) {
+		return instance.IGetStringValue(key, defaultValue);
+	}
+	
+	/// <summary>
 	/// Get an integer value associated with a given key.
 	/// </summary>
 	/// <param name="key">key of interest</param>
-	/// <param name="defaultValue">value to return if key is not found (or not boolean)</param>
+	/// <param name="defaultValue">value to return if key is not found (or not integer)</param>
 	/// <returns>value for that key, or defaultValue</returns>
 	public static int GetIntValue(string key, int defaultValue=0) {
 		return instance.IGetIntValue(key, defaultValue);
@@ -280,7 +302,7 @@ public class DataStore : MonoBehaviour {
 	/// Get a Vector3 value associated with a given key.
 	/// </summary>
 	/// <param name="key">key of interest</param>
-	/// <param name="defaultValue">value to return if key is not found (or not boolean)</param>
+	/// <param name="defaultValue">value to return if key is not found (or not Vector3)</param>
 	/// <returns>value for that key, or defaultValue</returns>
 	public static Vector3 GetVector3Value(string key, Vector3 defaultValue=default(Vector3)) {
 		return instance.IGetVector3Value(key, defaultValue);
