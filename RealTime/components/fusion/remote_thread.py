@@ -69,7 +69,7 @@ class Remote(threading.Thread):
                 events = self._sel.select()
                 if data is None:
                     try:
-                        data = self.input_queue.get_nowait()
+                        data = self.input_queue.get(block=True, timeout=0.01)
                     except queue.Empty:
                         pass
 
