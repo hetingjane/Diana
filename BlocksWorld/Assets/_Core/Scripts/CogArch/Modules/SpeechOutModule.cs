@@ -13,22 +13,36 @@ Writes:		me:speech:current
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Crosstales.RTVoice;
 
 public class SpeechOutModule : ModuleBase {
 
 	public StringEvent onSpeaking;
-
+	
 	float speechStartTime;
 	float speechDuration;
 	string nowSpeaking;
 	
-	//AppleSpeechSynth speechSynth;
+	Crosstales.RTVoice.Model.Voice voice;
+	Crosstales.RTVoice.Speaker speaker;
+	AudioSource audio;
 	
 	protected override void Start() {
 		base.Start();
 		DataStore.Subscribe("me:speech:intent", NoteSpeechIntent);
-		
-		//speechSynth = GetComponent<AppleSpeechSynth>();
+		speaker = GameObject.FindObjectOfType<Crosstales.RTVoice.Speaker>();
+		audio = GetComponentInChildren<AudioSource>();
+	}
+	
+	void ConfigureVoice() {
+		string voices = DataStore.GetStringValue("me:voice");
+		if (voices == null) return;
+		foreach (string v in voices.Split(new char[]{';'})) {
+			Debug.Log("Trying voice: " + v);
+			voice = Crosstales.RTVoice.Speaker.VoiceForName(v);
+			if (voice != null) return;
+		}
+		Debug.LogError("Unable to get voice matching " + voices);
 	}
 	
 	void NoteSpeechIntent(string key, DataStore.IValue value) {
@@ -38,6 +52,9 @@ public class SpeechOutModule : ModuleBase {
 	}
 
 	void Speak(string speech) {
+		if (voice == null) ConfigureVoice();
+		Speaker.Speak(speech, audio, voice);
+		
 		onSpeaking.Invoke(speech);
 		speechStartTime = Time.time;
 		speechDuration = 2 + speech.Length * 0.1f;
