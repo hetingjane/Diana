@@ -1,0 +1,135 @@
+Pick up a big red block. 
+Grasp the pyramid. 
+Find a block which is taller than the one you are holding and put it into the box. 
+What does the box contain? 
+What is the pyramid supported by? 
+How many blocks are not in the box? 
+Is at least one of them narrower than the one which I told you to pick up? 
+Is it supported? 
+Can the table pick up blocks? 
+Can a pyramid be supported by a block? 
+Can a pyramid support a pyramid? 
+Stack up two pyramids. 
+Will you please stack up both of the red blocks and either a green cube or a pyramid? 
+Which cube is sitting on the table? 
+Is there a large block behind a pyramid? 
+Put a small one onto the green cube which supports a pyramid. 
+Put the littlest pyramid on top of it. 
+Does the shortest thing the tallest pyramid's support supports support anything green? 
+What color is it? 
+How many things are on top of green cubes? 
+Had you touched any pyramid before you put the green one on the little cube? 
+When did you pick it up? 
+Why did you do that? 
+Why did you clear off that cube? 
+How did you do it? 
+How many objects did you touch while you were doing it? 
+What did the red cube support before you started to clean it off? 
+There were five blocks to the left of the box then. 
+Put the blue pyramid on the block in the box. 
+Is there anything which is bigger than every pyramid but is not as wide as the thing that supports it? 
+Does a steeple contain green cubes
+a "steeple" is a stack which contains two green cubes and a pyramid. 
+Are there any steeples now? 
+Build one. 
+Call the biggest block "superblock". 
+Have you picked superblock up since we began? 
+Why did you drop it? 
+Is there anything to the right of the red pyramid? 
+Pick up a block.
+What are you holding?
+Put it beside the pyramid.
+Where is the red block?
+What is it on?
+Is the big pyramid green?
+What shape is the big red thing?
+Can you put a block on a pyramid?
+How many blocks can you pick up?
+What is on the green cube?
+Are there any more?
+Which is taller, the red cube or the green one?
+Can a table support a pyramid?
+Can a cube roll off the table?
+Would a cube roll off the top of a pyramid?
+Can you put a pyramid on the side of a cube?
+Put everything in the box.
+Drop everything.
+Find an object on a red cube.
+What is it?
+How big is it?
+Is the top of the red cube clear?
+Where are all the cubes?
+Tell me what you are holding.
+Could you please pick something up?
+Now put it on the table.
+Clear an area on the left of the table.
+What did you have to move to do that?
+Is there any space left anywhere?
+Can you find room on the left of the table for two blocks and a pyramid?
+Roll the pyramid to the left.
+Can pyramids roll?
+If you put one block on another, can you then pick up the latter?
+Why not?
+What about the former?
+Will you put the pyramid on its side?
+Now drop a cube on it.
+Where did the cube go?
+What blocks are red and next to the pyramid?
+Which blocks are taller than any pyramid?
+Have you ever seen a blue pyramid?
+What did you do last?
+Put the red cube under the green pyramid.
+Don't ever touch the green cube.
+Make me a steeple.
+Where would you put the red block if you had to move the green one?
+Move the green block.
+Did you put the red block where you said you would?
+Where did I tell you to move the green block?
+Try to find all blocks colored red or blue.
+Move them to the front of the table.
+Move the rest to the back.
+If you build a steeple, where do you start?
+Why?
+Can a steeple have four blocks?
+Assume that there is another block on the table.
+How do you know?
+How can you tell?
+Who said it was red?
+Take either a red block or a green one and put it on a blue one.
+Were you aware that the green block is in the box?
+I want you to bring me a cube.
+Any one.
+Go find a block under a pyramid.
+Find the second last block I asked you to move and pick it up.
+What is that block's color?
+The one you are holding.
+Is the taller green cube taller than the tallest pyramid?
+Turn over a red cube.
+Turn the pyramid round so I can see its back.
+Does every cube have every face the same?
+Is there a cube not all of whose faces are the same?
+Can you find a cube with one face taller than the others?
+I have just put a cube on the table.
+How many colors does that cube have?
+How many pairs of opposite faces have the same color?
+Are you sure?
+Is that cube red?
+Call it Bert.
+Does Bert have any neighbors?
+Does Bert like any of his neighbors?
+Bert likes only yellow cubes, or cubes with some yellow in them.
+Does Bert like himself?
+Move most cubes to the back, leaving just one or two little cubes at the front.
+How many did you leave?
+How do you build a steeple?
+How would you begin to dismantle a steeple?
+How did you work that out?
+When dismantling a steeple, when would you move the bottom block?
+Is there always room to put down a block you are holding?
+What is the blue pyramid supported by?
+Put a small cube and a pyramid on the large red cube and the large green cube respectively.
+Are any red blocks resting on the table?
+Find the seventh tallest cube.
+In order to build an arch, you need a bar.
+If there is too much on that block to move it, clear it off.
+Thank you.
