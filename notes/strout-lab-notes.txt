@@ -1,0 +1,38 @@
+ABOUT THIS DOCUMENT: This file are the lab notes of Joe Strout, a graduate student working in the vision lab under Ross Beveridge and Bruce Draper in 2019-2020.  The notes mainly reflect development of Diana 2.0, an avatar that communicates with the human user via speech and gestures, as part of the Communicating with Computers (CwC) project.
+
+Entries are dated (in month/day/year) form and arranged chronologically, newest entries at the end of the document.
+
+5/09/19
+=======
+I'm working on an internal representation of speech, to act as an intermediary between the raw English text or parse tree from some particular parsing tool, and the rest of the system (cognition, planning, knowledge representation, response generation, etc.).
+
+This will almost certainly be some sort of semantic network.  Implementation details are still TBD.
+
+While most inputs from the user are likely to be commands or queries, we want to be able to be able to capture other types of input, too.
+
+Major communication-act types:
+	Confirmation (e.g.: yes, correct, that's right)
+	Denial (no)
+	Query (who/what/when/why/how)
+	Command/Request
+	Assert/Inform
+	Emote (wow, argh)
+	Phatic/Backchannel (hello, please, thank you, you're welcome, ah, I see, OK)
+
+Almost all commands (and most queries) will involve actions -- either something that has happened, or something the user wants to happen.  Actions also show up as subclauses in other contexts, such as identifying objects (e.g. "the block you moved before").  So we need to give special attention to describing actions.  I'm basing the following on standard linguistic themes, but lumping together some that seem like needless distinctions to me, and adding Activity (which was oddly absent from the source I used).
+
+Themes (slots on an action):
+	Subject (Agent, Experiencer, Force/Natural Cause)
+	Activity (verb)
+	Object (Patient, Stimulus, Theme)
+	Instrument (with, using, by means of)
+	Location
+	Direction (Goal)
+	Recipient (aka indirect object)
+	Source/Origin
+	Time
+	Beneficiary (may not be needed for Diana)
+	Manner (ditto)
+	Purpose
+	Cause
+
