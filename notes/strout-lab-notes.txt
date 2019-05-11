@@ -36,3 +36,44 @@ Themes (slots on an action):
 	Purpose
 	Cause
 
+5/10/19
+=======
+I've started on a parser.  I considered using StanfordNLP, but wasn't very impressed with the quality of its parsing when I used it on my CS540 project.  AllenNLP looks better, but it's an awfully heavy install.  I think we can bang out a mostly hand-coded parser that will do as well for the range of inputs we'll be likely to give it.
+
+To that end, I started a "NLPEx1" project (in Visual Studio for Mac).  It leverages data extracted from the SEMCOR 3.0 data set (downloaded via http://www.nltk.org/nltk_data/).  For every word (and set phrase), I collected all the instances in the corpus and counted its usage as various parts of speech (POS).  Then I output a simple file with the word, and the POS frequencies, normalized to 1.  The data has a lot of extra cruft in it, but for the most part the words I've looked at seem good (with a few exceptions).
+
+So here's the big picture of the parser so far:
+
+1. Replace set phrases, e.g. "thank you" -> "thank_you".
+2. Split into words, with parallel arrays for POS and dependencies (i.e., what word each word modifies).
+3. Assign initial parts of speech from the (tweaked) SEMCOR dictionary.
+4. Repeatedly apply a set of ordered heuristics, that define dependencies and/or change POS based on simple patterns (e.g., an adjective before a noun modifies that noun).
+
+That's pretty much it.  I'm not attempting to do a *complete* parse of the input; it's fine if multiple phrases remain floating at the root.  Indeed, it's impossible to reliably disambiguate from syntax alone; consider:
+
+	A. I looked up the hallway.
+	B. I looked up the address.
+
+Syntactically identical, but in one case we have essentially a compound verb ("look_up") while in the second, "up" is an ordinary preposition.  Actually this is an unfortunate example, since our step 3 replaces this with looked_up before we even start parsing.  Maybe this is better:
+
+	A. Put the red box on the table.
+	B. Grab the red box on the table.
+	
+In A, the prepositional phrase modifies "put;" in B it modifies "box."  There is no way to disambiguate this without delving into what "put" and "grab" mean.  We could have tables of such information, but I think it'll be easier to just let the put/grab handlers work it out.
+
+So the parsing we're doing pretty much locates noun phrases and prepositional phrases, and I think that's good enough.
+
+I currently have two forms of string output.  One has the words in order, with annotations for POS and dependency, like so:
+
+[put(VB:-1) a(DT:3) yellow(JJ:3) block(NN:0) on(IN:-1) the(DT:7) green(JJ:7) one(NN:4)]
+
+This is easily read as "put a yellow block on the green one."  The other format is tree form, with dependents under the head word they depend on:
+
+[VB[put NN[block DT[a] JJ[yellow]]] IN[on NN[one DT[the] JJ[green]]]]
+
+This format is a little harder to read, but it better represents patterns we might match against, such as [VB[put NN[$1] IN[$2]] in this case.  I'm concerned, however, that this tree format loses information on word order that may be important.  For example, "is there a red block" and "there is a red block" both come out as
+
+[VB[is RB[there] NN[block DT[a] JJ[red]]]]
+
+in tree form.  So I may need to somehow preserve that word order, for cases where it matters.
+
