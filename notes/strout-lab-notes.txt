@@ -77,3 +77,25 @@ This format is a little harder to read, but it better represents patterns we mig
 
 in tree form.  So I may need to somehow preserve that word order, for cases where it matters.
 
+
+5/13/19
+=======
+I haven't thought of a better order-preserving tree format than:
+
+[VB[RB[there] is NN[DT[a] JJ[red] block]]]
+
+It's a little awkward in that the POS can be so far separated from the actual word it's talking about (e.g. VB and "is" in this case).  But it'll do.
+
+Basic parser is doing nicely now.  I've adapted the UnitTest class from the BlocksWorld project, and added some unit tests verifying the parse (in tree format) of a variety of inputs.  I expect we will eventually need quite a lot of those, but for now it's time to push on to interpretation.
+
+That means building a semantic-network representation of the input (first we must understand the input, *then* we act or respond).  And here we face an implementation choice: use a generic semnet asset, like RDF?  Or a custom strongly-typed one, with properties for the various slots defined above?
+
+Advantages of RDF: it's a standard; later researchers will more easily recognize it; it comes with utilities to read and write semnets in various formats.  Also supports querying and updating with SPARQL.
+
+Advantage of custom classes: strong type-checking, probably simpler/clearer code.  Also less code overall (dotNetRDF is huge).
+
+I'm going to go with custom classes for now, but try to encapsulate this decision as much as possible so we can swap out a different implementation later if we decide to do so.  
+
+
+
+
