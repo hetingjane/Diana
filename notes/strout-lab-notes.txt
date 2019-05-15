@@ -97,5 +97,28 @@ Advantage of custom classes: strong type-checking, probably simpler/clearer code
 I'm going to go with custom classes for now, but try to encapsulate this decision as much as possible so we can swap out a different implementation later if we decide to do so.  
 
 
+5/15/19
+=======
+Despite the claim in the previous entry, my first attempt at a semantic representation turned out to basically reinvent RDF.  I have a SemNet class that contains SemNodes linked by Relations (triplets), and an ontology that spells out a variety of attributes and meta-relations.  It's all very general but also very weakly typed.  Elegant, but hard to use, as I discovered as soon as I tried to actually use it.
+
+I believe this was a misstep.  I'm going to back up and try again, with a series of more strongly-typed classes and enums.  I don't know that I'll be able to encapsulate this decision; a strongly-typed API is the whole point of it.  But let's try it and see how it goes.
+
+OK, this feels much better.  More work will be needed to generalize it, but it's very nice to have strongly-typed representations to work with.  So now, the input:
+
+	put a yellow block on the green one
+
+gets parts of speech and dependencies assigned as:
+
+	[put(VB:-1) a(DT:3) yellow(JJ:3) block(NN:0) on(IN:-1) the(DT:7) green(JJ:7) one(NN:4)]
+
+which is represented in tree form as:
+
+	[VB[put NN[DT[a] JJ[yellow] block]] IN[on NN[DT[the] JJ[green] one]]]
+
+and this is grokked as the following ActionSpec:
+
+	[Act:Put Obj:[any single Yellow block] Loc:[OnTopOf [the single Green one]]]
+
+The latter is the string form of a data structure that actually represents all those parts in (strongly-typed) symbolic form, and would be easy for the avatar to carry out.
 
 
