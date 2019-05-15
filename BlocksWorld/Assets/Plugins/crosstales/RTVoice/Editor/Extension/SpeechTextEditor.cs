@@ -42,52 +42,58 @@ namespace Crosstales.RTVoice.EditorExtension
             {
                 if (!string.IsNullOrEmpty(script.Text))
                 {
-                    if (Speaker.isTTSAvailable && EditorHelper.isRTVoiceInScene)
+                    if ((script.GenerateAudioFile && !string.IsNullOrEmpty(script.FileName)) || !script.GenerateAudioFile)
                     {
-                        GUILayout.Label("Test-Drive", EditorStyles.boldLabel);
-
-                        if (Util.Helper.isEditorMode)
+                        if (Speaker.isTTSAvailable && EditorHelper.isRTVoiceInScene)
                         {
-                            if (Speaker.isMaryMode)
+                            GUILayout.Label("Test-Drive", EditorStyles.boldLabel);
+
+                            if (Util.Helper.isEditorMode)
                             {
-                                EditorGUILayout.HelpBox("Test-Drive is not supported for MaryTTS.", MessageType.Info);
+                                if (Speaker.isWorkingInEditor)
+                                {
+                                    if (Speaker.isSpeaking)
+                                    {
+                                        if (GUILayout.Button(new GUIContent(" Silence", EditorHelper.Icon_Silence, "Silence the active speaker.")))
+                                        {
+                                            script.Silence();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (GUILayout.Button(new GUIContent(" Speak", EditorHelper.Icon_Speak, "Speaks the text with the selected voice and settings.")))
+                                        {
+                                            script.Speak();
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    EditorGUILayout.HelpBox("Test-Drive is not supported for current TTS-system inside the Unity Editor.", MessageType.Info);
+                                }
+
+                                EditorHelper.SeparatorUI();
+
+                                GUILayout.Label("Editor", EditorStyles.boldLabel);
+
+                                if (GUILayout.Button(new GUIContent(" Refresh AssetDatabase", EditorHelper.Icon_Refresh, "Refresh the AssetDatabase from the Editor.")))
+                                {
+                                    EditorHelper.RefreshAssetDatabase();
+                                }
                             }
                             else
                             {
-                                GUILayout.BeginHorizontal();
-                                {
-                                    if (GUILayout.Button(new GUIContent(" Speak", EditorHelper.Icon_Speak, "Speaks the text with the selected voice and settings.")))
-                                    {
-                                        script.Speak();
-                                    }
-
-                                    GUI.enabled = Speaker.isSpeaking;
-                                    if (GUILayout.Button(new GUIContent(" Silence", EditorHelper.Icon_Silence, "Silence the active speaker.")))
-                                    {
-                                        script.Silence();
-                                    }
-                                    GUI.enabled = true;
-                                }
-                                GUILayout.EndHorizontal();
-                            }
-
-                            EditorHelper.SeparatorUI();
-
-                            GUILayout.Label("Editor", EditorStyles.boldLabel);
-
-                            if (GUILayout.Button(new GUIContent(" Refresh AssetDatabase", EditorHelper.Icon_Refresh, "Refresh the AssetDatabase from the Editor.")))
-                            {
-                                refreshAssetDatabase();
+                                EditorGUILayout.HelpBox("Disabled in Play-mode!", MessageType.Info);
                             }
                         }
                         else
                         {
-                            EditorGUILayout.HelpBox("Disabled in Play-mode!", MessageType.Info);
+                            EditorHelper.NoVoicesUI();
                         }
                     }
                     else
                     {
-                        EditorHelper.NoVoicesUI();
+                        EditorGUILayout.HelpBox("'File Name' is null or empty! Please enter a valid name (incl. path).", MessageType.Warning);
                     }
                 }
                 else
@@ -102,19 +108,6 @@ namespace Crosstales.RTVoice.EditorExtension
         }
 
         #endregion
-
-
-        #region Private methods
-
-        private void refreshAssetDatabase()
-        {
-            if (Util.Helper.isEditorMode)
-            {
-                AssetDatabase.Refresh();
-            }
-        }
-
-        #endregion
     }
 }
-// © 2016-2018 crosstales LLC (https://www.crosstales.com)
+// © 2016-2019 crosstales LLC (https://www.crosstales.com)

@@ -88,4 +88,4 @@ namespace Crosstales.UI
         #endregion
     }
 }
-// © 2018 crosstales LLC (https://www.crosstales.com)
+// © 2018-2019 crosstales LLC (https://www.crosstales.com)

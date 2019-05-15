@@ -19,8 +19,6 @@ namespace Crosstales.RTVoice.Demo.Util
         [Tooltip("Selected objects for the controller.")]
         public GameObject[] Objects;
 
-        //private bool isNative;
-
         #endregion
 
 
@@ -30,13 +28,16 @@ namespace Crosstales.RTVoice.Demo.Util
         {
             foreach (GameObject go in Objects)
             {
-                if (GUISpeech.isNative)
+                if (go != null)
                 {
-                    go.SetActive(Active);
-                }
-                else
-                {
-                    go.SetActive(!Active);
+                    if (GUISpeech.isNative)
+                    {
+                        go.SetActive(Active);
+                    }
+                    else
+                    {
+                        go.SetActive(!Active);
+                    }
                 }
             }
         }
@@ -44,4 +45,4 @@ namespace Crosstales.RTVoice.Demo.Util
         #endregion
     }
 }
-// © 2016-2017 crosstales LLC (https://www.crosstales.com)
+// © 2016-2019 crosstales LLC (https://www.crosstales.com)

@@ -12,6 +12,8 @@ namespace Crosstales.RTVoice.EditorTask
 
         static ReminderCheck()
         {
+            //Debug.Log(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name);
+
             string lastDate = EditorPrefs.GetString(EditorConstants.KEY_REMINDER_DATE);
             string date = System.DateTime.Now.ToString("yyyyMMdd"); // every day
             //string date = System.DateTime.Now.ToString("yyyyMMddHHmm"); // every minute (for tests)
@@ -40,7 +42,9 @@ namespace Crosstales.RTVoice.EditorTask
                         Application.OpenURL(EditorConstants.ASSET_URL);
                         EditorConfig.REMINDER_CHECK = false;
 
-                        Debug.LogWarning("+++ Thank you for rating " + Util.Constants.ASSET_NAME + "! +++");
+                        Debug.LogWarning("<color=red>" + Common.Util.BaseHelper.CreateString("❤", 500) + "</color>");
+                        Debug.LogWarning("<b>+++ Thank you for rating <color=blue>" + Util.Constants.ASSET_NAME + "</color>! +++</b>");
+                        Debug.LogWarning("<color=red>" + Common.Util.BaseHelper.CreateString("❤", 500) + "</color>");
                     }
                     else if (option == 1)
                     {
@@ -68,4 +72,4 @@ namespace Crosstales.RTVoice.EditorTask
 
     }
 }
-// © 2017-2018 crosstales LLC (https://www.crosstales.com)
+// © 2017-2019 crosstales LLC (https://www.crosstales.com)

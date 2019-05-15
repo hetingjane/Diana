@@ -26,8 +26,6 @@ namespace Crosstales.RTVoice.EditorExtension
         {
             DrawDefaultInspector();
 
-            //EditorHelper.SeparatorUI();
-
             if (script.isActiveAndEnabled)
             {
                 if (script.Source != null)
@@ -37,7 +35,7 @@ namespace Crosstales.RTVoice.EditorExtension
                 else
                 {
                     EditorHelper.SeparatorUI();
-                    EditorGUILayout.HelpBox("Please add a Source!", MessageType.Warning);
+                    EditorGUILayout.HelpBox("Please add a 'Source'!", MessageType.Warning);
                 }
             }
             else
@@ -51,4 +49,4 @@ namespace Crosstales.RTVoice.EditorExtension
 
     }
 }
-// © 2017-2018 crosstales LLC (https://www.crosstales.com)
+// © 2017-2019 crosstales LLC (https://www.crosstales.com)

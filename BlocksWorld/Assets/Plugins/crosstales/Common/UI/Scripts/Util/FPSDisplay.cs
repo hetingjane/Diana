@@ -9,6 +9,8 @@ namespace Crosstales.UI.Util
 
         #region Variables
 
+        /// <summary>Text component to display the FPS.</summary>
+        [Tooltip("Text component to display the FPS.")]
         public Text FPS;
 
         private float deltaTime = 0f;
@@ -62,4 +64,4 @@ namespace Crosstales.UI.Util
         #endregion
     }
 }
-// © 2017-2018 crosstales LLC (https://www.crosstales.com)
+// © 2017-2019 crosstales LLC (https://www.crosstales.com)

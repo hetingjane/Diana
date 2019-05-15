@@ -1,8 +1,8 @@
 ﻿//
 //  RTVoiceIOSBridge.mm
-//  Version 2.8.6
+//  Version 2.9.9
 //
-//  Copyright 2016-2017 www.crosstales.com
+//  Copyright 2016-2018 www.crosstales.com
 //
 #import "RTVoiceIOSBridge.h"
 #import <AVFoundation/AVFoundation.h>
@@ -36,12 +36,12 @@ AVSpeechSynthesizer *MySynthesizer;
  * @param pitch Pitch of the speech in percent
  * @param volume Volume of the speaker in percent
  */
-- (void)speak: (NSString *)name text:(NSString *)text rate:(float)rate pitch:(float)pitch volume:(float)volume
-//- (void)speak: (NSString *)id text:(NSString *)text rate:(float)rate pitch:(float)pitch volume:(float)volume
+//- (void)speak: (NSString *)name text:(NSString *)text rate:(float)rate pitch:(float)pitch volume:(float)volume
+- (void)speak: (NSString *)id text:(NSString *)text rate:(float)rate pitch:(float)pitch volume:(float)volume
 {
 #ifdef DEBUG
-    NSLog(@"speak: %@ - Text: %@, Rate: %.3f, Pitch: %.3f, Volume: %.3f", name, text, rate, pitch, volume);
-    //NSLog(@"speak: %@ - Text: %@, Rate: %.3f, Pitch: %.3f, Volume: %.3f", id, text, rate, pitch, volume);
+    //NSLog(@"speak: %@ - Text: %@, Rate: %.3f, Pitch: %.3f, Volume: %.3f", name, text, rate, pitch, volume);
+    NSLog(@"speak: %@ - Text: %@, Rate: %.3f, Pitch: %.3f, Volume: %.3f", id, text, rate, pitch, volume);
 #endif
 
     if (!_synthesizer)
@@ -59,8 +59,8 @@ AVSpeechSynthesizer *MySynthesizer;
         AVSpeechSynthesisVoice *voice = voices[0]; // one voice must be available
         
         for (AVSpeechSynthesisVoice *v in voices) {
-            if ([v.name isEqualToString:name])
-            //if ([v.identifier isEqualToString:id])
+            //if ([v.name isEqualToString:name])
+            if ([v.identifier isEqualToString:id])
             {
                 voice = v;
                 break;
@@ -119,8 +119,8 @@ AVSpeechSynthesizer *MySynthesizer;
     
     NSString *appendstring = @"";
     for (AVSpeechSynthesisVoice *voice in voices) {
-        //appendstring = [appendstring stringByAppendingString:voice.identifier];
-        //appendstring = [appendstring stringByAppendingString:@","];
+        appendstring = [appendstring stringByAppendingString:voice.identifier];
+        appendstring = [appendstring stringByAppendingString:@","];
         appendstring = [appendstring stringByAppendingString:voice.name];
         appendstring = [appendstring stringByAppendingString:@","];
         appendstring = [appendstring stringByAppendingString:voice.language];
@@ -211,23 +211,23 @@ extern "C" {
      * @param pitch Pitch of the speech in percent
      * @param volume Volume of the speaker in percent
      */
-    void Speak(char *name, char *text, float rate, float pitch, float volume)
-    //void Speak(char *id, char *text, float rate, float pitch, float volume)
+    //void Speak(char *name, char *text, float rate, float pitch, float volume)
+    void Speak(char *id, char *text, float rate, float pitch, float volume)
     {
         if([[[UIDevice currentDevice]systemVersion]floatValue] < 8){
             NSLog(@"ERROR: RT-Voice doesn't support iOS-versions before 8!");
         } else {
-            NSString *voiceName = [NSString stringWithUTF8String:name];
-            //NSString *voiceId = [NSString stringWithUTF8String:id];
+            //NSString *voiceName = [NSString stringWithUTF8String:name];
+            NSString *voiceId = [NSString stringWithUTF8String:id];
             NSString *messageFromRTVoice = [NSString stringWithUTF8String:text];
 
 #ifdef DEBUG
-            NSLog(@"Speak: %@ - Text: %@, Rate: %.3f, Pitch: %.3f, Volume: %.3f", voiceName, messageFromRTVoice, rate, pitch, volume);
-            //NSLog(@"Speak: %@ - Text: %@, Rate: %.3f, Pitch: %.3f, Volume: %.3f", voiceId, messageFromRTVoice, rate, pitch, volume);
+            //NSLog(@"Speak: %@ - Text: %@, Rate: %.3f, Pitch: %.3f, Volume: %.3f", voiceName, messageFromRTVoice, rate, pitch, volume);
+            NSLog(@"Speak: %@ - Text: %@, Rate: %.3f, Pitch: %.3f, Volume: %.3f", voiceId, messageFromRTVoice, rate, pitch, volume);
 #endif
 
-            [[RTVoiceIOSBridge alloc] speak:voiceName text:messageFromRTVoice rate:rate pitch:pitch volume:volume];
-            //[[RTVoiceIOSBridge alloc] speak:voiceId text:messageFromRTVoice rate:rate pitch:pitch volume:volume];
+            //[[RTVoiceIOSBridge alloc] speak:voiceName text:messageFromRTVoice rate:rate pitch:pitch volume:volume];
+            [[RTVoiceIOSBridge alloc] speak:voiceId text:messageFromRTVoice rate:rate pitch:pitch volume:volume];
         }
     }
     

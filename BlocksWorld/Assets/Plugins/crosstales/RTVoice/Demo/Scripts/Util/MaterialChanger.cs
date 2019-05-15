@@ -29,7 +29,7 @@ namespace Crosstales.RTVoice.Demo.Util
 
         public void Update()
         {
-            if (Source.isPlaying)
+            if (RTVoice.Util.Helper.hasActiveClip(Source))
             {
                 myRenderer.material = ActiveMaterial;
             }
@@ -42,4 +42,4 @@ namespace Crosstales.RTVoice.Demo.Util
         #endregion
     }
 }
-// © 2016-2018 crosstales LLC (https://www.crosstales.com)
+// © 2016-2019 crosstales LLC (https://www.crosstales.com)

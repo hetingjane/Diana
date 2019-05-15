@@ -1,4 +1,4 @@
-﻿# RT-Voice - EmotionML
+﻿# RT-Voice PRO - EmotionML
 
 Works with MaryTTS.
 

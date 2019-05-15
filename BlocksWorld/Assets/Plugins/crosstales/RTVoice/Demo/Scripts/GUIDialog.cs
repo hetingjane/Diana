@@ -38,7 +38,7 @@ namespace Crosstales.RTVoice.Demo
             if (PanelPersonB != null)
                 baseColorB = PanelPersonB.color;
 
-            Speaker.isMaryMode = !Helper.hasBuiltInTTS;
+            //Speaker.isMaryMode = !Helper.hasBuiltInTTS;
         }
 
         public void Update()
@@ -166,4 +166,4 @@ namespace Crosstales.RTVoice.Demo
         #endregion
     }
 }
-// © 2015-2018 crosstales LLC (https://www.crosstales.com)
+// © 2015-2019 crosstales LLC (https://www.crosstales.com)

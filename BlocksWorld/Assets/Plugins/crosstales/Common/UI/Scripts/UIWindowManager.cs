@@ -25,6 +25,7 @@ namespace Crosstales.UI
             foreach (GameObject window in Windows)
             {
                 image = window.transform.Find("Panel/Header").GetComponent<Image>();
+
                 Color c = image.color;
                 c.a = 0.2f;
                 image.color = c;
@@ -36,24 +37,28 @@ namespace Crosstales.UI
 
         #region Public methods
 
-        public void ChangeState(GameObject x)
+        ///<summary>Change the state of all windows.</summary>
+        /// <param name="active">Active window.</param>
+        public void ChangeState(GameObject active)
         {
             foreach (GameObject window in Windows)
             {
-                if (window != x)
+                if (window != active)
                 {
                     image = window.transform.Find("Panel/Header").GetComponent<Image>();
+
                     Color c = image.color;
                     c.a = 0.2f;
                     image.color = c;
                 }
 
                 DontTouch = window.transform.Find("Panel/DontTouch").gameObject;
-                DontTouch.SetActive(window != x);
+
+                DontTouch.SetActive(window != active);
             }
         }
 
         #endregion
     }
 }
-// © 2017-2018 crosstales LLC (https://www.crosstales.com)
+// © 2017-2019 crosstales LLC (https://www.crosstales.com)

@@ -1,43 +1,29 @@
 ﻿using UnityEditor;
+using UnityEngine;
 
 namespace Crosstales.RTVoice.EditorTask
 {
-    /// <summary>Sets the required API levels.</summary>
+    /// <summary>Sets the required .NET API level.</summary>
     [InitializeOnLoad]
     public static class SetApiLevel
     {
-
         #region Constructor
 
         static SetApiLevel()
         {
-            // set the miniumum API-level for Android to 15/16
-            int androidVersion;
+#if UNITY_2018_2_OR_NEWER && UNITY_STANDALONE
+            ApiCompatibilityLevel level = ApiCompatibilityLevel.NET_4_6;
 
-            if (int.TryParse(PlayerSettings.Android.minSdkVersion.ToString().Substring("AndroidApiLevel".Length), out androidVersion))
+            BuildTarget target = EditorUserBuildSettings.activeBuildTarget;
+            BuildTargetGroup group = BuildPipeline.GetBuildTargetGroup(target);
+
+            //Debug.Log("API level: " + PlayerSettings.GetApiCompatibilityLevel(group));
+
+            if (PlayerSettings.GetApiCompatibilityLevel(group) != level)
             {
-                if (androidVersion < 16)
-                {
-                    PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel16;
-                }
-            }
+                PlayerSettings.SetApiCompatibilityLevel(group, level);
 
-            // set the miniumum version for iOS to 8.0
-            float iOSVersion;
-
-#if UNITY_5_5_OR_NEWER
-            if (float.TryParse(PlayerSettings.iOS.targetOSVersionString.ToString(), out iOSVersion)) {
-                if (iOSVersion < 8f) {
-                    PlayerSettings.iOS.targetOSVersionString = "8.0";
-                }
-            }
-#else
-            if (float.TryParse(PlayerSettings.iOS.targetOSVersion.ToString().Substring("iOS_".Length).Replace("_", "."), out iOSVersion))
-            {
-                if (iOSVersion < 8f)
-                {
-                    PlayerSettings.iOS.targetOSVersion = iOSTargetOSVersion.iOS_8_0;
-                }
+                Debug.Log("API level changed to '" + level + "'");
             }
 #endif
         }
@@ -45,4 +31,4 @@ namespace Crosstales.RTVoice.EditorTask
         #endregion
     }
 }
-// © 2017-2018 crosstales LLC (https://www.crosstales.com)
+// © 2019 crosstales LLC (https://www.crosstales.com)

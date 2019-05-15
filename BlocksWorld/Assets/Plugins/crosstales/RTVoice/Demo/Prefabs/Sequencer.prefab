@@ -5,10 +5,10 @@ GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 4: {fileID: 425052}
-  - 114: {fileID: 11482354}
+  - component: {fileID: 425052}
+  - component: {fileID: 11482354}
   m_Layer: 0
   m_Name: Sequencer
   m_TagString: Untagged
@@ -25,10 +25,10 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &11482354
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -37,16 +37,22 @@ MonoBehaviour:
   m_GameObject: {fileID: 143110}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 1656341854, guid: bd6a627ffc42e5643885da2fce5677c3, type: 3}
+  m_Script: {fileID: 11500000, guid: cde98428401e9e44aa043c8e87219b1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Sequences:
   - Text: Hi there!
-    RTVoiceNameWindows: Microsoft David Desktop
-    RTVoiceNameMac: Alex
-    RTVoiceNameAndroid: 
-    RTVoiceNameIOS: 
-    RTVoiceNameWSA: 
+    Voices:
+      VoiceNameWindows: David
+      VoiceNameMac: Alex
+      VoiceNameLinux: en
+      VoiceNameAndroid: en
+      VoiceNameIOS: Daniel
+      VoiceNameWSA: David
+      VoiceNameMaryTTS: cmu-rms-hsmm
+      VoiceNameCustom: 
+      Culture: en
+      Gender: 2
     Mode: 0
     Source: {fileID: 0}
     Rate: 1
@@ -54,18 +60,77 @@ MonoBehaviour:
     Volume: 1
     initalized: 1
   - Text: Howdy!
-    RTVoiceNameWindows: Microsoft Zira Desktop
-    RTVoiceNameMac: Vicki
-    RTVoiceNameAndroid: 
-    RTVoiceNameIOS: 
-    RTVoiceNameWSA: 
+    Voices:
+      VoiceNameWindows: David
+      VoiceNameMac: Alex
+      VoiceNameLinux: en
+      VoiceNameAndroid: en
+      VoiceNameIOS: Daniel
+      VoiceNameWSA: David
+      VoiceNameMaryTTS: cmu-rms-hsmm
+      VoiceNameCustom: 
+      Culture: en
+      Gender: 2
     Mode: 0
     Source: {fileID: 0}
     Rate: 1
     Pitch: 1
     Volume: 1
     initalized: 1
-  Culture: en
+  - Text: How are you?
+    Voices:
+      VoiceNameWindows: David
+      VoiceNameMac: Alex
+      VoiceNameLinux: en
+      VoiceNameAndroid: en
+      VoiceNameIOS: Daniel
+      VoiceNameWSA: David
+      VoiceNameMaryTTS: cmu-rms-hsmm
+      VoiceNameCustom: 
+      Culture: en
+      Gender: 2
+    Mode: 0
+    Source: {fileID: 0}
+    Rate: 1
+    Pitch: 1
+    Volume: 1
+    initalized: 1
+  - Text: Fine and you?
+    Voices:
+      VoiceNameWindows: David
+      VoiceNameMac: Alex
+      VoiceNameLinux: en
+      VoiceNameAndroid: en
+      VoiceNameIOS: Daniel
+      VoiceNameWSA: David
+      VoiceNameMaryTTS: cmu-rms-hsmm
+      VoiceNameCustom: 
+      Culture: en
+      Gender: 2
+    Mode: 0
+    Source: {fileID: 0}
+    Rate: 1
+    Pitch: 1
+    Volume: 1
+    initalized: 1
+  - Text: Great, thank you!
+    Voices:
+      VoiceNameWindows: David
+      VoiceNameMac: Alex
+      VoiceNameLinux: en
+      VoiceNameAndroid: en
+      VoiceNameIOS: Daniel
+      VoiceNameWSA: David
+      VoiceNameMaryTTS: cmu-rms-hsmm
+      VoiceNameCustom: 
+      Culture: en
+      Gender: 2
+    Mode: 0
+    Source: {fileID: 0}
+    Rate: 1
+    Pitch: 1
+    Volume: 1
+    initalized: 1
   Delay: 0
   PlayOnStart: 0
 --- !u!1001 &100100000

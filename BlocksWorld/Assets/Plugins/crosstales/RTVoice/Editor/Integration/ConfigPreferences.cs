@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿#if !UNITY_2019_1_OR_NEWER
+using UnityEditor;
 using UnityEngine;
 using Crosstales.RTVoice.EditorUtil;
 
@@ -71,4 +72,5 @@ namespace Crosstales.RTVoice.EditorIntegration
         #endregion
     }
 }
-// © 2016-2018 crosstales LLC (https://www.crosstales.com)
+#endif
+// © 2016-2019 crosstales LLC (https://www.crosstales.com)

@@ -26,16 +26,22 @@ namespace Crosstales.RTVoice.EditorIntegration
             EditorHelper.InstantiatePrefab("AudioFileGenerator");
         }
 
-        [MenuItem("Tools/" + Util.Constants.ASSET_NAME + "/Prefabs/SpeechText", false, EditorHelper.MENU_ID + 50)]
-        private static void AddSpeechText()
+        [MenuItem("Tools/" + Util.Constants.ASSET_NAME + "/Prefabs/Paralanguage", false, EditorHelper.MENU_ID + 45)]
+        private static void AddParalanguage()
         {
-            EditorHelper.InstantiatePrefab("SpeechText");
+            EditorHelper.InstantiatePrefab("Paralanguage");
         }
 
-        [MenuItem("Tools/" + Util.Constants.ASSET_NAME + "/Prefabs/Sequencer", false, EditorHelper.MENU_ID + 60)]
+        [MenuItem("Tools/" + Util.Constants.ASSET_NAME + "/Prefabs/Sequencer", false, EditorHelper.MENU_ID + 50)]
         private static void AddSequencer()
         {
             EditorHelper.InstantiatePrefab("Sequencer");
+        }
+
+        [MenuItem("Tools/" + Util.Constants.ASSET_NAME + "/Prefabs/SpeechText", false, EditorHelper.MENU_ID + 60)]
+        private static void AddSpeechText()
+        {
+            EditorHelper.InstantiatePrefab("SpeechText");
         }
 
         [MenuItem("Tools/" + Util.Constants.ASSET_NAME + "/Prefabs/TextFileSpeaker", false, EditorHelper.MENU_ID + 70)]
@@ -123,7 +129,7 @@ namespace Crosstales.RTVoice.EditorIntegration
                "Version: " + Util.Constants.ASSET_VERSION +
                System.Environment.NewLine +
                System.Environment.NewLine +
-               "© 2015-2018 by " + Util.Constants.ASSET_AUTHOR +
+               "© 2015-2019 by " + Util.Constants.ASSET_AUTHOR +
                System.Environment.NewLine +
                System.Environment.NewLine +
                Util.Constants.ASSET_AUTHOR_URL +
@@ -131,4 +137,4 @@ namespace Crosstales.RTVoice.EditorIntegration
         }
     }
 }
-// © 2015-2018 crosstales LLC (https://www.crosstales.com)
+// © 2015-2019 crosstales LLC (https://www.crosstales.com)

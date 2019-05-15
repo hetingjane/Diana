@@ -160,6 +160,8 @@ namespace Crosstales.RTVoice.EditorIntegration
 
         private void showPrefabs()
         {
+            EditorHelper.BannerOC();
+
             scrollPosPrefabs = EditorGUILayout.BeginScrollView(scrollPosPrefabs, false, false);
             {
                 //GUILayout.Space(8);
@@ -189,11 +191,11 @@ namespace Crosstales.RTVoice.EditorIntegration
 
                 GUILayout.Space(6);
 
-                GUILayout.Label("SpeechText");
+                GUILayout.Label("Paralanguage");
 
-                if (GUILayout.Button(new GUIContent(" Add", EditorHelper.Icon_Plus, "Adds a 'SpeechText'-prefab to the scene.")))
+                if (GUILayout.Button(new GUIContent(" Add", EditorHelper.Icon_Plus, "Adds a 'Paralanguage'-prefab to the scene.")))
                 {
-                    EditorHelper.InstantiatePrefab("SpeechText");
+                    EditorHelper.InstantiatePrefab("Paralanguage");
                 }
 
                 GUILayout.Space(6);
@@ -203,6 +205,15 @@ namespace Crosstales.RTVoice.EditorIntegration
                 if (GUILayout.Button(new GUIContent(" Add", EditorHelper.Icon_Plus, "Adds a 'Sequencer'-prefab to the scene.")))
                 {
                     EditorHelper.InstantiatePrefab("Sequencer");
+                }
+
+                GUILayout.Space(6);
+
+                GUILayout.Label("SpeechText");
+
+                if (GUILayout.Button(new GUIContent(" Add", EditorHelper.Icon_Plus, "Adds a 'SpeechText'-prefab to the scene.")))
+                {
+                    EditorHelper.InstantiatePrefab("SpeechText");
                 }
 
                 GUILayout.Space(6);
@@ -239,19 +250,18 @@ namespace Crosstales.RTVoice.EditorIntegration
 
         private void showTestDrive()
         {
+            EditorHelper.BannerOC();
+
+            GUILayout.Space(3);
+            GUILayout.Label("Test-Drive", EditorStyles.boldLabel);
+
             if (Util.Helper.isEditorMode)
             {
                 if (Speaker.Voices.Count > 0 && EditorHelper.isRTVoiceInScene)
                 {
                     scrollPosTD = EditorGUILayout.BeginScrollView(scrollPosTD, false, false);
                     {
-                        GUILayout.Label("Test-Drive", EditorStyles.boldLabel);
-
-                        if (Speaker.isMaryMode)
-                        {
-                            EditorGUILayout.HelpBox("Test-Drive is not supported for MaryTTS.", MessageType.Info);
-                        }
-                        else
+                        if (Speaker.isWorkingInEditor)
                         {
                             text = EditorGUILayout.TextField("Text: ", text);
 
@@ -265,36 +275,41 @@ namespace Crosstales.RTVoice.EditorIntegration
                                 volume = EditorGUILayout.Slider("Volume", volume, 0f, 1f);
                             }
                         }
+                        else
+                        {
+                            EditorGUILayout.HelpBox("Test-Drive is not supported for the current TTS-system.", MessageType.Info);
+                        }
                     }
                     EditorGUILayout.EndScrollView();
 
-                    EditorHelper.SeparatorUI();
-
-                    GUILayout.BeginHorizontal();
+                    if (Speaker.isWorkingInEditor)
                     {
-                        if (GUILayout.Button(new GUIContent(" Speak", EditorHelper.Icon_Speak, "Speaks the text with the selected voice and settings.")))
-                        {
-                            Speaker.SpeakNativeInEditor(text, Speaker.Voices[voiceIndex], rate, pitch, volume);
-                            silenced = false;
-                        }
+                        EditorHelper.SeparatorUI();
 
-                        GUI.enabled = Speaker.isSpeaking;
-                        if (GUILayout.Button(new GUIContent(" Silence", EditorHelper.Icon_Silence, "Silence all active speakers.")))
+                        GUILayout.BeginHorizontal();
                         {
-                            silence();
+                            if (GUILayout.Button(new GUIContent(" Speak", EditorHelper.Icon_Speak, "Speaks the text with the selected voice and settings.")))
+                            {
+                                Speaker.SpeakNative(text, Speaker.Voices[voiceIndex], rate, pitch, volume);
+                                silenced = false;
+                            }
+
+                            GUI.enabled = Speaker.isSpeaking;
+                            if (GUILayout.Button(new GUIContent(" Silence", EditorHelper.Icon_Silence, "Silence all active speakers.")))
+                            {
+                                silence();
+                            }
+                            GUI.enabled = true;
                         }
-                        GUI.enabled = true;
+                        GUILayout.EndHorizontal();
+
+                        GUILayout.Space(6);
                     }
-                    GUILayout.EndHorizontal();
-
-                    GUILayout.Space(6);
-
                 }
                 else
                 {
                     EditorHelper.NoVoicesUI();
                 }
-
             }
             else
             {
@@ -305,4 +320,4 @@ namespace Crosstales.RTVoice.EditorIntegration
         #endregion
     }
 }
-// © 2016-2018 crosstales LLC (https://www.crosstales.com)
+// © 2016-2019 crosstales LLC (https://www.crosstales.com)

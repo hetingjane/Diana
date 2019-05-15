@@ -5,10 +5,10 @@ GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 4: {fileID: 497942}
-  - 114: {fileID: 11434016}
+  - component: {fileID: 497942}
+  - component: {fileID: 11434016}
   m_Layer: 0
   m_Name: VoiceInitalizer
   m_TagString: Untagged
@@ -25,10 +25,10 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &11434016
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -37,7 +37,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 113936}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -971116272, guid: bd6a627ffc42e5643885da2fce5677c3, type: 3}
+  m_Script: {fileID: 11500000, guid: 78cfc974fb016614fb7fb6a2da7e82d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Provider: 2

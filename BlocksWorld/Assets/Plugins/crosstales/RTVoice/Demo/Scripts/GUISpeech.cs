@@ -39,9 +39,11 @@ namespace Crosstales.RTVoice.Demo
         private string lastCulture = "unknown";
         private System.Collections.Generic.List<SpeakWrapper> wrappers = new System.Collections.Generic.List<SpeakWrapper>();
 
-        System.Collections.Generic.List<Voice> items = new System.Collections.Generic.List<Voice>();
+        private System.Collections.Generic.List<Voice> items = new System.Collections.Generic.List<Voice>();
 
         private Model.Enum.Gender gender = Model.Enum.Gender.UNKNOWN;
+
+        private bool isCustomProvider;
 
         #endregion
 
@@ -50,14 +52,12 @@ namespace Crosstales.RTVoice.Demo
 
         public void Start()
         {
-            // Subscribe event listeners
-            Speaker.OnVoicesReady += onVoicesReady;
-            Speaker.OnProviderChange += onProviderChange;
+            isCustomProvider = Speaker.isCustomMode;
 
             if (Cultures != null)
                 Cultures.text = string.Join(", ", Speaker.Cultures.ToArray());
 
-            if (Speaker.isMaryMode || Helper.isWindowsBasedPlatform || Speaker.isESpeakMode)
+            if (Speaker.isSSMLSupported)
             {
                 if (Input != null)
                     Input.text = "Hi there, my name is RT-Voice, your runtime speaker!" + System.Environment.NewLine + "I can now speak with the complete SSML specification <prosody rate=\"-50%\">at half speed</prosody> or <prosody pitch=\"-50%\">50% lower pitched.</prosody>. " + System.Environment.NewLine + "<prosody contour=\"(0%,+20%) (40%,+40%) (60%,+60%) (80%,+80%) (100%,+100%)\">I can talk with rising intonation</prosody> <prosody contour=\"(0%,-20%) (40%,-40%) (60%,-60%) (80%,-80%) (100%,-100%)\">or with falling intonation.</prosody>" + System.Environment.NewLine + "This is <emphasis level=\"strong\">awesome</emphasis>!";
@@ -85,26 +85,32 @@ namespace Crosstales.RTVoice.Demo
 
         public void Update()
         {
-            if (Culture != null && !lastCulture.Equals(Culture.text))
+            if (Culture != null && !lastCulture.Equals(Culture.text) && Speaker.areVoicesReady)
             {
                 buildVoicesList();
 
                 lastCulture = Culture.text;
-            }
 
-            //            if (Helper.isIOSPlatform && Time.frameCount % 60 == 0 && !buildVoicesListIOS)
-            //            {
-            //                buildVoicesList();
-            //                buildVoicesListIOS = true;
-            //            }
+                if (Cultures != null)
+                    Cultures.text = string.Join(", ", Speaker.Cultures.ToArray());
+            }
+        }
+
+        public void OnEnable()
+        {
+            // Subscribe event listeners
+            Speaker.OnProviderChange += onProviderChange;
+
+        }
+
+        public void OnDisable()
+        {
+            // Unsubscribe event listeners
+            Speaker.OnProviderChange -= onProviderChange;
         }
 
         public void OnDestroy()
         {
-            // Unsubscribe event listeners
-            Speaker.OnVoicesReady -= onVoicesReady;
-            Speaker.OnProviderChange -= onProviderChange;
-
             if (Helper.hasBuiltInTTS && Speaker.isMaryMode)
             {
                 Speaker.isMaryMode = false;
@@ -118,15 +124,6 @@ namespace Crosstales.RTVoice.Demo
 
         public void Silence()
         {
-            //foreach (SpeakWrapper wrapper in wrappers)
-            //{
-            //    if (wrapper.Audio != null)
-            //    {
-            //        wrapper.Audio.Stop();
-            //        wrapper.Audio.clip = null;
-            //    }
-            //}
-
             Speaker.Silence();
         }
 
@@ -152,14 +149,27 @@ namespace Crosstales.RTVoice.Demo
 
         public void ChangeMaryTTS(bool maryTTS)
         {
-            Speaker.isMaryMode = maryTTS;
+            if (maryTTS)
+            {
+                Speaker.isMaryMode = maryTTS;
+
+                if (isCustomProvider)
+                    Speaker.isCustomMode = !maryTTS;
+            }
+            else
+            {
+                if (isCustomProvider)
+                    Speaker.isCustomMode = !maryTTS;
+
+                Speaker.isMaryMode = maryTTS;
+            }
         }
 
         public void GenderChanged(System.Int32 index)
         {
             gender = (Model.Enum.Gender)index;
 
-            buildVoicesList();
+            Invoke("buildVoicesList", 0.2f);
         }
 
         #endregion
@@ -167,24 +177,9 @@ namespace Crosstales.RTVoice.Demo
 
         #region Private methods
 
-        private void onVoicesReady()
-        {
-            //Debug.Log("onVoicesReady");
-
-            if (Cultures != null)
-                Cultures.text = string.Join(", ", Speaker.Cultures.ToArray());
-
-            buildVoicesList();
-        }
-
         private void onProviderChange(string provider)
         {
-            //Debug.Log("onProviderChange");
-
-            clearVoicesList();
-
-            if (Voices != null)
-                Voices.text = "Voices";
+            lastCulture = "RT-Voice rulez!"; //force update
         }
 
         private void clearVoicesList()
@@ -214,19 +209,7 @@ namespace Crosstales.RTVoice.Demo
             if (Target != null)
             {
                 RectTransform containerRectTransform = Target.GetComponent<RectTransform>();
-                //items = Speaker.VoicesForCulture(Culture.text);
                 items = Speaker.VoicesForGender(gender, Culture.text, false);
-
-                /*
-                if (items.Count == 0)
-                {
-                    if (!string.IsNullOrEmpty(Culture.text))
-                    {
-                        Debug.LogWarning("No voices for culture '" + Culture.text + "' found - using the default system voices.");
-                    }
-                    items = Speaker.Voices;
-                }
-                */
 
                 if (items.Count > 0)
                 {
@@ -309,4 +292,4 @@ namespace Crosstales.RTVoice.Demo
         #endregion
     }
 }
-// © 2015-2018 crosstales LLC (https://www.crosstales.com)
+// © 2015-2019 crosstales LLC (https://www.crosstales.com)

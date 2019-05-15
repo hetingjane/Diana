@@ -12,8 +12,9 @@ namespace Crosstales.RTVoice.EditorTask
 
         static Launch()
         {
+            //UnityEngine.Debug.Log(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name);
+
             bool launched = EditorPrefs.GetBool(EditorConstants.KEY_LAUNCH);
-            //bool launched = false;
 
             if (!launched)
             {
@@ -25,4 +26,4 @@ namespace Crosstales.RTVoice.EditorTask
         #endregion
     }
 }
-// © 2017-2018 crosstales LLC (https://www.crosstales.com)
+// © 2017-2019 crosstales LLC (https://www.crosstales.com)

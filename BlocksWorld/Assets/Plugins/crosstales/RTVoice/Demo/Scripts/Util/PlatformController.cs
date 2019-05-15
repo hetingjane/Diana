@@ -11,13 +11,18 @@ namespace Crosstales.RTVoice.Demo.Util
 
         public override void Start()
         {
-            Speaker.OnProviderChange += onProviderChange;
-
             onProviderChange(string.Empty);
         }
 
-        public void OnDestroy()
+        public void OnEnable()
         {
+            // Subscribe event listeners
+            Speaker.OnProviderChange += onProviderChange;
+        }
+
+        public void OnDisable()
+        {
+            // Unsubscribe event listeners
             Speaker.OnProviderChange -= onProviderChange;
         }
 
@@ -51,20 +56,6 @@ namespace Crosstales.RTVoice.Demo.Util
         }
 
         #endregion
-
-        /*
-        public enum Platform
-        {
-            OSX,
-            Windows,
-            IOS,
-            Android,
-            WSA,
-            MaryTTS,
-            Web,
-            Unsupported
-        }
-        */
     }
 }
-// © 2016-2018 crosstales LLC (https://www.crosstales.com)
+// © 2016-2019 crosstales LLC (https://www.crosstales.com)

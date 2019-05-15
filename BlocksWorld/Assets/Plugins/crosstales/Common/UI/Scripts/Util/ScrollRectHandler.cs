@@ -34,4 +34,4 @@ namespace Crosstales.UI.Util
         #endregion
     }
 }
-// © 2016-2018 crosstales LLC (https://www.crosstales.com)
+// © 2016-2019 crosstales LLC (https://www.crosstales.com)

@@ -17,6 +17,8 @@ namespace Crosstales.RTVoice.Demo
         public Text Label;
         public AudioSource Audio;
 
+        private string uid = string.Empty;
+
         #endregion
 
 
@@ -34,17 +36,19 @@ namespace Crosstales.RTVoice.Demo
 
         public void Speak()
         {
+            Speaker.Silence(uid);
+
             if (GUISpeech.isNative)
             {
-                Speaker.SpeakNative(Input.text, SpeakerVoice, GUISpeech.Rate, GUISpeech.Pitch, GUISpeech.Volume);
+                uid = Speaker.SpeakNative(Input.text, SpeakerVoice, GUISpeech.Rate, GUISpeech.Pitch, GUISpeech.Volume);
             }
             else
             {
-                Speaker.Speak(Input.text, Audio, SpeakerVoice, true, GUISpeech.Rate, GUISpeech.Pitch, GUISpeech.Volume);
+                uid = Speaker.Speak(Input.text, Audio, SpeakerVoice, true, GUISpeech.Rate, GUISpeech.Pitch, GUISpeech.Volume);
             }
         }
 
         #endregion
     }
 }
-// © 2015-2018 crosstales LLC (https://www.crosstales.com)
+// © 2015-2019 crosstales LLC (https://www.crosstales.com)

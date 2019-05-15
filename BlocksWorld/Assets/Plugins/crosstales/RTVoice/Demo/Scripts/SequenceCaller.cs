@@ -20,8 +20,6 @@ namespace Crosstales.RTVoice.Demo
 
         public void Start()
         {
-            //receiver.SendMessage("PlaySequence");
-
             for (int ii = 0; ii < NumberOfSequences; ii++)
             {
                 Invoke("playNextSequence", ii * SequenceDelay);
@@ -41,4 +39,4 @@ namespace Crosstales.RTVoice.Demo
         #endregion
     }
 }
-// © 2016-2018 crosstales LLC (https://www.crosstales.com)
+// © 2016-2019 crosstales LLC (https://www.crosstales.com)

@@ -29,6 +29,8 @@ namespace Crosstales.UI
 
         private GameObject panel;
 
+        private Transform tf;
+
         #endregion
 
 
@@ -36,9 +38,11 @@ namespace Crosstales.UI
 
         public void Start()
         {
-            panel = transform.Find("Panel").gameObject;
+            tf = transform;
 
-            startPos = transform.position;
+            panel = tf.Find("Panel").gameObject;
+
+            startPos = tf.position;
 
             ClosePanel();
 
@@ -61,7 +65,7 @@ namespace Crosstales.UI
             {
                 openProgress += Speed * Time.deltaTime;
 
-                transform.position = Vector3.Lerp(lerpPos, centerPos, openProgress);
+                tf.position = Vector3.Lerp(lerpPos, centerPos, openProgress);
             }
             else if (close)
             {
@@ -69,7 +73,7 @@ namespace Crosstales.UI
                 {
                     closeProgress += Speed * Time.deltaTime;
 
-                    transform.position = Vector3.Lerp(lerpPos, startPos, closeProgress);
+                    tf.position = Vector3.Lerp(lerpPos, startPos, closeProgress);
                 }
                 else
                 {
@@ -91,6 +95,7 @@ namespace Crosstales.UI
 
         #region Public methods
 
+        ///<summary>Switch between open and close.</summary>
         public void SwitchPanel()
         {
             if (open)
@@ -103,6 +108,7 @@ namespace Crosstales.UI
             }
         }
 
+        ///<summary>Open the panel.</summary>
         public void OpenPanel()
         {
             panel.SetActive(true);
@@ -118,15 +124,16 @@ namespace Crosstales.UI
             focus = gameObject.GetComponent<UIFocus>();
             focus.OnPanelEnter();
 
-            lerpPos = transform.position;
+            lerpPos = tf.position;
             open = true;
             close = false;
             openProgress = 0f;
         }
 
+        ///<summary>Close the panel.</summary>
         public void ClosePanel()
         {
-            lerpPos = transform.position;
+            lerpPos = tf.position;
             open = false;
             close = true;
             closeProgress = 0f;
@@ -135,4 +142,4 @@ namespace Crosstales.UI
         #endregion
     }
 }
-// © 2017-2018 crosstales LLC (https://www.crosstales.com)
+// © 2017-2019 crosstales LLC (https://www.crosstales.com)

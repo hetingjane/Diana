@@ -21,7 +21,13 @@ namespace Crosstales.RTVoice.EditorTask
 
         static AutoInitalize()
         {
+            //UnityEngine.Debug.Log(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name);
+
+#if UNITY_2018_1_OR_NEWER 
+            EditorApplication.hierarchyChanged += hierarchyWindowChanged;
+#else
             EditorApplication.hierarchyWindowChanged += hierarchyWindowChanged;
+#endif
         }
 
         #endregion
@@ -44,7 +50,7 @@ namespace Crosstales.RTVoice.EditorTask
             }
         }
 
-        #endregion
+#endregion
     }
 }
-// © 2016-2018 crosstales LLC (https://www.crosstales.com)
+// © 2016-2019 crosstales LLC (https://www.crosstales.com)

@@ -12,8 +12,9 @@ namespace Crosstales.RTVoice.EditorTask
 
         static SetupResources()
         {
+            //UnityEngine.Debug.Log(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name);
 
-#if !rtv_ignore_setup
+#if !CT_DEVELOP
 
             string path = Application.dataPath;
             string assetpath = "Assets" + EditorUtil.EditorConfig.ASSET_PATH;
@@ -32,4 +33,4 @@ namespace Crosstales.RTVoice.EditorTask
         #endregion
     }
 }
-// © 2016-2018 crosstales LLC (https://www.crosstales.com)
+// © 2016-2019 crosstales LLC (https://www.crosstales.com)

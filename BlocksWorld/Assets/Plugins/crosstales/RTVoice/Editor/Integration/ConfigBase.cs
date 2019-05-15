@@ -27,6 +27,8 @@ namespace Crosstales.RTVoice.EditorIntegration
         private static string ssml;
         private static string emotionml;
 
+        private bool enforceStandaloneTTS;
+
         private int aboutTab = 0;
 
         #endregion
@@ -36,6 +38,8 @@ namespace Crosstales.RTVoice.EditorIntegration
 
         protected void showConfiguration()
         {
+            EditorHelper.BannerOC();
+
             GUI.skin.label.wordWrap = true;
 
             scrollPosConfig = EditorGUILayout.BeginScrollView(scrollPosConfig, false, false);
@@ -48,9 +52,7 @@ namespace Crosstales.RTVoice.EditorIntegration
 
                 EditorConfig.REMINDER_CHECK = EditorGUILayout.Toggle(new GUIContent("Reminder Check", "Enable or disable the reminder-check (default: " + EditorConstants.DEFAULT_REMINDER_CHECK + ")"), EditorConfig.REMINDER_CHECK);
 
-                EditorConfig.TELEMETRY = EditorGUILayout.Toggle(new GUIContent("Telemetry", "Enable or disable anonymous telemetry data (default: " + EditorConstants.DEFAULT_TELEMETRY + ")"), EditorConfig.TELEMETRY);
-
-                //Constants.DONT_DESTROY_ON_LOAD = EditorGUILayout.Toggle(new GUIContent("Don't destroy on load", "Don't destroy RTVoice during scene switches (default: true, off is NOT RECOMMENDED!)."), Constants.DONT_DESTROY_ON_LOAD);
+                EditorConfig.TRACER = EditorGUILayout.Toggle(new GUIContent("Tracer", "Enable or disable anonymous tracing data (default: " + EditorConstants.DEFAULT_TRACER + ")"), EditorConfig.TRACER);
 
                 EditorConfig.PREFAB_AUTOLOAD = EditorGUILayout.Toggle(new GUIContent("Prefab Auto-Load", "Enable or disable auto-loading of the prefabs to the scene (default: " + EditorConstants.DEFAULT_PREFAB_AUTOLOAD + ")."), EditorConfig.PREFAB_AUTOLOAD);
 
@@ -58,22 +60,32 @@ namespace Crosstales.RTVoice.EditorIntegration
                 Util.Config.AUDIOFILE_AUTOMATIC_DELETE = EditorGUILayout.Toggle(new GUIContent("Audio Auto-Delete", "Enable or disable auto-delete of the generated audio files (default: " + Util.Constants.DEFAULT_AUDIOFILE_AUTOMATIC_DELETE + ")."), Util.Config.AUDIOFILE_AUTOMATIC_DELETE);
 
                 EditorHelper.SeparatorUI();
-                GUILayout.Label("UI Settings", EditorStyles.boldLabel);
+
+                GUILayout.Label("Speaker", EditorStyles.boldLabel);
                 EditorConfig.HIERARCHY_ICON = EditorGUILayout.Toggle(new GUIContent("Show Hierarchy Icon", "Show hierarchy icon (default: " + EditorConstants.DEFAULT_HIERARCHY_ICON + ")."), EditorConfig.HIERARCHY_ICON);
+                Util.Config.ENSURE_NAME = EditorGUILayout.Toggle(new GUIContent("Ensure Name", "Ensure the name of the RTVoice gameobject (default: " + Util.Constants.DEFAULT_ENSURE_NAME + ")."), Util.Config.ENSURE_NAME);
+
+                EditorHelper.SeparatorUI();
+                GUILayout.Label("Development Settings", EditorStyles.boldLabel);
+                enforceStandaloneTTS = EditorGUILayout.Toggle(new GUIContent("Enforce Standalone TTS", "Enforce standalone TTS for development (default: " + Util.Constants.DEFAULT_ENFORCE_STANDALONE_TTS + ")."), Util.Config.ENFORCE_STANDALONE_TTS);
+                if (enforceStandaloneTTS != Util.Config.ENFORCE_STANDALONE_TTS)
+                {
+                    Util.Config.ENFORCE_STANDALONE_TTS = enforceStandaloneTTS;
+                    Speaker.ReloadProvider();
+                }
 
                 EditorHelper.SeparatorUI();
                 GUILayout.Label("Windows Settings", EditorStyles.boldLabel);
                 Util.Config.ENFORCE_32BIT_WINDOWS = EditorGUILayout.Toggle(new GUIContent("Enforce 32bit Voices", "Enforce 32bit versions of voices under Windows (default: " + Util.Constants.DEFAULT_ENFORCE_32BIT_WINDOWS + ")."), Util.Config.ENFORCE_32BIT_WINDOWS);
-
-                //EditorHelper.SeparatorUI();
-                //GUILayout.Label("macOS Settings", EditorStyles.boldLabel);
-                //Constants.TTS_MACOS = EditorGUILayout.TextField(new GUIContent("TTS-command", "TTS-command under macOS (default: " + Constants.DEFAULT_TTS_MACOS + ")."), Constants.TTS_MACOS);
             }
             EditorGUILayout.EndScrollView();
         }
+           
 
         protected void showHelp()
         {
+            EditorHelper.BannerOC();
+
             scrollPosHelp = EditorGUILayout.BeginScrollView(scrollPosHelp, false, false);
             {
                 GUILayout.Label("Resources", EditorStyles.boldLabel);
@@ -150,7 +162,7 @@ namespace Crosstales.RTVoice.EditorIntegration
 
                 GUILayout.BeginHorizontal();
                 {
-                    if (GUILayout.Button(new GUIContent(string.Empty, EditorHelper.Store_PlayMaker, "More information about 'PlayMaker'.")))
+                    if (GUILayout.Button(new GUIContent(string.Empty, EditorHelper.Asset_PlayMaker, "More information about 'PlayMaker'.")))
                     {
                         Application.OpenURL(Util.Constants.ASSET_3P_PLAYMAKER);
                     }
@@ -167,7 +179,7 @@ namespace Crosstales.RTVoice.EditorIntegration
 
                     if (GUILayout.Button(new GUIContent(string.Empty, EditorHelper.Store_DialogueSystem, "More information about 'Dialogue System'.")))
                     {
-                        Application.OpenURL(Util.Constants.ASSET_3P_DIALOG_SYSTEM);
+                        Application.OpenURL(Util.Constants.ASSET_3P_DIALOGUE_SYSTEM);
                     }
                 }
                 GUILayout.EndHorizontal();
@@ -208,14 +220,14 @@ namespace Crosstales.RTVoice.EditorIntegration
                         Application.OpenURL(Util.Constants.ASSET_3P_SLATE);
                     }
 
-                    if (GUILayout.Button(new GUIContent(string.Empty, EditorHelper.Store_THE_Dialogue_Engine, "More information about 'THE Dialogue Engine'.")))
+                    if (GUILayout.Button(new GUIContent(string.Empty, EditorHelper.Store_Amplitude, "More information about 'Amplitude'.")))
                     {
-                        Application.OpenURL(Util.Constants.ASSET_3P_DIALOGUE_ENGINE);
+                        Application.OpenURL(Util.Constants.ASSET_3P_AMPLITUDE);
                     }
 
-                    if (GUILayout.Button(new GUIContent(string.Empty, EditorHelper.Store_uSequencer, "More information about 'uSequencer'.")))
+                    if (GUILayout.Button(new GUIContent(string.Empty, EditorHelper.Store_Klattersynth, "More information about 'Klattersynth'.")))
                     {
-                        Application.OpenURL(Util.Constants.ASSET_3P_USEQUENCER);
+                        Application.OpenURL(Util.Constants.ASSET_3P_KLATTERSYNTH);
                     }
                 }
                 GUILayout.EndHorizontal();
@@ -234,6 +246,9 @@ namespace Crosstales.RTVoice.EditorIntegration
 
         protected void showAbout()
         {
+            EditorHelper.BannerOC();
+
+            GUILayout.Space(3);
             GUILayout.Label(Util.Constants.ASSET_NAME, EditorStyles.boldLabel);
 
             GUILayout.BeginHorizontal();
@@ -281,20 +296,12 @@ namespace Crosstales.RTVoice.EditorIntegration
                     {
                         Application.OpenURL(EditorConstants.ASSET_URL);
                     }
-
-                    if (!Util.Constants.isPro)
-                    {
-                        if (GUILayout.Button(new GUIContent(" Upgrade", "Upgrade " + Util.Constants.ASSET_NAME + " to the PRO-version")))
-                        {
-                            Application.OpenURL(Util.Constants.ASSET_PRO_URL);
-                        }
-                    }
                 }
                 GUILayout.EndVertical();
             }
             GUILayout.EndHorizontal();
 
-            GUILayout.Label("© 2015-2018 by " + Util.Constants.ASSET_AUTHOR);
+            GUILayout.Label("© 2015-2019 by " + Util.Constants.ASSET_AUTHOR);
 
             EditorHelper.SeparatorUI();
 
@@ -335,7 +342,6 @@ namespace Crosstales.RTVoice.EditorIntegration
 
                         if (GUILayout.Button(new GUIContent(" Download", "Visit the 'Unity AssetStore' to download the latest version.")))
                         {
-                            //Application.OpenURL(EditorConstants.ASSET_URL);
                             UnityEditorInternal.AssetStore.Open("content/" + EditorConstants.ASSET_ID);
                         }
                     }
@@ -344,6 +350,15 @@ namespace Crosstales.RTVoice.EditorIntegration
                         GUILayout.Label(updateText);
 
                         if (GUILayout.Button(new GUIContent(" Upgrade", "Upgrade to the PRO-version in the 'Unity AssetStore'.")))
+                        {
+                            Application.OpenURL(Util.Constants.ASSET_PRO_URL);
+                        }
+                    }
+                    else if (updateStatus == UpdateStatus.V2019)
+                    {
+                        GUILayout.Label(updateText);
+
+                        if (GUILayout.Button(new GUIContent(" Upgrade", "Upgrade to the 2019-version in the 'Unity AssetStore'.")))
                         {
                             Application.OpenURL(Util.Constants.ASSET_PRO_URL);
                         }
@@ -487,6 +502,11 @@ namespace Crosstales.RTVoice.EditorIntegration
 
             GUILayout.BeginHorizontal();
             {
+                if (GUILayout.Button(new GUIContent(string.Empty, EditorHelper.Social_Discord, "Communicate with us via 'Discord'.")))
+                {
+                    Application.OpenURL(Util.Constants.ASSET_SOCIAL_DISCORD);
+                }
+
                 if (GUILayout.Button(new GUIContent(string.Empty, EditorHelper.Social_Facebook, "Follow us on 'Facebook'.")))
                 {
                     Application.OpenURL(Util.Constants.ASSET_SOCIAL_FACEBOOK);
@@ -500,11 +520,6 @@ namespace Crosstales.RTVoice.EditorIntegration
                 if (GUILayout.Button(new GUIContent(string.Empty, EditorHelper.Social_Linkedin, "Follow us on 'LinkedIn'.")))
                 {
                     Application.OpenURL(Util.Constants.ASSET_SOCIAL_LINKEDIN);
-                }
-
-                if (GUILayout.Button(new GUIContent(string.Empty, EditorHelper.Social_Xing, "Follow us on 'XING'.")))
-                {
-                    Application.OpenURL(Util.Constants.ASSET_SOCIAL_XING);
                 }
             }
             GUILayout.EndHorizontal();
@@ -525,4 +540,4 @@ namespace Crosstales.RTVoice.EditorIntegration
         #endregion
     }
 }
-// © 2016-2018 crosstales LLC (https://www.crosstales.com)
+// © 2016-2019 crosstales LLC (https://www.crosstales.com)

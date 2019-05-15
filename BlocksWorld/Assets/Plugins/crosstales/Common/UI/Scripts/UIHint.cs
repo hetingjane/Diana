@@ -21,9 +21,13 @@ namespace Crosstales.UI
         [Tooltip("Fade time in seconds (default: 2).")]
         public float FadeTime = 2f;
 
-        /// <summary>Destroy UI element after the fade (default: true).</summary>
-        [Tooltip("Destroy UI element after the fade (default: true).")]
-        public bool DestroyWhenFinished = true;
+        /// <summary>Disable UI element after the fade (default: true).</summary>
+        [Tooltip("Disable UI element after the fade (default: true).")]
+        public bool Disable = true;
+
+        /// <summary>Fade at Start (default: true).</summary>
+        [Tooltip("Fade at Start (default: true).")]
+        public bool FadeAtStart = true;
 
         #endregion
 
@@ -32,7 +36,23 @@ namespace Crosstales.UI
 
         public void Start()
         {
-            StartCoroutine(fadeTo(0f, Delay, FadeTime, DestroyWhenFinished));
+            if (FadeAtStart)
+                FadeDown();
+        }
+
+        #endregion
+
+
+        #region Public methods
+
+        public void FadeUp()
+        {
+            StartCoroutine(lerpAlphaUp(0f, 1f, FadeTime, Delay, Group));
+        }
+
+        public void FadeDown()
+        {
+            StartCoroutine(lerpAlphaDown(1f, 0f, FadeTime, Delay, Group));
         }
 
         #endregion
@@ -40,25 +60,43 @@ namespace Crosstales.UI
 
         #region Private methods
 
-        private IEnumerator fadeTo(float aValue, float delay, float aTime, bool destroy)
+        private IEnumerator lerpAlphaDown(float startAlphaValue, float endAlphaValue, float time, float delay, CanvasGroup gameObjectToFade)
         {
+            gameObjectToFade.gameObject.SetActive(true);
+
+            Group.alpha = Mathf.Clamp01(startAlphaValue);
+            endAlphaValue = Mathf.Clamp01(endAlphaValue);
+
             yield return new WaitForSeconds(delay);
 
-            float alpha = Group.alpha;
-
-            for (float t = 0f; t < 1f; t += Time.deltaTime / aTime)
+            while (Group.alpha >= endAlphaValue + 0.01f)
             {
-                //Debug.Log(Group.alpha + " - " + t);
-
-                Group.alpha = Mathf.Lerp(alpha, aValue, t);
+                Group.alpha -= ((1f - endAlphaValue) / time) * Time.deltaTime;
                 yield return null;
             }
 
-            if (destroy)
-                Destroy(gameObject, .5f);
+            gameObjectToFade.gameObject.SetActive(!Disable);
+        }
+
+        private IEnumerator lerpAlphaUp(float startAlphaValue, float endAlphaValue, float time, float delay, CanvasGroup gameObjectToFade)
+        {
+            gameObjectToFade.gameObject.SetActive(true);
+
+            Group.alpha = Mathf.Clamp01(startAlphaValue);
+            endAlphaValue = Mathf.Clamp01(endAlphaValue);
+
+            yield return new WaitForSeconds(delay);
+
+            while (Group.alpha <= endAlphaValue - 0.01f)
+            {
+                Group.alpha += (endAlphaValue / time) * Time.deltaTime;
+                yield return null;
+            }
+
+            gameObjectToFade.gameObject.SetActive(!Disable);
         }
 
         #endregion
     }
 }
-// © 2018 crosstales LLC (https://www.crosstales.com)
+// © 2018-2019 crosstales LLC (https://www.crosstales.com)
