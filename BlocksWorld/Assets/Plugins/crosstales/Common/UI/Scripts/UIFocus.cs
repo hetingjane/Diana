@@ -8,10 +8,14 @@ namespace Crosstales.UI
     {
         #region Variables
 
-        public string CanvasName = "Canvas";
+        /// <summary>Name of the gameobject containing the UIWindowManager.</summary>
+        [Tooltip("Name of the gameobject containing the UIWindowManager.")]
+        public string ManagerName = "Canvas";
 
         private UIWindowManager manager;
         private Image image;
+
+        private Transform tf;
 
         #endregion
 
@@ -20,9 +24,11 @@ namespace Crosstales.UI
 
         public void Start()
         {
-            manager = GameObject.Find(CanvasName).GetComponent<UIWindowManager>();
+            tf = transform;
 
-            image = transform.Find("Panel/Header").GetComponent<Image>();
+            manager = GameObject.Find(ManagerName).GetComponent<UIWindowManager>();
+
+            image = tf.Find("Panel/Header").GetComponent<Image>();
         }
 
         #endregion
@@ -30,6 +36,7 @@ namespace Crosstales.UI
 
         #region Public methods
 
+        ///<summary>Panel entered.</summary>
         public void OnPanelEnter()
         {
             manager.ChangeState(gameObject);
@@ -38,13 +45,13 @@ namespace Crosstales.UI
             c.a = 255;
             image.color = c;
 
-            transform.SetAsLastSibling(); //move to the front (on parent)
-            transform.SetAsFirstSibling(); //move to the back (on parent)
-            transform.SetSiblingIndex(-1); //move to position, whereas 0 is the backmost, transform.parent.childCount -1 is the frontmost position 
-            transform.GetSiblingIndex(); //get the position in the hierarchy (on parent)
+            tf.SetAsLastSibling(); //move to the front (on parent)
+            tf.SetAsFirstSibling(); //move to the back (on parent)
+            tf.SetSiblingIndex(-1); //move to position, whereas 0 is the backmost, transform.parent.childCount -1 is the frontmost position 
+            tf.GetSiblingIndex(); //get the position in the hierarchy (on parent)
         }
 
         #endregion
     }
 }
-// © 2017-2018 crosstales LLC (https://www.crosstales.com)
+// © 2017-2019 crosstales LLC (https://www.crosstales.com)

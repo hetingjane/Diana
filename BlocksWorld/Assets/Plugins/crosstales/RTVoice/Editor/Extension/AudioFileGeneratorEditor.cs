@@ -19,6 +19,7 @@ namespace Crosstales.RTVoice.EditorExtension
 
         #region Editor methods
 
+
         public void OnEnable()
         {
             script = (Tool.AudioFileGenerator)target;
@@ -36,36 +37,34 @@ namespace Crosstales.RTVoice.EditorExtension
                 {
                     if (Speaker.isTTSAvailable && EditorHelper.isRTVoiceInScene)
                     {
-                        GUILayout.Label("Generate Audio Files", EditorStyles.boldLabel);
-
                         if (Util.Helper.isEditorMode)
                         {
+                            GUILayout.Label("Generate Audio Files", EditorStyles.boldLabel);
+
                             GUILayout.BeginHorizontal();
                             {
-                                if (Speaker.isMaryMode)
-                                {
-                                    EditorGUILayout.HelpBox("Generate is not supported for MaryTTS inside the Editor.", MessageType.Info);
-                                }
-                                else
+                                if (Speaker.isWorkingInEditor)
                                 {
                                     if (GUILayout.Button(new GUIContent(" Generate", EditorHelper.Icon_Speak, "Generates the speeches from the text files.")))
                                     {
                                         script.Generate();
                                     }
                                 }
+                                else
+                                {
+                                    EditorGUILayout.HelpBox("Generate is not supported for current TTS-system inside the Unity Editor.", MessageType.Info);
+                                }
                             }
                             GUILayout.EndHorizontal();
 
-                            /*
                             EditorHelper.SeparatorUI();
 
                             GUILayout.Label("Editor", EditorStyles.boldLabel);
 
                             if (GUILayout.Button(new GUIContent(" Refresh AssetDatabase", EditorHelper.Icon_Refresh, "Refresh the AssetDatabase from the Editor.")))
                             {
-                                refreshAssetDatabase();
+                                EditorHelper.RefreshAssetDatabase();
                             }
-                            */
                         }
                         else
                         {
@@ -89,20 +88,6 @@ namespace Crosstales.RTVoice.EditorExtension
         }
 
         #endregion
-
-        /*
-        #region Private methods
-
-        private void refreshAssetDatabase()
-        {
-            if (Util.Helper.isEditorMode)
-            {
-                AssetDatabase.Refresh();
-            }
-        }
-
-        #endregion
-    */
     }
 }
-// © 2017-2018 crosstales LLC (https://www.crosstales.com)
+// © 2017-2019 crosstales LLC (https://www.crosstales.com)

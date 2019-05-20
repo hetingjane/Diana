@@ -1,0 +1,124 @@
+ABOUT THIS DOCUMENT: This file are the lab notes of Joe Strout, a graduate student working in the vision lab under Ross Beveridge and Bruce Draper in 2019-2020.  The notes mainly reflect development of Diana 2.0, an avatar that communicates with the human user via speech and gestures, as part of the Communicating with Computers (CwC) project.
+
+Entries are dated (in month/day/year) form and arranged chronologically, newest entries at the end of the document.
+
+5/09/19
+=======
+I'm working on an internal representation of speech, to act as an intermediary between the raw English text or parse tree from some particular parsing tool, and the rest of the system (cognition, planning, knowledge representation, response generation, etc.).
+
+This will almost certainly be some sort of semantic network.  Implementation details are still TBD.
+
+While most inputs from the user are likely to be commands or queries, we want to be able to be able to capture other types of input, too.
+
+Major communication-act types:
+	Confirmation (e.g.: yes, correct, that's right)
+	Denial (no)
+	Query (who/what/when/why/how)
+	Command/Request
+	Assert/Inform
+	Emote (wow, argh)
+	Phatic/Backchannel (hello, please, thank you, you're welcome, ah, I see, OK)
+
+Almost all commands (and most queries) will involve actions -- either something that has happened, or something the user wants to happen.  Actions also show up as subclauses in other contexts, such as identifying objects (e.g. "the block you moved before").  So we need to give special attention to describing actions.  I'm basing the following on standard linguistic themes, but lumping together some that seem like needless distinctions to me, and adding Activity (which was oddly absent from the source I used).
+
+Themes (slots on an action):
+	Subject (Agent, Experiencer, Force/Natural Cause)
+	Activity (verb)
+	Object (Patient, Stimulus, Theme)
+	Instrument (with, using, by means of)
+	Location
+	Direction (Goal)
+	Recipient (aka indirect object)
+	Source/Origin
+	Time
+	Beneficiary (may not be needed for Diana)
+	Manner (ditto)
+	Purpose
+	Cause
+
+5/10/19
+=======
+I've started on a parser.  I considered using StanfordNLP, but wasn't very impressed with the quality of its parsing when I used it on my CS540 project.  AllenNLP looks better, but it's an awfully heavy install.  I think we can bang out a mostly hand-coded parser that will do as well for the range of inputs we'll be likely to give it.
+
+To that end, I started a "NLPEx1" project (in Visual Studio for Mac).  It leverages data extracted from the SEMCOR 3.0 data set (downloaded via http://www.nltk.org/nltk_data/).  For every word (and set phrase), I collected all the instances in the corpus and counted its usage as various parts of speech (POS).  Then I output a simple file with the word, and the POS frequencies, normalized to 1.  The data has a lot of extra cruft in it, but for the most part the words I've looked at seem good (with a few exceptions).
+
+So here's the big picture of the parser so far:
+
+1. Replace set phrases, e.g. "thank you" -> "thank_you".
+2. Split into words, with parallel arrays for POS and dependencies (i.e., what word each word modifies).
+3. Assign initial parts of speech from the (tweaked) SEMCOR dictionary.
+4. Repeatedly apply a set of ordered heuristics, that define dependencies and/or change POS based on simple patterns (e.g., an adjective before a noun modifies that noun).
+
+That's pretty much it.  I'm not attempting to do a *complete* parse of the input; it's fine if multiple phrases remain floating at the root.  Indeed, it's impossible to reliably disambiguate from syntax alone; consider:
+
+	A. I looked up the hallway.
+	B. I looked up the address.
+
+Syntactically identical, but in one case we have essentially a compound verb ("look_up") while in the second, "up" is an ordinary preposition.  Actually this is an unfortunate example, since our step 3 replaces this with looked_up before we even start parsing.  Maybe this is better:
+
+	A. Put the red box on the table.
+	B. Grab the red box on the table.
+	
+In A, the prepositional phrase modifies "put;" in B it modifies "box."  There is no way to disambiguate this without delving into what "put" and "grab" mean.  We could have tables of such information, but I think it'll be easier to just let the put/grab handlers work it out.
+
+So the parsing we're doing pretty much locates noun phrases and prepositional phrases, and I think that's good enough.
+
+I currently have two forms of string output.  One has the words in order, with annotations for POS and dependency, like so:
+
+[put(VB:-1) a(DT:3) yellow(JJ:3) block(NN:0) on(IN:-1) the(DT:7) green(JJ:7) one(NN:4)]
+
+This is easily read as "put a yellow block on the green one."  The other format is tree form, with dependents under the head word they depend on:
+
+[VB[put NN[block DT[a] JJ[yellow]]] IN[on NN[one DT[the] JJ[green]]]]
+
+This format is a little harder to read, but it better represents patterns we might match against, such as [VB[put NN[$1] IN[$2]] in this case.  I'm concerned, however, that this tree format loses information on word order that may be important.  For example, "is there a red block" and "there is a red block" both come out as
+
+[VB[is RB[there] NN[block DT[a] JJ[red]]]]
+
+in tree form.  So I may need to somehow preserve that word order, for cases where it matters.
+
+
+5/13/19
+=======
+I haven't thought of a better order-preserving tree format than:
+
+[VB[RB[there] is NN[DT[a] JJ[red] block]]]
+
+It's a little awkward in that the POS can be so far separated from the actual word it's talking about (e.g. VB and "is" in this case).  But it'll do.
+
+Basic parser is doing nicely now.  I've adapted the UnitTest class from the BlocksWorld project, and added some unit tests verifying the parse (in tree format) of a variety of inputs.  I expect we will eventually need quite a lot of those, but for now it's time to push on to interpretation.
+
+That means building a semantic-network representation of the input (first we must understand the input, *then* we act or respond).  And here we face an implementation choice: use a generic semnet asset, like RDF?  Or a custom strongly-typed one, with properties for the various slots defined above?
+
+Advantages of RDF: it's a standard; later researchers will more easily recognize it; it comes with utilities to read and write semnets in various formats.  Also supports querying and updating with SPARQL.
+
+Advantage of custom classes: strong type-checking, probably simpler/clearer code.  Also less code overall (dotNetRDF is huge).
+
+I'm going to go with custom classes for now, but try to encapsulate this decision as much as possible so we can swap out a different implementation later if we decide to do so.  
+
+
+5/15/19
+=======
+Despite the claim in the previous entry, my first attempt at a semantic representation turned out to basically reinvent RDF.  I have a SemNet class that contains SemNodes linked by Relations (triplets), and an ontology that spells out a variety of attributes and meta-relations.  It's all very general but also very weakly typed.  Elegant, but hard to use, as I discovered as soon as I tried to actually use it.
+
+I believe this was a misstep.  I'm going to back up and try again, with a series of more strongly-typed classes and enums.  I don't know that I'll be able to encapsulate this decision; a strongly-typed API is the whole point of it.  But let's try it and see how it goes.
+
+OK, this feels much better.  More work will be needed to generalize it, but it's very nice to have strongly-typed representations to work with.  So now, the input:
+
+	put a yellow block on the green one
+
+gets parts of speech and dependencies assigned as:
+
+	[put(VB:-1) a(DT:3) yellow(JJ:3) block(NN:0) on(IN:-1) the(DT:7) green(JJ:7) one(NN:4)]
+
+which is represented in tree form as:
+
+	[VB[put NN[DT[a] JJ[yellow] block]] IN[on NN[DT[the] JJ[green] one]]]
+
+and this is grokked as the following ActionSpec:
+
+	[Act:Put Obj:[any single Yellow block] Loc:[OnTopOf [the single Green one]]]
+
+The latter is the string form of a data structure that actually represents all those parts in (strongly-typed) symbolic form, and would be easy for the avatar to carry out.
+
+

@@ -49,13 +49,6 @@ namespace Crosstales.RTVoice.Demo
 
         public void Start()
         {
-            // Subscribe event listeners
-            Speaker.OnSpeakCurrentWord += speakCurrentWordMethod;
-            Speaker.OnSpeakCurrentPhoneme += speakCurrentPhonemeMethod;
-            Speaker.OnSpeakCurrentViseme += speakCurrentVisemeMethod;
-            Speaker.OnSpeakStart += speakStartMethod;
-            Speaker.OnSpeakComplete += speakCompleteMethod;
-
             if (TextSpeakerA != null)
                 textA = TextSpeakerA.text;
 
@@ -73,7 +66,17 @@ namespace Crosstales.RTVoice.Demo
             }
         }
 
-        public void OnDestroy()
+        public void OnEnable()
+        {
+            // Subscribe event listeners
+            Speaker.OnSpeakCurrentWord += speakCurrentWordMethod;
+            Speaker.OnSpeakCurrentPhoneme += speakCurrentPhonemeMethod;
+            Speaker.OnSpeakCurrentViseme += speakCurrentVisemeMethod;
+            Speaker.OnSpeakStart += speakStartMethod;
+            Speaker.OnSpeakComplete += speakCompleteMethod;
+        }
+
+        public void OnDisable()
         {
             // Unsubscribe event listeners
             Speaker.OnSpeakCurrentWord -= speakCurrentWordMethod;
@@ -106,23 +109,22 @@ namespace Crosstales.RTVoice.Demo
 
         public void SpeakerA()
         {
-            uidSpeakerA = Speaker.SpeakNative(textA, Speaker.VoiceForCulture("en"), RateSpeakerA);
+            uidSpeakerA = Speaker.SpeakNative(textA, Speaker.VoiceForGender(Model.Enum.Gender.MALE, "en"), RateSpeakerA);
         }
 
         public void SpeakerB()
         {
-            uidSpeakerB = Speaker.SpeakNative(textB, Speaker.VoiceForCulture("en", 1), RateSpeakerB);
+            uidSpeakerB = Speaker.SpeakNative(textB, Speaker.VoiceForGender(Model.Enum.Gender.FEMALE, "en"), RateSpeakerB);
         }
 
         public void SpeakerC()
         { //default voice
-            uidSpeakerC = Speaker.SpeakNative(textC, Speaker.VoiceForCulture("en", 2), RateSpeakerC);
+            uidSpeakerC = Speaker.SpeakNative(textC, Speaker.VoiceForGender(Model.Enum.Gender.MALE, "en", 1), RateSpeakerC);
         }
 
         public void Silence()
         {
             Speaker.Silence();
-            //Speaker.Silence(speakerC);
 
             if (TextSpeakerA != null)
                 TextSpeakerA.text = textA;
@@ -186,7 +188,6 @@ namespace Crosstales.RTVoice.Demo
                     VisemeSpeakerB.text = PhonemeSpeakerB.text = "-";
 
                 SpeakerC();
-                //Invoke("Silence", 3f);
             }
             else if (wrapper.Uid.Equals(uidSpeakerC))
             {
@@ -278,4 +279,4 @@ namespace Crosstales.RTVoice.Demo
         #endregion
     }
 }
-// © 2015-2018 crosstales LLC (https://www.crosstales.com)
+// © 2015-2019 crosstales LLC (https://www.crosstales.com)

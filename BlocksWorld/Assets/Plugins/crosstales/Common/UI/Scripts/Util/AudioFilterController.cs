@@ -91,6 +91,7 @@ namespace Crosstales.UI.Util
 
         #region Public methods
 
+        /// <summary>Finds all audio filters in the scene.</summary>
         public void FindAllAudioFilters()
         {
             ReverbFilters = FindObjectsOfType(typeof(AudioReverbFilter)) as AudioReverbFilter[];
@@ -101,6 +102,7 @@ namespace Crosstales.UI.Util
             HighPassFilters = FindObjectsOfType(typeof(AudioHighPassFilter)) as AudioHighPassFilter[];
         }
 
+        /// <summary>Resets all audio filters.</summary>
         public void ResetAudioFilters()
         {
             ReverbFilterDropdownChanged(0);
@@ -204,4 +206,4 @@ namespace Crosstales.UI.Util
         #endregion
     }
 }
-// © 2016-2018 crosstales LLC (https://www.crosstales.com)
+// © 2016-2019 crosstales LLC (https://www.crosstales.com)

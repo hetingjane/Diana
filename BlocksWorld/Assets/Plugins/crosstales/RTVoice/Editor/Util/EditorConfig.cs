@@ -16,8 +16,8 @@ namespace Crosstales.RTVoice.EditorUtil
         /// <summary>Enable or disable reminder-checks for the asset.</summary>
         public static bool REMINDER_CHECK = EditorConstants.DEFAULT_REMINDER_CHECK;
 
-        /// <summary>Enable or disable anonymous telemetry data.</summary>
-        public static bool TELEMETRY = EditorConstants.DEFAULT_TELEMETRY;
+        /// <summary>Enable or disable anonymous tracer data.</summary>
+        public static bool TRACER = EditorConstants.DEFAULT_TRACER;
 
         /// <summary>Automatically load and add the prefabs to the scene.</summary>
         public static bool PREFAB_AUTOLOAD = EditorConstants.DEFAULT_PREFAB_AUTOLOAD;
@@ -85,7 +85,7 @@ namespace Crosstales.RTVoice.EditorUtil
         {
             UPDATE_CHECK = EditorConstants.DEFAULT_UPDATE_CHECK;
             REMINDER_CHECK = EditorConstants.DEFAULT_REMINDER_CHECK;
-            TELEMETRY = EditorConstants.DEFAULT_TELEMETRY;
+            TRACER = EditorConstants.DEFAULT_TRACER;
             PREFAB_AUTOLOAD = EditorConstants.DEFAULT_PREFAB_AUTOLOAD;
             HIERARCHY_ICON = EditorConstants.DEFAULT_HIERARCHY_ICON;
         }
@@ -105,9 +105,9 @@ namespace Crosstales.RTVoice.EditorUtil
                 REMINDER_CHECK = Common.Util.CTPlayerPrefs.GetBool(EditorConstants.KEY_REMINDER_CHECK);
             }
 
-            if (Common.Util.CTPlayerPrefs.HasKey(EditorConstants.KEY_TELEMETRY))
+            if (Common.Util.CTPlayerPrefs.HasKey(EditorConstants.KEY_TRACER))
             {
-                TELEMETRY = Common.Util.CTPlayerPrefs.GetBool(EditorConstants.KEY_TELEMETRY);
+                TRACER = Common.Util.CTPlayerPrefs.GetBool(EditorConstants.KEY_TRACER);
             }
 
             if (Common.Util.CTPlayerPrefs.HasKey(EditorConstants.KEY_PREFAB_AUTOLOAD))
@@ -128,7 +128,7 @@ namespace Crosstales.RTVoice.EditorUtil
         {
             Common.Util.CTPlayerPrefs.SetBool(EditorConstants.KEY_UPDATE_CHECK, UPDATE_CHECK);
             Common.Util.CTPlayerPrefs.SetBool(EditorConstants.KEY_REMINDER_CHECK, REMINDER_CHECK);
-            Common.Util.CTPlayerPrefs.SetBool(EditorConstants.KEY_TELEMETRY, TELEMETRY);
+            Common.Util.CTPlayerPrefs.SetBool(EditorConstants.KEY_TRACER, TRACER);
             Common.Util.CTPlayerPrefs.SetBool(EditorConstants.KEY_PREFAB_AUTOLOAD, PREFAB_AUTOLOAD);
             Common.Util.CTPlayerPrefs.SetBool(EditorConstants.KEY_HIERARCHY_ICON, HIERARCHY_ICON);
 
@@ -165,6 +165,7 @@ namespace Crosstales.RTVoice.EditorUtil
 
                     //Debug.LogWarning("PATH : " + assetPath);
                     Common.Util.CTPlayerPrefs.SetString(Util.Constants.KEY_ASSET_PATH, assetPath);
+                    Common.Util.CTPlayerPrefs.Save();
                 }
                 catch (System.Exception ex)
                 {
@@ -174,4 +175,4 @@ namespace Crosstales.RTVoice.EditorUtil
         }
     }
 }
-// © 2017-2018 crosstales LLC (https://www.crosstales.com)
+// © 2017-2019 crosstales LLC (https://www.crosstales.com)

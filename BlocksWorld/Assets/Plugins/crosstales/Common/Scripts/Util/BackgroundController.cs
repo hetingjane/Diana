@@ -3,14 +3,14 @@
 namespace Crosstales.Common.Util
 {
     /// <summary>Enables or disable game objects on Android or iOS in the background.</summary>
-    //[HelpURL("https://www.crosstales.com/media/data/assets/radio/api/class_crosstales_1_1_radio_1_1_demo_1_1_util_1_1_platform_controller.html")] 
+    //[HelpURL("https://www.crosstales.com/media/data/assets/rtvoice/api/class_crosstales_1_1_common_1_1_util_1_1_background_controller.html")] 
     public class BackgroundController : MonoBehaviour
     {
 
         #region Variables
 
-        ///<summary>Selected objects for the controller.</summary>
-        [Tooltip("Selected objects for the controller.")]
+        ///<summary>Selected objects to disable in the background for the controller.</summary>
+        [Tooltip("Selected objects to disable in the background for the controller.")]
         public GameObject[] Objects;
 
         private bool isFocused;
@@ -20,7 +20,7 @@ namespace Crosstales.Common.Util
 
         #region MonoBehaviour methods
 
-#if UNITY_2017 || UNITY_2018
+#if UNITY_2017_1_OR_NEWER
 #if UNITY_ANDROID || UNITY_IOS
         public void Start()
         {
@@ -43,7 +43,8 @@ namespace Crosstales.Common.Util
                         }
                     }
 
-                    Debug.Log("Application.isFocused: " + isFocused);
+                    if (BaseConstants.DEV_DEBUG)
+                        Debug.Log("Application.isFocused: " + isFocused);
                 }
             }
         }
@@ -51,7 +52,7 @@ namespace Crosstales.Common.Util
 #else
         public void Start()
         {
-            Debug.LogWarning("'BackgroundController' needs Unity 2017 or newer to work!");
+            Debug.LogWarning("'BackgroundController' needs Unity 2017.1 or newer to work!");
         }
 
 #endif
@@ -60,4 +61,4 @@ namespace Crosstales.Common.Util
 
     }
 }
-// © 2018 crosstales LLC (https://www.crosstales.com)
+// © 2018-2019 crosstales LLC (https://www.crosstales.com)

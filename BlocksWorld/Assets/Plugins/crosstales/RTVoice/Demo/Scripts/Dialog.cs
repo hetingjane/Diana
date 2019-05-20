@@ -35,6 +35,9 @@ namespace Crosstales.RTVoice.Demo
         public AudioSource AudioPersonA;
         public AudioSource AudioPersonB;
 
+        public Model.Enum.SpeakMode ModeA = Model.Enum.SpeakMode.Speak;
+        public Model.Enum.SpeakMode ModeB = Model.Enum.SpeakMode.Speak;
+
         [Header("Dialogues")]
         public string[] DialogPersonA;
         public string[] DialogPersonB;
@@ -54,14 +57,14 @@ namespace Crosstales.RTVoice.Demo
 
         #region MonoBehaviour methods
 
-        public void Start()
+        public void OnEnable()
         {
             // Subscribe event listeners
             Speaker.OnSpeakStart += speakStartMethod;
             Speaker.OnSpeakComplete += speakCompleteMethod;
         }
 
-        void OnDestroy()
+        public void OnDisable()
         {
             // Unsubscribe event listeners
             Speaker.OnSpeakStart -= speakStartMethod;
@@ -82,11 +85,6 @@ namespace Crosstales.RTVoice.Demo
                 playingA = false;
                 playingB = false;
 
-                //Voice personA = Speaker.VoiceForCulture(CultureA);
-                //Voice personB = Speaker.VoiceForCulture(CultureB, 1);
-                //Voice personA = Speaker.VoiceForGender(GenderA, CultureA);
-                //Voice personB = Speaker.VoiceForGender(GenderB, CultureB, 1);
-
                 int index = 0;
 
                 while (Running && (DialogPersonA != null && index < DialogPersonA.Length) || (DialogPersonB != null && index < DialogPersonB.Length))
@@ -98,7 +96,13 @@ namespace Crosstales.RTVoice.Demo
                         CurrentDialogA = DialogPersonA[index];
                     }
 
-                    uidSpeakerA = Speaker.Speak(CurrentDialogA, AudioPersonA, Speaker.VoiceForGender(GenderA, CultureA), true, RateA, PitchA, VolumeA);
+                    if (ModeA == Model.Enum.SpeakMode.Speak)
+                    {
+                        uidSpeakerA = Speaker.Speak(CurrentDialogA, AudioPersonA, Speaker.VoiceForGender(GenderA, CultureA), true, RateA, PitchA, VolumeA);
+                    } else
+                    {
+                        uidSpeakerA = Speaker.SpeakNative(CurrentDialogA, Speaker.VoiceForGender(GenderA, CultureA), RateA, PitchA, VolumeA);
+                    }
 
                     //wait until ready
                     do
@@ -123,7 +127,14 @@ namespace Crosstales.RTVoice.Demo
                             CurrentDialogB = DialogPersonB[index];
                         }
 
-                        uidSpeakerB = Speaker.Speak(CurrentDialogB, AudioPersonB, Speaker.VoiceForGender(GenderB, CultureB, 1), true, RateB, PitchB, VolumeB);
+                        if (ModeB == Model.Enum.SpeakMode.Speak)
+                        {
+                            uidSpeakerB = Speaker.Speak(CurrentDialogB, AudioPersonB, Speaker.VoiceForGender(GenderB, CultureB, 1), true, RateB, PitchB, VolumeB); ;
+                        }
+                        else
+                        {
+                            uidSpeakerB = Speaker.SpeakNative(CurrentDialogB, Speaker.VoiceForGender(GenderB, CultureB, 1), RateB, PitchB, VolumeB);
+                        }
 
                         //wait until ready
                         do
@@ -166,7 +177,6 @@ namespace Crosstales.RTVoice.Demo
             else
             {
                 Debug.LogWarning("speakStartMethod - Unknown speaker: " + wrapper);
-                //Debug.LogWarning("speakStartMethod - Unknown speaker: " + wrapper.Uid + " - A: " + uidSpeakerA + " - B: " + uidSpeakerB);
 
                 Running = false;
             }
@@ -187,7 +197,6 @@ namespace Crosstales.RTVoice.Demo
             else
             {
                 Debug.LogWarning("speakCompleteMethod - Unknown speaker: " + wrapper);
-                //Debug.LogWarning("speakCompleteMethod - Unknown speaker: " + wrapper.Uid + " - A: " + uidSpeakerA + " - B: " + uidSpeakerB);
 
                 Running = false;
             }
@@ -196,4 +205,4 @@ namespace Crosstales.RTVoice.Demo
         #endregion
     }
 }
-// © 2015-2018 crosstales LLC (https://www.crosstales.com)
+// © 2015-2019 crosstales LLC (https://www.crosstales.com)

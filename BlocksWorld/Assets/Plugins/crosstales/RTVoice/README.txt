@@ -1,12 +1,8 @@
-﻿# RT-Voice 2.9.8
+﻿# RT-Voice PRO 2019.3.0
 
-Thank you for buying our asset "RT-Voice"! 
+Thank you for buying our asset "RT-Voice PRO"! 
 If you have any questions about this asset, send us an email at [rtvoice@crosstales.com](mailto:rtvoice@crosstales.com). 
 Please don't forget to rate it or even better write a little review – it would be very much appreciated.
-
-If you need the source code or build for WSA (UWP), consider upgrading to the PRO edition:
-
-https://www.assetstore.unity3d.com/#!/content/41068?aid=1011lNGT
 
 
 
@@ -25,11 +21,11 @@ Please read the "RTVoice-doc.pdf" and "RTVoice-api.pdf" for more details.
 
 
 ## Upgrade to new version
-Follow this steps to upgrade your version of "RT-Voice":
+Follow this steps to upgrade your version of "RT-Voice PRO":
 
-1. Update "RT-Voice" to the latest version from the "Unity AssetStore"
+1. Update "RT-Voice PRO" to the latest version from the "Unity AssetStore"
 2. Inside your project in Unity, go to menu "File" => "New Scene"
-3. Delete the "Assets/Plugins/crosstales/RTVoice" folder from the Project-view
+3. Delete the "Assets/Plugins/crosstales" folder from the Project-view
 4. Import the latest version from the "Unity AssetStore"
 
 
@@ -56,18 +52,18 @@ CH-8002 Zürich
 * [Email](mailto:rtvoice@crosstales.com)
 
 ### Social media
+* [Discord](https://discord.gg/ZbZ2sh4)
 * [Facebook](https://www.facebook.com/crosstales/)
 * [Twitter](https://twitter.com/crosstales)
 * [LinkedIN](https://www.linkedin.com/company/crosstales)
-* [Xing](https://www.xing.com/companies/crosstales)
 
 
 
 ## More information
-* [AssetStore](https://goo.gl/qwtXyb)
-* [Forum](http://goo.gl/Z6MZMl)
+* [AssetStore](https://assetstore.unity.com/lists/crosstales-42213?aid=1011lNGT)
+* [Forum](http://forum.unity3d.com/threads/rt-voice-run-time-text-to-speech-solution.340046/)
 * [Documentation](https://www.crosstales.com/media/data/assets/rtvoice/RTVoice-doc.pdf)
-* [API](http://goo.gl/6w4Fy0)
+* [API](http://www.crosstales.com/en/assets/rtvoice/api/)
 
 ### Videos
 [Youtube-channel](https://www.youtube.com/c/Crosstales)
@@ -82,21 +78,22 @@ CH-8002 Zürich
 * [Android-Demo](https://www.crosstales.com/media/rtvoice/RTVoice.apk)
 
 ### Supported 3rd party assets
-[All supported asset](https://www.assetstore.unity3d.com/#!/list/42209-rt-voice-friends?aid=1011lNGT)
+[All supported asset](https://assetstore.unity.com/lists/rt-voice-friends-42209?aid=1011lNGT)
 
-* [PlayMaker](https://www.assetstore.unity3d.com/#!/content/368?aid=1011lNGT)
-* [SALSA](https://www.assetstore.unity3d.com/#!/content/16944?aid=1011lNGT)
-* [Localized Dialogs](https://www.assetstore.unity3d.com/#!/content/5020?aid=1011lNGT)
-* [Dialogue System](https://www.assetstore.unity3d.com/#!/content/11672?aid=1011lNGT)
-* [Dialogue Engine](https://www.assetstore.unity3d.com/#!/content/42467?aid=1011lNGT)
-* [Adventure Creator](https://www.assetstore.unity3d.com/#!/content/11896?aid=1011lNGT)
-* [LipSync Pro](https://www.assetstore.unity3d.com/#!/content/32117?aid=1011lNGT)
-* [SLATE](https://www.assetstore.unity3d.com/#!/content/56558?aid=1011lNGT)
-* [Cinema Director](https://www.assetstore.unity3d.com/#!/content/19779?aid=1011lNGT)
-* [uSequencer](https://www.assetstore.unity3d.com/#!/content/3666?aid=1011lNGT)
-* [Quest System Pro](https://www.assetstore.unity3d.com/#!/content/63460?aid=1011lNGT)
-* [NPC Chat](https://www.assetstore.unity3d.com/#!/content/9723?aid=1011lNGT)
-* [NPC Chat](https://www.assetstore.unity3d.com/#!/content/9723?aid=1011lNGT)
+* [PlayMaker](https://assetstore.unity.com/packages/slug/368?aid=1011lNGT)
+* [SALSA](https://assetstore.unity.com/packages/slug/16944?aid=1011lNGT)
+* [Amplitude](https://assetstore.unity.com/packages/slug/111277?aid=1011lNGT)
+* [Localized Dialogs](https://assetstore.unity.com/packages/slug/5020?aid=1011lNGT)
+* [Dialogue System](https://assetstore.unity.com/packages/slug/11672?aid=1011lNGT)
+* [Adventure Creator](https://assetstore.unity.com/packages/slug/11896?aid=1011lNGT)
+* [LipSync Pro](https://assetstore.unity.com/packages/slug/32117?aid=1011lNGT)
+* [SLATE](https://assetstore.unity.com/packages/slug/56558?aid=1011lNGT)
+* [Cinema Director](https://assetstore.unity.com/packages/slug/19779?aid=1011lNGT)
+* [Quest System Pro](https://assetstore.unity.com/packages/slug/63460?aid=1011lNGT)
+* [NPC Chat](https://assetstore.unity.com/packages/slug/9723?aid=1011lNGT)
+* [Klattersynth](https://assetstore.unity.com/packages/slug/95453?aid=1011lNGT)
+* [WebGL Speech Synthesis](https://assetstore.unity.com/packages/slug/81861?aid=1011lNGT)
+* [Online Check](https://assetstore.unity.com/packages/slug/74688?aid=1011lNGT)
 
 
-`Version: 05.06.2018 11:56`
+`Version: 08.05.2019`

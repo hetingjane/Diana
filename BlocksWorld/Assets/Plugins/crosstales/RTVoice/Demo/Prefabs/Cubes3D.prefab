@@ -5,14 +5,14 @@ GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 4: {fileID: 412512}
-  - 33: {fileID: 3351048}
-  - 23: {fileID: 2372810}
-  - 114: {fileID: 11435620}
-  - 114: {fileID: 11402556}
-  - 114: {fileID: 11439110}
+  - component: {fileID: 412512}
+  - component: {fileID: 3351048}
+  - component: {fileID: 2372810}
+  - component: {fileID: 11435620}
+  - component: {fileID: 11402556}
+  - component: {fileID: 11439110}
   m_Layer: 0
   m_Name: CTCube1
   m_TagString: Untagged
@@ -25,14 +25,14 @@ GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 4: {fileID: 418262}
-  - 33: {fileID: 3365744}
-  - 23: {fileID: 2370688}
-  - 114: {fileID: 11437650}
-  - 114: {fileID: 11462076}
-  - 114: {fileID: 11474832}
+  - component: {fileID: 418262}
+  - component: {fileID: 3365744}
+  - component: {fileID: 2370688}
+  - component: {fileID: 11437650}
+  - component: {fileID: 11462076}
+  - component: {fileID: 11474832}
   m_Layer: 0
   m_Name: CTCube2
   m_TagString: Untagged
@@ -45,14 +45,14 @@ GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 4: {fileID: 453886}
-  - 33: {fileID: 3354954}
-  - 23: {fileID: 2311994}
-  - 114: {fileID: 11448334}
-  - 114: {fileID: 11463918}
-  - 114: {fileID: 11422224}
+  - component: {fileID: 453886}
+  - component: {fileID: 3354954}
+  - component: {fileID: 2311994}
+  - component: {fileID: 11448334}
+  - component: {fileID: 11463918}
+  - component: {fileID: 11422224}
   m_Layer: 0
   m_Name: CTCube4
   m_TagString: Untagged
@@ -65,14 +65,14 @@ GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 4: {fileID: 456668}
-  - 33: {fileID: 3369574}
-  - 23: {fileID: 2395342}
-  - 114: {fileID: 11408564}
-  - 114: {fileID: 11400964}
-  - 114: {fileID: 11477906}
+  - component: {fileID: 456668}
+  - component: {fileID: 3369574}
+  - component: {fileID: 2395342}
+  - component: {fileID: 11408564}
+  - component: {fileID: 11400964}
+  - component: {fileID: 11477906}
   m_Layer: 0
   m_Name: CTCube
   m_TagString: Untagged
@@ -85,11 +85,11 @@ GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 4: {fileID: 472580}
-  - 114: {fileID: 11424320}
-  - 114: {fileID: 11480514}
+  - component: {fileID: 472580}
+  - component: {fileID: 11424320}
+  - component: {fileID: 11480514}
   m_Layer: 0
   m_Name: Cubes3D
   m_TagString: Untagged
@@ -106,10 +106,10 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 30, y: 20, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 472580}
   m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &418262
 Transform:
   m_ObjectHideFlags: 1
@@ -119,10 +119,10 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -30, y: 20, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 472580}
   m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &453886
 Transform:
   m_ObjectHideFlags: 1
@@ -132,10 +132,10 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 20, z: 30}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 472580}
   m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &456668
 Transform:
   m_ObjectHideFlags: 1
@@ -145,10 +145,10 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 20, z: -30}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 472580}
   m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &472580
 Transform:
   m_ObjectHideFlags: 1
@@ -158,7 +158,6 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 25, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 456668}
   - {fileID: 412512}
@@ -166,6 +165,7 @@ Transform:
   - {fileID: 453886}
   m_Father: {fileID: 0}
   m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &2311994
 MeshRenderer:
   m_ObjectHideFlags: 1
@@ -175,22 +175,28 @@ MeshRenderer:
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
   m_Materials:
   - {fileID: 2100000, guid: 13884da78c22e8b429edd11bb9b94452, type: 2}
-  m_SubsetIndices: 
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
   m_StaticBatchRoot: {fileID: 0}
-  m_UseLightProbes: 1
-  m_ReflectionProbeUsage: 1
   m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
   m_PreserveUVs: 1
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
+  m_SelectedEditorRenderState: 3
   m_MinimumChartSize: 4
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
+  m_SortingLayer: 0
   m_SortingOrder: 0
 --- !u!23 &2370688
 MeshRenderer:
@@ -201,22 +207,28 @@ MeshRenderer:
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
   m_Materials:
   - {fileID: 2100000, guid: 13884da78c22e8b429edd11bb9b94452, type: 2}
-  m_SubsetIndices: 
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
   m_StaticBatchRoot: {fileID: 0}
-  m_UseLightProbes: 1
-  m_ReflectionProbeUsage: 1
   m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
   m_PreserveUVs: 1
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
+  m_SelectedEditorRenderState: 3
   m_MinimumChartSize: 4
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
+  m_SortingLayer: 0
   m_SortingOrder: 0
 --- !u!23 &2372810
 MeshRenderer:
@@ -227,22 +239,28 @@ MeshRenderer:
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
   m_Materials:
   - {fileID: 2100000, guid: 13884da78c22e8b429edd11bb9b94452, type: 2}
-  m_SubsetIndices: 
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
   m_StaticBatchRoot: {fileID: 0}
-  m_UseLightProbes: 1
-  m_ReflectionProbeUsage: 1
   m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
   m_PreserveUVs: 1
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
+  m_SelectedEditorRenderState: 3
   m_MinimumChartSize: 4
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
+  m_SortingLayer: 0
   m_SortingOrder: 0
 --- !u!23 &2395342
 MeshRenderer:
@@ -253,22 +271,28 @@ MeshRenderer:
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
   m_Materials:
   - {fileID: 2100000, guid: 13884da78c22e8b429edd11bb9b94452, type: 2}
-  m_SubsetIndices: 
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
   m_StaticBatchRoot: {fileID: 0}
-  m_UseLightProbes: 1
-  m_ReflectionProbeUsage: 1
   m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
   m_PreserveUVs: 1
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
+  m_SelectedEditorRenderState: 3
   m_MinimumChartSize: 4
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
+  m_SortingLayer: 0
   m_SortingOrder: 0
 --- !u!33 &3351048
 MeshFilter:
@@ -306,11 +330,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 183986}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 1180380308, guid: 59ec414da56d5b141a060ad983746918, type: 3}
+  m_Script: {fileID: 11500000, guid: b41202e6221440c595186dbe4f3ab5b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Speed: {x: 15, y: 15, z: 15}
+  UseInterval: 1
   ChangeInterval: {x: 10, y: 20}
+  SpeedMin: {x: 5, y: 5, z: 5}
+  SpeedMax: {x: 15, y: 15, z: 15}
+  RandomRotationAtStart: 0
 --- !u!114 &11402556
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -319,11 +346,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 121888}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 1180380308, guid: 59ec414da56d5b141a060ad983746918, type: 3}
+  m_Script: {fileID: 11500000, guid: b41202e6221440c595186dbe4f3ab5b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Speed: {x: 15, y: 15, z: 15}
+  UseInterval: 1
   ChangeInterval: {x: 10, y: 20}
+  SpeedMin: {x: 5, y: 5, z: 5}
+  SpeedMax: {x: 15, y: 15, z: 15}
+  RandomRotationAtStart: 0
 --- !u!114 &11408564
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -332,17 +362,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 183986}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 1118156796, guid: 59ec414da56d5b141a060ad983746918, type: 3}
+  m_Script: {fileID: 11500000, guid: 41bc400696c74fb48224ff191c758bb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  UseInterval: 1
   ChangeInterval: {x: 5, y: 15}
-  Saturation: 1
-  Value: 1
-  Opacity: 1
-  ChangeMaterial: 0
-  Material: {fileID: 0}
-  ColorRange: {x: 0, y: 360}
+  HueRange: {x: 0, y: 1}
+  SaturationRange: {x: 1, y: 1}
+  ValueRange: {x: 1, y: 1}
+  AlphaRange: {x: 1, y: 1}
   GrayScale: 0
+  Material: {fileID: 0}
+  RandomColorAtStart: 0
 --- !u!114 &11422224
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -351,13 +382,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 159080}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 156830345, guid: 59ec414da56d5b141a060ad983746918, type: 3}
+  m_Script: {fileID: 11500000, guid: 9899c043d4f94a3f9557cf7b0229e297, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  UseInterval: 1
+  ChangeInterval: {x: 5, y: 15}
   ScaleMin: {x: 2, y: 2, z: 2}
   ScaleMax: {x: 10, y: 10, z: 10}
   Uniform: 1
-  ChangeInterval: {x: 5, y: 15}
+  RandomScaleAtStart: 0
 --- !u!114 &11424320
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -366,11 +399,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 188386}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 1180380308, guid: 59ec414da56d5b141a060ad983746918, type: 3}
+  m_Script: {fileID: 11500000, guid: b41202e6221440c595186dbe4f3ab5b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Speed: {x: 10, y: 10, z: 10}
+  UseInterval: 1
   ChangeInterval: {x: 10, y: 20}
+  SpeedMin: {x: 5, y: 5, z: 5}
+  SpeedMax: {x: 15, y: 15, z: 15}
+  RandomRotationAtStart: 0
 --- !u!114 &11435620
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -379,17 +415,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 121888}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 1118156796, guid: 59ec414da56d5b141a060ad983746918, type: 3}
+  m_Script: {fileID: 11500000, guid: 41bc400696c74fb48224ff191c758bb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  UseInterval: 1
   ChangeInterval: {x: 5, y: 15}
-  Saturation: 1
-  Value: 1
-  Opacity: 1
-  ChangeMaterial: 0
-  Material: {fileID: 0}
-  ColorRange: {x: 0, y: 360}
+  HueRange: {x: 0, y: 1}
+  SaturationRange: {x: 1, y: 1}
+  ValueRange: {x: 1, y: 1}
+  AlphaRange: {x: 1, y: 1}
   GrayScale: 0
+  Material: {fileID: 0}
+  RandomColorAtStart: 0
 --- !u!114 &11437650
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -398,17 +435,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 138870}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 1118156796, guid: 59ec414da56d5b141a060ad983746918, type: 3}
+  m_Script: {fileID: 11500000, guid: 41bc400696c74fb48224ff191c758bb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  UseInterval: 1
   ChangeInterval: {x: 5, y: 15}
-  Saturation: 1
-  Value: 1
-  Opacity: 1
-  ChangeMaterial: 0
-  Material: {fileID: 0}
-  ColorRange: {x: 0, y: 360}
+  HueRange: {x: 0, y: 1}
+  SaturationRange: {x: 1, y: 1}
+  ValueRange: {x: 1, y: 1}
+  AlphaRange: {x: 1, y: 1}
   GrayScale: 0
+  Material: {fileID: 0}
+  RandomColorAtStart: 0
 --- !u!114 &11439110
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -417,13 +455,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 121888}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 156830345, guid: 59ec414da56d5b141a060ad983746918, type: 3}
+  m_Script: {fileID: 11500000, guid: 9899c043d4f94a3f9557cf7b0229e297, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  UseInterval: 1
+  ChangeInterval: {x: 5, y: 15}
   ScaleMin: {x: 2, y: 2, z: 2}
   ScaleMax: {x: 10, y: 10, z: 10}
   Uniform: 1
-  ChangeInterval: {x: 5, y: 15}
+  RandomScaleAtStart: 0
 --- !u!114 &11448334
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -432,17 +472,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 159080}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 1118156796, guid: 59ec414da56d5b141a060ad983746918, type: 3}
+  m_Script: {fileID: 11500000, guid: 41bc400696c74fb48224ff191c758bb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  UseInterval: 1
   ChangeInterval: {x: 5, y: 15}
-  Saturation: 1
-  Value: 1
-  Opacity: 1
-  ChangeMaterial: 0
-  Material: {fileID: 0}
-  ColorRange: {x: 0, y: 360}
+  HueRange: {x: 0, y: 1}
+  SaturationRange: {x: 1, y: 1}
+  ValueRange: {x: 1, y: 1}
+  AlphaRange: {x: 1, y: 1}
   GrayScale: 0
+  Material: {fileID: 0}
+  RandomColorAtStart: 0
 --- !u!114 &11462076
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -451,11 +492,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 138870}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 1180380308, guid: 59ec414da56d5b141a060ad983746918, type: 3}
+  m_Script: {fileID: 11500000, guid: b41202e6221440c595186dbe4f3ab5b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Speed: {x: 15, y: 15, z: 15}
+  UseInterval: 1
   ChangeInterval: {x: 10, y: 20}
+  SpeedMin: {x: 5, y: 5, z: 5}
+  SpeedMax: {x: 15, y: 15, z: 15}
+  RandomRotationAtStart: 0
 --- !u!114 &11463918
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -464,11 +508,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 159080}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 1180380308, guid: 59ec414da56d5b141a060ad983746918, type: 3}
+  m_Script: {fileID: 11500000, guid: b41202e6221440c595186dbe4f3ab5b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Speed: {x: 15, y: 15, z: 15}
+  UseInterval: 1
   ChangeInterval: {x: 10, y: 20}
+  SpeedMin: {x: 5, y: 5, z: 5}
+  SpeedMax: {x: 15, y: 15, z: 15}
+  RandomRotationAtStart: 0
 --- !u!114 &11474832
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -477,13 +524,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 138870}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 156830345, guid: 59ec414da56d5b141a060ad983746918, type: 3}
+  m_Script: {fileID: 11500000, guid: 9899c043d4f94a3f9557cf7b0229e297, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  UseInterval: 1
+  ChangeInterval: {x: 5, y: 15}
   ScaleMin: {x: 2, y: 2, z: 2}
   ScaleMax: {x: 10, y: 10, z: 10}
   Uniform: 1
-  ChangeInterval: {x: 5, y: 15}
+  RandomScaleAtStart: 0
 --- !u!114 &11477906
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -492,13 +541,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 183986}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 156830345, guid: 59ec414da56d5b141a060ad983746918, type: 3}
+  m_Script: {fileID: 11500000, guid: 9899c043d4f94a3f9557cf7b0229e297, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  UseInterval: 1
+  ChangeInterval: {x: 5, y: 15}
   ScaleMin: {x: 2, y: 2, z: 2}
   ScaleMax: {x: 10, y: 10, z: 10}
   Uniform: 1
-  ChangeInterval: {x: 5, y: 15}
+  RandomScaleAtStart: 0
 --- !u!114 &11480514
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -507,13 +558,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 188386}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 156830345, guid: 59ec414da56d5b141a060ad983746918, type: 3}
+  m_Script: {fileID: 11500000, guid: 9899c043d4f94a3f9557cf7b0229e297, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  UseInterval: 1
+  ChangeInterval: {x: 5, y: 15}
   ScaleMin: {x: 0.5, y: 0.5, z: 0.5}
   ScaleMax: {x: 5, y: 5, z: 5}
   Uniform: 1
-  ChangeInterval: {x: 5, y: 15}
+  RandomScaleAtStart: 0
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

@@ -13,13 +13,19 @@ namespace Crosstales.RTVoice.Demo
         [Tooltip("Name of the previous scene.")]
         public string PreviousScene;
 
+        [Tooltip("Name of the previous scene (WebGL only).")]
+        public string PreviousSceneWebGL;
+
         [Tooltip("Name of the next scene.")]
         public string NextScene;
+
+        [Tooltip("Name of the next scene (WebGL only).")]
+        public string NextSceneWebGL;
 
         public void LoadPrevoiusScene()
         {
             Speaker.Silence();
-            SceneManager.LoadScene(PreviousScene);
+            SceneManager.LoadScene(RTVoice.Util.Helper.isWebGLPlatform ? PreviousSceneWebGL : PreviousScene);
         }
 
         #endregion
@@ -30,10 +36,10 @@ namespace Crosstales.RTVoice.Demo
         public void LoadNextScene()
         {
             Speaker.Silence();
-            SceneManager.LoadScene(NextScene);
+            SceneManager.LoadScene(RTVoice.Util.Helper.isWebGLPlatform ? NextSceneWebGL : NextScene);
         }
 
         #endregion
     }
 }
-// © 2015-2018 crosstales LLC (https://www.crosstales.com)
+// © 2015-2019 crosstales LLC (https://www.crosstales.com)

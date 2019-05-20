@@ -68,7 +68,7 @@ namespace Crosstales.UI.Util
 
                 if (ResetAudioSourcesOnStart)
                 {
-                    ResetAudioFilters();
+                    ResetAllAudioSources();
                 }
             }
         }
@@ -78,12 +78,14 @@ namespace Crosstales.UI.Util
 
         #region Public methods
 
+        /// <summary>Finds all audio sources in the scene.</summary>
         public void FindAllAudioSources()
         {
             AudioSources = FindObjectsOfType(typeof(AudioSource)) as AudioSource[];
         }
 
-        public void ResetAudioFilters()
+        /// <summary>Resets all audio sources.</summary>
+        public void ResetAllAudioSources()
         {
             MuteEnabled(Mute);
             LoopEnabled(Loop);
@@ -150,4 +152,4 @@ namespace Crosstales.UI.Util
         #endregion
     }
 }
-// © 2016-2018 crosstales LLC (https://www.crosstales.com)
+// © 2016-2019 crosstales LLC (https://www.crosstales.com)

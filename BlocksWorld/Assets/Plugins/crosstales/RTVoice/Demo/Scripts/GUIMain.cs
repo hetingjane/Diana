@@ -26,10 +26,6 @@ namespace Crosstales.RTVoice.Demo
 
         public void Start()
         {
-            Speaker.OnVoicesReady += onVoicesReady;
-            Speaker.OnErrorInfo += onErrorInfo;
-            Speaker.OnSpeakStart += onSpeakStart;
-
             if (Name != null)
             {
                 Name.text = Constants.ASSET_NAME;
@@ -55,10 +51,12 @@ namespace Crosstales.RTVoice.Demo
                 Errors.text = string.Empty;
             }
 
+            /*
             if (!Helper.hasBuiltInTTS)
             {
                 Speaker.isMaryMode = true;
             }
+            */
         }
 
         public void Update()
@@ -66,8 +64,17 @@ namespace Crosstales.RTVoice.Demo
             Cursor.visible = true;
         }
 
-        public void OnDestroy()
+        public void OnEnable()
         {
+            // Subscribe event listeners
+            Speaker.OnVoicesReady += onVoicesReady;
+            Speaker.OnErrorInfo += onErrorInfo;
+            Speaker.OnSpeakStart += onSpeakStart;
+        }
+
+        public void OnDisable()
+        {
+            // Unsubscribe event listeners
             Speaker.OnVoicesReady -= onVoicesReady;
             Speaker.OnErrorInfo -= onErrorInfo;
             Speaker.OnSpeakStart += onSpeakStart;
@@ -145,4 +152,4 @@ namespace Crosstales.RTVoice.Demo
 
     }
 }
-// © 2015-2018 crosstales LLC (https://www.crosstales.com)
+// © 2015-2019 crosstales LLC (https://www.crosstales.com)

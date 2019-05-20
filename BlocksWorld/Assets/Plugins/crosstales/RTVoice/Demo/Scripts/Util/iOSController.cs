@@ -11,7 +11,7 @@ namespace Crosstales.RTVoice.Demo.Util
         {
             if (RTVoice.Util.Helper.hasBuiltInTTS)
             {
-                Speaker.isMaryMode = RTVoice.Util.Helper.isIOSPlatform;
+                Speaker.isMaryMode = RTVoice.Util.Helper.isIOSBasedPlatform;
             }
         }
 
@@ -24,4 +24,4 @@ namespace Crosstales.RTVoice.Demo.Util
         }
     }
 }
-// © 2016-2018 crosstales LLC (https://www.crosstales.com)
+// © 2016-2019 crosstales LLC (https://www.crosstales.com)

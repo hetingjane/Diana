@@ -21,17 +21,20 @@ namespace Crosstales.RTVoice.Demo
 
         public void Start()
         {
-            // Subscribe event listeners
-            Speaker.OnSpeakStart += play;
-            Speaker.OnSpeakComplete += stop;
-
             if (PlayOnStart)
             {
                 Invoke("StartTTS", Delay); //Invoke the TTS-system after x seconds
             }
         }
 
-        public void OnDestroy()
+        public void OnEnable()
+        {
+            // Subscribe event listeners
+            Speaker.OnSpeakStart += play;
+            Speaker.OnSpeakComplete += stop;
+        }
+
+        public void OnDisable()
         {
             // Unsubscribe event listeners
             Speaker.OnSpeakStart -= play;
@@ -76,4 +79,4 @@ namespace Crosstales.RTVoice.Demo
 
     }
 }
-// © 2015-2018 crosstales LLC (https://www.crosstales.com)
+// © 2015-2019 crosstales LLC (https://www.crosstales.com)

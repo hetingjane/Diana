@@ -15,20 +15,17 @@ namespace Crosstales.RTVoice.EditorTask
 
         private static UpdateStatus status = UpdateStatus.NOT_CHECKED;
 
-#if !UNITY_WSA || UNITY_EDITOR
-        private static char[] splitChar = new char[] { ';' };
-
-        //private static System.Threading.Thread worker;
-#endif
+        private static readonly char[] splitChar = new char[] { ';' };
 
         #endregion
 
-#if !UNITY_WSA || UNITY_EDITOR
 
         #region Constructor
 
         static UpdateCheck()
         {
+            //Debug.Log(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name);
+
             if (EditorConfig.UPDATE_CHECK)
             {
                 if (Util.Config.DEBUG)
@@ -48,12 +45,10 @@ namespace Crosstales.RTVoice.EditorTask
                         if (Util.Config.DEBUG)
                             Debug.Log("Checking for update...");
 
+                        //new System.Threading.Thread(() => updateCheck()).Start();
+                        updateCheck();
+
                         EditorPrefs.SetString(EditorConstants.KEY_UPDATE_DATE, date);
-
-                        //worker = new System.Threading.Thread(() => updateCheck());
-                        //worker.Start();
-
-                        updateCheck ();
                     }
                     else
                     {
@@ -76,7 +71,6 @@ namespace Crosstales.RTVoice.EditorTask
 
         #endregion
 
-#endif
 
         #region Static methods
 
@@ -94,6 +88,10 @@ namespace Crosstales.RTVoice.EditorTask
             {
                 result = updateProTextForEditor(data);
             }
+            else if (status == UpdateStatus.V2019)
+            {
+                result = update2019(data);
+            }
             else if (status == UpdateStatus.UPDATE_VERSION)
             {
                 result = updateVersionTextForEditor(data);
@@ -106,7 +104,7 @@ namespace Crosstales.RTVoice.EditorTask
             {
                 result = TEXT_NO_UPDATE;
             }
-            
+
             st = status;
         }
 
@@ -115,7 +113,6 @@ namespace Crosstales.RTVoice.EditorTask
 
         #region Private methods
 
-#if !UNITY_WSA || UNITY_EDITOR
         private static void updateCheck()
         {
             string[] data = readData();
@@ -157,6 +154,29 @@ namespace Crosstales.RTVoice.EditorTask
                 if (option == 0)
                 {
                     Application.OpenURL(Util.Constants.ASSET_PRO_URL);
+                }
+                else if (option == 1)
+                {
+                    // do nothing!
+                }
+                else
+                {
+                    EditorConfig.UPDATE_CHECK = false;
+
+                    EditorConfig.Save();
+                }
+            }
+            else if (status == UpdateStatus.V2019)
+            {
+                int option = EditorUtility.DisplayDialogComplex(Util.Constants.ASSET_NAME + " - Upgrade needed",
+                update2019(data),
+                "Yes, let's do it!",
+                "Not right now",
+                "Don't ask again!");
+
+                if (option == 0)
+                {
+                    Application.OpenURL(Util.Constants.ASSET_2019_URL);
                 }
                 else if (option == 1)
                 {
@@ -241,14 +261,14 @@ namespace Crosstales.RTVoice.EditorTask
             return sb.ToString();
         }
 
-        private static string updateProText(string[] data)
+        private static string updateProText(string[] data) //TODO remove in the future
         {
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
 
             if (data != null)
             {
                 sb.Append(Util.Constants.ASSET_NAME);
-                sb.Append(" is deprecated in favour of the PRO-version!");
+                sb.Append(" is deprecated in favor of the PRO-version!");
                 sb.Append(System.Environment.NewLine);
                 sb.Append(System.Environment.NewLine);
                 sb.AppendLine("Please consider an upgrade in the Unity AssetStore.");
@@ -257,14 +277,30 @@ namespace Crosstales.RTVoice.EditorTask
             return sb.ToString();
         }
 
-        private static string updateVersionText(string[] data)
+        private static string update2019(string[] data)
+        {
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+
+            if (data != null)
+            {
+                sb.Append(Util.Constants.ASSET_NAME + " " + Util.Constants.ASSET_VERSION);
+                sb.Append(" is deprecated in favor of the 2019-version!");
+                sb.Append(System.Environment.NewLine);
+                sb.Append(System.Environment.NewLine);
+                sb.AppendLine("Please consider an upgrade in the Unity AssetStore.");
+            }
+
+            return sb.ToString();
+        }
+
+        private static string updateVersionText(string[] data) //TODO remove in the future
         {
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
 
             if (data != null)
             {
                 sb.Append(Util.Constants.ASSET_NAME);
-                sb.Append(" is deprecated in favour of an newer version!");
+                sb.Append(" is deprecated in favor of an newer version!");
                 sb.Append(System.Environment.NewLine);
                 sb.Append(System.Environment.NewLine);
                 sb.AppendLine("Please consider an upgrade in the Unity AssetStore.");
@@ -289,13 +325,10 @@ namespace Crosstales.RTVoice.EditorTask
 
             return sb.ToString();
         }
-#endif
 
         private static string[] readData()
         {
             string[] data = null;
-
-#if !UNITY_WSA || UNITY_EDITOR
 
             try
             {
@@ -307,9 +340,13 @@ namespace Crosstales.RTVoice.EditorTask
 
                     foreach (string line in Util.Helper.SplitStringToLines(content))
                     {
+                        //Debug.Log("Line: " + line);
+
                         if (line.StartsWith(EditorConstants.ASSET_UID.ToString()))
                         {
                             data = line.Split(splitChar, System.StringSplitOptions.RemoveEmptyEntries);
+
+                            //Debug.Log("data: " + data.CTDump());
 
                             if (data != null && data.Length >= 3)
                             { //valid record?
@@ -317,6 +354,7 @@ namespace Crosstales.RTVoice.EditorTask
                             }
                             else
                             {
+                                //Debug.LogWarning("invalid data: " + data.Length);
                                 data = null;
                             }
                         }
@@ -328,7 +366,6 @@ namespace Crosstales.RTVoice.EditorTask
                 Debug.LogError("Could not load update file: " + System.Environment.NewLine + ex);
             }
 
-#endif
             return data;
         }
 
@@ -356,11 +393,23 @@ namespace Crosstales.RTVoice.EditorTask
                     {
                         status = UpdateStatus.DEPRECATED;
                     }
+                    else if (buildNumber == -2019)
+                    {
+                        status = UpdateStatus.V2019;
+                    }
                     else
                     {
                         status = UpdateStatus.NO_UPDATE;
                     }
                 }
+
+                if (Util.Config.DEBUG)
+                    Debug.Log("buildNumber: " + buildNumber);
+            }
+            else
+            {
+                if (Util.Config.DEBUG)
+                    Debug.LogWarning("data is null!");
             }
         }
 
@@ -385,14 +434,14 @@ namespace Crosstales.RTVoice.EditorTask
             return sb.ToString();
         }
 
-        private static string updateProTextForEditor(string[] data)
+        private static string updateProTextForEditor(string[] data) //TODO remove in the future
         {
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
 
             if (data != null)
             {
                 sb.Append(Util.Constants.ASSET_NAME);
-                sb.Append(" is deprecated in favour of the PRO-version!");
+                sb.Append(" is deprecated in favor of the PRO-version!");
                 sb.Append(System.Environment.NewLine);
                 sb.Append(System.Environment.NewLine);
                 sb.AppendLine("Please consider an upgrade in the Unity AssetStore.");
@@ -401,14 +450,30 @@ namespace Crosstales.RTVoice.EditorTask
             return sb.ToString();
         }
 
-        private static string updateVersionTextForEditor(string[] data)
+        private static string update2019ForEditor(string[] data)
+        {
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+
+            if (data != null)
+            {
+                sb.Append(Util.Constants.ASSET_NAME + " " + Util.Constants.ASSET_VERSION);
+                sb.Append(" is deprecated in favor of the 2019-version!");
+                sb.Append(System.Environment.NewLine);
+                sb.Append(System.Environment.NewLine);
+                sb.AppendLine("Please consider an upgrade in the Unity AssetStore.");
+            }
+
+            return sb.ToString();
+        }
+
+        private static string updateVersionTextForEditor(string[] data) //TODO remove in the future
         {
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
 
             if (data != null)
             {
                 sb.Append(Util.Constants.ASSET_NAME);
-                sb.Append(" is deprecated in favour of an newer version!");
+                sb.Append(" is deprecated in favor of an newer version!");
                 sb.Append(System.Environment.NewLine);
                 sb.Append(System.Environment.NewLine);
                 sb.AppendLine("Please consider an upgrade in the Unity AssetStore.");
@@ -444,7 +509,8 @@ namespace Crosstales.RTVoice.EditorTask
         UPDATE,
         UPDATE_PRO,
         UPDATE_VERSION,
-        DEPRECATED
+        DEPRECATED,
+        V2019
     }
 }
-// © 2016-2018 crosstales LLC (https://www.crosstales.com)
+// © 2016-2019 crosstales LLC (https://www.crosstales.com)

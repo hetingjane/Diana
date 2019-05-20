@@ -12,7 +12,7 @@ namespace Crosstales.RTVoice.EditorUtil
         [PostProcessBuildAttribute(1)]
         public static void OnPostprocessBuild(BuildTarget target, string pathToBuiltProject)
         {
-            if (target == BuildTarget.StandaloneWindows || target == BuildTarget.StandaloneWindows64)
+            if (EditorHelper.isWindowsPlatform)
             {
                 string dataPath = pathToBuiltProject.Substring(0, pathToBuiltProject.Length - 4) + "_Data/";
 
@@ -32,4 +32,4 @@ namespace Crosstales.RTVoice.EditorUtil
     }
 }
 #endif
-// © 2015-2018 crosstales LLC (https://www.crosstales.com)
+// © 2015-2019 crosstales LLC (https://www.crosstales.com)

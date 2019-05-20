@@ -4,7 +4,7 @@ using UnityEditor;
 namespace Crosstales.RTVoice.EditorUtil
 {
     /// <summary>Editor helper class.</summary>
-    public static class EditorHelper
+    public abstract class EditorHelper : Common.EditorUtil.BaseEditorHelper
     {
         #region Static variables
 
@@ -18,36 +18,12 @@ namespace Crosstales.RTVoice.EditorUtil
 
         private static Texture2D logo_asset;
         private static Texture2D logo_asset_small;
-        private static Texture2D logo_ct;
-        private static Texture2D logo_unity;
 
-        private static Texture2D icon_save;
-        private static Texture2D icon_reset;
-        private static Texture2D icon_plus;
-        private static Texture2D icon_minus;
-        private static Texture2D icon_refresh;
         private static Texture2D icon_speak;
         private static Texture2D icon_silence;
+        private static Texture2D icon_next;
+        private static Texture2D icon_previous;
 
-        private static Texture2D icon_manual;
-        private static Texture2D icon_api;
-        private static Texture2D icon_forum;
-        private static Texture2D icon_product;
-
-        private static Texture2D icon_check;
-
-        private static Texture2D social_Facebook;
-        private static Texture2D social_Twitter;
-        private static Texture2D social_Youtube;
-        private static Texture2D social_Linkedin;
-        private static Texture2D social_Xing;
-
-        private static Texture2D video_promo;
-        private static Texture2D video_tutorial;
-
-        private static Texture2D icon_videos;
-
-        private static Texture2D store_PlayMaker;
         private static Texture2D store_AdventureCreator;
         private static Texture2D store_CinemaDirector;
         private static Texture2D store_DialogueSystem;
@@ -57,10 +33,8 @@ namespace Crosstales.RTVoice.EditorUtil
         private static Texture2D store_QuestSystem;
         private static Texture2D store_SALSA;
         private static Texture2D store_SLATE;
-        private static Texture2D store_THE_Dialogue_Engine;
-        private static Texture2D store_uSequencer;
-
-        private static Texture2D icon_3p_assets;
+        private static Texture2D store_Amplitude;
+        private static Texture2D store_Klattersynth;
 
         #endregion
 
@@ -71,14 +45,7 @@ namespace Crosstales.RTVoice.EditorUtil
         {
             get
             {
-                if (Util.Constants.isPro)
-                {
-                    return loadImage(ref logo_asset, "logo_asset_pro.png");
-                }
-                else
-                {
-                    return loadImage(ref logo_asset, "logo_asset.png");
-                }
+                return loadImage(ref logo_asset, "logo_asset_pro.png");
             }
         }
 
@@ -86,70 +53,7 @@ namespace Crosstales.RTVoice.EditorUtil
         {
             get
             {
-                if (Util.Constants.isPro)
-                {
-                    return loadImage(ref logo_asset_small, "logo_asset_small_pro.png");
-                }
-                else
-                {
-                    return loadImage(ref logo_asset_small, "logo_asset_small.png");
-                }
-            }
-        }
-
-        public static Texture2D Logo_CT
-        {
-            get
-            {
-                return loadImage(ref logo_ct, "logo_ct.png");
-            }
-        }
-
-        public static Texture2D Logo_Unity
-        {
-            get
-            {
-                return loadImage(ref logo_unity, "logo_unity.png");
-            }
-        }
-
-        public static Texture2D Icon_Save
-        {
-            get
-            {
-                return loadImage(ref icon_save, "icon_save.png");
-            }
-        }
-
-        public static Texture2D Icon_Reset
-        {
-            get
-            {
-                return loadImage(ref icon_reset, "icon_reset.png");
-            }
-        }
-
-        public static Texture2D Icon_Plus
-        {
-            get
-            {
-                return loadImage(ref icon_plus, "icon_plus.png");
-            }
-        }
-
-        public static Texture2D Icon_Minus
-        {
-            get
-            {
-                return loadImage(ref icon_minus, "icon_minus.png");
-            }
-        }
-
-        public static Texture2D Icon_Refresh
-        {
-            get
-            {
-                return loadImage(ref icon_refresh, "icon_refresh.png");
+                return loadImage(ref logo_asset_small, "logo_asset_small_pro.png");
             }
         }
 
@@ -169,115 +73,19 @@ namespace Crosstales.RTVoice.EditorUtil
             }
         }
 
-        public static Texture2D Icon_Manual
+        public static Texture2D Icon_Next
         {
             get
             {
-                return loadImage(ref icon_manual, "icon_manual.png");
+                return loadImage(ref icon_next, "icon_next.png");
             }
         }
 
-        public static Texture2D Icon_API
+        public static Texture2D Icon_Previous
         {
             get
             {
-                return loadImage(ref icon_api, "icon_api.png");
-            }
-        }
-
-        public static Texture2D Icon_Forum
-        {
-            get
-            {
-                return loadImage(ref icon_forum, "icon_forum.png");
-            }
-        }
-
-        public static Texture2D Icon_Product
-        {
-            get
-            {
-                return loadImage(ref icon_product, "icon_product.png");
-            }
-        }
-
-        public static Texture2D Icon_Check
-        {
-            get
-            {
-                return loadImage(ref icon_check, "icon_check.png");
-            }
-        }
-
-        public static Texture2D Social_Facebook
-        {
-            get
-            {
-                return loadImage(ref social_Facebook, "social_Facebook.png");
-            }
-        }
-
-        public static Texture2D Social_Twitter
-        {
-            get
-            {
-                return loadImage(ref social_Twitter, "social_Twitter.png");
-            }
-        }
-
-        public static Texture2D Social_Youtube
-        {
-            get
-            {
-                return loadImage(ref social_Youtube, "social_Youtube.png");
-            }
-        }
-
-        public static Texture2D Social_Linkedin
-        {
-            get
-            {
-                return loadImage(ref social_Linkedin, "social_Linkedin.png");
-            }
-        }
-
-        public static Texture2D Social_Xing
-        {
-            get
-            {
-                return loadImage(ref social_Xing, "social_Xing.png");
-            }
-        }
-
-        public static Texture2D Video_Promo
-        {
-            get
-            {
-                return loadImage(ref video_promo, "video_promo.png");
-            }
-        }
-
-        public static Texture2D Video_Tutorial
-        {
-            get
-            {
-                return loadImage(ref video_tutorial, "video_tutorial.png");
-            }
-        }
-
-        public static Texture2D Icon_Videos
-        {
-            get
-            {
-                return loadImage(ref icon_videos, "icon_videos.png");
-            }
-        }
-
-        public static Texture2D Store_PlayMaker
-        {
-            get
-            {
-                return loadImage(ref store_PlayMaker, "store_PlayMaker.png");
+                return loadImage(ref icon_previous, "icon_previous.png");
             }
         }
 
@@ -285,7 +93,7 @@ namespace Crosstales.RTVoice.EditorUtil
         {
             get
             {
-                return loadImage(ref store_AdventureCreator, "store_AdventureCreator.png");
+                return loadImage(ref store_AdventureCreator, "Store_AdventureCreator.png");
             }
         }
 
@@ -293,7 +101,7 @@ namespace Crosstales.RTVoice.EditorUtil
         {
             get
             {
-                return loadImage(ref store_CinemaDirector, "store_CinemaDirector.png");
+                return loadImage(ref store_CinemaDirector, "Store_CinemaDirector.png");
             }
         }
 
@@ -301,7 +109,7 @@ namespace Crosstales.RTVoice.EditorUtil
         {
             get
             {
-                return loadImage(ref store_DialogueSystem, "store_DialogueSystem.png");
+                return loadImage(ref store_DialogueSystem, "Store_DialogueSystem.png");
             }
         }
 
@@ -309,7 +117,7 @@ namespace Crosstales.RTVoice.EditorUtil
         {
             get
             {
-                return loadImage(ref store_LDC, "store_LDC.png");
+                return loadImage(ref store_LDC, "Store_LDC.png");
             }
         }
 
@@ -317,7 +125,7 @@ namespace Crosstales.RTVoice.EditorUtil
         {
             get
             {
-                return loadImage(ref store_LipSync, "store_LipSync.png");
+                return loadImage(ref store_LipSync, "Store_LipSync.png");
             }
         }
 
@@ -325,7 +133,7 @@ namespace Crosstales.RTVoice.EditorUtil
         {
             get
             {
-                return loadImage(ref store_NPC_Chat, "store_NPC_Chat.png");
+                return loadImage(ref store_NPC_Chat, "Store_NPC_Chat.png");
             }
         }
 
@@ -333,7 +141,7 @@ namespace Crosstales.RTVoice.EditorUtil
         {
             get
             {
-                return loadImage(ref store_QuestSystem, "store_QuestSystem.png");
+                return loadImage(ref store_QuestSystem, "Store_QuestSystem.png");
             }
         }
 
@@ -341,7 +149,7 @@ namespace Crosstales.RTVoice.EditorUtil
         {
             get
             {
-                return loadImage(ref store_SALSA, "store_SALSA.png");
+                return loadImage(ref store_SALSA, "Store_SALSA.png");
             }
         }
 
@@ -349,31 +157,23 @@ namespace Crosstales.RTVoice.EditorUtil
         {
             get
             {
-                return loadImage(ref store_SLATE, "store_SLATE.png");
+                return loadImage(ref store_SLATE, "Store_SLATE.png");
             }
         }
 
-        public static Texture2D Store_THE_Dialogue_Engine
+        public static Texture2D Store_Amplitude
         {
             get
             {
-                return loadImage(ref store_THE_Dialogue_Engine, "store_THE_Dialogue_Engine.png");
+                return loadImage(ref store_Amplitude, "Store_Amplitude.png");
             }
         }
 
-        public static Texture2D Store_uSequencer
+        public static Texture2D Store_Klattersynth
         {
             get
             {
-                return loadImage(ref store_uSequencer, "store_uSequencer.png");
-            }
-        }
-
-        public static Texture2D Icon_3p_Assets
-        {
-            get
-            {
-                return loadImage(ref icon_3p_assets, "icon_3p_assets.png");
+                return loadImage(ref store_Klattersynth, "Store_Klattersynth.png");
             }
         }
 
@@ -385,14 +185,25 @@ namespace Crosstales.RTVoice.EditorUtil
         /// <summary>Shows the "no voices found"-UI.</summary>
         public static void NoVoicesUI()
         {
-            EditorGUILayout.HelpBox("Could not load voices!", MessageType.Warning);
-
             if (isRTVoiceInScene)
             {
-                EditorGUILayout.HelpBox("TTS with the current settings is not possible!", MessageType.Error);
+                if (Speaker.isPlatformSupported && !Speaker.isWorkingInPlaymode)
+                {
+                    EditorGUILayout.HelpBox("The current TTS only works in builds!", MessageType.Error);
+                }
+                else if (!Speaker.isPlatformSupported)
+                {
+                    EditorGUILayout.HelpBox("The current platform is not supported by the active voice provider. Please use MaryTTS or a custom provider (e.g. Klattersynth).", MessageType.Error);
+                }
+                else
+                {
+                    EditorGUILayout.HelpBox("TTS with the current settings is not possible!", MessageType.Error);
+                }
             }
             else
             {
+                EditorGUILayout.HelpBox("Could not load voices!", MessageType.Warning);
+
                 EditorGUILayout.HelpBox("Did you add the '" + Util.Constants.RTVOICE_SCENE_OBJECT_NAME + "'-prefab to the scene?", MessageType.Info);
 
                 GUILayout.Space(8);
@@ -402,14 +213,6 @@ namespace Crosstales.RTVoice.EditorUtil
                     InstantiatePrefab(Util.Constants.RTVOICE_SCENE_OBJECT_NAME);
                 }
             }
-        }
-
-        /// <summary>Shows a separator-UI.</summary>
-        /// <param name="space">Space in pixels between the component and the seperator line (default: 12, optional).</param>
-        public static void SeparatorUI(int space = 12)
-        {
-            GUILayout.Space(space);
-            GUILayout.Box(string.Empty, new GUILayoutOption[] { GUILayout.ExpandWidth(true), GUILayout.Height(1) });
         }
 
         /// <summary>Instantiates a prefab.</summary>
@@ -429,6 +232,32 @@ namespace Crosstales.RTVoice.EditorUtil
             }
         }
 
+        /// <summary>Shows a banner for "Online Check".</summary>
+        public static void BannerOC()
+        {
+#if !CT_OC
+            if (Speaker.isOnlineService && Util.Constants.SHOW_OC_BANNER)
+            {
+                GUILayout.BeginHorizontal();
+                {
+                    EditorGUILayout.HelpBox("'Online Check' is not installed!" + System.Environment.NewLine + "For reliable Internet availability tests, please install or get it from the Unity AssetStore.", MessageType.Info);
+
+                    GUILayout.BeginVertical(GUILayout.Width(32));
+                    {
+                        GUILayout.Space(4);
+
+                        if (GUILayout.Button(new GUIContent(string.Empty, EditorHelper.Logo_Asset_OC, "Visit Online Check in the Unity AssetStore")))
+                        {
+                            Application.OpenURL(Util.Constants.ASSET_OC);
+                        }
+                    }
+                    GUILayout.EndVertical();
+                }
+                GUILayout.EndHorizontal();
+            }
+#endif
+        }
+
         /// <summary>Loads an image as Texture2D from 'Editor Default Resources'.</summary>
         /// <param name="logo">Logo to load.</param>
         /// <param name="fileName">Name of the image.</param>
@@ -437,7 +266,7 @@ namespace Crosstales.RTVoice.EditorUtil
         {
             if (logo == null)
             {
-#if rtv_ignore_setup
+#if CT_DEVELOP
                 logo = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets" + EditorConfig.ASSET_PATH + "Icons/" + fileName, typeof(Texture2D));
 #else
                 logo = (Texture2D)EditorGUIUtility.Load("crosstales/RTVoice/" + fileName);
@@ -454,4 +283,4 @@ namespace Crosstales.RTVoice.EditorUtil
         #endregion
     }
 }
-// © 2016-2018 crosstales LLC (https://www.crosstales.com)
+// © 2016-2019 crosstales LLC (https://www.crosstales.com)

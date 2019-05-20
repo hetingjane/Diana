@@ -39,6 +39,8 @@ namespace Crosstales.RTVoice.Demo
         private string textA = "Text A";
         private string textB = "Text B";
 
+        private Wrapper currentWrapper;
+
         #endregion
 
 
@@ -46,15 +48,6 @@ namespace Crosstales.RTVoice.Demo
 
         public void Start()
         {
-            // Subscribe event listeners
-            Speaker.OnSpeakAudioGenerationStart += speakAudioGenerationStartMethod;
-            Speaker.OnSpeakAudioGenerationComplete += speakAudioGenerationCompleteMethod;
-            Speaker.OnSpeakCurrentWord += speakCurrentWordMethod;
-            Speaker.OnSpeakCurrentPhoneme += speakCurrentPhonemeMethod;
-            Speaker.OnSpeakCurrentViseme += speakCurrentVisemeMethod;
-            Speaker.OnSpeakStart += speakStartMethod;
-            Speaker.OnSpeakComplete += speakCompleteMethod;
-
             if (TextSpeakerA != null)
                 textA = TextSpeakerA.text;
 
@@ -67,7 +60,19 @@ namespace Crosstales.RTVoice.Demo
             }
         }
 
-        public void OnDestroy()
+        public void OnEnable()
+        {
+            // Subscribe event listeners
+            Speaker.OnSpeakAudioGenerationStart += speakAudioGenerationStartMethod;
+            Speaker.OnSpeakAudioGenerationComplete += speakAudioGenerationCompleteMethod;
+            Speaker.OnSpeakCurrentWord += speakCurrentWordMethod;
+            Speaker.OnSpeakCurrentPhoneme += speakCurrentPhonemeMethod;
+            Speaker.OnSpeakCurrentViseme += speakCurrentVisemeMethod;
+            Speaker.OnSpeakStart += speakStartMethod;
+            Speaker.OnSpeakComplete += speakCompleteMethod;
+        }
+
+        public void OnDisable()
         {
             // Unsubscribe event listeners
             Speaker.OnSpeakAudioGenerationStart -= speakAudioGenerationStartMethod;
@@ -100,12 +105,12 @@ namespace Crosstales.RTVoice.Demo
 
         public void SpeakerA()
         { //Don't speak the text immediately
-            uidSpeakerA = Speaker.Speak(textA, SourceA, Speaker.VoiceForCulture("en"), false, RateSpeakerA);
+            uidSpeakerA = Speaker.Speak(textA, SourceA, Speaker.VoiceForGender(Model.Enum.Gender.MALE, "en"), false, RateSpeakerA);
         }
 
         public void SpeakerB()
         { //Don't speak the text immediately
-            uidSpeakerB = Speaker.Speak(textB, SourceB, Speaker.VoiceForCulture("en", 1), false, RateSpeakerB);
+            uidSpeakerB = Speaker.Speak(textB, SourceB, Speaker.VoiceForGender(Model.Enum.Gender.FEMALE, "en"), false, RateSpeakerB);
         }
 
         public void Silence()
@@ -130,6 +135,16 @@ namespace Crosstales.RTVoice.Demo
         #endregion
 
 
+        #region Private methods
+
+        private void speakAudio()
+        {
+            Speaker.SpeakMarkedWordsWithUID(currentWrapper);
+        }
+
+        #endregion
+
+
         #region Callback methods
 
         private void speakAudioGenerationStartMethod(Wrapper wrapper)
@@ -140,8 +155,9 @@ namespace Crosstales.RTVoice.Demo
         private void speakAudioGenerationCompleteMethod(Wrapper wrapper)
         {
             Debug.Log("speakAudioGenerationCompleteMethod: " + wrapper);
-
-            Speaker.SpeakMarkedWordsWithUID(wrapper);
+            currentWrapper = wrapper;
+            
+            Invoke("speakAudio", 0.1f); //needs a small delay
         }
 
         private void speakStartMethod(Wrapper wrapper)
@@ -162,7 +178,7 @@ namespace Crosstales.RTVoice.Demo
 
         private void speakCompleteMethod(Wrapper wrapper)
         {
-            if (wrapper.Uid.Equals(uidSpeakerA))
+             if (wrapper.Uid.Equals(uidSpeakerA))
             {
                 Debug.Log("Speaker A - Speech complete: " + wrapper);
 
@@ -194,8 +210,6 @@ namespace Crosstales.RTVoice.Demo
 
         private void speakCurrentWordMethod(Model.Wrapper wrapper, string[] speechTextArray, int wordIndex)
         {
-            //Debug.Log(speechTextArray [wordIndex]);
-
             if (wrapper.Uid.Equals(uidSpeakerA))
             {
                 if (TextSpeakerA != null)
@@ -251,4 +265,4 @@ namespace Crosstales.RTVoice.Demo
         #endregion
     }
 }
-// © 2015-2018 crosstales LLC (https://www.crosstales.com)
+// © 2015-2019 crosstales LLC (https://www.crosstales.com)

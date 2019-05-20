@@ -13,8 +13,10 @@ namespace Crosstales.RTVoice.EditorTask
 
         static CompileDefines()
         {
-            setCompileDefines(symbols);
+            //UnityEngine.Debug.Log(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name);
+
+            setCompileDefines(symbols); //TODO replace with addSymbolsToAllTargets
         }
     }
 }
-// © 2017-2018 crosstales LLC (https://www.crosstales.com)
+// © 2017-2019 crosstales LLC (https://www.crosstales.com)

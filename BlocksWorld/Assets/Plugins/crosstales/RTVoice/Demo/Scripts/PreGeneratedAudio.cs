@@ -25,21 +25,26 @@ namespace Crosstales.RTVoice.Demo
         {
             audioSource = gameObject.AddComponent<AudioSource>();
 
-            Speaker.OnSpeakAudioGenerationComplete += speakAudioGenerationCompleteMethod;
-
             Speaker.Speak(SpeechText, audioSource, Speaker.VoiceForCulture("en", 1), false);
         }
 
         public void Update()
         {
-            if (!audioSource.isPlaying && isPlayed)
+            if (!RTVoice.Util.Helper.hasActiveClip(audioSource) && isPlayed)
             {
                 Stop();
             }
         }
 
-        public void OnDestroy()
+        public void OnEnable()
         {
+            // Subscribe event listeners
+            Speaker.OnSpeakAudioGenerationComplete += speakAudioGenerationCompleteMethod;
+        }
+
+        public void OnDisable()
+        {
+            // Unsubscribe event listeners
             Speaker.OnSpeakAudioGenerationComplete -= speakAudioGenerationCompleteMethod;
         }
 
@@ -84,4 +89,4 @@ namespace Crosstales.RTVoice.Demo
         }
     }
 }
-// © 2015-2018 crosstales LLC (https://www.crosstales.com)
+// © 2015-2019 crosstales LLC (https://www.crosstales.com)

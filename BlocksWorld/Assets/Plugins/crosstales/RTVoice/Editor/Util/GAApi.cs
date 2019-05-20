@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace Crosstales.RTVoice.EditorUtil
+﻿namespace Crosstales.RTVoice.EditorUtil
 {
     /// <summary>GA-wrapper API.</summary>
     public abstract class GAApi : Common.EditorUtil.BaseGAApi
@@ -15,7 +13,7 @@ namespace Crosstales.RTVoice.EditorUtil
         /// <param name="value">Specifies the event value.</param>
         public static void Event(string category, string action, string label = "", int value = 0)
         {
-            if (EditorConfig.TELEMETRY)
+            if (EditorConfig.TRACER)
             {
                 Event(Util.Constants.ASSET_NAME, Util.Constants.ASSET_VERSION, category, action, label, value);
             }
@@ -25,4 +23,4 @@ namespace Crosstales.RTVoice.EditorUtil
 
     }
 }
-// © 2017-2018 crosstales LLC (https://www.crosstales.com)
+// © 2017-2019 crosstales LLC (https://www.crosstales.com)

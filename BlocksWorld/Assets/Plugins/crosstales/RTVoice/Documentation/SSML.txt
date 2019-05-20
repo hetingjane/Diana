@@ -1,13 +1,13 @@
-﻿# RT-Voice - SSML
+﻿# RT-Voice PRO - SSML
 
-Works with Windows, WSA (UWP), MaryTTS and eSpeak.
+Works with Windows, WSA (UWP), MaryTTS, eSpeak and AWS Polly.
 
 
 ## Examples
 
 ### Changing Voices
 This is the default voice. <voice name="Microsoft David Desktop">This is David.</voice> This is the default again. <voice name="Microsoft Zira Desktop">Zira here.</voice>
-This is the default voice. <voice name="cmu-bdl-hsmm">This is David.</voice> This is the default again. <voice name="dfki-spike-hsmm">Zira here.</voice>
+This is the default voice. <voice name="cmu-bdl-hsmm">This is cmu-bdl-hsmm.</voice> This is the default again. <voice name="dfki-spike-hsmm">dfki-spike-hsmm here.</voice>
 
 
 ### Inserting silence / pauses (not working in MaryTTS 5.2)
@@ -90,6 +90,11 @@ has been confirmed. Please call <say-as interpret-as="telephone" format="1">
 The rental car you reserved <break strength="medium" /> a mid-size sedan
 <break strength="medium" /> will be ready for you to pick up at <break
 time="500ms" /> <say-as interpret-as="hms12"> 4:00pm </say-as> today.
+
+
+### Adding audio (e.g. for paralanguage, only Windows and WSA (UWP))
+<audio src="https://www.crosstales.com/media/rtvoice/Miau.wav"/>is the sound of a cat.
+<audio src="https://www.crosstales.com/media/rtvoice/Ouch.wav"/>I hit my thumb!
 
 
 

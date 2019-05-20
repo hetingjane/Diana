@@ -7,6 +7,7 @@ namespace Crosstales.UI
     {
         #region Public methods
 
+        ///<summary>Quit the application (stop playing inside the Editor).</summary>
         public void Quit()
         {
 #if UNITY_EDITOR
@@ -16,17 +17,19 @@ namespace Crosstales.UI
 #endif
         }
 
+        ///<summary>Open the crosstales homepage.</summary>
         public void OpenCrosstales()
         {
             Application.OpenURL(Common.Util.BaseConstants.ASSET_AUTHOR_URL);
         }
 
+        ///<summary>Open the Unity AssetStore homepage.</summary>
         public void OpenAssetstore()
         {
-            Application.OpenURL("https://goo.gl/qwtXyb");
+            Application.OpenURL(Common.Util.BaseConstants.ASSET_CT_URL);
         }
 
         #endregion
     }
 }
-// © 2017-2018 crosstales LLC (https://www.crosstales.com)
+// © 2017-2019 crosstales LLC (https://www.crosstales.com)
