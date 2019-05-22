@@ -5,21 +5,22 @@ using System.Linq;
 
 namespace Crosstales.RTVoice.Provider
 {
-	
     /// <summary>
     /// Linux voice provider.
     /// NOTE: needs eSpeak to work: http://espeak.sourceforge.net/
     /// </summary>
     public class VoiceProviderLinux : BaseVoiceProvider
-    {	
-		#region Variables
+    {
+        #region Variables
 
         private const int defaultRate = 160;
         private const int defaultVolume = 100;
         private const int defaultPitch = 50;
 
         private System.Collections.Generic.List<Model.Voice> voices = new System.Collections.Generic.List<Model.Voice>(100);
+#if ENABLE_IL2CPP && (UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN)
         private System.Collections.Generic.Dictionary<string, Common.Util.CTProcess> processCreators = new System.Collections.Generic.Dictionary<string, Common.Util.CTProcess>();
+#endif
 
         #endregion
 
@@ -415,18 +416,21 @@ namespace Crosstales.RTVoice.Provider
         {
             base.Silence();
 
+#if ENABLE_IL2CPP && (UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN)
             foreach (System.Collections.Generic.KeyValuePair<string, Common.Util.CTProcess> kvp in processCreators)
             {
                 if (kvp.Value.isBusy)
                     kvp.Value.Kill();
             }
             processCreators.Clear();
+#endif
         }
 
         public override void Silence(string uid)
         {
             base.Silence(uid);
 
+#if ENABLE_IL2CPP && (UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN)
             if (!string.IsNullOrEmpty(uid))
             {
                 if (processCreators.ContainsKey(uid))
@@ -437,6 +441,7 @@ namespace Crosstales.RTVoice.Provider
                     processCreators.Remove(uid);
                 }
             }
+#endif
         }
 
         #endregion
@@ -783,7 +788,6 @@ namespace Crosstales.RTVoice.Provider
 
         #endregion
     }
-    
 }
 #endif
 // © 2018-2019 crosstales LLC (https://www.crosstales.com)

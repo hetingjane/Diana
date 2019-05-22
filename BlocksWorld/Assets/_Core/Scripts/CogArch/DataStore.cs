@@ -28,7 +28,7 @@ public class DataStore : MonoBehaviour {
 	public class StringValue : IValue {
 		public string val;
 		public StringValue(string inVal) { this.val = inVal; }
-		public string ToString() { return val; }
+		public override string ToString() { return val; }
 		public bool Equals(IValue other) { return other is StringValue && val == ((StringValue)other).val; }
 		public bool IsEmpty() { return string.IsNullOrEmpty(val); }
 	}
@@ -37,7 +37,7 @@ public class DataStore : MonoBehaviour {
 	public class BoolValue : IValue {
 		public bool val;
 		public BoolValue(bool inVal) { this.val = inVal; }
-		public string ToString() { return val ? "True" : "False"; }
+		public override string ToString() { return val ? "True" : "False"; }
 		public bool Equals(IValue other) { return other is BoolValue && val == ((BoolValue)other).val; }
 		public bool IsEmpty() { return false; }
 		
@@ -51,7 +51,7 @@ public class DataStore : MonoBehaviour {
 	public class IntValue : IValue {
 		public int val;
 		public IntValue(int inVal) { this.val = inVal; }
-		public string ToString() { return val.ToString(); }
+		public override string ToString() { return val.ToString(); }
 		public bool Equals(IValue other) { return other is IntValue && val == ((IntValue)other).val; }
 		public bool IsEmpty() { return false; }
 		
@@ -65,7 +65,7 @@ public class DataStore : MonoBehaviour {
 	public class Vector3Value : IValue {
 		public Vector3 val;
 		public Vector3Value(Vector3 inVal) { this.val = inVal; }
-		public string ToString() { return val.ToString(); }
+		public override string ToString() { return val.ToString(); }
 		public bool Equals(IValue other) { return other is Vector3Value && val == ((Vector3Value)other).val; }
 		public bool IsEmpty() { return false; }
 		

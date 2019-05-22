@@ -13,7 +13,8 @@ using UnityEngine;
 
 public class DianaSelfKnowledge : ModuleBase
 {
-	protected void Start() {
+	protected override void Start() {
+		base.Start();
 		SetValue("me:name", "Diana", "initial state");
 		SetValue("me:voice", "Victoria", "initial state");
     }

@@ -1,4 +1,4 @@
-﻿# RT-Voice PRO 2019.3.0
+﻿# RT-Voice PRO 2019.3.1
 
 Thank you for buying our asset "RT-Voice PRO"! 
 If you have any questions about this asset, send us an email at [rtvoice@crosstales.com](mailto:rtvoice@crosstales.com). 
@@ -96,4 +96,4 @@ CH-8002 Zürich
 * [Online Check](https://assetstore.unity.com/packages/slug/74688?aid=1011lNGT)
 
 
-`Version: 08.05.2019`
+`Version: 22.05.2019`

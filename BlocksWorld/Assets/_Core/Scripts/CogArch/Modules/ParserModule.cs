@@ -53,7 +53,7 @@ public class ParserModule : ModuleBase {
 	public class WordValue : DataStore.IValue {
 		public Word val;
 		public WordValue(Word inVal) { this.val = inVal; }
-		public string ToString() { return val.ToString(); }
+		public override string ToString() { return val.ToString(); }
 		public bool Equals(DataStore.IValue other) { return other is WordValue && val.Equals(((WordValue)other).val); }
 		public bool IsEmpty() { return val == null; }
 	}

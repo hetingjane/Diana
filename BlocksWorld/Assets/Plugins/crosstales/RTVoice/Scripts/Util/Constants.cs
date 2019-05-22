@@ -12,22 +12,22 @@ namespace Crosstales.RTVoice.Util
         public const string ASSET_NAME = "RT-Voice PRO";
 
         /// <summary>Version of the asset.</summary>
-        public const string ASSET_VERSION = "2019.3.0";
+        public const string ASSET_VERSION = "2019.3.1b1";
 
         /// <summary>Build number of the asset.</summary>
-        public const int ASSET_BUILD = 20190508;
+        public const int ASSET_BUILD = 20190522;
 
         /// <summary>Create date of the asset (YYYY, MM, DD).</summary>
         public static readonly System.DateTime ASSET_CREATED = new System.DateTime(2015, 4, 29);
 
         /// <summary>Change date of the asset (YYYY, MM, DD).</summary>
-        public static readonly System.DateTime ASSET_CHANGED = new System.DateTime(2019, 5, 8);
+        public static readonly System.DateTime ASSET_CHANGED = new System.DateTime(2019, 5, 22);
 
         /// <summary>URL of the PRO asset in UAS.</summary>
         public const string ASSET_PRO_URL = "https://assetstore.unity.com/packages/slug/41068?aid=1011lNGT";
 
         /// <summary>URL of the 2019 asset in UAS.</summary>
-        public const string ASSET_2019_URL = "https://www.assetstore.unity3d.com/#!/content/41068?aid=1011lNGT&pubref=" + ASSET_NAME; //TODO TBD!
+        public const string ASSET_2019_URL = "https://www.assetstore.unity3d.com/#!/content/41068?aid=1011lNGT"; //TODO TBD!
 
         /// <summary>URL of the 3rd party assets in UAS.</summary>
         public const string ASSET_3P_URL = "https://assetstore.unity.com/lists/rt-voice-friends-42209?aid=1011lNGT"; // RTV&Friends list

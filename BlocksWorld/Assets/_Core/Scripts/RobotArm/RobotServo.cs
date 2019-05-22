@@ -36,7 +36,7 @@ public class RobotServo : MonoBehaviour
 	float curAngle = 0;
 	Vector3 startPosition;
 	Quaternion startAngle;
-	AudioSource audio;
+	new AudioSource audio;
 	float baseVolume, basePitch;
 
 	protected void Awake() {

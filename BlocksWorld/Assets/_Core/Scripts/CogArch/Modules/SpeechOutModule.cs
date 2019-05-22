@@ -13,7 +13,8 @@ Writes:		me:speech:current
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-//using Crosstales.RTVoice;
+using Crosstales.RTVoice;
+using Crosstales.RTVoice.Model;
 
 public class SpeechOutModule : ModuleBase {
 	
@@ -23,9 +24,9 @@ public class SpeechOutModule : ModuleBase {
 	float speechDuration;
 	string nowSpeaking;
 	
-	Crosstales.RTVoice.Model.Voice voice;
-	Crosstales.RTVoice.Speaker speaker;
-	AudioSource audio;
+	Voice voice;
+	Speaker speaker;
+	new AudioSource audio;
 	
 	protected override void Start() {
 		base.Start();

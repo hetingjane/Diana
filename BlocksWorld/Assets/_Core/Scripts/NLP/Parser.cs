@@ -130,17 +130,6 @@ namespace NLPEx1
 				}
 			}
 			sb.Append("]");
-			return;
-			
-			
-		
-			if (baseIndex < 0) sb.Append("[");
-			else sb.Append(" " + partOfSpeech[baseIndex] + "[" + words[baseIndex]);
-			var kids = ChildrenOf(baseIndex);
-			if (kids != null) {
-				foreach (int idx in kids) TreeForm(idx, sb);				
-			}
-			sb.Append("]");
 		}
 
 		public string TreeForm(int baseIndex = -1) {
