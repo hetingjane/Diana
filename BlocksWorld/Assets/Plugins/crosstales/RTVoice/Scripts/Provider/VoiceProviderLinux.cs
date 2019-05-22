@@ -5,13 +5,14 @@ using System.Linq;
 
 namespace Crosstales.RTVoice.Provider
 {
+	
     /// <summary>
     /// Linux voice provider.
     /// NOTE: needs eSpeak to work: http://espeak.sourceforge.net/
     /// </summary>
     public class VoiceProviderLinux : BaseVoiceProvider
-    {
-        #region Variables
+    {	
+		#region Variables
 
         private const int defaultRate = 160;
         private const int defaultVolume = 100;
@@ -782,6 +783,7 @@ namespace Crosstales.RTVoice.Provider
 
         #endregion
     }
+    
 }
 #endif
 // © 2018-2019 crosstales LLC (https://www.crosstales.com)

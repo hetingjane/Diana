@@ -122,3 +122,11 @@ and this is grokked as the following ActionSpec:
 The latter is the string form of a data structure that actually represents all those parts in (strongly-typed) symbolic form, and would be easy for the avatar to carry out.
 
 
+5/22/19
+=======
+Added a Communication class hierarchy, with subclasses for the seven subtypes of communication (command, query, etc.).  The main Grok method has been updated to grok both commands and phatic greetings/goodbyes.  So when you enter "hello", it now gets reduced to:
+
+  --> Phatic(Greeting) : [hello(UH:-1)](Score=0)
+
+I think this is about ready to integrate with the main BlocksWorld (Diana 2.0) Unity project.  There's still a lot more to be done on it, but the foundation is solid and it will already be a fine replacement for the current StanfordNLP-based language modules in there now.
+
