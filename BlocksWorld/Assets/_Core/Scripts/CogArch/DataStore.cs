@@ -93,7 +93,17 @@ public class DataStore : MonoBehaviour {
 	// Here's the actual data storage:
 	Dictionary<string, IValue> store = new Dictionary<string, IValue>();
 	
+	static bool didRunUnitTests = false;
+	
 	protected void Awake() {
+		// Because this is a MonoBehavior, we can't unit test it at static
+		// initialization time (as most of our unit tests do).  Instead we
+		// must do it here, from Awake.  Careful to only do it once.
+		if (!didRunUnitTests) {
+			didRunUnitTests = true;
+			QA.UnitTest.RunUnitTest(new UnitTest());
+		}
+		
 		instance = this;
 	}
 
@@ -334,7 +344,8 @@ public class DataStore : MonoBehaviour {
 		}
 		
 		protected override void Run() {
-			DataStore ds = new DataStore();
+			GameObject temp = new GameObject("temp (for DataStore unit test)");
+			DataStore ds = temp.AddComponent<DataStore>();
 			ds.logChanges = false;
 			ds.ISubscribe("foo", NoteChange);
 			ds.ISubscribe("bar", NoteChange);
@@ -363,13 +374,9 @@ public class DataStore : MonoBehaviour {
 			AssertEqual(Vector3.forward, ds.IGetVector3Value("baz"));
 			AssertEqual(changeCount, 2);		// (since we didn't subscribe to "baz")
 			AssertEqual(lastChangedKey, "bar");
+			Destroy(temp);
 		}
 		
-	}
-	
-	// Static constructor for the main class instantiates the unit test class:
-	static DataStore() {
-		QA.UnitTest.RunUnitTest(new UnitTest());
 	}
 	
 	#endregion  // Unit Test

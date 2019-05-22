@@ -15,6 +15,11 @@ public class PleasantriesModule : ModuleBase {
 	protected override void Start() {
 		base.Start();
 		DataStore.Subscribe("user:parse", NoteUserParse);
+		Invoke("TestSpeech", 0.5f);
+	}
+
+	void TestSpeech() {
+		SetValue("me:speech:intent", "System ready.", "test message for debugging");
 	}
 
 	void NoteUserParse(string key, DataStore.IValue value) {
