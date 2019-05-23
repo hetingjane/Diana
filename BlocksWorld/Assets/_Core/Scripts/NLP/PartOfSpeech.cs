@@ -9,7 +9,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace NLPEx1
+namespace CWCNLP
 {
 	public static class PartOfSpeech {
 		public const string NN = "NN";		// noun
@@ -76,22 +76,24 @@ namespace NLPEx1
 		static PartOfSpeech() {
 			dictionary = new Dictionary<string, List<PosEntry>>();
 			setPhrases = new List<SetPhrase>();
-					
+		}
+		
+		public static void Init(string semcoreWords) {
+			
 			// Read dictionary data and set phrases from the SEMCOR corpus
-			using (StreamReader file = new StreamReader("semcor-words.dat")) {
-				string line;
-				while ((line = file.ReadLine()) != null) {
-					int colonPos = line.IndexOf(':');
-					string word = line.Substring(0, colonPos);
-					string data = line.Substring(colonPos+1);
-					AddEntry(word, data);
-					
-					// Note some exceptions coded into the following, where SEMCOR just
-					// has dumb set phrases like "on_the" that only make things harder.
-					if (word.IndexOf('_') >= 0 && word.IndexOf('(') < 0 && word.IndexOf(')') < 0
-						&& !word.EndsWith("_the")) {
-						AddSetPhrase(word.Replace('_', ' '), word);
-					}
+			string[] lines = semcoreWords.Split(new char[]{'\r','\n'});
+			foreach (string line in lines) {
+				int colonPos = line.IndexOf(':');
+				if (colonPos < 0) continue;
+				string word = line.Substring(0, colonPos);
+				string data = line.Substring(colonPos+1);
+				AddEntry(word, data);
+				
+				// Note some exceptions coded into the following, where SEMCOR just
+				// has dumb set phrases like "on_the" that only make things harder.
+				if (word.IndexOf('_') >= 0 && word.IndexOf('(') < 0 && word.IndexOf(')') < 0
+					&& !word.EndsWith("_the")) {
+					AddSetPhrase(word.Replace('_', ' '), word);
 				}
 			}
 			
@@ -103,6 +105,8 @@ namespace NLPEx1
 			AddEntry("minus", "CC=1");
 			AddEntry("times", "CC=1");
 			AddEntry("divided_by", "CC=1");
+			AddEntry("hi", "UH=1");
+			AddEntry("bye", "UH=1");
 			RemoveSetPhrase("two times");
 			RemoveSetPhrase("three times");
 			RemoveSetPhrase("four times");

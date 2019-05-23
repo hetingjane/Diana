@@ -1,5 +1,5 @@
 ﻿using System;
-using NLPEx1;
+using CWCNLP;
 
 namespace Semantics
 {

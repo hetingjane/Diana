@@ -1,6 +1,6 @@
 ﻿using Semantics;
 
-namespace NLPEx1
+namespace CWCNLP
 {
 	public static class Grok {
 	
@@ -118,6 +118,9 @@ namespace NLPEx1
 				case "put":
 					act.action = Action.Put;
 					break;
+				case "thank":
+					// whoops, this isn't an action, it's a phatic comment.
+					return null;
 			}
 
 			var kids = st.ChildrenOf(verbIdx);
@@ -149,7 +152,7 @@ namespace NLPEx1
 					}
 				}
 				if (st.partOfSpeech[child] == PartOfSpeech.UH) {
-					switch (st.words[child]) {
+					switch (st.words[child].ToLower()) {
 					case "hello":
 					case "hi":
 						comm = new ComPhatic(text, st, ComPhatic.Type.Greeting);
@@ -163,10 +166,16 @@ namespace NLPEx1
 						comm = new ComEmote(text, st);
 						break;
 					}
+				} else if (st.partOfSpeech[child] == PartOfSpeech.VB) {
+					switch (st.words[child].ToLower()) {
+					case "thank":
+						comm = new ComPhatic(text, st, ComPhatic.Type.ThankYou);
+						break;
+					}
 				}
 			}
 			
-			if (act != null) {
+			if (act != null && act.action != null) {
 				// For now, we'll assume commands...
 				comm = new ComCommand(text, st, act);
 			} else if (comm == null) {

@@ -10,7 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace NLPEx1
+namespace CWCNLP
 {
 	public class ParseState {
 		// "ROOT" followed by the text of each word
