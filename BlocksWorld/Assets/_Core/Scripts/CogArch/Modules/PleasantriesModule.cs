@@ -23,11 +23,11 @@ public class PleasantriesModule : ModuleBase {
 	}
 
 	void NoteUserParse(string key, DataStore.IValue value) {
-		var wordValue = value as ParserModule.WordValue;
+		var wordValue = value as StanfordParserModule.WordValue;
 		if (wordValue != null) HandleInput(wordValue.val);
 	}
 
-	void HandleInput(ParserModule.Word parseTree) {
+	void HandleInput(StanfordParserModule.Word parseTree) {
 		string head = parseTree.text.ToUpper();
 		string fullTree = parseTree.ToString();
 		

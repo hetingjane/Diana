@@ -13,7 +13,7 @@ using System.Net;
 using System.Threading;
 using SimpleJSON;
 
-public class ParserModule : ModuleBase {
+public class StanfordParserModule : ModuleBase {
 	
 	public class Word {
 		public string text;					// actual text of the word
