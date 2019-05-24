@@ -107,6 +107,10 @@ namespace CWCNLP
 			AddEntry("divided_by", "CC=1");
 			AddEntry("hi", "UH=1");
 			AddEntry("bye", "UH=1");
+			AddEntry("close", "VB=0.6;JJ=0.3;RB=0.1");
+			AddEntry("Close", "VB=0.9;RB=0.1");
+			AddEntry("open", "VB=0.6;JJ=0.3;RB=0.1");
+			AddEntry("Open", "VB=0.9;RB=0.1");
 			RemoveSetPhrase("two times");
 			RemoveSetPhrase("three times");
 			RemoveSetPhrase("four times");

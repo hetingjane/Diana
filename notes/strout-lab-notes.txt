@@ -130,3 +130,14 @@ Added a Communication class hierarchy, with subclasses for the seven subtypes of
 
 I think this is about ready to integrate with the main BlocksWorld (Diana 2.0) Unity project.  There's still a lot more to be done on it, but the foundation is solid and it will already be a fine replacement for the current StanfordNLP-based language modules in there now.
 
+
+5/23/19
+=======
+I've begun integration of the new parser module with the main BlocksWorld project.  So far, I have only a couple of phatic responses hooked up in the PleasantriesModule.
+
+
+5/24/19
+=======
+I've added a CommandsModule, which processes direct commands from the user (grokked as ComCommand objects).  Right now you can tell the avatar "open your eyes" or "close your eyes", and it will do it (works for both Diana and SAM).  Any other command (including, for example "close my eyes") and the avatar will respond "I can't."
+
+Still need to do anaphora resolution, so that after saying "close your eyes" you could then say "open them."

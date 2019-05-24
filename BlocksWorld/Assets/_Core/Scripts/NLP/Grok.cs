@@ -50,6 +50,12 @@ namespace CWCNLP
 					case "little":
 						obj.vagueSize = VagueSize.Small;
 						break;
+					case "your":
+						obj.owner = Owner.You;
+						break;
+					case "my":
+						obj.owner = Owner.Me;
+						break;
 					default:
 						foreach (Color c in System.Enum.GetValues(typeof(Color))) {
 							if (word == c.ToString().ToLower()) {
@@ -117,6 +123,12 @@ namespace CWCNLP
 					break;
 				case "put":
 					act.action = Action.Put;
+					break;
+				case "close":
+					act.action = Action.Close;
+					break;
+				case "open":
+					act.action = Action.Open;
 					break;
 				case "thank":
 					// whoops, this isn't an action, it's a phatic comment.

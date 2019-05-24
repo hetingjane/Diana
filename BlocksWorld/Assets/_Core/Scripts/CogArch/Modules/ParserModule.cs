@@ -14,6 +14,7 @@ using Semantics;
 
 public class ParserModule : ModuleBase {
 
+	[Tooltip("Semcor Words asset (statistical part-of-speech data)")]
 	public TextAsset semcorWords;
 
 	protected override void Start() {

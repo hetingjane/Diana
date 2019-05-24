@@ -29,12 +29,19 @@ namespace Semantics
 		Plural,
 	}
 	
+	public enum Owner {
+		Unspecified,
+		Me,
+		You
+	}
+	
 	public class ObjSpec {
 		public string referredToAs;		// main noun or pronoun used
 		public Color color;
 		public VagueSize vagueSize;
 		public Specificity specificity;
 		public Plurality plurality;
+		public Owner owner;
 		
 		public override string ToString() {
 			var sb = new System.Text.StringBuilder();
@@ -55,6 +62,10 @@ namespace Semantics
 				sb.Append(" ");
 			}
 			sb.Append(referredToAs);
+			if (owner != Owner.Unspecified) {
+				sb.Append(" of ");
+				sb.Append(owner.ToString());
+			}
 			sb.Append("]");
 			return sb.ToString();
 		}

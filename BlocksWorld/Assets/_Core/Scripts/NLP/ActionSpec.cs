@@ -4,9 +4,13 @@ namespace Semantics
 	public enum Action {
 		Unknown,
 		PickUp,
+		Raise,
 		SetDown,
+		Lower,
 		Put,
-		Say
+		Say,
+		Open,
+		Close
 	}
 	
 	
