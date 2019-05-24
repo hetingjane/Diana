@@ -50,6 +50,12 @@ namespace CWCNLP
 					case "little":
 						obj.vagueSize = VagueSize.Small;
 						break;
+					case "left":
+						obj.leftRight = LeftRightAxis.Left;
+						break;
+					case "right":
+						obj.leftRight = LeftRightAxis.Right;
+						break;
 					case "your":
 						obj.owner = Owner.You;
 						break;
@@ -129,6 +135,13 @@ namespace CWCNLP
 					break;
 				case "open":
 					act.action = Action.Open;
+					break;
+				case "raise":
+				case "lift":
+					act.action = Action.Raise;
+					break;
+				case "lower":
+					act.action = Action.Lower;
 					break;
 				case "thank":
 					// whoops, this isn't an action, it's a phatic comment.

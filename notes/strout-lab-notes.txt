@@ -138,6 +138,8 @@ I've begun integration of the new parser module with the main BlocksWorld projec
 
 5/24/19
 =======
-I've added a CommandsModule, which processes direct commands from the user (grokked as ComCommand objects).  Right now you can tell the avatar "open your eyes" or "close your eyes", and it will do it (works for both Diana and SAM).  Any other command (including, for example "close my eyes") and the avatar will respond "I can't."
+I've added a CommandsModule, which processes direct commands from the user (grokked as ComCommand objects).  Right now you can tell the avatar "open your eyes" or "close your eyes", and it will do it (works for both Diana and SAM, though SAM does a better job of resting when his eyes are closed, and so he can no longer see where you are pointing).  Any other command (including, for example "close my eyes") and the avatar will respond "I can't."
 
-Still need to do anaphora resolution, so that after saying "close your eyes" you could then say "open them."
+Still need to do anaphora resolution, so that after saying "close your eyes" you could then say "open them."  And of course we will want many more commands, such as "raise your left hand" and "point where I point."
+
+

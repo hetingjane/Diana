@@ -35,12 +35,20 @@ namespace Semantics
 		You
 	}
 	
+	public enum LeftRightAxis {
+		Unspecified,
+		Left,
+		Center,
+		Right
+	}
+	
 	public class ObjSpec {
 		public string referredToAs;		// main noun or pronoun used
 		public Color color;
 		public VagueSize vagueSize;
 		public Specificity specificity;
 		public Plurality plurality;
+		public LeftRightAxis leftRight;
 		public Owner owner;
 		
 		public override string ToString() {
@@ -59,6 +67,10 @@ namespace Semantics
 			}
 			if (color != Color.Unspecified) {
 				sb.Append(color.ToString());
+				sb.Append(" ");
+			}
+			if (leftRight != LeftRightAxis.Unspecified) {
+				sb.Append(leftRight.ToString());
 				sb.Append(" ");
 			}
 			sb.Append(referredToAs);
