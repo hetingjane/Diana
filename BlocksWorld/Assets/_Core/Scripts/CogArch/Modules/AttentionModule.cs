@@ -2,6 +2,7 @@
 This module controls Diana's attention.
 
 Reads:		user:isSpeaking (BoolValue)
+			me:intent:action (StringValue)
 Writes:		me:attending (StringValue)
 			me:alertness (IntValue: 0 = comatose, 7 = normal, 10 = hyperexcited)
 */
@@ -25,6 +26,7 @@ public class AttentionModule : ModuleBase {
 		SetValue("me:attending", "none", "initialization");
 		lastSalientTime = Time.time;
 		DataStore.Subscribe("user:isSpeaking", NoteUserIsSpeaking);
+		DataStore.Subscribe("me:intent:action", NoteIntent);
 	}
 
 	void NoteUserIsSpeaking(string key, DataStore.IValue value) {
@@ -33,6 +35,15 @@ public class AttentionModule : ModuleBase {
 			SetValue("me:alertness", 7, "user is speaking");
 			SetValue("me:attending", "user", "user is speaking");
 			lastSalientTime = Time.time;
+		}
+	}
+	
+	void NoteIntent(string key, DataStore.IValue value) {
+		string action = value.ToString();
+		if (string.IsNullOrEmpty(action)) {
+			SetValue("me:attending", "none", "me:intent:action is empty");
+		} else if (action == "point") {
+			SetValue("me:attending", "user", "pointing");
 		}
 	}
 	

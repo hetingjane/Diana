@@ -61,7 +61,9 @@ public class CommandsModule : ModuleBase
 			SetValue("me:intent:pointAt", "", comment);
 			break;
 		default:
-			SayICant(comment);
+			// Let's not say "I can't" to every unknown command.
+			// At least not yet ... it gets pretty annoying.
+			//SayICant(comment);
 			break;
 		}
 	}
