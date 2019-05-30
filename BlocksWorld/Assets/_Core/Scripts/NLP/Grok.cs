@@ -149,9 +149,19 @@ namespace CWCNLP
 				case "point":
 					act.action = Action.Point;
 					break;
+				case "stop":
+					act.action = Action.Stop;
+					break;
 				case "thank":
 					// whoops, this isn't an action, it's a phatic comment.
 					return null;
+			}
+
+			// Check for specific action idioms.
+			string verbTree = st.TreeForm(verbIdx);
+			if (verbTree == "VB[is RB[enough]]" && verbIdx > 0 && st.words[verbIdx-1] == "that") {
+				// that's enough: idiom for "stop"
+				act.action = Action.Stop;
 			}
 
 			var kids = st.ChildrenOf(verbIdx);
@@ -221,5 +231,22 @@ namespace CWCNLP
 			return comm;
 		}
 
+	}
+	
+	public class GrokUnitTest : QA.UnitTest {
+		void Test(string input, string expectedComm) {
+			ParseState st = Parser.Parse(input);
+			string s = st.TreeForm();
+			Communication comm = Grok.GrokInput(input, st);
+			if (comm.ToString() == expectedComm) return;
+			Fail("Grok failed on: " + input);
+			Fail("Parse: " + st.TreeForm());
+			QA.UnitTest.AssertEqual(expectedComm, comm.ToString());
+		}
+		
+		protected override void Run() {
+			Test("stop", "Command : [Act:Stop]");
+			Test("that's enough", "Command : [Act:Stop]");
+		}
 	}
 }

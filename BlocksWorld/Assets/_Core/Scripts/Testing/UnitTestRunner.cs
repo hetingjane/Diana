@@ -8,6 +8,7 @@ namespace QA {
 	{
 		void Start() {
 			UnitTest.RunUnitTest(new CWCNLP.ParserUnitTest());
+			UnitTest.RunUnitTest(new CWCNLP.GrokUnitTest());
 		}
 	}
 

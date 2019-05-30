@@ -29,18 +29,18 @@ public class PointAtPointModule : ModuleBase
 
 	protected override void Start() {
 		base.Start();
-		DataStore.Subscribe("me:intent:lookAt", NoteLookAt);
-		DataStore.Subscribe("me:intent:pointAt", NotePointAt);
+		DataStore.Subscribe("me:intent:lookAt", NoteLookOrPointAt);
+		DataStore.Subscribe("me:intent:pointAt", NoteLookOrPointAt);
 	}
 	
-	void NoteLookAt(string key, DataStore.IValue value) {
-		if (value.ToString() == "userPoint") mode = Mode.Looking;
-		else if (mode == Mode.Looking) mode = Mode.Off;
-	}
-
-	void NotePointAt(string key, DataStore.IValue value) {
-		if (value.ToString() == "userPoint") mode = Mode.Pointing;
-		else if (mode == Mode.Pointing) mode = Mode.Off;
+	void NoteLookOrPointAt(string key, DataStore.IValue value) {
+		if (value.ToString() == "userPoint" && key == "me:intent:lookAt") mode = Mode.Looking;
+		else if (value.ToString() == "userPoint" && key == "me:intent:pointAt") mode = Mode.Pointing;
+		else if (mode != Mode.Off) {
+			mode = Mode.Off;
+			SetValue("me:intent:target", "", "mode := Mode.Off");
+			SetValue("me:intent:action", "", "mode := Mode.Off");			
+		}
 	}
 
 	protected void Update() {

@@ -12,7 +12,8 @@ namespace Semantics
 		Open,
 		Close,
 		Point,
-		Look
+		Look,
+		Stop
 	}
 	
 	

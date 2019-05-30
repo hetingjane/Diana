@@ -49,6 +49,7 @@ namespace CWCNLP
 				var w2 = w.Trim();
 				if (!string.IsNullOrEmpty(w2)) inputWords.Add(w2);
 			}
+			Preprocess(inputWords);
 			this.words = inputWords.ToArray();
 			this.partOfSpeech = new string[words.Length];
 			
@@ -63,6 +64,20 @@ namespace CWCNLP
 			}
 
 			CalculateScore();
+		}
+		
+		/// <summary>
+		/// Preprocess the given words, replacing some contractions with their
+		/// extended versions, correcting obvious misspellings, etc.
+		/// </summary>
+		/// <param name="words"></param>
+		void Preprocess(List<string> words) {
+			for (int i=0; i<words.Count; i++) {
+				if (words[i] == "that's") {
+					words[i] = "that";
+					words.Insert(i+1, "is");
+				}
+			}
 		}
 		
 		public void CalculateScore() {

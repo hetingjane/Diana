@@ -55,6 +55,11 @@ public class CommandsModule : ModuleBase
 			SetValue("me:speech:intent", "OK.", comment);		
 			SetValue("me:intent:lookAt", "userPoint", comment);
 			break;
+		case Action.Stop:
+			SetValue("me:speech:intent", "OK.", comment);		
+			SetValue("me:intent:lookAt", "", comment);
+			SetValue("me:intent:pointAt", "", comment);
+			break;
 		default:
 			SayICant(comment);
 			break;
