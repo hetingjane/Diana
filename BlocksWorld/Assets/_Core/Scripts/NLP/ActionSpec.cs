@@ -10,7 +10,9 @@ namespace Semantics
 		Put,
 		Say,
 		Open,
-		Close
+		Close,
+		Point,
+		Look
 	}
 	
 	
@@ -19,6 +21,7 @@ namespace Semantics
 		public Action action;
 		public ObjSpec directObject;
 		public LocationSpec location;
+		public DirectionSpec direction;
 		public ObjSpec instrument;
 		
 		public override string ToString() {
@@ -28,6 +31,7 @@ namespace Semantics
 			sb.Append("Act:" + action.ToString());
 			if (directObject != null) sb.Append(" Obj:" + directObject);
 			if (location != null) sb.Append(" Loc:" + location);
+			if (direction != null) sb.Append(" Dir:" + direction);
 			if (instrument != null) sb.Append(" With:" + instrument);
 			sb.Append("]");
 			return sb.ToString();

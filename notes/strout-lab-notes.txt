@@ -143,3 +143,14 @@ I've added a CommandsModule, which processes direct commands from the user (grok
 Still need to do anaphora resolution, so that after saying "close your eyes" you could then say "open them."  And of course we will want many more commands, such as "raise your left hand" and "point where I point."
 
 
+5/30/19
+=======
+As another example of how a traditional corpus fails to serve our needs well, I discovered today that the word "Point" in the SEMCOR database works out to these parts of speech:
+
+Point:NNP=1.000
+point:NN=0.970;VB=0.030
+
+In other words, overwhelmingly a noun, even when capitalized (as in the start of a sentence).  That's because SEMCOR includes very few imperative statements.  Yet in a command context, "point" is almost always a verb (point at the red block, look where I point, etc.).  We really need a corpus of imperative and interrogative dialog.
+
+But for now, I just added "point" to the list of words I have manually overridden in PartOfSpeech.cs.
+

@@ -17,9 +17,12 @@ public class ParserModule : ModuleBase {
 	[Tooltip("Semcor Words asset (statistical part-of-speech data)")]
 	public TextAsset semcorWords;
 
-	protected override void Start() {
+	protected void Awake() {
 		Debug.Assert(semcorWords != null);
 		PartOfSpeech.Init(semcorWords.text);
+	}
+	
+	protected override void Start() {
 		base.Start();
 		DataStore.Subscribe("user:speech", NoteUserSpeech);
 	}
@@ -37,6 +40,7 @@ public class ParserModule : ModuleBase {
 		while ((rule = parser.NextStep(st)) > 0) {
 			//Print(st.ToString() + " {" + rule + "}");
 		}
+		SetValue("user:parse", st.TreeForm(), "parsed: " + input);
 
 		// Now, attempt to grok the input (convert it to a Communication)
 		Communication comm = Grok.GrokInput(input, st);

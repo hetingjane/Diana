@@ -22,6 +22,7 @@ namespace CWCNLP
 		public const string NP = "NP";		// proper noun
 		public const string VB = "VB";		// verb
 		public const string RP = "RP";		// adverb particle (off, up)
+		public const string WRB = "WRB";	// WH-adverb (where)
 		public const string PPS = "PPS";	// singular pronoun (it, one)
 		public const string UH = "UH";		// interjections and greetings
 
@@ -111,6 +112,8 @@ namespace CWCNLP
 			AddEntry("Close", "VB=0.9;RB=0.1");
 			AddEntry("open", "VB=0.6;JJ=0.3;RB=0.1");
 			AddEntry("Open", "VB=0.9;RB=0.1");
+			AddEntry("point", "VB=0.6;NN=0.4");
+			AddEntry("Point", "VB=0.9;NN=0.1");
 			RemoveSetPhrase("two times");
 			RemoveSetPhrase("three times");
 			RemoveSetPhrase("four times");

@@ -143,6 +143,12 @@ namespace CWCNLP
 				case "lower":
 					act.action = Action.Lower;
 					break;
+				case "look":
+					act.action = Action.Look;
+					break;
+				case "point":
+					act.action = Action.Point;
+					break;
 				case "thank":
 					// whoops, this isn't an action, it's a phatic comment.
 					return null;
@@ -154,7 +160,12 @@ namespace CWCNLP
 					ObjSpec obj = GrokObject(st, i);
 					act.directObject = obj;
 				}
-			}
+				if (st.partOfSpeech[i] == PartOfSpeech.WRB) {
+					// e.g.: [VB[point WRB[where]] VB[NN[I] point]]
+					// For now, we'll assume any "where" clause boils down to:
+					act.direction = new DirectionSpec(DirectionSpec.Direction.WhereUserPoints);
+				}
+			}			
 			
 			return act;
 		}
@@ -163,7 +174,7 @@ namespace CWCNLP
 			Communication comm = null;
 			ActionSpec act = null;
 			foreach (int child in st.ChildrenOf(-1)) {
-				if (st.partOfSpeech[child] == PartOfSpeech.VB) {
+				if (st.partOfSpeech[child] == PartOfSpeech.VB && act == null) {
 					act = Grok.GrokAction(st, child);
 				}
 				if (st.partOfSpeech[child] == PartOfSpeech.IN) {

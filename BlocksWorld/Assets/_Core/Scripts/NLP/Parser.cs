@@ -257,7 +257,8 @@ namespace CWCNLP
 			// must be a verb.
 			if (maxi > 0 && st.partOfSpeech[0] == null && (
 					st.partOfSpeech[1] == PartOfSpeech.DT ||
-					st.partOfSpeech[1] == PartOfSpeech.RP)) {
+					st.partOfSpeech[1] == PartOfSpeech.RP ||
+					st.partOfSpeech[1] == PartOfSpeech.WRB)) {
 				st.partOfSpeech[0] = PartOfSpeech.VB;
 				st.CalculateScore();
 				return 6;
@@ -266,7 +267,7 @@ namespace CWCNLP
 			// If we have an adverb particle still unassigned, it probably modifies the closest verb.
 			for (int i=maxi; i>0; i--) {
 				if (st.dependencies[i] >= 0) continue;
-				if (st.partOfSpeech[i] != PartOfSpeech.RP) continue;
+				if (st.partOfSpeech[i] != PartOfSpeech.RP || st.partOfSpeech[i] != PartOfSpeech.WRB) continue;
 				for (int j=i-1; j>=0; j--) {
 					if (st.partOfSpeech[j] == PartOfSpeech.VB) {
 						st.dependencies[i] = j;
@@ -275,6 +276,19 @@ namespace CWCNLP
 					}
 				}
 			}
+					
+			// A noun right before a verb modifies that verb.
+			for (int i=maxi-1; i>=0; i--) {
+				if (st.dependencies[i] >= 0) continue;
+				if ((st.partOfSpeech[i+1] == PartOfSpeech.VB) && (
+					st.partOfSpeech[i] == PartOfSpeech.NN ||
+					st.partOfSpeech[i] == PartOfSpeech.PPS)) {
+					st.dependencies[i] = i+1;
+					st.CalculateScore();
+					return 8;
+				}
+			}
+			
 
 			// If we have a noun or pronoun particle still unassigned, 
 			// it probably modifies the closest verb or preposition.
@@ -286,7 +300,7 @@ namespace CWCNLP
 					if (st.partOfSpeech[j] == PartOfSpeech.VB || st.partOfSpeech[j] == PartOfSpeech.IN) {
 						st.dependencies[i] = j;
 						st.CalculateScore();
-						return 8;
+						return 9;
 					}
 				}
 			}
@@ -301,7 +315,7 @@ namespace CWCNLP
 					if (st.partOfSpeech[i-1] == PartOfSpeech.NN) st.partOfSpeech[i-1] = PartOfSpeech.JJ;
 				}
 				st.CalculateScore();
-				return 9;
+				return 10;
 			}
 			
 			// An ordinal at the end of the sentence or phrase often acts as a noun
@@ -313,7 +327,7 @@ namespace CWCNLP
 						|| st.partOfSpeech[i+1] == PartOfSpeech.DT) {
 					st.partOfSpeech[i] = PartOfSpeech.NN;
 					st.CalculateScore();
-					return 10;
+					return 11;
 				}						
 			}
 			
@@ -325,7 +339,7 @@ namespace CWCNLP
 				if (st.partOfSpeech[i-1] == PartOfSpeech.CD && st.words[i] == "of") {
 					st.dependencies[i] = i-1;
 					st.CalculateScore();
-					return 11;
+					return 12;
 				}						
 			}
 			
@@ -338,7 +352,7 @@ namespace CWCNLP
 						st.dependencies[maxi] = i;
 						st.partOfSpeech[maxi] = PartOfSpeech.RB;
 						st.CalculateScore();
-						return 12;
+						return 13;
 					}
 				}
 			}
@@ -350,12 +364,12 @@ namespace CWCNLP
 					if (st.partOfSpeech[i+1] == PartOfSpeech.VB) {
 						st.dependencies[i] = i+1;
 						st.CalculateScore();
-						return 13;
+						return 14;
 					}
 					if (st.partOfSpeech[i+1] == PartOfSpeech.RB && st.dependencies[i+1] >= 0) {
 						st.dependencies[i] = st.dependencies[i+1];
 						st.CalculateScore();
-						return 14;
+						return 15;
 					}
 				}
 			}
@@ -363,12 +377,12 @@ namespace CWCNLP
 			// Any remaining adverbs modify the closest preceeding verb.
 			for (int i=maxi; i>0; i--) {
 				if (st.dependencies[i] >= 0) continue;
-				if (st.partOfSpeech[i] != PartOfSpeech.RB) continue;
+				if (st.partOfSpeech[i] != PartOfSpeech.RB && st.partOfSpeech[i] != PartOfSpeech.WRB) continue;
 				for (int j=i-1; j>=0; j--) {
 					if (st.partOfSpeech[j] == PartOfSpeech.VB) {
 						st.dependencies[i] = j;
 						st.CalculateScore();
-						return 15;
+						return 16;
 					}
 				}
 			}
@@ -384,8 +398,7 @@ namespace CWCNLP
 			string s = st.TreeForm();
 			if (s == expectedTree) return;
 			Fail("Parse failed on: " + input);
-			Console.WriteLine("Expected:" + expectedTree);
-			Console.WriteLine("Actual:  " + st.TreeForm());
+			QA.UnitTest.AssertEqual(expectedTree, st.TreeForm());
 		}
 		
 		protected override void Run() {
@@ -396,6 +409,9 @@ namespace CWCNLP
 			Test("now put one of them down", "[VB[RB[now] put NN[one] RB[down]] IN[of NN[them]]]");
 			Test("put a yellow block on the green one", "[VB[put NN[DT[a] JJ[yellow] block]] IN[on NN[DT[the] JJ[green] one]]]");
 			Test("what is 2+3", "[WP[what] VB[is] CC[CD[2] plus CD[3]]]");
+			Test("point where I point", "[VB[point WRB[where]] VB[NN[I] point]]");
+			Test("point where I am pointing", "[VB[point WRB[where]] VB[NN[I] am] VB[pointing]]");
+			Test("look where I point", "[VB[look WRB[where]] VB[NN[I] point]]");
 		}
 
 	}

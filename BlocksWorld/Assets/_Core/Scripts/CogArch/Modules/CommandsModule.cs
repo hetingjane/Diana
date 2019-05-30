@@ -45,6 +45,16 @@ public class CommandsModule : ModuleBase
 				SayICant(comment);
 			}
 			break;
+		case Action.Point:
+			// For now we assume the direction to point is always where the user is pointing.
+			SetValue("me:speech:intent", "OK.", comment);		
+			SetValue("me:intent:pointAt", "userPoint", comment);
+			break;
+		case Action.Look:
+			// For now we assume the direction to point is always where the user is pointing.
+			SetValue("me:speech:intent", "OK.", comment);		
+			SetValue("me:intent:lookAt", "userPoint", comment);
+			break;
 		default:
 			SayICant(comment);
 			break;
