@@ -197,6 +197,22 @@ namespace CWCNLP
 				}
 			}
 
+			// The word "to" before a verb is a helping verb; but
+			// before a determinant or noun equivalent, it's a preposition.
+			for (int i=maxi-1; i>=0; i--) {
+				if (st.dependencies[i] >= 0 || st.partOfSpeech[i] != "TO") continue;
+				if (st.partOfSpeech[i+1] == PartOfSpeech.VB || st.partOfSpeech[i+1] == PartOfSpeech.RB) {
+					st.dependencies[i] = i+1;
+					st.CalculateScore();
+					return 2;
+				} else if (st.partOfSpeech[i+1] == PartOfSpeech.DT
+						|| st.partOfSpeech[i+1] == PartOfSpeech.NP
+						|| st.partOfSpeech[i+1] == PartOfSpeech.NN) {
+					st.partOfSpeech[i] = PartOfSpeech.IN;
+					st.CalculateScore();
+					return 2;
+				}
+			}
 			
 			// Any adjective or number before a noun or pronoun modifies that thing.
 			// (Work back to front.)
@@ -208,7 +224,7 @@ namespace CWCNLP
 						st.partOfSpeech[i+1] == PartOfSpeech.PPS)) {
 					st.dependencies[i] = i+1;
 					st.CalculateScore();
-					return 2;
+					return 3;
 				}
 			}
 			
@@ -222,7 +238,7 @@ namespace CWCNLP
 						st.dependencies[i+1] >= 0) {
 					st.dependencies[i] = st.dependencies[i+1];
 					st.CalculateScore();
-					return 3;
+					return 4;
 				}
 			}
 			
@@ -234,7 +250,7 @@ namespace CWCNLP
 				if (st.partOfSpeech[i] == PartOfSpeech.DT && closestNN >= 0) {
 					st.dependencies[i] = closestNN;
 					st.CalculateScore();
-					return 4;
+					return 5;
 				}
 			}
 			
@@ -263,7 +279,7 @@ namespace CWCNLP
 							didAny = true;
 						}						
 					}
-					if (didAny) return 5;
+					if (didAny) return 6;
 				}
 			}
 			
@@ -276,7 +292,7 @@ namespace CWCNLP
 					st.partOfSpeech[1] == PartOfSpeech.WRB)) {
 				st.partOfSpeech[0] = PartOfSpeech.VB;
 				st.CalculateScore();
-				return 6;
+				return 7;
 			}
 			
 			// If we have an adverb particle still unassigned, it probably modifies the closest verb.
@@ -287,7 +303,7 @@ namespace CWCNLP
 					if (st.partOfSpeech[j] == PartOfSpeech.VB) {
 						st.dependencies[i] = j;
 						st.CalculateScore();
-						return 7;
+						return 8;
 					}
 				}
 			}
@@ -300,7 +316,7 @@ namespace CWCNLP
 					st.partOfSpeech[i] == PartOfSpeech.PPS)) {
 					st.dependencies[i] = i+1;
 					st.CalculateScore();
-					return 8;
+					return 9;
 				}
 			}
 			
@@ -315,7 +331,7 @@ namespace CWCNLP
 					if (st.partOfSpeech[j] == PartOfSpeech.VB || st.partOfSpeech[j] == PartOfSpeech.IN) {
 						st.dependencies[i] = j;
 						st.CalculateScore();
-						return 9;
+						return 10;
 					}
 				}
 			}
@@ -330,7 +346,7 @@ namespace CWCNLP
 					if (st.partOfSpeech[i-1] == PartOfSpeech.NN) st.partOfSpeech[i-1] = PartOfSpeech.JJ;
 				}
 				st.CalculateScore();
-				return 10;
+				return 11;
 			}
 			
 			// An ordinal at the end of the sentence or phrase often acts as a noun
@@ -342,7 +358,7 @@ namespace CWCNLP
 						|| st.partOfSpeech[i+1] == PartOfSpeech.DT) {
 					st.partOfSpeech[i] = PartOfSpeech.NN;
 					st.CalculateScore();
-					return 11;
+					return 12;
 				}						
 			}
 			
@@ -354,7 +370,7 @@ namespace CWCNLP
 				if (st.partOfSpeech[i-1] == PartOfSpeech.CD && st.words[i] == "of") {
 					st.dependencies[i] = i-1;
 					st.CalculateScore();
-					return 12;
+					return 13;
 				}						
 			}
 			
@@ -367,7 +383,7 @@ namespace CWCNLP
 						st.dependencies[maxi] = i;
 						st.partOfSpeech[maxi] = PartOfSpeech.RB;
 						st.CalculateScore();
-						return 13;
+						return 14;
 					}
 				}
 			}
@@ -379,12 +395,12 @@ namespace CWCNLP
 					if (st.partOfSpeech[i+1] == PartOfSpeech.VB) {
 						st.dependencies[i] = i+1;
 						st.CalculateScore();
-						return 14;
+						return 15;
 					}
 					if (st.partOfSpeech[i+1] == PartOfSpeech.RB && st.dependencies[i+1] >= 0) {
 						st.dependencies[i] = st.dependencies[i+1];
 						st.CalculateScore();
-						return 15;
+						return 16;
 					}
 				}
 			}
@@ -397,7 +413,7 @@ namespace CWCNLP
 					if (st.partOfSpeech[j] == PartOfSpeech.VB) {
 						st.dependencies[i] = j;
 						st.CalculateScore();
-						return 16;
+						return 17;
 					}
 				}
 			}
@@ -427,6 +443,8 @@ namespace CWCNLP
 			Test("point where I point", "[VB[point WRB[where]] VB[NN[I] point]]");
 			Test("point where I am pointing", "[VB[point WRB[where]] VB[NN[I] am] VB[pointing]]");
 			Test("look where I point", "[VB[look WRB[where]] VB[NN[I] point]]");
+			Test("look at the green block", "[VB[look_at NN[DT[the] JJ[green] block]]]");
+			Test("point to the green block", "[VB[point] IN[to NN[DT[the] JJ[green] block]]]");
 		}
 
 	}
