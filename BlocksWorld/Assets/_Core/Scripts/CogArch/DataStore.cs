@@ -8,6 +8,7 @@ It derives from MonoBehaviour so it can be configured and provide events in the 
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class DataStore : MonoBehaviour {
 
@@ -80,18 +81,24 @@ public class DataStore : MonoBehaviour {
 	
 	[Header("Configuration")]
 	[Tooltip("Whether to log all value changes with Debug.Log")]
-	public bool logChanges = false;
-	
+	public bool logWithDebugLog = false;
+	[Tooltip("Whether to log all value changes to a \"DataStore.log\" file")]
+	public bool logToFile = false;
+
 	[Header("Events")]
 	// fires when any value is changed, with the key:
 	public StringEvent onValueChanged;
-	
+		
 	// Delegate used when subscribing to a specific key; receives both key and value changed
 	public delegate void ChangeHandler(string key, IValue value);
 	Dictionary<string, List<ChangeHandler>> subscriptions = new Dictionary<string, List<ChangeHandler>>();
 	
 	// Here's the actual data storage:
 	Dictionary<string, IValue> store = new Dictionary<string, IValue>();
+	Dictionary<string, DateTime> changeTime = new Dictionary<string, DateTime>();
+
+	// Stream to the log file
+	System.IO.StreamWriter logFileStream;
 	
 	static bool didRunUnitTests = false;
 	
@@ -104,7 +111,17 @@ public class DataStore : MonoBehaviour {
 			QA.UnitTest.RunUnitTest(new UnitTest());
 		}
 		
-		instance = this;
+		// become the standard (singleton-ish) instance
+		instance = this;		
+	}
+
+	protected void Update() {
+		// Flush our log file once per frame
+		if (logFileStream != null) logFileStream.FlushAsync();
+	}
+	
+	protected void OnDestroy() {
+		if (logFileStream != null) logFileStream.Close();
 	}
 
 	//--------------------------------------------------------------------------------
@@ -146,12 +163,21 @@ public class DataStore : MonoBehaviour {
 		IValue oldVal;
 		if (store.TryGetValue(key, out oldVal) && oldVal.Equals(value)) return false;	// no change
 		
-		// Store the data
+		// Store the data (and the change time)
+		var now = DateTime.Now;
 		store[key] = value;
+		changeTime[key] = now;
 		
 		// Log the changes for debugging purposes (if desired)
-		if (logChanges) {
+		if (logWithDebugLog) {
 			Debug.Log(string.Format("{0} := {1} ({2}: {3})", key, value.ToString(), module.name, comment), module);
+		}
+		if (logToFile) {
+			if (logFileStream == null) logFileStream = System.IO.File.AppendText("DataStore.log");
+			string line = string.Format("[{0}] {1} := {2} ({3}: {4})",
+				now.ToString("yyyy-MM-dd HH:mm:ss"),
+				key, value.ToString(), module.name, comment);
+			logFileStream.WriteLine(line);
 		}
 		
 		// Invoke the general value-changed event handler
@@ -346,7 +372,7 @@ public class DataStore : MonoBehaviour {
 		protected override void Run() {
 			GameObject temp = new GameObject("temp (for DataStore unit test)");
 			DataStore ds = temp.AddComponent<DataStore>();
-			ds.logChanges = false;
+			ds.logToFile = ds.logWithDebugLog = false;
 			ds.ISubscribe("foo", NoteChange);
 			ds.ISubscribe("bar", NoteChange);
 			
