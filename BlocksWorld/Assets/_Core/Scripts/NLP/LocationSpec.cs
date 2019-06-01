@@ -7,7 +7,8 @@ namespace Semantics
 			OnTopOf,
 			NextTo,
 			Under,
-			Inside
+			Inside,
+			Towards
 		}
 		
 		public Relation relation;

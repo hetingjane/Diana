@@ -13,7 +13,12 @@ using Semantics;
 
 public class CommandsModule : ModuleBase
 {
+	[Tooltip("Container for objects the agent can see and manipulate")]
+	public Transform manipulableObjects;
+	
 	protected override void Start() {
+		Debug.Assert(manipulableObjects != null);	// we need this asigned
+		
 		base.Start();
 		DataStore.Subscribe("user:communication", NoteUserCommunication);
 	}
@@ -46,9 +51,22 @@ public class CommandsModule : ModuleBase
 			}
 			break;
 		case Action.Point:
-			// For now we assume the direction to point is always where the user is pointing.
-			SetValue("me:speech:intent", "OK.", comment);		
-			SetValue("me:intent:pointAt", "userPoint", comment);
+			if (act.location != null && act.location.obj != null	) {
+				// Point at the indicated object.
+				Transform obj = FindObjectFromSpec(act.location.obj);
+				if (obj == null) {
+					SetValue("me:spee:intent", "I can't find that.", comment);
+				} else {
+					SetValue("me:speech:intent", "OK.", comment);		
+					SetValue("me:intent:action", "point", comment);
+					SetValue("me:intent:pointAt", obj.name, comment);					
+					SetValue("me:intent:target", obj.position, comment);
+				}
+			} else {
+				// If no object, we assume the direction to point is always where the user is pointing.
+				SetValue("me:speech:intent", "OK.", comment);		
+				SetValue("me:intent:pointAt", "userPoint", comment);
+			}
 			break;
 		case Action.Look:
 			// For now we assume the direction to point is always where the user is pointing.
@@ -59,6 +77,7 @@ public class CommandsModule : ModuleBase
 			SetValue("me:speech:intent", "OK.", comment);		
 			SetValue("me:intent:lookAt", "", comment);
 			SetValue("me:intent:pointAt", "", comment);
+			SetValue("me:intent:action", "", comment);
 			break;
 		default:
 			// Let's not say "I can't" to every unknown command.
@@ -66,6 +85,23 @@ public class CommandsModule : ModuleBase
 			//SayICant(comment);
 			break;
 		}
+	}
+	
+	Transform FindObjectFromSpec(Semantics.ObjSpec objSpec) {
+		Debug.Log("Looking for object fitting: " + objSpec);
+		Transform foundObject = null;
+		for (int i=0; i<manipulableObjects.childCount; i++) {
+			Transform candidate = manipulableObjects.GetChild(i);
+			Renderer r = candidate.GetComponentInChildren<Renderer>();
+			if (r == null) continue;
+			string matName = r.sharedMaterial.name.ToLower();
+			if (matName == objSpec.color.ToString().ToLower()) {
+				// Looks like a good match!
+				foundObject = candidate;
+			}
+		}
+		Debug.Log("Found: " + foundObject);
+		return foundObject;
 	}
 	
 	void SayICant(string comment) {

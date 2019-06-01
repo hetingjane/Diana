@@ -80,25 +80,30 @@ namespace CWCNLP
 			var loc = new LocationSpec();
 			string preposition = st.words[root].ToLower();
 			switch (preposition) {
-				case "on":
-				case "on_top_of":
-				case "atop":
-					loc.relation = LocationSpec.Relation.OnTopOf;
-					break;
-				case "in":
-				case "inside":
-				case "within":
-					loc.relation = LocationSpec.Relation.Inside;
-					break;
-				case "next_to":
-				case "beside":
-					loc.relation = LocationSpec.Relation.NextTo;
-					break;
-				case "under":
-				case "underneath":
-				case "beneath":
-					loc.relation = LocationSpec.Relation.Under;						
-					break;
+			case "on":
+			case "on_top_of":
+			case "atop":
+				loc.relation = LocationSpec.Relation.OnTopOf;
+				break;
+			case "in":
+			case "inside":
+			case "within":
+				loc.relation = LocationSpec.Relation.Inside;
+				break;
+			case "next_to":
+			case "beside":
+				loc.relation = LocationSpec.Relation.NextTo;
+				break;
+			case "under":
+			case "underneath":
+			case "beneath":
+				loc.relation = LocationSpec.Relation.Under;						
+				break;
+			case "to":
+			case "at":
+			case "towards":
+				loc.relation = LocationSpec.Relation.Towards;
+				break;
 			}
 
 			var kids = st.ChildrenOf(root);
