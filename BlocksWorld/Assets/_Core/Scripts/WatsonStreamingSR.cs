@@ -22,6 +22,10 @@ public class WatsonStreamingSR : ModuleBase
 	public string _password = null;
 	public string _url = null;
 	
+	[Header("Control Options")]
+	public bool pushToTalk = false;
+	public KeyCode talkKey = KeyCode.RightShift;
+	
 	[Header("SR Options")]
 	public string[] keywords;
 	
@@ -32,6 +36,7 @@ public class WatsonStreamingSR : ModuleBase
 	
 	[Header("Events")]
 	public UnityEvent onListening;
+	public UnityEvent onNotListening;
 	public StringEvent onInterim;
 	public StringEvent onFinal;
 	public UnityEvent onStopped;
@@ -46,8 +51,7 @@ public class WatsonStreamingSR : ModuleBase
 	
     private SpeechToText _speechToText;
 
-    void Start()
-    {
+	void Start() {
         LogSystem.InstallDefaultReactors();
 
         //  Create credential and instantiate service
@@ -55,10 +59,26 @@ public class WatsonStreamingSR : ModuleBase
 
 	    _speechToText = new SpeechToText(credentials);
 	    alternatives = new List<string>();
-        Active = true;
 
-	    StartRecording();
+	    if (!pushToTalk) {
+		    Active = true;
+	    	StartRecording();
+	    } else {
+	    	onNotListening.Invoke();
+	    }
     }
+    
+	protected void Update() {
+		if (pushToTalk) {
+			if (Input.GetKeyDown(talkKey) && !Active) {
+				Active = true;
+				StartRecording();
+			}
+			if (Input.GetKeyUp(talkKey) && Active) {
+				Active = false;
+			}
+		}
+	}
 
     public bool Active
     {
@@ -84,7 +104,8 @@ public class WatsonStreamingSR : ModuleBase
             }
             else if (!value && _speechToText.IsListening)
             {
-                _speechToText.StopListening();
+	            _speechToText.StopListening();
+	            onNotListening.Invoke();
             }
         }
     }
