@@ -358,7 +358,7 @@ public class SocketInterfaceModule : ModuleBase
 			try {
 				stream.Write(sendBytes, 0, sendBytes.Length);
 				stream.Flush();
-				Debug.Log(clientID + " << " + msg);
+				//Debug.Log(clientID + " << " + msg);
 			} catch (System.IO.IOException e) {
 				Debug.Log(clientID + " EXCEPTION: " + e);
 			}
