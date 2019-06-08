@@ -117,7 +117,12 @@ public class DataStore : MonoBehaviour {
 
 	protected void Update() {
 		// Flush our log file once per frame
-		if (logFileStream != null) logFileStream.FlushAsync();
+		if (logFileStream != null) {
+			try {
+				logFileStream.FlushAsync();
+			} catch (InvalidOperationException e) {				
+			}
+		}
 	}
 	
 	protected void OnDestroy() {
