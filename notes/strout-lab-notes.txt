@@ -169,3 +169,21 @@ I've seen so many projects flounder because they were assembled as a tottering s
 
 But apparently we're going to discuss it at the lab meeting on Monday; I'll present the case for keeping our current approach there.
 
+
+6/10/19
+=======
+After much discussion -- and Dave's discovery that Redis doesn't support Windows very well -- we finally decided to proceed with the current DataStore implementation, and a TCP socket interface for communicating with external processes.  Implemented that over the weekend, including a Python demo.
+
+
+6/18/19
+=======
+I've been tasked with migrating KSIM (currently a standalone Windows executable) into Unity.  KSIM's job is mainly to read the Kinect sensor, and provide frames or skeleton data to clients that need it.  We should be able to do that in Unity.
+
+The "normal" way of starting Kinect development appears to be using the Kinect for Windows SDK (https://www.microsoft.com/en-us/download/details.aspx?id=44561).  But Microsoft also provides a Unity plugin (http://go.microsoft.com/fwlink/?LinkID=513177).  I've downloaded the latter, and imported both:
+
+	Kinect.2.0.1410.19000.unitypackage
+	Kinect.Face.2.0.1410.19000.unitypackage
+
+(the latter because I see that our KinectSensor.cs script in the KSIM project is using Microsoft.Kinect.Face).
+
+Project still runs fine on my Mac.  So I'm going to check that in and call it a good start.
