@@ -1,0 +1,2 @@
+-r:Microsoft.Kinect.dll
+-r:Microsoft.Kinect.Face.dll
