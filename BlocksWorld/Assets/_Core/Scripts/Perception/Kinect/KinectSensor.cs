@@ -286,7 +286,7 @@ namespace Perception.Kinect
 
                 if (faceFrameSources[i] != null)
                 {
-                    //faceFrameSources[i].Dispose();
+                    faceFrameSources[i].Dispose();
                     faceFrameSources[i] = null;
                 }
             }
