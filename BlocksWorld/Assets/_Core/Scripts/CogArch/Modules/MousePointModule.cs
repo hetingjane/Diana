@@ -13,18 +13,19 @@ using UnityEngine;
 
 public class MousePointModule : ModuleBase
 {
-	public float maxDistance = 10;
+	public float maxDistance = 1000000;
 	public LayerMask layerMask = -1;
 	
 	protected void Update() {
 		Vector3 screenPos = Input.mousePosition;
-		Ray ray = Camera.main.ScreenPointToRay(screenPos);
+        SetValue("user:pointPosvec", screenPos, comment);
+        Ray ray = Camera.main.ScreenPointToRay(screenPos);
 		RaycastHit hit;
 		if (Physics.Raycast(ray, out hit, maxDistance, layerMask)) {
 			var comment =  "ray hit " + hit.collider.name;
 			SetValue("user:isPointing", true, comment);
 			SetValue("user:pointPos", hit.point, comment);
-		} else {
+        } else {
 			SetValue("user:isPointing", false, "no ray hit");
 		}
 	}

@@ -286,7 +286,8 @@ namespace Perception.Kinect
 
                 if (faceFrameSources[i] != null)
                 {
-                    faceFrameSources[i].Dispose();
+                    // The dispose method is called by the deconstructor
+                    // faceFrameSources[i].Dispose();
                     faceFrameSources[i] = null;
                 }
             }

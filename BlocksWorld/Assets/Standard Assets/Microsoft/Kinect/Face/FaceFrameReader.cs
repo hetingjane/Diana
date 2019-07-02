@@ -156,7 +156,7 @@ namespace Microsoft.Kinect.Face
                     if(callbackList.Count == 0)
                     {
                         Microsoft_Kinect_Face_FaceFrameReader_add_FrameArrived(_pNative, Microsoft_Kinect_Face_FaceFrameArrivedEventArgs_Delegate_Handler, true);
-                        _Microsoft_Kinect_Face_FaceFrameArrivedEventArgs_Delegate_Handle.Free();
+                        //_Microsoft_Kinect_Face_FaceFrameArrivedEventArgs_Delegate_Handle.Free();
                     }
                 }
             }

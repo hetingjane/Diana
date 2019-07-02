@@ -24,8 +24,8 @@ public class SkeletonFrame : ModuleBase
     {
         base.Start();
         sensor = new Perception.Kinect.KinectSensor(Perception.Kinect.KinectSensor.FrameType.Body);
-
-        // Not sure if it is better to have this in start or in update
+        
+        //This code sets the function to be executed on the arribal of a frame
         sensor.MultiSourceFrameArrived += OnMultiSourceFrameArrived;
     }
 
@@ -33,7 +33,6 @@ public class SkeletonFrame : ModuleBase
     protected void Update()
     {
 
-        //sensor.MultiSourceFrameArrived += OnMultiSourceFrameArrived;
     }
 
     private void OnMultiSourceFrameArrived(object sender, Perception.Kinect.MultiSourceFrameArrivedEventArgs e)
@@ -51,6 +50,7 @@ public class SkeletonFrame : ModuleBase
                 //DataStore.SetValue("user:joint:tracked:" + joint.Key.ToString(), isTracked, this, "");
                 //DataStore.SetValue("user:joint:inferred:" + joint.Key.ToString(), isInferred, this, "");
             }
+            //DataStore.SetValue("user:joint:handLeftState", bodyFrame.HandLeftState, this, enum   "decode with Windows.Kinect.HandState");
         }
     }
 

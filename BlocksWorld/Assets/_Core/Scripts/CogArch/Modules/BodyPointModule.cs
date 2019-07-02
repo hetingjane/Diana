@@ -34,6 +34,7 @@ public class BodyPointModule : ModuleBase
         if (DataStore.HasValue("user:pointpos:right")) pointing = true;
         {
             Vector3 screenPos = DataStore.GetVector3Value("user:pointpos:right");
+
             Ray ray = Camera.main.ScreenPointToRay(screenPos);
             RaycastHit hit;
             if (Physics.Raycast(ray, out hit, maxDistance, layerMask))

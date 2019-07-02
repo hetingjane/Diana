@@ -1,18 +1,15 @@
 ﻿/*
-This module computes pointing position based on joint locations and writes location to black bloard.
+This module computes pointing position based on joint locations converts to pixel space and writes location to black bloard.
 
-Writes:		user:joint:<jointType> = Vector3
-			user:joint:tracked:<jointType> = Boolean
-            user:joint:inferred:<jointType> = Boolean
+Writes:		user:pointpos:right = Vector3
+            user:pointpos:left = Vector3
+
+We will further use this module when we can recognize gestures again.  
 */
 
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Windows.Kinect;
-//using Microsoft.Kinect;
-using Perception.Kinect;
-using Perception.Frames;
 
 public class PointingModule : ModuleBase
 {
@@ -24,8 +21,13 @@ public class PointingModule : ModuleBase
 
     bool leftPoint = false;
     bool rightPoint = false;
+    public bool calibrationMode = false;
 
-    int windowSize = 5;
+    public int windowSize = 10;
+    public Vector3 pixSpaceTopRight = new Vector3(1537, 696, 1),
+                   pixSpaceBotLeft = new Vector3(0, 0, 1),
+                   kinSpaceTopRight = new Vector3(0.4f, -0.6f, 1),
+                   kinSpaceBotLeft = new Vector3(-0.5f, -0.9f, 1);
 
     List<Vector3> handTipLeftVal = new List<Vector3>();
     List<Vector3> shoulderLeftVal = new List<Vector3>();
@@ -83,7 +85,10 @@ public class PointingModule : ModuleBase
 
             rightPointPos = CalcCoordinates(avgHandTipRight, avgShoulderRight);
 
-            if(rightPointPos.x != -float.MaxValue)
+            if(!calibrationMode)
+                rightPointPos = ConvertToPixelSpace(rightPointPos, kinSpaceBotLeft, kinSpaceTopRight, pixSpaceBotLeft, pixSpaceTopRight);
+
+            if (rightPointPos.x != -float.MaxValue)
                 DataStore.SetValue("user:pointpos:right", new DataStore.Vector3Value(rightPointPos), this, rightPointPos.ToString());
         }
     }
@@ -108,6 +113,13 @@ public class PointingModule : ModuleBase
         return averageJointPos / windowSize;
     }
 
+    /*
+     * This method creates a ray with a start point at the shoulder joint in the direction of the handtip 
+     * From there we can compute the value "t" which is how far along the ray that we travel when z = 0 
+     * 0 = start.z + t*direction.z
+     * 
+     * Then we simply solve for x and y based on the t that we find
+     */
     private Vector3 CalcCoordinates(Vector3 handTip, Vector3 shoulder)
     {
         Vector3 direction = new Vector3(handTip.x - shoulder.x, handTip.y - shoulder.y, handTip.z - shoulder.z);
@@ -122,6 +134,39 @@ public class PointingModule : ModuleBase
 
         return new Vector3(x, y, 0);
     }
+
+    /*
+     * Here I solve for the scale and translation factors in both the x and y direction in order to perform the transformation
+     * Using the two formulas:
+     * 
+     * [x1']   [sx 0 dx] [x1]
+     * [y1'] = [0 sy dy] [y1]
+     * [1  ]   [0  0  1] [1 ]
+     * 
+     * [x2']   [sx 0 dx] [x2]
+     * [y2'] = [0 sy dy] [y2]
+     * [1  ]   [0  0  1] [1 ]
+     * 
+     * The input points should be calibrated so that the bottom left and top right corners of the screen solve this transformation 
+     * from kinect space to pixel space
+     */
+    private Vector3 ConvertToPixelSpace(Vector3 point, Vector3 kPoint1, Vector3 kPoint2, Vector3 pPoint1, Vector3 pPoint2)
+    {
+        float dx, dy, sx, sy, x, y;
+
+        dx = (pPoint2.x * kPoint1.x - pPoint1.x * kPoint2.x) / (kPoint1.x - kPoint2.x);
+        dy = (pPoint2.y * kPoint1.y - pPoint1.y * kPoint2.y) / (kPoint1.y - kPoint2.y);
+
+        sx = (pPoint1.x - dx) / kPoint1.x;
+        sy = (pPoint1.y - dy) / kPoint1.y;
+
+
+        x = point.x * sx + dx;
+        y = point.y * sy + dy;
+
+        return new Vector3(x, y, 0.0f);
+    }
+
 
 
 }
