@@ -1,10 +1,10 @@
 using RootSystem = System;
 using System.Linq;
 using System.Collections.Generic;
-namespace Microsoft.Kinect.VisualGestureBuilder
+namespace Windows.Kinect.VisualGestureBuilder
 {
     //
-    // Microsoft.Kinect.VisualGestureBuilder.VisualGestureBuilderFrameArrivedEventArgs
+    // Windows.Kinect.VisualGestureBuilder.VisualGestureBuilderFrameArrivedEventArgs
     //
     public sealed partial class VisualGestureBuilderFrameArrivedEventArgs : RootSystem.EventArgs, Helper.INativeWrapper
 
@@ -47,7 +47,7 @@ namespace Microsoft.Kinect.VisualGestureBuilder
         // Public Properties
         [RootSystem.Runtime.InteropServices.DllImport("KinectVisualGestureBuilderUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl, SetLastError=true)]
         private static extern RootSystem.IntPtr Microsoft_Kinect_VisualGestureBuilder_VisualGestureBuilderFrameArrivedEventArgs_get_FrameReference(RootSystem.IntPtr pNative);
-        public  Microsoft.Kinect.VisualGestureBuilder.VisualGestureBuilderFrameReference FrameReference
+        public  Windows.Kinect.VisualGestureBuilder.VisualGestureBuilderFrameReference FrameReference
         {
             get
             {
@@ -63,7 +63,7 @@ namespace Microsoft.Kinect.VisualGestureBuilder
                     return null;
                 }
 
-                return Helper.NativeObjectCache.CreateOrGetObject<Microsoft.Kinect.VisualGestureBuilder.VisualGestureBuilderFrameReference>(objectPointer, n => new Microsoft.Kinect.VisualGestureBuilder.VisualGestureBuilderFrameReference(n));
+                return Helper.NativeObjectCache.CreateOrGetObject<Windows.Kinect.VisualGestureBuilder.VisualGestureBuilderFrameReference>(objectPointer, n => new Windows.Kinect.VisualGestureBuilder.VisualGestureBuilderFrameReference(n));
             }
         }
 

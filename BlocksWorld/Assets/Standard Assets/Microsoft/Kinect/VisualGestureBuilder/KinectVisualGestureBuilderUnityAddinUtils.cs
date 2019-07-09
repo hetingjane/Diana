@@ -1,10 +1,10 @@
 using RootSystem = System;
 using System.Linq;
 using System.Collections.Generic;
-namespace Microsoft.Kinect.VisualGestureBuilder
+namespace Windows.Kinect.VisualGestureBuilder
 {
     //
-    // Microsoft.Kinect.VisualGestureBuilder.KinectVisualGestureBuilderUnityAddinUtils
+    // Windows.Kinect.VisualGestureBuilder.KinectVisualGestureBuilderUnityAddinUtils
     //
     public sealed partial class KinectVisualGestureBuilderUnityAddinUtils
     {

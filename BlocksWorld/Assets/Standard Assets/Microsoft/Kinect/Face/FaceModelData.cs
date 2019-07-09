@@ -1,10 +1,10 @@
 using RootSystem = System;
 using System.Linq;
 using System.Collections.Generic;
-namespace Microsoft.Kinect.Face
+namespace Windows.Kinect.Face
 {
     //
-    // Microsoft.Kinect.Face.FaceModelData
+    // Windows.Kinect.Face.FaceModelData
     //
     public sealed partial class FaceModelData : RootSystem.IDisposable, Helper.INativeWrapper
 
@@ -52,7 +52,7 @@ namespace Microsoft.Kinect.Face
         // Public Methods
         [RootSystem.Runtime.InteropServices.DllImport("KinectFaceUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl, SetLastError=true)]
         private static extern RootSystem.IntPtr Microsoft_Kinect_Face_FaceModelData_ProduceFaceModel(RootSystem.IntPtr pNative);
-        public Microsoft.Kinect.Face.FaceModel ProduceFaceModel()
+        public Windows.Kinect.Face.FaceModel ProduceFaceModel()
         {
             if (_pNative == RootSystem.IntPtr.Zero)
             {
@@ -66,7 +66,7 @@ namespace Microsoft.Kinect.Face
                 return null;
             }
 
-            return Helper.NativeObjectCache.CreateOrGetObject<Microsoft.Kinect.Face.FaceModel>(objectPointer, n => new Microsoft.Kinect.Face.FaceModel(n));
+            return Helper.NativeObjectCache.CreateOrGetObject<Windows.Kinect.Face.FaceModel>(objectPointer, n => new Windows.Kinect.Face.FaceModel(n));
         }
 
         [RootSystem.Runtime.InteropServices.DllImport("KinectFaceUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl, SetLastError=true)]

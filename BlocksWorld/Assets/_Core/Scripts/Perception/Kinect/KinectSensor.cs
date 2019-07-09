@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Collections.Generic;
 using Windows.Kinect;
-using Microsoft.Kinect.Face;
+using Windows.Kinect.Face;
 
 namespace Perception.Kinect
 {
@@ -234,7 +234,7 @@ namespace Perception.Kinect
             return false;
         }
 
-        private void OnFaceFrameArrived(object sender, Microsoft.Kinect.Face.FaceFrameArrivedEventArgs e)
+        private void OnFaceFrameArrived(object sender, Windows.Kinect.Face.FaceFrameArrivedEventArgs e)
         {
             long timestamp = Timestamp;
             FaceFrame faceFrame = null;

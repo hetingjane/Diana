@@ -1,10 +1,10 @@
 using RootSystem = System;
 using System.Linq;
 using System.Collections.Generic;
-namespace Microsoft.Kinect.Face
+namespace Windows.Kinect.Face
 {
     //
-    // Microsoft.Kinect.Face.HighDefinitionFaceFrameReader
+    // Windows.Kinect.Face.HighDefinitionFaceFrameReader
     //
     public sealed partial class HighDefinitionFaceFrameReader : RootSystem.IDisposable, Helper.INativeWrapper
 
@@ -79,7 +79,7 @@ namespace Microsoft.Kinect.Face
 
         [RootSystem.Runtime.InteropServices.DllImport("KinectFaceUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl, SetLastError=true)]
         private static extern RootSystem.IntPtr Microsoft_Kinect_Face_HighDefinitionFaceFrameReader_get_HighDefinitionFaceFrameSource(RootSystem.IntPtr pNative);
-        public  Microsoft.Kinect.Face.HighDefinitionFaceFrameSource HighDefinitionFaceFrameSource
+        public  Windows.Kinect.Face.HighDefinitionFaceFrameSource HighDefinitionFaceFrameSource
         {
             get
             {
@@ -95,7 +95,7 @@ namespace Microsoft.Kinect.Face
                     return null;
                 }
 
-                return Helper.NativeObjectCache.CreateOrGetObject<Microsoft.Kinect.Face.HighDefinitionFaceFrameSource>(objectPointer, n => new Microsoft.Kinect.Face.HighDefinitionFaceFrameSource(n));
+                return Helper.NativeObjectCache.CreateOrGetObject<Windows.Kinect.Face.HighDefinitionFaceFrameSource>(objectPointer, n => new Windows.Kinect.Face.HighDefinitionFaceFrameSource(n));
             }
         }
 
@@ -104,16 +104,16 @@ namespace Microsoft.Kinect.Face
         private static RootSystem.Runtime.InteropServices.GCHandle _Microsoft_Kinect_Face_HighDefinitionFaceFrameArrivedEventArgs_Delegate_Handle;
         [RootSystem.Runtime.InteropServices.UnmanagedFunctionPointer(RootSystem.Runtime.InteropServices.CallingConvention.Cdecl)]
         private delegate void _Microsoft_Kinect_Face_HighDefinitionFaceFrameArrivedEventArgs_Delegate(RootSystem.IntPtr args, RootSystem.IntPtr pNative);
-        private static Helper.CollectionMap<RootSystem.IntPtr, List<RootSystem.EventHandler<Microsoft.Kinect.Face.HighDefinitionFaceFrameArrivedEventArgs>>> Microsoft_Kinect_Face_HighDefinitionFaceFrameArrivedEventArgs_Delegate_callbacks = new Helper.CollectionMap<RootSystem.IntPtr, List<RootSystem.EventHandler<Microsoft.Kinect.Face.HighDefinitionFaceFrameArrivedEventArgs>>>();
+        private static Helper.CollectionMap<RootSystem.IntPtr, List<RootSystem.EventHandler<Windows.Kinect.Face.HighDefinitionFaceFrameArrivedEventArgs>>> Microsoft_Kinect_Face_HighDefinitionFaceFrameArrivedEventArgs_Delegate_callbacks = new Helper.CollectionMap<RootSystem.IntPtr, List<RootSystem.EventHandler<Windows.Kinect.Face.HighDefinitionFaceFrameArrivedEventArgs>>>();
         [AOT.MonoPInvokeCallbackAttribute(typeof(_Microsoft_Kinect_Face_HighDefinitionFaceFrameArrivedEventArgs_Delegate))]
         private static void Microsoft_Kinect_Face_HighDefinitionFaceFrameArrivedEventArgs_Delegate_Handler(RootSystem.IntPtr result, RootSystem.IntPtr pNative)
         {
-            List<RootSystem.EventHandler<Microsoft.Kinect.Face.HighDefinitionFaceFrameArrivedEventArgs>> callbackList = null;
+            List<RootSystem.EventHandler<Windows.Kinect.Face.HighDefinitionFaceFrameArrivedEventArgs>> callbackList = null;
             Microsoft_Kinect_Face_HighDefinitionFaceFrameArrivedEventArgs_Delegate_callbacks.TryGetValue(pNative, out callbackList);
             lock(callbackList)
             {
                 var objThis = Helper.NativeObjectCache.GetObject<HighDefinitionFaceFrameReader>(pNative);
-                var args = new Microsoft.Kinect.Face.HighDefinitionFaceFrameArrivedEventArgs(result);
+                var args = new Windows.Kinect.Face.HighDefinitionFaceFrameArrivedEventArgs(result);
                 foreach(var func in callbackList)
                 {
                     Helper.EventPump.Instance.Enqueue(() => { try { func(objThis, args); } catch { } });
@@ -122,7 +122,7 @@ namespace Microsoft.Kinect.Face
         }
         [RootSystem.Runtime.InteropServices.DllImport("KinectFaceUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl, SetLastError=true)]
         private static extern void Microsoft_Kinect_Face_HighDefinitionFaceFrameReader_add_FrameArrived(RootSystem.IntPtr pNative, _Microsoft_Kinect_Face_HighDefinitionFaceFrameArrivedEventArgs_Delegate eventCallback, bool unsubscribe);
-        public  event RootSystem.EventHandler<Microsoft.Kinect.Face.HighDefinitionFaceFrameArrivedEventArgs> FrameArrived
+        public  event RootSystem.EventHandler<Windows.Kinect.Face.HighDefinitionFaceFrameArrivedEventArgs> FrameArrived
         {
             add
             {
@@ -227,7 +227,7 @@ namespace Microsoft.Kinect.Face
         // Public Methods
         [RootSystem.Runtime.InteropServices.DllImport("KinectFaceUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl, SetLastError=true)]
         private static extern RootSystem.IntPtr Microsoft_Kinect_Face_HighDefinitionFaceFrameReader_AcquireLatestFrame(RootSystem.IntPtr pNative);
-        public Microsoft.Kinect.Face.HighDefinitionFaceFrame AcquireLatestFrame()
+        public Windows.Kinect.Face.HighDefinitionFaceFrame AcquireLatestFrame()
         {
             if (_pNative == RootSystem.IntPtr.Zero)
             {
@@ -241,7 +241,7 @@ namespace Microsoft.Kinect.Face
                 return null;
             }
 
-            return Helper.NativeObjectCache.CreateOrGetObject<Microsoft.Kinect.Face.HighDefinitionFaceFrame>(objectPointer, n => new Microsoft.Kinect.Face.HighDefinitionFaceFrame(n));
+            return Helper.NativeObjectCache.CreateOrGetObject<Windows.Kinect.Face.HighDefinitionFaceFrame>(objectPointer, n => new Windows.Kinect.Face.HighDefinitionFaceFrame(n));
         }
 
         [RootSystem.Runtime.InteropServices.DllImport("KinectFaceUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl, SetLastError=true)]

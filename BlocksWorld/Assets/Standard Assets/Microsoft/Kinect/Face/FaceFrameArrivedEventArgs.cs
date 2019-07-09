@@ -1,10 +1,10 @@
 using RootSystem = System;
 using System.Linq;
 using System.Collections.Generic;
-namespace Microsoft.Kinect.Face
+namespace Windows.Kinect.Face
 {
     //
-    // Microsoft.Kinect.Face.FaceFrameArrivedEventArgs
+    // Windows.Kinect.Face.FaceFrameArrivedEventArgs
     //
     public sealed partial class FaceFrameArrivedEventArgs : RootSystem.EventArgs, Helper.INativeWrapper
 
@@ -47,7 +47,7 @@ namespace Microsoft.Kinect.Face
         // Public Properties
         [RootSystem.Runtime.InteropServices.DllImport("KinectFaceUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl, SetLastError=true)]
         private static extern RootSystem.IntPtr Microsoft_Kinect_Face_FaceFrameArrivedEventArgs_get_FrameReference(RootSystem.IntPtr pNative);
-        public  Microsoft.Kinect.Face.FaceFrameReference FrameReference
+        public  Windows.Kinect.Face.FaceFrameReference FrameReference
         {
             get
             {
@@ -63,7 +63,7 @@ namespace Microsoft.Kinect.Face
                     return null;
                 }
 
-                return Helper.NativeObjectCache.CreateOrGetObject<Microsoft.Kinect.Face.FaceFrameReference>(objectPointer, n => new Microsoft.Kinect.Face.FaceFrameReference(n));
+                return Helper.NativeObjectCache.CreateOrGetObject<Windows.Kinect.Face.FaceFrameReference>(objectPointer, n => new Windows.Kinect.Face.FaceFrameReference(n));
             }
         }
 

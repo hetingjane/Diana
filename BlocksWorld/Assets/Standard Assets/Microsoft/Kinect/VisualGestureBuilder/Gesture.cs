@@ -1,10 +1,10 @@
 using RootSystem = System;
 using System.Linq;
 using System.Collections.Generic;
-namespace Microsoft.Kinect.VisualGestureBuilder
+namespace Windows.Kinect.VisualGestureBuilder
 {
     //
-    // Microsoft.Kinect.VisualGestureBuilder.Gesture
+    // Windows.Kinect.VisualGestureBuilder.Gesture
     //
     public sealed partial class Gesture : Helper.INativeWrapper
 
@@ -46,8 +46,8 @@ namespace Microsoft.Kinect.VisualGestureBuilder
 
         // Public Properties
         [RootSystem.Runtime.InteropServices.DllImport("KinectVisualGestureBuilderUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl, SetLastError=true)]
-        private static extern Microsoft.Kinect.VisualGestureBuilder.GestureType Microsoft_Kinect_VisualGestureBuilder_Gesture_get_GestureType(RootSystem.IntPtr pNative);
-        public  Microsoft.Kinect.VisualGestureBuilder.GestureType GestureType
+        private static extern Windows.Kinect.VisualGestureBuilder.GestureType Microsoft_Kinect_VisualGestureBuilder_Gesture_get_GestureType(RootSystem.IntPtr pNative);
+        public  Windows.Kinect.VisualGestureBuilder.GestureType GestureType
         {
             get
             {

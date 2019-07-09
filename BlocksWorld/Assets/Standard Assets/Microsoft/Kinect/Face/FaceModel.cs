@@ -1,10 +1,10 @@
 using RootSystem = System;
 using System.Linq;
 using System.Collections.Generic;
-namespace Microsoft.Kinect.Face
+namespace Windows.Kinect.Face
 {
     //
-    // Microsoft.Kinect.Face.FaceModel
+    // Windows.Kinect.Face.FaceModel
     //
     public sealed partial class FaceModel : RootSystem.IDisposable, Helper.INativeWrapper
 
@@ -51,10 +51,10 @@ namespace Microsoft.Kinect.Face
 
         // Public Properties
         [RootSystem.Runtime.InteropServices.DllImport("KinectFaceUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl, SetLastError=true)]
-        private static extern int Microsoft_Kinect_Face_FaceModel_get_FaceShapeDeformations(RootSystem.IntPtr pNative, [RootSystem.Runtime.InteropServices.Out] Microsoft.Kinect.Face.FaceShapeDeformations[] outKeys, float[] outValues, int outCollectionSize);
+        private static extern int Microsoft_Kinect_Face_FaceModel_get_FaceShapeDeformations(RootSystem.IntPtr pNative, [RootSystem.Runtime.InteropServices.Out] Windows.Kinect.Face.FaceShapeDeformations[] outKeys, float[] outValues, int outCollectionSize);
         [RootSystem.Runtime.InteropServices.DllImport("KinectFaceUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl, SetLastError=true)]
         private static extern int Microsoft_Kinect_Face_FaceModel_get_FaceShapeDeformations_Length(RootSystem.IntPtr pNative);
-        public  RootSystem.Collections.Generic.Dictionary<Microsoft.Kinect.Face.FaceShapeDeformations, float> FaceShapeDeformations
+        public  RootSystem.Collections.Generic.Dictionary<Windows.Kinect.Face.FaceShapeDeformations, float> FaceShapeDeformations
         {
             get
             {
@@ -64,9 +64,9 @@ namespace Microsoft.Kinect.Face
                 }
 
                 int outCollectionSize = Microsoft_Kinect_Face_FaceModel_get_FaceShapeDeformations_Length(_pNative);
-                var outKeys = new Microsoft.Kinect.Face.FaceShapeDeformations[outCollectionSize];
+                var outKeys = new Windows.Kinect.Face.FaceShapeDeformations[outCollectionSize];
                 var outValues = new float[outCollectionSize];
-                var managedDictionary = new RootSystem.Collections.Generic.Dictionary<Microsoft.Kinect.Face.FaceShapeDeformations, float>();
+                var managedDictionary = new RootSystem.Collections.Generic.Dictionary<Windows.Kinect.Face.FaceShapeDeformations, float>();
 
                 outCollectionSize = Microsoft_Kinect_Face_FaceModel_get_FaceShapeDeformations(_pNative, outKeys, outValues, outCollectionSize);
                 Helper.ExceptionHelper.CheckLastError();
@@ -141,7 +141,7 @@ namespace Microsoft.Kinect.Face
         private static extern int Microsoft_Kinect_Face_FaceModel_CalculateVerticesForAlignment_Length(RootSystem.IntPtr pNative, RootSystem.IntPtr faceAlignment);
         [RootSystem.Runtime.InteropServices.DllImport("KinectFaceUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl, SetLastError=true)]
         private static extern int Microsoft_Kinect_Face_FaceModel_CalculateVerticesForAlignment(RootSystem.IntPtr pNative, RootSystem.IntPtr faceAlignment, [RootSystem.Runtime.InteropServices.Out] Windows.Kinect.CameraSpacePoint[] outCollection, int outCollectionSize);
-        public RootSystem.Collections.Generic.IList<Windows.Kinect.CameraSpacePoint> CalculateVerticesForAlignment(Microsoft.Kinect.Face.FaceAlignment faceAlignment)
+        public RootSystem.Collections.Generic.IList<Windows.Kinect.CameraSpacePoint> CalculateVerticesForAlignment(Windows.Kinect.Face.FaceAlignment faceAlignment)
         {
             if (_pNative == RootSystem.IntPtr.Zero)
             {

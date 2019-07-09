@@ -1,10 +1,10 @@
 using RootSystem = System;
 using System.Linq;
 using System.Collections.Generic;
-namespace Microsoft.Kinect.VisualGestureBuilder
+namespace Windows.Kinect.VisualGestureBuilder
 {
     //
-    // Microsoft.Kinect.VisualGestureBuilder.TrackingIdLostEventArgs
+    // Windows.Kinect.VisualGestureBuilder.TrackingIdLostEventArgs
     //
     public sealed partial class TrackingIdLostEventArgs : RootSystem.EventArgs, Helper.INativeWrapper
 

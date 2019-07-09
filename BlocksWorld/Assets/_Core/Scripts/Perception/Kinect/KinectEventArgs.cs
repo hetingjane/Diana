@@ -70,12 +70,12 @@ namespace Perception.Kinect
 
     public class FaceFrameArrivedEventArgs : KinectEventArgs
     {
-        public Microsoft.Kinect.Face.FaceFrameResult FaceFrameResult
+        public Windows.Kinect.Face.FaceFrameResult FaceFrameResult
         {
             get;
         }
 
-        public FaceFrameArrivedEventArgs(long timestamp, Microsoft.Kinect.Face.FaceFrameResult faceFrameResult) : base(timestamp)
+        public FaceFrameArrivedEventArgs(long timestamp, Windows.Kinect.Face.FaceFrameResult faceFrameResult) : base(timestamp)
         {
             FaceFrameResult = faceFrameResult;
         }

@@ -1,10 +1,10 @@
 using RootSystem = System;
 using System.Linq;
 using System.Collections.Generic;
-namespace Microsoft.Kinect.VisualGestureBuilder
+namespace Windows.Kinect.VisualGestureBuilder
 {
     //
-    // Microsoft.Kinect.VisualGestureBuilder.DiscreteGestureResult
+    // Windows.Kinect.VisualGestureBuilder.DiscreteGestureResult
     //
     public sealed partial class DiscreteGestureResult : Helper.INativeWrapper
 

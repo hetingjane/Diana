@@ -1,10 +1,10 @@
 using RootSystem = System;
 using System.Linq;
 using System.Collections.Generic;
-namespace Microsoft.Kinect.VisualGestureBuilder
+namespace Windows.Kinect.VisualGestureBuilder
 {
     //
-    // Microsoft.Kinect.VisualGestureBuilder.VisualGestureBuilderFrame
+    // Windows.Kinect.VisualGestureBuilder.VisualGestureBuilderFrame
     //
     public sealed partial class VisualGestureBuilderFrame : RootSystem.IDisposable, Helper.INativeWrapper
 
@@ -54,7 +54,7 @@ namespace Microsoft.Kinect.VisualGestureBuilder
         private static extern int Microsoft_Kinect_VisualGestureBuilder_VisualGestureBuilderFrame_get_ContinuousGestureResults(RootSystem.IntPtr pNative, [RootSystem.Runtime.InteropServices.Out] RootSystem.IntPtr[] outKeys, [RootSystem.Runtime.InteropServices.Out] RootSystem.IntPtr[] outValues, int outCollectionSize);
         [RootSystem.Runtime.InteropServices.DllImport("KinectVisualGestureBuilderUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl, SetLastError=true)]
         private static extern int Microsoft_Kinect_VisualGestureBuilder_VisualGestureBuilderFrame_get_ContinuousGestureResults_Length(RootSystem.IntPtr pNative);
-        public  RootSystem.Collections.Generic.Dictionary<Microsoft.Kinect.VisualGestureBuilder.Gesture, Microsoft.Kinect.VisualGestureBuilder.ContinuousGestureResult> ContinuousGestureResults
+        public  RootSystem.Collections.Generic.Dictionary<Windows.Kinect.VisualGestureBuilder.Gesture, Windows.Kinect.VisualGestureBuilder.ContinuousGestureResult> ContinuousGestureResults
         {
             get
             {
@@ -66,7 +66,7 @@ namespace Microsoft.Kinect.VisualGestureBuilder
                 int outCollectionSize = Microsoft_Kinect_VisualGestureBuilder_VisualGestureBuilderFrame_get_ContinuousGestureResults_Length(_pNative);
                 var outKeys = new RootSystem.IntPtr[outCollectionSize];
                 var outValues = new RootSystem.IntPtr[outCollectionSize];
-                var managedDictionary = new RootSystem.Collections.Generic.Dictionary<Microsoft.Kinect.VisualGestureBuilder.Gesture, Microsoft.Kinect.VisualGestureBuilder.ContinuousGestureResult>();
+                var managedDictionary = new RootSystem.Collections.Generic.Dictionary<Windows.Kinect.VisualGestureBuilder.Gesture, Windows.Kinect.VisualGestureBuilder.ContinuousGestureResult>();
 
                 outCollectionSize = Microsoft_Kinect_VisualGestureBuilder_VisualGestureBuilderFrame_get_ContinuousGestureResults(_pNative, outKeys, outValues, outCollectionSize);
                 Helper.ExceptionHelper.CheckLastError();
@@ -77,9 +77,9 @@ namespace Microsoft.Kinect.VisualGestureBuilder
                         continue;
                     }
 
-                    var keyObj = Helper.NativeObjectCache.CreateOrGetObject<Microsoft.Kinect.VisualGestureBuilder.Gesture>(outKeys[i], n => new Microsoft.Kinect.VisualGestureBuilder.Gesture(n));
+                    var keyObj = Helper.NativeObjectCache.CreateOrGetObject<Windows.Kinect.VisualGestureBuilder.Gesture>(outKeys[i], n => new Windows.Kinect.VisualGestureBuilder.Gesture(n));
 
-                    var valueObj = Helper.NativeObjectCache.CreateOrGetObject<Microsoft.Kinect.VisualGestureBuilder.ContinuousGestureResult>(outValues[i], n => new Microsoft.Kinect.VisualGestureBuilder.ContinuousGestureResult(n));
+                    var valueObj = Helper.NativeObjectCache.CreateOrGetObject<Windows.Kinect.VisualGestureBuilder.ContinuousGestureResult>(outValues[i], n => new Windows.Kinect.VisualGestureBuilder.ContinuousGestureResult(n));
 
                     managedDictionary.Add(keyObj, valueObj);
                 }
@@ -91,7 +91,7 @@ namespace Microsoft.Kinect.VisualGestureBuilder
         private static extern int Microsoft_Kinect_VisualGestureBuilder_VisualGestureBuilderFrame_get_DiscreteGestureResults(RootSystem.IntPtr pNative, [RootSystem.Runtime.InteropServices.Out] RootSystem.IntPtr[] outKeys, [RootSystem.Runtime.InteropServices.Out] RootSystem.IntPtr[] outValues, int outCollectionSize);
         [RootSystem.Runtime.InteropServices.DllImport("KinectVisualGestureBuilderUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl, SetLastError=true)]
         private static extern int Microsoft_Kinect_VisualGestureBuilder_VisualGestureBuilderFrame_get_DiscreteGestureResults_Length(RootSystem.IntPtr pNative);
-        public  RootSystem.Collections.Generic.Dictionary<Microsoft.Kinect.VisualGestureBuilder.Gesture, Microsoft.Kinect.VisualGestureBuilder.DiscreteGestureResult> DiscreteGestureResults
+        public  RootSystem.Collections.Generic.Dictionary<Windows.Kinect.VisualGestureBuilder.Gesture, Windows.Kinect.VisualGestureBuilder.DiscreteGestureResult> DiscreteGestureResults
         {
             get
             {
@@ -103,7 +103,7 @@ namespace Microsoft.Kinect.VisualGestureBuilder
                 int outCollectionSize = Microsoft_Kinect_VisualGestureBuilder_VisualGestureBuilderFrame_get_DiscreteGestureResults_Length(_pNative);
                 var outKeys = new RootSystem.IntPtr[outCollectionSize];
                 var outValues = new RootSystem.IntPtr[outCollectionSize];
-                var managedDictionary = new RootSystem.Collections.Generic.Dictionary<Microsoft.Kinect.VisualGestureBuilder.Gesture, Microsoft.Kinect.VisualGestureBuilder.DiscreteGestureResult>();
+                var managedDictionary = new RootSystem.Collections.Generic.Dictionary<Windows.Kinect.VisualGestureBuilder.Gesture, Windows.Kinect.VisualGestureBuilder.DiscreteGestureResult>();
 
                 outCollectionSize = Microsoft_Kinect_VisualGestureBuilder_VisualGestureBuilderFrame_get_DiscreteGestureResults(_pNative, outKeys, outValues, outCollectionSize);
                 Helper.ExceptionHelper.CheckLastError();
@@ -114,9 +114,9 @@ namespace Microsoft.Kinect.VisualGestureBuilder
                         continue;
                     }
 
-                    var keyObj = Helper.NativeObjectCache.CreateOrGetObject<Microsoft.Kinect.VisualGestureBuilder.Gesture>(outKeys[i], n => new Microsoft.Kinect.VisualGestureBuilder.Gesture(n));
+                    var keyObj = Helper.NativeObjectCache.CreateOrGetObject<Windows.Kinect.VisualGestureBuilder.Gesture>(outKeys[i], n => new Windows.Kinect.VisualGestureBuilder.Gesture(n));
 
-                    var valueObj = Helper.NativeObjectCache.CreateOrGetObject<Microsoft.Kinect.VisualGestureBuilder.DiscreteGestureResult>(outValues[i], n => new Microsoft.Kinect.VisualGestureBuilder.DiscreteGestureResult(n));
+                    var valueObj = Helper.NativeObjectCache.CreateOrGetObject<Windows.Kinect.VisualGestureBuilder.DiscreteGestureResult>(outValues[i], n => new Windows.Kinect.VisualGestureBuilder.DiscreteGestureResult(n));
 
                     managedDictionary.Add(keyObj, valueObj);
                 }
@@ -171,7 +171,7 @@ namespace Microsoft.Kinect.VisualGestureBuilder
 
         [RootSystem.Runtime.InteropServices.DllImport("KinectVisualGestureBuilderUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl, SetLastError=true)]
         private static extern RootSystem.IntPtr Microsoft_Kinect_VisualGestureBuilder_VisualGestureBuilderFrame_get_VisualGestureBuilderFrameSource(RootSystem.IntPtr pNative);
-        public  Microsoft.Kinect.VisualGestureBuilder.VisualGestureBuilderFrameSource VisualGestureBuilderFrameSource
+        public  Windows.Kinect.VisualGestureBuilder.VisualGestureBuilderFrameSource VisualGestureBuilderFrameSource
         {
             get
             {
@@ -187,7 +187,7 @@ namespace Microsoft.Kinect.VisualGestureBuilder
                     return null;
                 }
 
-                return Helper.NativeObjectCache.CreateOrGetObject<Microsoft.Kinect.VisualGestureBuilder.VisualGestureBuilderFrameSource>(objectPointer, n => new Microsoft.Kinect.VisualGestureBuilder.VisualGestureBuilderFrameSource(n));
+                return Helper.NativeObjectCache.CreateOrGetObject<Windows.Kinect.VisualGestureBuilder.VisualGestureBuilderFrameSource>(objectPointer, n => new Windows.Kinect.VisualGestureBuilder.VisualGestureBuilderFrameSource(n));
             }
         }
 

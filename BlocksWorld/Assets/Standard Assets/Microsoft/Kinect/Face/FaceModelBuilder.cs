@@ -1,10 +1,10 @@
 using RootSystem = System;
 using System.Linq;
 using System.Collections.Generic;
-namespace Microsoft.Kinect.Face
+namespace Windows.Kinect.Face
 {
     //
-    // Microsoft.Kinect.Face.FaceModelBuilder
+    // Windows.Kinect.Face.FaceModelBuilder
     //
     public sealed partial class FaceModelBuilder : RootSystem.IDisposable, Helper.INativeWrapper
 
@@ -51,8 +51,8 @@ namespace Microsoft.Kinect.Face
 
         // Public Properties
         [RootSystem.Runtime.InteropServices.DllImport("KinectFaceUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl, SetLastError=true)]
-        private static extern Microsoft.Kinect.Face.FaceModelBuilderCaptureStatus Microsoft_Kinect_Face_FaceModelBuilder_get_CaptureStatus(RootSystem.IntPtr pNative);
-        public  Microsoft.Kinect.Face.FaceModelBuilderCaptureStatus CaptureStatus
+        private static extern Windows.Kinect.Face.FaceModelBuilderCaptureStatus Microsoft_Kinect_Face_FaceModelBuilder_get_CaptureStatus(RootSystem.IntPtr pNative);
+        public  Windows.Kinect.Face.FaceModelBuilderCaptureStatus CaptureStatus
         {
             get
             {
@@ -66,8 +66,8 @@ namespace Microsoft.Kinect.Face
         }
 
         [RootSystem.Runtime.InteropServices.DllImport("KinectFaceUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl, SetLastError=true)]
-        private static extern Microsoft.Kinect.Face.FaceModelBuilderCollectionStatus Microsoft_Kinect_Face_FaceModelBuilder_get_CollectionStatus(RootSystem.IntPtr pNative);
-        public  Microsoft.Kinect.Face.FaceModelBuilderCollectionStatus CollectionStatus
+        private static extern Windows.Kinect.Face.FaceModelBuilderCollectionStatus Microsoft_Kinect_Face_FaceModelBuilder_get_CollectionStatus(RootSystem.IntPtr pNative);
+        public  Windows.Kinect.Face.FaceModelBuilderCollectionStatus CollectionStatus
         {
             get
             {
@@ -85,16 +85,16 @@ namespace Microsoft.Kinect.Face
         private static RootSystem.Runtime.InteropServices.GCHandle _Microsoft_Kinect_Face_CaptureStatusChangedEventArgs_Delegate_Handle;
         [RootSystem.Runtime.InteropServices.UnmanagedFunctionPointer(RootSystem.Runtime.InteropServices.CallingConvention.Cdecl)]
         private delegate void _Microsoft_Kinect_Face_CaptureStatusChangedEventArgs_Delegate(RootSystem.IntPtr args, RootSystem.IntPtr pNative);
-        private static Helper.CollectionMap<RootSystem.IntPtr, List<RootSystem.EventHandler<Microsoft.Kinect.Face.CaptureStatusChangedEventArgs>>> Microsoft_Kinect_Face_CaptureStatusChangedEventArgs_Delegate_callbacks = new Helper.CollectionMap<RootSystem.IntPtr, List<RootSystem.EventHandler<Microsoft.Kinect.Face.CaptureStatusChangedEventArgs>>>();
+        private static Helper.CollectionMap<RootSystem.IntPtr, List<RootSystem.EventHandler<Windows.Kinect.Face.CaptureStatusChangedEventArgs>>> Microsoft_Kinect_Face_CaptureStatusChangedEventArgs_Delegate_callbacks = new Helper.CollectionMap<RootSystem.IntPtr, List<RootSystem.EventHandler<Windows.Kinect.Face.CaptureStatusChangedEventArgs>>>();
         [AOT.MonoPInvokeCallbackAttribute(typeof(_Microsoft_Kinect_Face_CaptureStatusChangedEventArgs_Delegate))]
         private static void Microsoft_Kinect_Face_CaptureStatusChangedEventArgs_Delegate_Handler(RootSystem.IntPtr result, RootSystem.IntPtr pNative)
         {
-            List<RootSystem.EventHandler<Microsoft.Kinect.Face.CaptureStatusChangedEventArgs>> callbackList = null;
+            List<RootSystem.EventHandler<Windows.Kinect.Face.CaptureStatusChangedEventArgs>> callbackList = null;
             Microsoft_Kinect_Face_CaptureStatusChangedEventArgs_Delegate_callbacks.TryGetValue(pNative, out callbackList);
             lock(callbackList)
             {
                 var objThis = Helper.NativeObjectCache.GetObject<FaceModelBuilder>(pNative);
-                var args = new Microsoft.Kinect.Face.CaptureStatusChangedEventArgs(result);
+                var args = new Windows.Kinect.Face.CaptureStatusChangedEventArgs(result);
                 foreach(var func in callbackList)
                 {
                     Helper.EventPump.Instance.Enqueue(() => { try { func(objThis, args); } catch { } });
@@ -103,7 +103,7 @@ namespace Microsoft.Kinect.Face
         }
         [RootSystem.Runtime.InteropServices.DllImport("KinectFaceUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl, SetLastError=true)]
         private static extern void Microsoft_Kinect_Face_FaceModelBuilder_add_CaptureStatusChanged(RootSystem.IntPtr pNative, _Microsoft_Kinect_Face_CaptureStatusChangedEventArgs_Delegate eventCallback, bool unsubscribe);
-        public  event RootSystem.EventHandler<Microsoft.Kinect.Face.CaptureStatusChangedEventArgs> CaptureStatusChanged
+        public  event RootSystem.EventHandler<Windows.Kinect.Face.CaptureStatusChangedEventArgs> CaptureStatusChanged
         {
             add
             {
@@ -146,16 +146,16 @@ namespace Microsoft.Kinect.Face
         private static RootSystem.Runtime.InteropServices.GCHandle _Microsoft_Kinect_Face_CollectionStatusChangedEventArgs_Delegate_Handle;
         [RootSystem.Runtime.InteropServices.UnmanagedFunctionPointer(RootSystem.Runtime.InteropServices.CallingConvention.Cdecl)]
         private delegate void _Microsoft_Kinect_Face_CollectionStatusChangedEventArgs_Delegate(RootSystem.IntPtr args, RootSystem.IntPtr pNative);
-        private static Helper.CollectionMap<RootSystem.IntPtr, List<RootSystem.EventHandler<Microsoft.Kinect.Face.CollectionStatusChangedEventArgs>>> Microsoft_Kinect_Face_CollectionStatusChangedEventArgs_Delegate_callbacks = new Helper.CollectionMap<RootSystem.IntPtr, List<RootSystem.EventHandler<Microsoft.Kinect.Face.CollectionStatusChangedEventArgs>>>();
+        private static Helper.CollectionMap<RootSystem.IntPtr, List<RootSystem.EventHandler<Windows.Kinect.Face.CollectionStatusChangedEventArgs>>> Microsoft_Kinect_Face_CollectionStatusChangedEventArgs_Delegate_callbacks = new Helper.CollectionMap<RootSystem.IntPtr, List<RootSystem.EventHandler<Windows.Kinect.Face.CollectionStatusChangedEventArgs>>>();
         [AOT.MonoPInvokeCallbackAttribute(typeof(_Microsoft_Kinect_Face_CollectionStatusChangedEventArgs_Delegate))]
         private static void Microsoft_Kinect_Face_CollectionStatusChangedEventArgs_Delegate_Handler(RootSystem.IntPtr result, RootSystem.IntPtr pNative)
         {
-            List<RootSystem.EventHandler<Microsoft.Kinect.Face.CollectionStatusChangedEventArgs>> callbackList = null;
+            List<RootSystem.EventHandler<Windows.Kinect.Face.CollectionStatusChangedEventArgs>> callbackList = null;
             Microsoft_Kinect_Face_CollectionStatusChangedEventArgs_Delegate_callbacks.TryGetValue(pNative, out callbackList);
             lock(callbackList)
             {
                 var objThis = Helper.NativeObjectCache.GetObject<FaceModelBuilder>(pNative);
-                var args = new Microsoft.Kinect.Face.CollectionStatusChangedEventArgs(result);
+                var args = new Windows.Kinect.Face.CollectionStatusChangedEventArgs(result);
                 foreach(var func in callbackList)
                 {
                     Helper.EventPump.Instance.Enqueue(() => { try { func(objThis, args); } catch { } });
@@ -164,7 +164,7 @@ namespace Microsoft.Kinect.Face
         }
         [RootSystem.Runtime.InteropServices.DllImport("KinectFaceUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl, SetLastError=true)]
         private static extern void Microsoft_Kinect_Face_FaceModelBuilder_add_CollectionStatusChanged(RootSystem.IntPtr pNative, _Microsoft_Kinect_Face_CollectionStatusChangedEventArgs_Delegate eventCallback, bool unsubscribe);
-        public  event RootSystem.EventHandler<Microsoft.Kinect.Face.CollectionStatusChangedEventArgs> CollectionStatusChanged
+        public  event RootSystem.EventHandler<Windows.Kinect.Face.CollectionStatusChangedEventArgs> CollectionStatusChanged
         {
             add
             {

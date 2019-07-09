@@ -1,10 +1,10 @@
 using RootSystem = System;
 using System.Linq;
 using System.Collections.Generic;
-namespace Microsoft.Kinect.VisualGestureBuilder
+namespace Windows.Kinect.VisualGestureBuilder
 {
     //
-    // Microsoft.Kinect.VisualGestureBuilder.VisualGestureBuilderDatabase
+    // Windows.Kinect.VisualGestureBuilder.VisualGestureBuilderDatabase
     //
     public sealed partial class VisualGestureBuilderDatabase : RootSystem.IDisposable, Helper.INativeWrapper
 
@@ -54,7 +54,7 @@ namespace Microsoft.Kinect.VisualGestureBuilder
         private static extern int Microsoft_Kinect_VisualGestureBuilder_VisualGestureBuilderDatabase_get_AvailableGestures(RootSystem.IntPtr pNative, [RootSystem.Runtime.InteropServices.Out] RootSystem.IntPtr[] outCollection, int outCollectionSize);
         [RootSystem.Runtime.InteropServices.DllImport("KinectVisualGestureBuilderUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl, SetLastError=true)]
         private static extern int Microsoft_Kinect_VisualGestureBuilder_VisualGestureBuilderDatabase_get_AvailableGestures_Length(RootSystem.IntPtr pNative);
-        public  RootSystem.Collections.Generic.IList<Microsoft.Kinect.VisualGestureBuilder.Gesture> AvailableGestures
+        public  RootSystem.Collections.Generic.IList<Windows.Kinect.VisualGestureBuilder.Gesture> AvailableGestures
         {
             get
             {
@@ -65,7 +65,7 @@ namespace Microsoft.Kinect.VisualGestureBuilder
 
                 int outCollectionSize = Microsoft_Kinect_VisualGestureBuilder_VisualGestureBuilderDatabase_get_AvailableGestures_Length(_pNative);
                 var outCollection = new RootSystem.IntPtr[outCollectionSize];
-                var managedCollection = new Microsoft.Kinect.VisualGestureBuilder.Gesture[outCollectionSize];
+                var managedCollection = new Windows.Kinect.VisualGestureBuilder.Gesture[outCollectionSize];
 
                 outCollectionSize = Microsoft_Kinect_VisualGestureBuilder_VisualGestureBuilderDatabase_get_AvailableGestures(_pNative, outCollection, outCollectionSize);
                 Helper.ExceptionHelper.CheckLastError();
@@ -76,7 +76,7 @@ namespace Microsoft.Kinect.VisualGestureBuilder
                         continue;
                     }
 
-                    var obj = Helper.NativeObjectCache.CreateOrGetObject<Microsoft.Kinect.VisualGestureBuilder.Gesture>(outCollection[i], n => new Microsoft.Kinect.VisualGestureBuilder.Gesture(n));
+                    var obj = Helper.NativeObjectCache.CreateOrGetObject<Windows.Kinect.VisualGestureBuilder.Gesture>(outCollection[i], n => new Windows.Kinect.VisualGestureBuilder.Gesture(n));
 
                     managedCollection[i] = obj;
                 }

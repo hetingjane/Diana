@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-namespace Microsoft.Kinect.VisualGestureBuilder
+namespace Windows.Kinect.VisualGestureBuilder
 {
     public sealed partial class VisualGestureBuilderDatabase
     {
@@ -21,8 +21,8 @@ namespace Microsoft.Kinect.VisualGestureBuilder
                 return null;
             }
 
-            return Helper.NativeObjectCache.CreateOrGetObject<Microsoft.Kinect.VisualGestureBuilder.VisualGestureBuilderDatabase>(
-                objectPointer, n => new Microsoft.Kinect.VisualGestureBuilder.VisualGestureBuilderDatabase(n));
+            return Helper.NativeObjectCache.CreateOrGetObject<Windows.Kinect.VisualGestureBuilder.VisualGestureBuilderDatabase>(
+                objectPointer, n => new Windows.Kinect.VisualGestureBuilder.VisualGestureBuilderDatabase(n));
         }
     }
 
@@ -42,8 +42,8 @@ namespace Microsoft.Kinect.VisualGestureBuilder
                 return null;
             }
 
-            return Helper.NativeObjectCache.CreateOrGetObject<Microsoft.Kinect.VisualGestureBuilder.VisualGestureBuilderFrameSource>(
-                objectPointer, n => new Microsoft.Kinect.VisualGestureBuilder.VisualGestureBuilderFrameSource(n));
+            return Helper.NativeObjectCache.CreateOrGetObject<Windows.Kinect.VisualGestureBuilder.VisualGestureBuilderFrameSource>(
+                objectPointer, n => new Windows.Kinect.VisualGestureBuilder.VisualGestureBuilderFrameSource(n));
         }
 
         [RootSystem.Runtime.InteropServices.DllImport(
@@ -51,7 +51,7 @@ namespace Microsoft.Kinect.VisualGestureBuilder
             EntryPoint = "Microsoft_Kinect_VisualGestureBuilder_VisualGestureBuilderFrameSource_GetIsEnabled",
             CallingConvention = RootSystem.Runtime.InteropServices.CallingConvention.Cdecl)]
         private static extern bool Microsoft_Kinect_VisualGestureBuilder_VisualGestureBuilderFrameSource_GetIsEnabled(RootSystem.IntPtr pNative, RootSystem.IntPtr gesturePtr);
-        public bool GetIsEnabled(Microsoft.Kinect.VisualGestureBuilder.Gesture gesture)
+        public bool GetIsEnabled(Windows.Kinect.VisualGestureBuilder.Gesture gesture)
         {
             if (_pNative == RootSystem.IntPtr.Zero)
             {

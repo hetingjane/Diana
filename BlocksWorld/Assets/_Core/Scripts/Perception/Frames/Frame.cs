@@ -1,6 +1,6 @@
 ﻿using System;
-using Microsoft.Kinect;
-using Microsoft.Kinect.Face;
+using Windows.Kinect;
+using Windows.Kinect.Face;
 using System.IO;
 //using Microsoft.Speech.Recognition;
 using System.Collections.Generic;

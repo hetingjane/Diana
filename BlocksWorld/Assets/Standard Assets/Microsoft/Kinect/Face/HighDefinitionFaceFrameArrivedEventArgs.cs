@@ -1,10 +1,10 @@
 using RootSystem = System;
 using System.Linq;
 using System.Collections.Generic;
-namespace Microsoft.Kinect.Face
+namespace Windows.Kinect.Face
 {
     //
-    // Microsoft.Kinect.Face.HighDefinitionFaceFrameArrivedEventArgs
+    // Windows.Kinect.Face.HighDefinitionFaceFrameArrivedEventArgs
     //
     public sealed partial class HighDefinitionFaceFrameArrivedEventArgs : RootSystem.EventArgs, Helper.INativeWrapper
 
@@ -47,7 +47,7 @@ namespace Microsoft.Kinect.Face
         // Public Properties
         [RootSystem.Runtime.InteropServices.DllImport("KinectFaceUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl, SetLastError=true)]
         private static extern RootSystem.IntPtr Microsoft_Kinect_Face_HighDefinitionFaceFrameArrivedEventArgs_get_FrameReference(RootSystem.IntPtr pNative);
-        public  Microsoft.Kinect.Face.HighDefinitionFaceFrameReference FrameReference
+        public  Windows.Kinect.Face.HighDefinitionFaceFrameReference FrameReference
         {
             get
             {
@@ -63,7 +63,7 @@ namespace Microsoft.Kinect.Face
                     return null;
                 }
 
-                return Helper.NativeObjectCache.CreateOrGetObject<Microsoft.Kinect.Face.HighDefinitionFaceFrameReference>(objectPointer, n => new Microsoft.Kinect.Face.HighDefinitionFaceFrameReference(n));
+                return Helper.NativeObjectCache.CreateOrGetObject<Windows.Kinect.Face.HighDefinitionFaceFrameReference>(objectPointer, n => new Windows.Kinect.Face.HighDefinitionFaceFrameReference(n));
             }
         }
 

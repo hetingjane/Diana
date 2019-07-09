@@ -1,10 +1,10 @@
 using RootSystem = System;
 using System.Linq;
 using System.Collections.Generic;
-namespace Microsoft.Kinect.Face
+namespace Windows.Kinect.Face
 {
     //
-    // Microsoft.Kinect.Face.CollectionStatusChangedEventArgs
+    // Windows.Kinect.Face.CollectionStatusChangedEventArgs
     //
     public sealed partial class CollectionStatusChangedEventArgs : RootSystem.EventArgs, Helper.INativeWrapper
 
@@ -46,8 +46,8 @@ namespace Microsoft.Kinect.Face
 
         // Public Properties
         [RootSystem.Runtime.InteropServices.DllImport("KinectFaceUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl, SetLastError=true)]
-        private static extern Microsoft.Kinect.Face.FaceModelBuilderCollectionStatus Microsoft_Kinect_Face_CollectionStatusChangedEventArgs_get_PreviousCollectionStatus(RootSystem.IntPtr pNative);
-        public  Microsoft.Kinect.Face.FaceModelBuilderCollectionStatus PreviousCollectionStatus
+        private static extern Windows.Kinect.Face.FaceModelBuilderCollectionStatus Microsoft_Kinect_Face_CollectionStatusChangedEventArgs_get_PreviousCollectionStatus(RootSystem.IntPtr pNative);
+        public  Windows.Kinect.Face.FaceModelBuilderCollectionStatus PreviousCollectionStatus
         {
             get
             {

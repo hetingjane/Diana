@@ -1,10 +1,10 @@
 using RootSystem = System;
 using System.Linq;
 using System.Collections.Generic;
-namespace Microsoft.Kinect.Face
+namespace Windows.Kinect.Face
 {
     //
-    // Microsoft.Kinect.Face.FaceFrameResult
+    // Windows.Kinect.Face.FaceFrameResult
     //
     public sealed partial class FaceFrameResult : Helper.INativeWrapper
 
@@ -47,7 +47,7 @@ namespace Microsoft.Kinect.Face
         // Public Properties
         [RootSystem.Runtime.InteropServices.DllImport("KinectFaceUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl, SetLastError=true)]
         private static extern RootSystem.IntPtr Microsoft_Kinect_Face_FaceFrameResult_get_FaceBoundingBoxInColorSpace(RootSystem.IntPtr pNative);
-        public  Microsoft.Kinect.Face.RectI FaceBoundingBoxInColorSpace
+        public  Windows.Kinect.Face.RectI FaceBoundingBoxInColorSpace
         {
             get
             {
@@ -58,15 +58,15 @@ namespace Microsoft.Kinect.Face
 
                 var objectPointer = Microsoft_Kinect_Face_FaceFrameResult_get_FaceBoundingBoxInColorSpace(_pNative);
                 Helper.ExceptionHelper.CheckLastError();
-                var obj = (Microsoft.Kinect.Face.RectI)RootSystem.Runtime.InteropServices.Marshal.PtrToStructure(objectPointer, typeof(Microsoft.Kinect.Face.RectI));
-                Microsoft.Kinect.Face.KinectFaceUnityAddinUtils.FreeMemory(objectPointer);
+                var obj = (Windows.Kinect.Face.RectI)RootSystem.Runtime.InteropServices.Marshal.PtrToStructure(objectPointer, typeof(Windows.Kinect.Face.RectI));
+                Windows.Kinect.Face.KinectFaceUnityAddinUtils.FreeMemory(objectPointer);
                 return obj;
             }
         }
 
         [RootSystem.Runtime.InteropServices.DllImport("KinectFaceUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl, SetLastError=true)]
         private static extern RootSystem.IntPtr Microsoft_Kinect_Face_FaceFrameResult_get_FaceBoundingBoxInInfraredSpace(RootSystem.IntPtr pNative);
-        public  Microsoft.Kinect.Face.RectI FaceBoundingBoxInInfraredSpace
+        public  Windows.Kinect.Face.RectI FaceBoundingBoxInInfraredSpace
         {
             get
             {
@@ -77,15 +77,15 @@ namespace Microsoft.Kinect.Face
 
                 var objectPointer = Microsoft_Kinect_Face_FaceFrameResult_get_FaceBoundingBoxInInfraredSpace(_pNative);
                 Helper.ExceptionHelper.CheckLastError();
-                var obj = (Microsoft.Kinect.Face.RectI)RootSystem.Runtime.InteropServices.Marshal.PtrToStructure(objectPointer, typeof(Microsoft.Kinect.Face.RectI));
-                Microsoft.Kinect.Face.KinectFaceUnityAddinUtils.FreeMemory(objectPointer);
+                var obj = (Windows.Kinect.Face.RectI)RootSystem.Runtime.InteropServices.Marshal.PtrToStructure(objectPointer, typeof(Windows.Kinect.Face.RectI));
+                Windows.Kinect.Face.KinectFaceUnityAddinUtils.FreeMemory(objectPointer);
                 return obj;
             }
         }
 
         [RootSystem.Runtime.InteropServices.DllImport("KinectFaceUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl, SetLastError=true)]
-        private static extern Microsoft.Kinect.Face.FaceFrameFeatures Microsoft_Kinect_Face_FaceFrameResult_get_FaceFrameFeatures(RootSystem.IntPtr pNative);
-        public  Microsoft.Kinect.Face.FaceFrameFeatures FaceFrameFeatures
+        private static extern Windows.Kinect.Face.FaceFrameFeatures Microsoft_Kinect_Face_FaceFrameResult_get_FaceFrameFeatures(RootSystem.IntPtr pNative);
+        public  Windows.Kinect.Face.FaceFrameFeatures FaceFrameFeatures
         {
             get
             {
@@ -99,10 +99,10 @@ namespace Microsoft.Kinect.Face
         }
 
         [RootSystem.Runtime.InteropServices.DllImport("KinectFaceUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl, SetLastError=true)]
-        private static extern int Microsoft_Kinect_Face_FaceFrameResult_get_FaceProperties(RootSystem.IntPtr pNative, [RootSystem.Runtime.InteropServices.Out] Microsoft.Kinect.Face.FaceProperty[] outKeys, [RootSystem.Runtime.InteropServices.Out] Windows.Kinect.DetectionResult[] outValues, int outCollectionSize);
+        private static extern int Microsoft_Kinect_Face_FaceFrameResult_get_FaceProperties(RootSystem.IntPtr pNative, [RootSystem.Runtime.InteropServices.Out] Windows.Kinect.Face.FaceProperty[] outKeys, [RootSystem.Runtime.InteropServices.Out] Windows.Kinect.DetectionResult[] outValues, int outCollectionSize);
         [RootSystem.Runtime.InteropServices.DllImport("KinectFaceUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl, SetLastError=true)]
         private static extern int Microsoft_Kinect_Face_FaceFrameResult_get_FaceProperties_Length(RootSystem.IntPtr pNative);
-        public  RootSystem.Collections.Generic.Dictionary<Microsoft.Kinect.Face.FaceProperty, Windows.Kinect.DetectionResult> FaceProperties
+        public  RootSystem.Collections.Generic.Dictionary<Windows.Kinect.Face.FaceProperty, Windows.Kinect.DetectionResult> FaceProperties
         {
             get
             {
@@ -112,9 +112,9 @@ namespace Microsoft.Kinect.Face
                 }
 
                 int outCollectionSize = Microsoft_Kinect_Face_FaceFrameResult_get_FaceProperties_Length(_pNative);
-                var outKeys = new Microsoft.Kinect.Face.FaceProperty[outCollectionSize];
+                var outKeys = new Windows.Kinect.Face.FaceProperty[outCollectionSize];
                 var outValues = new Windows.Kinect.DetectionResult[outCollectionSize];
-                var managedDictionary = new RootSystem.Collections.Generic.Dictionary<Microsoft.Kinect.Face.FaceProperty, Windows.Kinect.DetectionResult>();
+                var managedDictionary = new RootSystem.Collections.Generic.Dictionary<Windows.Kinect.Face.FaceProperty, Windows.Kinect.DetectionResult>();
 
                 outCollectionSize = Microsoft_Kinect_Face_FaceFrameResult_get_FaceProperties(_pNative, outKeys, outValues, outCollectionSize);
                 Helper.ExceptionHelper.CheckLastError();
@@ -140,7 +140,7 @@ namespace Microsoft.Kinect.Face
                 var objectPointer = Microsoft_Kinect_Face_FaceFrameResult_get_FaceRotationQuaternion(_pNative);
                 Helper.ExceptionHelper.CheckLastError();
                 var obj = (Windows.Kinect.Vector4)RootSystem.Runtime.InteropServices.Marshal.PtrToStructure(objectPointer, typeof(Windows.Kinect.Vector4));
-                Microsoft.Kinect.Face.KinectFaceUnityAddinUtils.FreeMemory(objectPointer);
+                Windows.Kinect.Face.KinectFaceUnityAddinUtils.FreeMemory(objectPointer);
                 return obj;
             }
         }

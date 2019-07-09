@@ -1,10 +1,10 @@
 using RootSystem = System;
 using System.Linq;
 using System.Collections.Generic;
-namespace Microsoft.Kinect.VisualGestureBuilder
+namespace Windows.Kinect.VisualGestureBuilder
 {
     //
-    // Microsoft.Kinect.VisualGestureBuilder.VisualGestureBuilderFrameReader
+    // Windows.Kinect.VisualGestureBuilder.VisualGestureBuilderFrameReader
     //
     public sealed partial class VisualGestureBuilderFrameReader : RootSystem.IDisposable, Helper.INativeWrapper
 
@@ -79,7 +79,7 @@ namespace Microsoft.Kinect.VisualGestureBuilder
 
         [RootSystem.Runtime.InteropServices.DllImport("KinectVisualGestureBuilderUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl, SetLastError=true)]
         private static extern RootSystem.IntPtr Microsoft_Kinect_VisualGestureBuilder_VisualGestureBuilderFrameReader_get_VisualGestureBuilderFrameSource(RootSystem.IntPtr pNative);
-        public  Microsoft.Kinect.VisualGestureBuilder.VisualGestureBuilderFrameSource VisualGestureBuilderFrameSource
+        public  Windows.Kinect.VisualGestureBuilder.VisualGestureBuilderFrameSource VisualGestureBuilderFrameSource
         {
             get
             {
@@ -95,7 +95,7 @@ namespace Microsoft.Kinect.VisualGestureBuilder
                     return null;
                 }
 
-                return Helper.NativeObjectCache.CreateOrGetObject<Microsoft.Kinect.VisualGestureBuilder.VisualGestureBuilderFrameSource>(objectPointer, n => new Microsoft.Kinect.VisualGestureBuilder.VisualGestureBuilderFrameSource(n));
+                return Helper.NativeObjectCache.CreateOrGetObject<Windows.Kinect.VisualGestureBuilder.VisualGestureBuilderFrameSource>(objectPointer, n => new Windows.Kinect.VisualGestureBuilder.VisualGestureBuilderFrameSource(n));
             }
         }
 
@@ -104,16 +104,16 @@ namespace Microsoft.Kinect.VisualGestureBuilder
         private static RootSystem.Runtime.InteropServices.GCHandle _Microsoft_Kinect_VisualGestureBuilder_VisualGestureBuilderFrameArrivedEventArgs_Delegate_Handle;
         [RootSystem.Runtime.InteropServices.UnmanagedFunctionPointer(RootSystem.Runtime.InteropServices.CallingConvention.Cdecl)]
         private delegate void _Microsoft_Kinect_VisualGestureBuilder_VisualGestureBuilderFrameArrivedEventArgs_Delegate(RootSystem.IntPtr args, RootSystem.IntPtr pNative);
-        private static Helper.CollectionMap<RootSystem.IntPtr, List<RootSystem.EventHandler<Microsoft.Kinect.VisualGestureBuilder.VisualGestureBuilderFrameArrivedEventArgs>>> Microsoft_Kinect_VisualGestureBuilder_VisualGestureBuilderFrameArrivedEventArgs_Delegate_callbacks = new Helper.CollectionMap<RootSystem.IntPtr, List<RootSystem.EventHandler<Microsoft.Kinect.VisualGestureBuilder.VisualGestureBuilderFrameArrivedEventArgs>>>();
+        private static Helper.CollectionMap<RootSystem.IntPtr, List<RootSystem.EventHandler<Windows.Kinect.VisualGestureBuilder.VisualGestureBuilderFrameArrivedEventArgs>>> Microsoft_Kinect_VisualGestureBuilder_VisualGestureBuilderFrameArrivedEventArgs_Delegate_callbacks = new Helper.CollectionMap<RootSystem.IntPtr, List<RootSystem.EventHandler<Windows.Kinect.VisualGestureBuilder.VisualGestureBuilderFrameArrivedEventArgs>>>();
         [AOT.MonoPInvokeCallbackAttribute(typeof(_Microsoft_Kinect_VisualGestureBuilder_VisualGestureBuilderFrameArrivedEventArgs_Delegate))]
         private static void Microsoft_Kinect_VisualGestureBuilder_VisualGestureBuilderFrameArrivedEventArgs_Delegate_Handler(RootSystem.IntPtr result, RootSystem.IntPtr pNative)
         {
-            List<RootSystem.EventHandler<Microsoft.Kinect.VisualGestureBuilder.VisualGestureBuilderFrameArrivedEventArgs>> callbackList = null;
+            List<RootSystem.EventHandler<Windows.Kinect.VisualGestureBuilder.VisualGestureBuilderFrameArrivedEventArgs>> callbackList = null;
             Microsoft_Kinect_VisualGestureBuilder_VisualGestureBuilderFrameArrivedEventArgs_Delegate_callbacks.TryGetValue(pNative, out callbackList);
             lock(callbackList)
             {
                 var objThis = Helper.NativeObjectCache.GetObject<VisualGestureBuilderFrameReader>(pNative);
-                var args = new Microsoft.Kinect.VisualGestureBuilder.VisualGestureBuilderFrameArrivedEventArgs(result);
+                var args = new Windows.Kinect.VisualGestureBuilder.VisualGestureBuilderFrameArrivedEventArgs(result);
                 foreach(var func in callbackList)
                 {
                     Helper.EventPump.Instance.Enqueue(() => { try { func(objThis, args); } catch { } });
@@ -122,7 +122,7 @@ namespace Microsoft.Kinect.VisualGestureBuilder
         }
         [RootSystem.Runtime.InteropServices.DllImport("KinectVisualGestureBuilderUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl, SetLastError=true)]
         private static extern void Microsoft_Kinect_VisualGestureBuilder_VisualGestureBuilderFrameReader_add_FrameArrived(RootSystem.IntPtr pNative, _Microsoft_Kinect_VisualGestureBuilder_VisualGestureBuilderFrameArrivedEventArgs_Delegate eventCallback, bool unsubscribe);
-        public  event RootSystem.EventHandler<Microsoft.Kinect.VisualGestureBuilder.VisualGestureBuilderFrameArrivedEventArgs> FrameArrived
+        public  event RootSystem.EventHandler<Windows.Kinect.VisualGestureBuilder.VisualGestureBuilderFrameArrivedEventArgs> FrameArrived
         {
             add
             {
@@ -227,7 +227,7 @@ namespace Microsoft.Kinect.VisualGestureBuilder
         // Public Methods
         [RootSystem.Runtime.InteropServices.DllImport("KinectVisualGestureBuilderUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl, SetLastError=true)]
         private static extern RootSystem.IntPtr Microsoft_Kinect_VisualGestureBuilder_VisualGestureBuilderFrameReader_CalculateAndAcquireLatestFrame(RootSystem.IntPtr pNative);
-        public Microsoft.Kinect.VisualGestureBuilder.VisualGestureBuilderFrame CalculateAndAcquireLatestFrame()
+        public Windows.Kinect.VisualGestureBuilder.VisualGestureBuilderFrame CalculateAndAcquireLatestFrame()
         {
             if (_pNative == RootSystem.IntPtr.Zero)
             {
@@ -241,7 +241,7 @@ namespace Microsoft.Kinect.VisualGestureBuilder
                 return null;
             }
 
-            return Helper.NativeObjectCache.CreateOrGetObject<Microsoft.Kinect.VisualGestureBuilder.VisualGestureBuilderFrame>(objectPointer, n => new Microsoft.Kinect.VisualGestureBuilder.VisualGestureBuilderFrame(n));
+            return Helper.NativeObjectCache.CreateOrGetObject<Windows.Kinect.VisualGestureBuilder.VisualGestureBuilderFrame>(objectPointer, n => new Windows.Kinect.VisualGestureBuilder.VisualGestureBuilderFrame(n));
         }
 
         [RootSystem.Runtime.InteropServices.DllImport("KinectVisualGestureBuilderUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl, SetLastError=true)]

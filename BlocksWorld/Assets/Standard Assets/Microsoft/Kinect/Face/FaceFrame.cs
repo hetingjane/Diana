@@ -1,10 +1,10 @@
 using RootSystem = System;
 using System.Linq;
 using System.Collections.Generic;
-namespace Microsoft.Kinect.Face
+namespace Windows.Kinect.Face
 {
     //
-    // Microsoft.Kinect.Face.FaceFrame
+    // Windows.Kinect.Face.FaceFrame
     //
     public sealed partial class FaceFrame : RootSystem.IDisposable, Helper.INativeWrapper
 
@@ -118,7 +118,7 @@ namespace Microsoft.Kinect.Face
 
         [RootSystem.Runtime.InteropServices.DllImport("KinectFaceUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl, SetLastError=true)]
         private static extern RootSystem.IntPtr Microsoft_Kinect_Face_FaceFrame_get_FaceFrameResult(RootSystem.IntPtr pNative);
-        public  Microsoft.Kinect.Face.FaceFrameResult FaceFrameResult
+        public  Windows.Kinect.Face.FaceFrameResult FaceFrameResult
         {
             get
             {
@@ -134,13 +134,13 @@ namespace Microsoft.Kinect.Face
                     return null;
                 }
 
-                return Helper.NativeObjectCache.CreateOrGetObject<Microsoft.Kinect.Face.FaceFrameResult>(objectPointer, n => new Microsoft.Kinect.Face.FaceFrameResult(n));
+                return Helper.NativeObjectCache.CreateOrGetObject<Windows.Kinect.Face.FaceFrameResult>(objectPointer, n => new Windows.Kinect.Face.FaceFrameResult(n));
             }
         }
 
         [RootSystem.Runtime.InteropServices.DllImport("KinectFaceUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl, SetLastError=true)]
         private static extern RootSystem.IntPtr Microsoft_Kinect_Face_FaceFrame_get_FaceFrameSource(RootSystem.IntPtr pNative);
-        public  Microsoft.Kinect.Face.FaceFrameSource FaceFrameSource
+        public  Windows.Kinect.Face.FaceFrameSource FaceFrameSource
         {
             get
             {
@@ -156,7 +156,7 @@ namespace Microsoft.Kinect.Face
                     return null;
                 }
 
-                return Helper.NativeObjectCache.CreateOrGetObject<Microsoft.Kinect.Face.FaceFrameSource>(objectPointer, n => new Microsoft.Kinect.Face.FaceFrameSource(n));
+                return Helper.NativeObjectCache.CreateOrGetObject<Windows.Kinect.Face.FaceFrameSource>(objectPointer, n => new Windows.Kinect.Face.FaceFrameSource(n));
             }
         }
 
