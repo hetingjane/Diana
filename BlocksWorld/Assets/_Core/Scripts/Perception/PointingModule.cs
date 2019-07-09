@@ -9,6 +9,8 @@ We will further use this module when we can recognize gestures again.
 
 using System.Collections;
 using System.Collections.Generic;
+using System;
+using MathNet.Numerics;
 using UnityEngine;
 
 public class PointingModule : ModuleBase
@@ -19,8 +21,9 @@ public class PointingModule : ModuleBase
     string handTipRightKey = "user:joint:HandTipRight";
     string shoulderRightKey = "user:joint:ShoulderRight";
 
-    bool leftPoint = false;
-    bool rightPoint = false;
+    private bool leftPoint = false;
+    private bool rightPoint = false;
+    private bool filterInitialized = false;
     public bool calibrationMode = false;
 
     public int windowSize = 10;
@@ -33,6 +36,9 @@ public class PointingModule : ModuleBase
     List<Vector3> shoulderLeftVal = new List<Vector3>();
     List<Vector3> handTipRightVal = new List<Vector3>();
     List<Vector3> shoulderRightVal = new List<Vector3>();
+    List<Vector3> rightPointList = new List<Vector3>();
+
+
 
     protected override void Start()
     {
@@ -55,6 +61,7 @@ public class PointingModule : ModuleBase
         if (DataStore.HasValue(handTipLeftKey) && DataStore.HasValue(shoulderLeftKey)) leftPoint = true;
         if (DataStore.HasValue(handTipRightKey) && DataStore.HasValue(shoulderRightKey)) rightPoint = true;
 
+
         if (leftPoint)
         {
             handTipLeftVal.Insert(0, DataStore.GetVector3Value(handTipLeftKey));
@@ -74,8 +81,12 @@ public class PointingModule : ModuleBase
 
         if (rightPoint)
         {
+            DataStore.GetVector3Value(handTipRightKey);
+            DataStore.GetVector3Value(shoulderRightKey);
+
             handTipRightVal.Insert(0, DataStore.GetVector3Value(handTipRightKey));
             shoulderRightVal.Insert(0, DataStore.GetVector3Value(shoulderRightKey));
+
 
             if (handTipRightVal.Count > windowSize) handTipRightVal.RemoveAt(windowSize);
             if (shoulderRightVal.Count > windowSize) shoulderRightVal.RemoveAt(windowSize);
@@ -85,21 +96,55 @@ public class PointingModule : ModuleBase
 
             rightPointPos = CalcCoordinates(avgHandTipRight, avgShoulderRight);
 
-            if(!calibrationMode)
+            if (!calibrationMode)
                 rightPointPos = ConvertToPixelSpace(rightPointPos, kinSpaceBotLeft, kinSpaceTopRight, pixSpaceBotLeft, pixSpaceTopRight);
 
+            rightPointList.Insert(0, rightPointPos);
+
+            if (rightPointList.Count > windowSize) rightPointList.RemoveAt(windowSize);
+
+            Debug.Log("point before " + rightPointList[0].ToString());
+            SmoothJoint(rightPointList);
+            Debug.Log("point after " + rightPointList[0].ToString());
+
+
             if (rightPointPos.x != -float.MaxValue)
-                DataStore.SetValue("user:pointpos:right", new DataStore.Vector3Value(rightPointPos), this, rightPointPos.ToString());
+                DataStore.SetValue("user:pointpos:right", new DataStore.Vector3Value(rightPointList[0]), this, rightPointPos.ToString());
         }
     }
 
+ 
     // smoothing will likely help but will come later
     private void SmoothJoint(List<Vector3> joint)
     {
         if (joint.Count == windowSize)
         {
+            double[] x = new double[joint.Count], y = new double[joint.Count], z = new double[joint.Count], count = new double[joint.Count];
 
+            for (int i = 0; i < joint.Count; i++)
+            {
+                x[i] = joint[i].x;
+                y[i] = joint[i].y;
+                z[i] = joint[i].z;
+                count[i] = (i - windowSize)/2;
+            }
+
+            joint[0] = new Vector3((float)SavGolay(count, x), (float)SavGolay(count, y), (float)SavGolay(count, z));
         }
+    }
+
+    private double SavGolay(double[] x, double[] y, int polyOrder = 1)
+    {
+        double[] fit = Fit.Polynomial(x, y, polyOrder);
+        double retVal = 0.0;
+
+
+        for (int i = 0; i <= polyOrder; i++)
+        {
+            retVal += fit[i] * Math.Pow(x[0], i); 
+        }
+
+        return retVal;
     }
 
     private Vector3 AverageJoint(List<Vector3> jointList)
@@ -112,6 +157,7 @@ public class PointingModule : ModuleBase
         }
         return averageJointPos / windowSize;
     }
+
 
     /*
      * This method creates a ray with a start point at the shoulder joint in the direction of the handtip 
@@ -166,7 +212,4 @@ public class PointingModule : ModuleBase
 
         return new Vector3(x, y, 0.0f);
     }
-
-
-
 }

@@ -17,7 +17,7 @@ public class SkeletonFrame : ModuleBase
 {
     private Perception.Kinect.KinectSensor sensor;
     private MultiSourceFrameReader multiSourceFrameReader;
-    private static double engageMin = 1.5;
+    private static double engageMin = 0;
     private static double engageMax = 5;
 
     protected override void Start()
