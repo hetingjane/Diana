@@ -55,7 +55,7 @@ public class CommandsModule : ModuleBase
 				// Point at the indicated object.
 				Transform obj = FindObjectFromSpec(act.location.obj);
 				if (obj == null) {
-					SetValue("me:spee:intent", "I can't find that.", comment);
+					SetValue("me:speech:intent", "I can't find that.", comment);
 				} else {
 					SetValue("me:speech:intent", "OK.", comment);		
 					SetValue("me:intent:action", "point", comment);
