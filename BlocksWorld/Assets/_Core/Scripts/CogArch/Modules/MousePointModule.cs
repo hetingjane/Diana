@@ -5,6 +5,7 @@ and then sets the blackboard values just as if the user were pointing with his h
 Reads:		(nothing)
 Writes:		user:isPointing (BoolValue)
 			user:pointPos (Vector3Value)
+			user:pointValid (BoolValue)
 */
 
 using System.Collections;

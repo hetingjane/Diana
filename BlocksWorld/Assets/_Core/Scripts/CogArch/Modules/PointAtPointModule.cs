@@ -5,6 +5,7 @@ at whatever the user's pointing at.
 Reads:		me:intent:lookAt (StringValue; looking for "userPoint")
 			me:intent:pointAt (StringValue; looking for "userPoint")
 			user:isPointing (BoolValue)
+			user:pointValid (BoolValue)
 			user:pointPos (Vector3Value)
 			me:eyes:open (IntValue, 0=closed, 100=wide open)
 			
@@ -49,7 +50,7 @@ public class PointAtPointModule : ModuleBase
 		
 		if (mode == Mode.Off) return;
 		
-		if (DataStore.GetBoolValue("user:isPointing")) {
+		if (DataStore.GetBoolValue("user:isPointing") && DataStore.GetBoolValue("user:pointValid")) {
 			if (eyesClosedTime > 0.2f) {
 				SetValue("me:intent:target", "", "can't see");
 				SetValue("me:intent:action", "", "can't see");
