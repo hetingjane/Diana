@@ -286,7 +286,14 @@ namespace Windows.Kinect
                         {
                             Windows_Kinect_MultiSourceFrameReader_add_MultiSourceFrameArrived(_pNative, Windows_Kinect_MultiSourceFrameArrivedEventArgs_Delegate_Handler, true);
                         }
-                        _Windows_Kinect_MultiSourceFrameArrivedEventArgs_Delegate_Handle.Free();
+                        try
+                        {
+                            _Windows_Kinect_MultiSourceFrameArrivedEventArgs_Delegate_Handle.Free();
+                        }
+                        catch
+                        {
+
+                        }
                     }
                 }
             }
@@ -302,7 +309,14 @@ namespace Windows.Kinect
                         {
                             Windows_Kinect_MultiSourceFrameReader_add_PropertyChanged(_pNative, Windows_Data_PropertyChangedEventArgs_Delegate_Handler, true);
                         }
-                        _Windows_Data_PropertyChangedEventArgs_Delegate_Handle.Free();
+                        try
+                        {
+                            _Windows_Data_PropertyChangedEventArgs_Delegate_Handle.Free();
+                        }
+                        catch
+                        {
+
+                        }
                     }
                 }
             }
