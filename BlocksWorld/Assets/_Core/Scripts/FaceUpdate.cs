@@ -5,55 +5,45 @@ using System;
 public class FaceUpdate : MonoBehaviour
 {
 
-    DianaEmotion dianaEmotions;
 
     M3DCharacterManager charMgr;
-    DataStore dataStore;
+    PlayerEmotions playerEmotions;
+
+    //DataStore dataStore;
     void Start()
     {
+        playerEmotions = GetComponent<PlayerEmotions>();
         charMgr = GetComponent<M3DCharacterManager>();
-        dataStore = GetComponent<DataStore>();
+        //dataStore = GetComponent<DataStore>();
+        Debug.Assert(playerEmotions != null);
+        Debug.Assert(charMgr != null);
+
     }
 
     void Update()
     {
 
-        
-
-        int dominantEmotion = Mathf.Max(dataStore.IGetIntValue("user:joy:"), dataStore.IGetIntValue("user:sadness:")); //find the dominant emotion
-        if (dominantEmotion <= 20)
+        switch (playerEmotions.dominantEmotion)
         {
-        }
-        else if (dominantEmotion == dianaEmotions.currentJoy)
-        {
-
-            if (dominantEmotion > 60)
-            {
-                //charMgr.SetBlendshapeValue("eCTRLMouthOpen", 50);
+            case Emotion.Neutral:
+                charMgr.SetBlendshapeValue("eCTRLHappy", 0);
+                charMgr.SetBlendshapeValue("eCTRLSad", 0);
+                break;
+            case Emotion.Happy:
                 charMgr.SetBlendshapeValue("eCTRLHappy", 100);
-                //charMgr.SetBlendshapeValue("eCTRLMouthSmile", 100);
+                charMgr.SetBlendshapeValue("eCTRLSad", 0);
 
-            }
-            else
-            {
-
-                charMgr.SetBlendshapeValue("eCTRLHappy", 50);
-            }
-
-        }
-        else if (dominantEmotion == dianaEmotions.currentSadness)
-        {
-            //charMgr.SetBlendshapeValue("eCTRLSad", 100);
-
-            if (dominantEmotion > 40)
-            {
+                break;
+            case Emotion.Angry:
                 charMgr.SetBlendshapeValue("eCTRLSad", 100);
-            }
-            else
-            {
-                charMgr.SetBlendshapeValue("eCTRLSad", 50);
-            }
+                charMgr.SetBlendshapeValue("eCTRLHappy", 0);
+
+                break;
+            default:
+                break;
 
         }
+
+
     }
 }

@@ -1,56 +1,75 @@
 ﻿using Affdex;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum Emotion
+{
+    Neutral,
+    Angry,
+    Happy,
+    //Confused
+}
 public class PlayerEmotions : ImageResultsListener
 {
-    public float currentJoy;
-    public float currentSadness;
+    float currentJoy = 0f;
+    float currentAnger = 0f;
+    //float currentFear = 0f;
+    //float currentContempt = 0f;
+    //public FeaturePoint[] featurePointsList;
 
-    //public DataStore.IntValue joy;
-    //public DataStore.IntValue sadness;
-    public AffectModule affectModule;
+    public Emotion dominantEmotion = Emotion.Neutral;
+
+    [Range(0, 100)]
+    public float happyThreshold = 70f;
+
+    [Range(0, 100)]
+    public float angryThreshold = 10f;
+
     public override void onFaceFound(float timestamp, int faceId)
     {
         Debug.Log("Found the face");
-
     }
 
     public override void onFaceLost(float timestamp, int faceId)
     {
-        currentSadness = 0;
-        currentJoy = 0;
         Debug.Log("Lost the face");
-
     }
 
     public override void onImageResults(Dictionary<int, Face> faces)
     {
-        if (faces.Count > 0)
+        //Debug.Log("Got face results");
+
+        foreach (KeyValuePair<int, Face> pair in faces)
         {
+            int FaceId = pair.Key;  // The Face Unique Id.
+            Face face = pair.Value;    // Instance of the face class containing emotions, and facial expression values.
 
-            faces[0].Emotions.TryGetValue(Emotions.Sadness, out currentSadness); //setting emotions...
-            faces[0].Emotions.TryGetValue(Emotions.Joy, out currentJoy);
-            Debug.LogError(currentJoy);
-            var joy = new DataStore.IntValue((int)currentJoy);
-            var sadness = new DataStore.IntValue((int)currentSadness);
-            affectModule = GetComponent<AffectModule>();
-            //DataStore.Subscribe("user:joy:", NoteJoy);
-            DataStore.SetValue("user:joy:", joy, affectModule, currentJoy.ToString());
+            //Retrieve the Emotions Scores
+            //face.Emotions.TryGetValue(Emotions.Contempt, out currentContempt);
+            face.Emotions.TryGetValue(Emotions.Joy, out currentJoy);
+            face.Emotions.TryGetValue(Emotions.Anger, out currentAnger);
+            //face.Emotions.TryGetValue(Emotions.Fear, out currentFear);
 
-            DataStore.SetValue("user:sadness:", sadness, affectModule, currentSadness.ToString());
+            //Retrieve the Smile Score
+            //face.Expressions.TryGetValue(Expressions.Smile, out currentSmile);
+
+            if (currentJoy >= currentAnger)
+            {
+                if (currentJoy > happyThreshold)
+                    dominantEmotion = Emotion.Happy;
+            }
+            else if (currentAnger > angryThreshold)
+            {
+                dominantEmotion = Emotion.Angry;
+            }
+            else
+            {
+                dominantEmotion = Emotion.Neutral;
+            }
+
+            //Retrieve the coordinates of the facial landmarks (face feature points)
+            //featurePointsList = face.FeaturePoints;
+
         }
     }
-    //void NoteJoy(string key, DataStore.IValue value)
-    //{
-    //    if (value.ToString() == "userPoint" && key == "me:intent:lookAt") mode = Mode.Looking;
-    //    else if (value.ToString() == "userPoint" && key == "me:intent:pointAt") mode = Mode.Pointing;
-    //    else if (mode != Mode.Off)
-    //    {
-    //        mode = Mode.Off;
-    //        SetValue("me:intent:target", "", "mode := Mode.Off");
-    //        SetValue("me:intent:action", "", "mode := Mode.Off");
-    //    }
-    //}
 }
