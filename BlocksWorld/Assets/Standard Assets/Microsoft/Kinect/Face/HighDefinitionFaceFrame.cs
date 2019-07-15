@@ -1,10 +1,10 @@
 using RootSystem = System;
 using System.Linq;
 using System.Collections.Generic;
-namespace Microsoft.Kinect.Face
+namespace Windows.Kinect.Face
 {
     //
-    // Microsoft.Kinect.Face.HighDefinitionFaceFrame
+    // Windows.Kinect.Face.HighDefinitionFaceFrame
     //
     public sealed partial class HighDefinitionFaceFrame : RootSystem.IDisposable, Helper.INativeWrapper
 
@@ -117,8 +117,8 @@ namespace Microsoft.Kinect.Face
         }
 
         [RootSystem.Runtime.InteropServices.DllImport("KinectFaceUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl, SetLastError=true)]
-        private static extern Microsoft.Kinect.Face.FaceAlignmentQuality Microsoft_Kinect_Face_HighDefinitionFaceFrame_get_FaceAlignmentQuality(RootSystem.IntPtr pNative);
-        public  Microsoft.Kinect.Face.FaceAlignmentQuality FaceAlignmentQuality
+        private static extern Windows.Kinect.Face.FaceAlignmentQuality Microsoft_Kinect_Face_HighDefinitionFaceFrame_get_FaceAlignmentQuality(RootSystem.IntPtr pNative);
+        public  Windows.Kinect.Face.FaceAlignmentQuality FaceAlignmentQuality
         {
             get
             {
@@ -133,7 +133,7 @@ namespace Microsoft.Kinect.Face
 
         [RootSystem.Runtime.InteropServices.DllImport("KinectFaceUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl, SetLastError=true)]
         private static extern RootSystem.IntPtr Microsoft_Kinect_Face_HighDefinitionFaceFrame_get_FaceModel(RootSystem.IntPtr pNative);
-        public  Microsoft.Kinect.Face.FaceModel FaceModel
+        public  Windows.Kinect.Face.FaceModel FaceModel
         {
             get
             {
@@ -149,13 +149,13 @@ namespace Microsoft.Kinect.Face
                     return null;
                 }
 
-                return Helper.NativeObjectCache.CreateOrGetObject<Microsoft.Kinect.Face.FaceModel>(objectPointer, n => new Microsoft.Kinect.Face.FaceModel(n));
+                return Helper.NativeObjectCache.CreateOrGetObject<Windows.Kinect.Face.FaceModel>(objectPointer, n => new Windows.Kinect.Face.FaceModel(n));
             }
         }
 
         [RootSystem.Runtime.InteropServices.DllImport("KinectFaceUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl, SetLastError=true)]
         private static extern RootSystem.IntPtr Microsoft_Kinect_Face_HighDefinitionFaceFrame_get_HighDefinitionFaceFrameSource(RootSystem.IntPtr pNative);
-        public  Microsoft.Kinect.Face.HighDefinitionFaceFrameSource HighDefinitionFaceFrameSource
+        public  Windows.Kinect.Face.HighDefinitionFaceFrameSource HighDefinitionFaceFrameSource
         {
             get
             {
@@ -171,7 +171,7 @@ namespace Microsoft.Kinect.Face
                     return null;
                 }
 
-                return Helper.NativeObjectCache.CreateOrGetObject<Microsoft.Kinect.Face.HighDefinitionFaceFrameSource>(objectPointer, n => new Microsoft.Kinect.Face.HighDefinitionFaceFrameSource(n));
+                return Helper.NativeObjectCache.CreateOrGetObject<Windows.Kinect.Face.HighDefinitionFaceFrameSource>(objectPointer, n => new Windows.Kinect.Face.HighDefinitionFaceFrameSource(n));
             }
         }
 
@@ -261,7 +261,7 @@ namespace Microsoft.Kinect.Face
         // Public Methods
         [RootSystem.Runtime.InteropServices.DllImport("KinectFaceUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl, SetLastError=true)]
         private static extern void Microsoft_Kinect_Face_HighDefinitionFaceFrame_GetAndRefreshFaceAlignmentResult(RootSystem.IntPtr pNative, RootSystem.IntPtr faceAlignmentResults);
-        public void GetAndRefreshFaceAlignmentResult(Microsoft.Kinect.Face.FaceAlignment faceAlignmentResults)
+        public void GetAndRefreshFaceAlignmentResult(Windows.Kinect.Face.FaceAlignment faceAlignmentResults)
         {
             if (_pNative == RootSystem.IntPtr.Zero)
             {

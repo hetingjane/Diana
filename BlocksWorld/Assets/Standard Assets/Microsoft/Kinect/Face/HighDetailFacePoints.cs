@@ -1,10 +1,10 @@
 using RootSystem = System;
 using System.Linq;
 using System.Collections.Generic;
-namespace Microsoft.Kinect.Face
+namespace Windows.Kinect.Face
 {
     //
-    // Microsoft.Kinect.Face.HighDetailFacePoints
+    // Windows.Kinect.Face.HighDetailFacePoints
     //
     public enum HighDetailFacePoints : int
     {

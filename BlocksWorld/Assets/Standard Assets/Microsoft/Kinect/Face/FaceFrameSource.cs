@@ -1,10 +1,10 @@
 using RootSystem = System;
 using System.Linq;
 using System.Collections.Generic;
-namespace Microsoft.Kinect.Face
+namespace Windows.Kinect.Face
 {
     //
-    // Microsoft.Kinect.Face.FaceFrameSource
+    // Windows.Kinect.Face.FaceFrameSource
     //
     public sealed partial class FaceFrameSource : Helper.INativeWrapper
 
@@ -73,10 +73,10 @@ namespace Microsoft.Kinect.Face
         }
 
         [RootSystem.Runtime.InteropServices.DllImport("KinectFaceUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl, SetLastError=true)]
-        private static extern Microsoft.Kinect.Face.FaceFrameFeatures Microsoft_Kinect_Face_FaceFrameSource_get_FaceFrameFeatures(RootSystem.IntPtr pNative);
+        private static extern Windows.Kinect.Face.FaceFrameFeatures Microsoft_Kinect_Face_FaceFrameSource_get_FaceFrameFeatures(RootSystem.IntPtr pNative);
         [RootSystem.Runtime.InteropServices.DllImport("KinectFaceUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl, SetLastError=true)]
-        private static extern void Microsoft_Kinect_Face_FaceFrameSource_put_FaceFrameFeatures(RootSystem.IntPtr pNative, Microsoft.Kinect.Face.FaceFrameFeatures faceFrameFeatures);
-        public  Microsoft.Kinect.Face.FaceFrameFeatures FaceFrameFeatures
+        private static extern void Microsoft_Kinect_Face_FaceFrameSource_put_FaceFrameFeatures(RootSystem.IntPtr pNative, Windows.Kinect.Face.FaceFrameFeatures faceFrameFeatures);
+        public  Windows.Kinect.Face.FaceFrameFeatures FaceFrameFeatures
         {
             get
             {
@@ -156,16 +156,16 @@ namespace Microsoft.Kinect.Face
         private static RootSystem.Runtime.InteropServices.GCHandle _Microsoft_Kinect_Face_TrackingIdLostEventArgs_Delegate_Handle;
         [RootSystem.Runtime.InteropServices.UnmanagedFunctionPointer(RootSystem.Runtime.InteropServices.CallingConvention.Cdecl)]
         private delegate void _Microsoft_Kinect_Face_TrackingIdLostEventArgs_Delegate(RootSystem.IntPtr args, RootSystem.IntPtr pNative);
-        private static Helper.CollectionMap<RootSystem.IntPtr, List<RootSystem.EventHandler<Microsoft.Kinect.Face.TrackingIdLostEventArgs>>> Microsoft_Kinect_Face_TrackingIdLostEventArgs_Delegate_callbacks = new Helper.CollectionMap<RootSystem.IntPtr, List<RootSystem.EventHandler<Microsoft.Kinect.Face.TrackingIdLostEventArgs>>>();
+        private static Helper.CollectionMap<RootSystem.IntPtr, List<RootSystem.EventHandler<Windows.Kinect.Face.TrackingIdLostEventArgs>>> Microsoft_Kinect_Face_TrackingIdLostEventArgs_Delegate_callbacks = new Helper.CollectionMap<RootSystem.IntPtr, List<RootSystem.EventHandler<Windows.Kinect.Face.TrackingIdLostEventArgs>>>();
         [AOT.MonoPInvokeCallbackAttribute(typeof(_Microsoft_Kinect_Face_TrackingIdLostEventArgs_Delegate))]
         private static void Microsoft_Kinect_Face_TrackingIdLostEventArgs_Delegate_Handler(RootSystem.IntPtr result, RootSystem.IntPtr pNative)
         {
-            List<RootSystem.EventHandler<Microsoft.Kinect.Face.TrackingIdLostEventArgs>> callbackList = null;
+            List<RootSystem.EventHandler<Windows.Kinect.Face.TrackingIdLostEventArgs>> callbackList = null;
             Microsoft_Kinect_Face_TrackingIdLostEventArgs_Delegate_callbacks.TryGetValue(pNative, out callbackList);
             lock(callbackList)
             {
                 var objThis = Helper.NativeObjectCache.GetObject<FaceFrameSource>(pNative);
-                var args = new Microsoft.Kinect.Face.TrackingIdLostEventArgs(result);
+                var args = new Windows.Kinect.Face.TrackingIdLostEventArgs(result);
                 foreach(var func in callbackList)
                 {
                     Helper.EventPump.Instance.Enqueue(() => { try { func(objThis, args); } catch { } });
@@ -174,7 +174,7 @@ namespace Microsoft.Kinect.Face
         }
         [RootSystem.Runtime.InteropServices.DllImport("KinectFaceUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl, SetLastError=true)]
         private static extern void Microsoft_Kinect_Face_FaceFrameSource_add_TrackingIdLost(RootSystem.IntPtr pNative, _Microsoft_Kinect_Face_TrackingIdLostEventArgs_Delegate eventCallback, bool unsubscribe);
-        public  event RootSystem.EventHandler<Microsoft.Kinect.Face.TrackingIdLostEventArgs> TrackingIdLost
+        public  event RootSystem.EventHandler<Windows.Kinect.Face.TrackingIdLostEventArgs> TrackingIdLost
         {
             add
             {
@@ -279,7 +279,7 @@ namespace Microsoft.Kinect.Face
         // Public Methods
         [RootSystem.Runtime.InteropServices.DllImport("KinectFaceUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl, SetLastError=true)]
         private static extern RootSystem.IntPtr Microsoft_Kinect_Face_FaceFrameSource_OpenReader(RootSystem.IntPtr pNative);
-        public Microsoft.Kinect.Face.FaceFrameReader OpenReader()
+        public Windows.Kinect.Face.FaceFrameReader OpenReader()
         {
             if (_pNative == RootSystem.IntPtr.Zero)
             {
@@ -293,7 +293,7 @@ namespace Microsoft.Kinect.Face
                 return null;
             }
 
-            return Helper.NativeObjectCache.CreateOrGetObject<Microsoft.Kinect.Face.FaceFrameReader>(objectPointer, n => new Microsoft.Kinect.Face.FaceFrameReader(n));
+            return Helper.NativeObjectCache.CreateOrGetObject<Windows.Kinect.Face.FaceFrameReader>(objectPointer, n => new Windows.Kinect.Face.FaceFrameReader(n));
         }
 
         private void __EventCleanup()

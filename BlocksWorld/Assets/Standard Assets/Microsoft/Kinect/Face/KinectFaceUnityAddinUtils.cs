@@ -1,10 +1,10 @@
 using RootSystem = System;
 using System.Linq;
 using System.Collections.Generic;
-namespace Microsoft.Kinect.Face
+namespace Windows.Kinect.Face
 {
     //
-    // Microsoft.Kinect.Face.KinectFaceUnityAddinUtils
+    // Windows.Kinect.Face.KinectFaceUnityAddinUtils
     //
     public sealed partial class KinectFaceUnityAddinUtils
     {

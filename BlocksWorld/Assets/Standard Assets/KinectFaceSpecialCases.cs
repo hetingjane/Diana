@@ -3,10 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-namespace Microsoft.Kinect.Face
+namespace Windows.Kinect.Face
 {
     //
-    // Microsoft.Kinect.Face.Point
+    // Windows.Kinect.Face.Point
     //
     [RootSystem.Runtime.InteropServices.StructLayout(RootSystem.Runtime.InteropServices.LayoutKind.Sequential)]
     public struct Point
@@ -46,7 +46,7 @@ namespace Microsoft.Kinect.Face
     }
 
     //
-    // Microsoft.Kinect.Face.Color
+    // Windows.Kinect.Face.Color
     //
     [RootSystem.Runtime.InteropServices.StructLayout(RootSystem.Runtime.InteropServices.LayoutKind.Sequential)]
     public struct Color
@@ -88,19 +88,19 @@ namespace Microsoft.Kinect.Face
     }
 
     //
-    // Microsoft.Kinect.Face.FaceModel
+    // Windows.Kinect.Face.FaceModel
     //
     public sealed partial class FaceModel
     {   
         [RootSystem.Runtime.InteropServices.DllImport("KinectFaceUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl)]
-        private static extern RootSystem.IntPtr Microsoft_Kinect_Face_FaceModel_ctor(float scale, Microsoft.Kinect.Face.FaceShapeDeformations[] faceShapeDeformationsKeys, float[] faceShapeDeformationsValues, int faceShapeDeformationsSize);
-        public static FaceModel Create(float scale, RootSystem.Collections.Generic.Dictionary<Microsoft.Kinect.Face.FaceShapeDeformations, float> faceShapeDeformations)
+        private static extern RootSystem.IntPtr Microsoft_Kinect_Face_FaceModel_ctor(float scale, Windows.Kinect.Face.FaceShapeDeformations[] faceShapeDeformationsKeys, float[] faceShapeDeformationsValues, int faceShapeDeformationsSize);
+        public static FaceModel Create(float scale, RootSystem.Collections.Generic.Dictionary<Windows.Kinect.Face.FaceShapeDeformations, float> faceShapeDeformations)
         {
             int _faceShapeDeformationsKeys_idx=0;
-            var _faceShapeDeformationsKeys = new Microsoft.Kinect.Face.FaceShapeDeformations[faceShapeDeformations.Keys.Count];
+            var _faceShapeDeformationsKeys = new Windows.Kinect.Face.FaceShapeDeformations[faceShapeDeformations.Keys.Count];
             foreach(var key in faceShapeDeformations.Keys)
             {
-                _faceShapeDeformationsKeys[_faceShapeDeformationsKeys_idx] = (Microsoft.Kinect.Face.FaceShapeDeformations)key;
+                _faceShapeDeformationsKeys[_faceShapeDeformationsKeys_idx] = (Windows.Kinect.Face.FaceShapeDeformations)key;
                 _faceShapeDeformationsKeys_idx++;
             }
             int _faceShapeDeformationsValues_idx=0;
@@ -118,8 +118,8 @@ namespace Microsoft.Kinect.Face
                 return null;
             }
 
-            return Helper.NativeObjectCache.CreateOrGetObject<Microsoft.Kinect.Face.FaceModel>(
-                objectPointer, n => new Microsoft.Kinect.Face.FaceModel(n));
+            return Helper.NativeObjectCache.CreateOrGetObject<Windows.Kinect.Face.FaceModel>(
+                objectPointer, n => new Windows.Kinect.Face.FaceModel(n));
         }
 
         [RootSystem.Runtime.InteropServices.DllImport("KinectFaceUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl)]
@@ -133,13 +133,13 @@ namespace Microsoft.Kinect.Face
                 return null;
             }
 
-            return Helper.NativeObjectCache.CreateOrGetObject<Microsoft.Kinect.Face.FaceModel>(
-                objectPointer, n => new Microsoft.Kinect.Face.FaceModel(n));
+            return Helper.NativeObjectCache.CreateOrGetObject<Windows.Kinect.Face.FaceModel>(
+                objectPointer, n => new Windows.Kinect.Face.FaceModel(n));
         }
 
         [RootSystem.Runtime.InteropServices.DllImport("KinectFaceUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl)]
         private static extern RootSystem.IntPtr Microsoft_Kinect_Face_FaceModel_get_HairColor(RootSystem.IntPtr pNative);
-        public  Microsoft.Kinect.Face.Color HairColor
+        public  Windows.Kinect.Face.Color HairColor
         {
             get
             {
@@ -150,15 +150,15 @@ namespace Microsoft.Kinect.Face
 
                 var objectPointer = Microsoft_Kinect_Face_FaceModel_get_HairColor(_pNative);
                 Helper.ExceptionHelper.CheckLastError();
-                var obj = (Microsoft.Kinect.Face.Color)RootSystem.Runtime.InteropServices.Marshal.PtrToStructure(objectPointer, typeof(Microsoft.Kinect.Face.Color));
-                Microsoft.Kinect.Face.KinectFaceUnityAddinUtils.FreeMemory(objectPointer);
+                var obj = (Windows.Kinect.Face.Color)RootSystem.Runtime.InteropServices.Marshal.PtrToStructure(objectPointer, typeof(Windows.Kinect.Face.Color));
+                Windows.Kinect.Face.KinectFaceUnityAddinUtils.FreeMemory(objectPointer);
                 return obj;
             }
         }
 
         [RootSystem.Runtime.InteropServices.DllImport("KinectFaceUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl)]
         private static extern RootSystem.IntPtr Microsoft_Kinect_Face_FaceModel_get_SkinColor(RootSystem.IntPtr pNative);
-        public  Microsoft.Kinect.Face.Color SkinColor
+        public  Windows.Kinect.Face.Color SkinColor
         {
             get
             {
@@ -169,23 +169,23 @@ namespace Microsoft.Kinect.Face
 
                 var objectPointer = Microsoft_Kinect_Face_FaceModel_get_SkinColor(_pNative);
                 Helper.ExceptionHelper.CheckLastError();
-                var obj = (Microsoft.Kinect.Face.Color)RootSystem.Runtime.InteropServices.Marshal.PtrToStructure(objectPointer, typeof(Microsoft.Kinect.Face.Color));
-                Microsoft.Kinect.Face.KinectFaceUnityAddinUtils.FreeMemory(objectPointer);
+                var obj = (Windows.Kinect.Face.Color)RootSystem.Runtime.InteropServices.Marshal.PtrToStructure(objectPointer, typeof(Windows.Kinect.Face.Color));
+                Windows.Kinect.Face.KinectFaceUnityAddinUtils.FreeMemory(objectPointer);
                 return obj;
             }
         }
     }
 
     //
-    // Microsoft.Kinect.Face.FaceFrameResult
+    // Windows.Kinect.Face.FaceFrameResult
     //
     public sealed partial class FaceFrameResult
     {
         [RootSystem.Runtime.InteropServices.DllImport("KinectFaceUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl)]
-        private static extern int Microsoft_Kinect_Face_FaceFrameResult_get_FacePointsInColorSpace(RootSystem.IntPtr pNative, [RootSystem.Runtime.InteropServices.Out] Microsoft.Kinect.Face.FacePointType[] outKeys, [RootSystem.Runtime.InteropServices.Out] Microsoft.Kinect.Face.Point[] outValues, int outCollectionSize);
+        private static extern int Microsoft_Kinect_Face_FaceFrameResult_get_FacePointsInColorSpace(RootSystem.IntPtr pNative, [RootSystem.Runtime.InteropServices.Out] Windows.Kinect.Face.FacePointType[] outKeys, [RootSystem.Runtime.InteropServices.Out] Windows.Kinect.Face.Point[] outValues, int outCollectionSize);
         [RootSystem.Runtime.InteropServices.DllImport("KinectFaceUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl)]
         private static extern int Microsoft_Kinect_Face_FaceFrameResult_get_FacePointsInColorSpace_Length(RootSystem.IntPtr pNative);
-        public  RootSystem.Collections.Generic.Dictionary<Microsoft.Kinect.Face.FacePointType, Microsoft.Kinect.Face.Point> FacePointsInColorSpace
+        public  RootSystem.Collections.Generic.Dictionary<Windows.Kinect.Face.FacePointType, Windows.Kinect.Face.Point> FacePointsInColorSpace
         {
             get
             {
@@ -195,9 +195,9 @@ namespace Microsoft.Kinect.Face
                 }
 
                 int outCollectionSize = Microsoft_Kinect_Face_FaceFrameResult_get_FacePointsInColorSpace_Length(_pNative);
-                var outKeys = new Microsoft.Kinect.Face.FacePointType[outCollectionSize];
-                var outValues = new Microsoft.Kinect.Face.Point[outCollectionSize];
-                var managedDictionary = new RootSystem.Collections.Generic.Dictionary<Microsoft.Kinect.Face.FacePointType, Microsoft.Kinect.Face.Point>();
+                var outKeys = new Windows.Kinect.Face.FacePointType[outCollectionSize];
+                var outValues = new Windows.Kinect.Face.Point[outCollectionSize];
+                var managedDictionary = new RootSystem.Collections.Generic.Dictionary<Windows.Kinect.Face.FacePointType, Windows.Kinect.Face.Point>();
 
                 outCollectionSize = Microsoft_Kinect_Face_FaceFrameResult_get_FacePointsInColorSpace(_pNative, outKeys, outValues, outCollectionSize);
                 Helper.ExceptionHelper.CheckLastError();
@@ -210,10 +210,10 @@ namespace Microsoft.Kinect.Face
         }
 
         [RootSystem.Runtime.InteropServices.DllImport("KinectFaceUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl)]
-        private static extern int Microsoft_Kinect_Face_FaceFrameResult_get_FacePointsInInfraredSpace(RootSystem.IntPtr pNative, [RootSystem.Runtime.InteropServices.Out] Microsoft.Kinect.Face.FacePointType[] outKeys, [RootSystem.Runtime.InteropServices.Out] Microsoft.Kinect.Face.Point[] outValues, int outCollectionSize);
+        private static extern int Microsoft_Kinect_Face_FaceFrameResult_get_FacePointsInInfraredSpace(RootSystem.IntPtr pNative, [RootSystem.Runtime.InteropServices.Out] Windows.Kinect.Face.FacePointType[] outKeys, [RootSystem.Runtime.InteropServices.Out] Windows.Kinect.Face.Point[] outValues, int outCollectionSize);
         [RootSystem.Runtime.InteropServices.DllImport("KinectFaceUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl)]
         private static extern int Microsoft_Kinect_Face_FaceFrameResult_get_FacePointsInInfraredSpace_Length(RootSystem.IntPtr pNative);
-        public  RootSystem.Collections.Generic.Dictionary<Microsoft.Kinect.Face.FacePointType, Microsoft.Kinect.Face.Point> FacePointsInInfraredSpace
+        public  RootSystem.Collections.Generic.Dictionary<Windows.Kinect.Face.FacePointType, Windows.Kinect.Face.Point> FacePointsInInfraredSpace
         {
             get
             {
@@ -223,9 +223,9 @@ namespace Microsoft.Kinect.Face
                 }
 
                 int outCollectionSize = Microsoft_Kinect_Face_FaceFrameResult_get_FacePointsInInfraredSpace_Length(_pNative);
-                var outKeys = new Microsoft.Kinect.Face.FacePointType[outCollectionSize];
-                var outValues = new Microsoft.Kinect.Face.Point[outCollectionSize];
-                var managedDictionary = new RootSystem.Collections.Generic.Dictionary<Microsoft.Kinect.Face.FacePointType, Microsoft.Kinect.Face.Point>();
+                var outKeys = new Windows.Kinect.Face.FacePointType[outCollectionSize];
+                var outValues = new Windows.Kinect.Face.Point[outCollectionSize];
+                var managedDictionary = new RootSystem.Collections.Generic.Dictionary<Windows.Kinect.Face.FacePointType, Windows.Kinect.Face.Point>();
 
                 outCollectionSize = Microsoft_Kinect_Face_FaceFrameResult_get_FacePointsInInfraredSpace(_pNative, outKeys, outValues, outCollectionSize);
                 Helper.ExceptionHelper.CheckLastError();
@@ -239,7 +239,7 @@ namespace Microsoft.Kinect.Face
     }
 
     //
-    // Microsoft.Kinect.Face.FaceAlignment
+    // Windows.Kinect.Face.FaceAlignment
     //
     public sealed partial class FaceAlignment
     {
@@ -254,19 +254,19 @@ namespace Microsoft.Kinect.Face
                 return null;
             }
 
-            return Helper.NativeObjectCache.CreateOrGetObject<Microsoft.Kinect.Face.FaceAlignment>(
-                objectPointer, n => new Microsoft.Kinect.Face.FaceAlignment(n));
+            return Helper.NativeObjectCache.CreateOrGetObject<Windows.Kinect.Face.FaceAlignment>(
+                objectPointer, n => new Windows.Kinect.Face.FaceAlignment(n));
         }
     }
 
     //
-    // Microsoft.Kinect.Face.FaceFrameSource
+    // Windows.Kinect.Face.FaceFrameSource
     //
     public sealed partial class FaceFrameSource
     {
         [RootSystem.Runtime.InteropServices.DllImport("KinectFaceUnityAddin", CallingConvention = RootSystem.Runtime.InteropServices.CallingConvention.Cdecl)]
-        private static extern RootSystem.IntPtr Microsoft_Kinect_Face_FaceFrameSource_ctor(RootSystem.IntPtr sensor, ulong initialTrackingId, Microsoft.Kinect.Face.FaceFrameFeatures initialFaceFrameFeatures);
-        public static FaceFrameSource Create(Windows.Kinect.KinectSensor sensor, ulong initialTrackingId, Microsoft.Kinect.Face.FaceFrameFeatures initialFaceFrameFeatures)
+        private static extern RootSystem.IntPtr Microsoft_Kinect_Face_FaceFrameSource_ctor(RootSystem.IntPtr sensor, ulong initialTrackingId, Windows.Kinect.Face.FaceFrameFeatures initialFaceFrameFeatures);
+        public static FaceFrameSource Create(Windows.Kinect.KinectSensor sensor, ulong initialTrackingId, Windows.Kinect.Face.FaceFrameFeatures initialFaceFrameFeatures)
         {
             RootSystem.IntPtr objectPointer = Microsoft_Kinect_Face_FaceFrameSource_ctor(Helper.NativeWrapper.GetNativePtr(sensor), initialTrackingId, initialFaceFrameFeatures);
             Helper.ExceptionHelper.CheckLastError();
@@ -275,13 +275,13 @@ namespace Microsoft.Kinect.Face
                 return null;
             }
 
-            return Helper.NativeObjectCache.CreateOrGetObject<Microsoft.Kinect.Face.FaceFrameSource>(
-                objectPointer, n => new Microsoft.Kinect.Face.FaceFrameSource(n));
+            return Helper.NativeObjectCache.CreateOrGetObject<Windows.Kinect.Face.FaceFrameSource>(
+                objectPointer, n => new Windows.Kinect.Face.FaceFrameSource(n));
         }
     }
 
     //
-    // Microsoft.Kinect.Face.HighDefinitionFaceFrameSource
+    // Windows.Kinect.Face.HighDefinitionFaceFrameSource
     //
     public sealed partial class HighDefinitionFaceFrameSource
     {
@@ -296,19 +296,19 @@ namespace Microsoft.Kinect.Face
                 return null;
             }
 
-            return Helper.NativeObjectCache.CreateOrGetObject<Microsoft.Kinect.Face.HighDefinitionFaceFrameSource>(
-                objectPointer, n => new Microsoft.Kinect.Face.HighDefinitionFaceFrameSource(n));
+            return Helper.NativeObjectCache.CreateOrGetObject<Windows.Kinect.Face.HighDefinitionFaceFrameSource>(
+                objectPointer, n => new Windows.Kinect.Face.HighDefinitionFaceFrameSource(n));
         }
     }
 
     //
-    // Microsoft.Kinect.Face.FaceModelBuilder
+    // Windows.Kinect.Face.FaceModelBuilder
     //
     public sealed partial class FaceModelBuilder
     {
         [RootSystem.Runtime.InteropServices.UnmanagedFunctionPointer(RootSystem.Runtime.InteropServices.CallingConvention.Cdecl)]
         private delegate void Microsoft_Kinect_Face_FaceModelData_Delegate_Indexed(RootSystem.IntPtr result, [RootSystem.Runtime.InteropServices.MarshalAs(RootSystem.Runtime.InteropServices.UnmanagedType.LPWStr)] string guid);
-        private static Helper.ThreadSafeDictionary<string, RootSystem.Action<Microsoft.Kinect.Face.FaceModelData>> Microsoft_Kinect_Face_FaceModelData_Delegate_SuccessCallbacks = new Helper.ThreadSafeDictionary<string, RootSystem.Action<Microsoft.Kinect.Face.FaceModelData>>();
+        private static Helper.ThreadSafeDictionary<string, RootSystem.Action<Windows.Kinect.Face.FaceModelData>> Microsoft_Kinect_Face_FaceModelData_Delegate_SuccessCallbacks = new Helper.ThreadSafeDictionary<string, RootSystem.Action<Windows.Kinect.Face.FaceModelData>>();
         [AOT.MonoPInvokeCallback(typeof(Microsoft_Kinect_Face_FaceModelData_Delegate_Indexed))]
         private static void Microsoft_Kinect_Face_FaceModelData_Delegate_Success(RootSystem.IntPtr result, string guid)
         {
@@ -321,10 +321,10 @@ namespace Microsoft.Kinect.Face
                 }
                 PinnedObjects.Remove(guid);
             }
-            RootSystem.Action<Microsoft.Kinect.Face.FaceModelData> callback = null;
+            RootSystem.Action<Windows.Kinect.Face.FaceModelData> callback = null;
             if(Microsoft_Kinect_Face_FaceModelData_Delegate_SuccessCallbacks.TryGetValue(guid, out callback))
             {
-                var faceModelData = Helper.NativeObjectCache.CreateOrGetObject<Microsoft.Kinect.Face.FaceModelData>(result, n => new Microsoft.Kinect.Face.FaceModelData(n));
+                var faceModelData = Helper.NativeObjectCache.CreateOrGetObject<Windows.Kinect.Face.FaceModelData>(result, n => new Windows.Kinect.Face.FaceModelData(n));
                 Helper.EventPump.Instance.Enqueue(() => callback(faceModelData));
             }
             ErrorCallbacks.Remove(guid);
@@ -351,7 +351,7 @@ namespace Microsoft.Kinect.Face
 
         [RootSystem.Runtime.InteropServices.DllImport("KinectFaceUnityAddin", CallingConvention=RootSystem.Runtime.InteropServices.CallingConvention.Cdecl, SetLastError=true)]
         private static extern void Microsoft_Kinect_Face_FaceModelBuilder_CollectFaceDataAsync_Indexed(RootSystem.IntPtr pNative, Microsoft_Kinect_Face_FaceModelData_Delegate_Indexed success, Error_Delegate_Indexed failure, [RootSystem.Runtime.InteropServices.MarshalAs(RootSystem.Runtime.InteropServices.UnmanagedType.LPWStr)] string guid);
-        public void CollectFaceDataAsync(RootSystem.Action<Microsoft.Kinect.Face.FaceModelData> success, RootSystem.Action<int> failure)
+        public void CollectFaceDataAsync(RootSystem.Action<Windows.Kinect.Face.FaceModelData> success, RootSystem.Action<int> failure)
         {
             if (_pNative == RootSystem.IntPtr.Zero)
             {
