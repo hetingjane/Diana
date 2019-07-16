@@ -22,7 +22,7 @@ public class FaceUpdate : MonoBehaviour
 
     void Update()
     {
-
+        int score = DataStore.GetIntValue("user:dominant emotion:" + playerEmotions.dominantEmotion.ToString());
         switch (playerEmotions.dominantEmotion)
         {
             case Emotion.Neutral:
@@ -30,14 +30,29 @@ public class FaceUpdate : MonoBehaviour
                 charMgr.SetBlendshapeValue("eCTRLSad", 0);
                 break;
             case Emotion.Happy:
-                charMgr.SetBlendshapeValue("eCTRLHappy", 100);
-                charMgr.SetBlendshapeValue("eCTRLSad", 0);
+                if (score > 90)
+                {
+                    charMgr.SetBlendshapeValue("eCTRLHappy", 100);
+                }
+                else
+                {
+                    charMgr.SetBlendshapeValue("eCTRLHappy", 50);
+
+                }
+                //charMgr.SetBlendshapeValue("eCTRLSad", 0);
 
                 break;
             case Emotion.Angry:
-                charMgr.SetBlendshapeValue("eCTRLSad", 100);
-                charMgr.SetBlendshapeValue("eCTRLHappy", 0);
+                if (score > 5)
+                {
+                    charMgr.SetBlendshapeValue("eCTRLSad", 100);
+                }
+                else
+                {
+                    charMgr.SetBlendshapeValue("eCTRLSad", 50);
 
+                }
+                //charMgr.SetBlendshapeValue("eCTRLHappy", 0);
                 break;
             default:
                 break;

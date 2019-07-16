@@ -106,11 +106,11 @@ namespace Affdex
             {
                 SelectCamera(isFrontFacing);
 
-                if (device.name != "Null")
-                {
-                    cameraTexture = new WebCamTexture(device.name, targetWidth, targetHeight, (int)sampleRate);
-                    cameraTexture.Play();
-                }
+                //if (device.name != "Null")
+                //{
+                //    cameraTexture = new WebCamTexture(device.name, targetWidth, targetHeight, (int)sampleRate);
+                //    cameraTexture.Play();
+                //}
             }
 #endif
         }
@@ -120,23 +120,25 @@ namespace Affdex
         /// </summary>
         /// <param name="isFrontFacing">Should the device be forward facing?</param>
         /// <param name="name">The name of the webcam to select.</param>
-        public void SelectCamera(bool isFrontFacing, string name = "")
+        public void SelectCamera(bool isFrontFacing, string name = "Kinect V2 Video Sensor")
         {
 #if !UNITY_XBOXONE && UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN || UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX || UNITY_IOS || UNITY_ANDROID
             foreach (WebCamDevice d in devices)
             {
+                Debug.Log(d.name);
                 if (d.name.Length > 1 && d.name == name)
                 {
-                        cameraTexture.Stop();
+                        //cameraTexture.Stop();
                         device = d;
 
                         cameraTexture = new WebCamTexture(device.name, targetWidth, targetHeight, (int)sampleRate);
                         cameraTexture.Play();
+                    
                 }
-                else if (d.isFrontFacing == isFrontFacing)
-                {
-                    device = d;
-                }
+                //else if (d.isFrontFacing == isFrontFacing)
+                //{
+                //    device = d;
+                //}
             }
 #endif
         }
