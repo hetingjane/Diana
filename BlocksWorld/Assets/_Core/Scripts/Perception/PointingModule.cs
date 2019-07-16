@@ -24,25 +24,35 @@ public class PointingModule : ModuleBase
     private bool leftPoint = false;
     private bool rightPoint = false;
     private bool filterInitialized = false;
+    private bool leftValid = true;
+    private bool rightValid = true;
     public bool calibrationMode = false;
 
     public int windowSize = 10;
-    public Vector3 pixSpaceTopRight = new Vector3(1537, 696, 1),
+
+    private float leftDx, leftDy, rightDx, rightDy, leftSx, leftSy, rightSx, rightSy;
+
+    public Vector3 pixSpaceTopRight = new Vector3(Screen.width, Screen.height, 1),
                    pixSpaceBotLeft = new Vector3(0, 0, 1),
-                   kinSpaceTopRight = new Vector3(0.4f, -0.6f, 1),
-                   kinSpaceBotLeft = new Vector3(-0.5f, -0.9f, 1);
+                   rHKinSpaceTopRight = new Vector3(0.4f, -0.6f, 1),
+                   rHKinSpaceBotLeft = new Vector3(-0.5f, -0.9f, 1),
+                   lHKinSpaceTopRight = new Vector3(0.4f, -0.6f, 1),
+                   lHKinSpaceBotLeft = new Vector3(-0.5f, -0.9f, 1);
 
-    List<Vector3> handTipLeftVal = new List<Vector3>();
-    List<Vector3> shoulderLeftVal = new List<Vector3>();
-    List<Vector3> handTipRightVal = new List<Vector3>();
-    List<Vector3> shoulderRightVal = new List<Vector3>();
+    List<Vector3> handTipLeftList = new List<Vector3>();
+    List<Vector3> shoulderLeftList = new List<Vector3>();
+    List<Vector3> handTipRightList = new List<Vector3>();
+    List<Vector3> shoulderRightList = new List<Vector3>();
     List<Vector3> rightPointList = new List<Vector3>();
-
+    List<Vector3> leftPointList = new List<Vector3>();
 
 
     protected override void Start()
     {
         base.Start();
+
+        SetUpTransformations();
+
         DataStore.Subscribe(handTipLeftKey, NoteScreenOrDeskMode);
         DataStore.Subscribe(shoulderLeftKey, NoteScreenOrDeskMode);
 
@@ -64,75 +74,138 @@ public class PointingModule : ModuleBase
 
         if (leftPoint)
         {
-            handTipLeftVal.Insert(0, DataStore.GetVector3Value(handTipLeftKey));
-            shoulderLeftVal.Insert(0,DataStore.GetVector3Value(shoulderLeftKey));
+            handTipLeftList.Insert(0, DataStore.GetVector3Value(handTipLeftKey));
+            shoulderLeftList.Insert(0,DataStore.GetVector3Value(shoulderLeftKey));
 
-            if (handTipLeftVal.Count > windowSize) handTipLeftVal.RemoveAt(windowSize);
-            if (shoulderLeftVal.Count > windowSize) shoulderLeftVal.RemoveAt(windowSize);
+            if (handTipLeftList.Count > windowSize) handTipLeftList.RemoveAt(windowSize);
+            if (shoulderLeftList.Count > windowSize) shoulderLeftList.RemoveAt(windowSize);
 
-            avgHandTipLeft = AverageJoint(handTipLeftVal);
-            avgShoulderLeft = AverageJoint(shoulderLeftVal);
+            avgHandTipLeft = AverageJoint(handTipLeftList);
+            avgShoulderLeft = AverageJoint(shoulderLeftList);
 
             leftPointPos = CalcCoordinates(avgHandTipLeft, avgShoulderLeft);
-            
-            if (leftPointPos.x != -float.MaxValue)
+
+            if (leftPointPos.x == -float.MaxValue)
+                leftValid = false;
+            else
+                leftValid = true;
+
+            if (calibrationMode)
+            {
                 DataStore.SetValue("user:pointpos:left", new DataStore.Vector3Value(leftPointPos), this, leftPointPos.ToString());
+            }
+            else
+            {
+                leftPointPos = ConvertToPixelSpace(leftPointPos, leftDx, leftDy, leftSx, leftSy);
+
+                if (leftValid) leftPointList.Insert(0, leftPointPos);
+
+                if (leftPointList.Count > windowSize) leftPointList.RemoveAt(windowSize);
+
+                SmoothJoint(leftPointList);
+
+                if (CheckValidRange(leftPointList[0]))
+                {
+                    DataStore.SetValue("user:pointpos:left", new DataStore.Vector3Value(leftPointList[0]), this, leftPointList[0].ToString());
+                    DataStore.SetValue("user:pointpos:left:valid", new DataStore.BoolValue(true), this, leftPointList[0].ToString() + " is valid");
+                }
+                else
+                {
+                    DataStore.SetValue("user:pointpos:left", new DataStore.Vector3Value(leftPointList[0]), this, leftPointList[0].ToString());
+                    DataStore.SetValue("user:pointpos:left:valid", new DataStore.BoolValue(false), this, leftPointList[0].ToString() + " is valid");
+                }
+            }
         }
 
         if (rightPoint)
         {
-            DataStore.GetVector3Value(handTipRightKey);
-            DataStore.GetVector3Value(shoulderRightKey);
+            handTipRightList.Insert(0, DataStore.GetVector3Value(handTipRightKey));
+            shoulderRightList.Insert(0, DataStore.GetVector3Value(shoulderRightKey));
 
-            handTipRightVal.Insert(0, DataStore.GetVector3Value(handTipRightKey));
-            shoulderRightVal.Insert(0, DataStore.GetVector3Value(shoulderRightKey));
+            if (handTipRightList.Count > windowSize) handTipRightList.RemoveAt(windowSize);
+            if (shoulderRightList.Count > windowSize) shoulderRightList.RemoveAt(windowSize);
 
-
-            if (handTipRightVal.Count > windowSize) handTipRightVal.RemoveAt(windowSize);
-            if (shoulderRightVal.Count > windowSize) shoulderRightVal.RemoveAt(windowSize);
-
-            avgHandTipRight = AverageJoint(handTipRightVal);
-            avgShoulderRight = AverageJoint(shoulderRightVal);
+            avgHandTipRight = AverageJoint(handTipRightList);
+            avgShoulderRight = AverageJoint(shoulderRightList);
 
             rightPointPos = CalcCoordinates(avgHandTipRight, avgShoulderRight);
 
-            if (!calibrationMode)
-                rightPointPos = ConvertToPixelSpace(rightPointPos, kinSpaceBotLeft, kinSpaceTopRight, pixSpaceBotLeft, pixSpaceTopRight);
+            if (rightPointPos.x == -float.MaxValue)
+                rightValid = false;
+            else
+                rightValid = true;
 
-            rightPointList.Insert(0, rightPointPos);
+            if (calibrationMode)
+            {
+                DataStore.SetValue("user:pointpos:right", new DataStore.Vector3Value(rightPointPos), this, rightPointPos[0].ToString());
+            }
+            else
+            {
+                rightPointPos = ConvertToPixelSpace(rightPointPos, rightDx, rightDy, rightSx, rightSy);
 
-            if (rightPointList.Count > windowSize) rightPointList.RemoveAt(windowSize);
+                if(rightValid) rightPointList.Insert(0, rightPointPos);
 
-            Debug.Log("point before " + rightPointList[0].ToString());
-            SmoothJoint(rightPointList);
-            Debug.Log("point after " + rightPointList[0].ToString());
+                if (rightPointList.Count > windowSize) rightPointList.RemoveAt(windowSize);
+                Debug.Log("before smooothing: " + rightPointList[0].ToString());
+                SmoothJoint(rightPointList);
+                //Debug.Log("After: " + rightPointList[0].ToString());
+                //Debug.Log("After: " + rightPointList[0].ToString());
 
+                //rightPointList[0] = AverageJoint(rightPointList);
+                Debug.Log("final point: " + rightPointList[0].ToString());
 
-            if (rightPointPos.x != -float.MaxValue)
-                DataStore.SetValue("user:pointpos:right", new DataStore.Vector3Value(rightPointList[0]), this, rightPointPos.ToString());
+                if (CheckValidRange(rightPointList[0]) || calibrationMode)
+                {
+                    DataStore.SetValue("user:pointpos:right", new DataStore.Vector3Value(rightPointList[0]), this, rightPointList[0].ToString());
+                    DataStore.SetValue("user:pointpos:right:valid", new DataStore.BoolValue(true), this, rightPointList[0].ToString() + " is valid");
+                }
+                else
+                {
+                    DataStore.SetValue("user:pointpos:right", new DataStore.Vector3Value(rightPointList[0]), this, rightPointList[0].ToString());
+                    DataStore.SetValue("user:pointpos:right:valid", new DataStore.BoolValue(false), this, rightPointList[0].ToString() + " is not valid");
+                }
+            }
         }
     }
 
  
-    // smoothing will likely help but will come later
+    /* 
+     * Smooth the joint using an implementation of the Savitsky Golay filter.
+     * I updated this implementation a bit so that the smoothed point is in the center
+     * x = [joint[len -1].x, joint[len -2].x, ..., joint[0].x, joint[1].x, ..., joint[len-1].x]
+     * The format is similar for y and z
+     * count = [-(len-1), -(len-2), ..., 0, ..., len-2, len-1]
+     * The count variable is the independent variable in our case
+     */
     private void SmoothJoint(List<Vector3> joint)
     {
         if (joint.Count == windowSize)
         {
-            double[] x = new double[joint.Count], y = new double[joint.Count], z = new double[joint.Count], count = new double[joint.Count];
+            double[] x = new double[joint.Count*2 -1], y = new double[joint.Count *2 - 1], z = new double[joint.Count*2 -1], count = new double[joint.Count*2-1];
 
             for (int i = 0; i < joint.Count; i++)
             {
-                x[i] = joint[i].x;
-                y[i] = joint[i].y;
-                z[i] = joint[i].z;
-                count[i] = (i - windowSize)/2;
+                x[i] = joint[joint.Count - i - 1].x;
+                y[i] = joint[joint.Count - i - 1].y;
+                //z[i] = joint[joint.Count - i - 1].z;
+                count[i] = i - (joint.Count - 1);
+            }
+            for (int i = 1; i < joint.Count; i++)
+            {
+                x[i + joint.Count - 1] = joint[i].x;
+                y[i + joint.Count - 1] = joint[i].y;
+                //z[i + joint.Count - 1] = joint[i].z;
+                count[i + joint.Count - 1] = i;
             }
 
-            joint[0] = new Vector3((float)SavGolay(count, x), (float)SavGolay(count, y), (float)SavGolay(count, z));
+            joint[0] = new Vector3((float)SavGolay(count, x), (float)SavGolay(count, y), 0.0f);// (float)SavGolay(count, z));
         }
     }
 
+
+    // Implmenentation of the Savitsky Golay Filter.  I am not sure that this implementation follows the exact defitinition. 
+    // Basically we fit a line to the previous points (I found that a line worked the best) and adjust the point 
+    // based on the point where it existed on the line.
     private double SavGolay(double[] x, double[] y, int polyOrder = 1)
     {
         double[] fit = Fit.Polynomial(x, y, polyOrder);
@@ -141,12 +214,14 @@ public class PointingModule : ModuleBase
 
         for (int i = 0; i <= polyOrder; i++)
         {
-            retVal += fit[i] * Math.Pow(x[0], i); 
+            retVal += fit[i] * Math.Pow(x[x.Length/2], i); 
         }
 
         return retVal;
     }
 
+    // average the joint x, y, and z position
+    // provides a little smoothing over a window
     private Vector3 AverageJoint(List<Vector3> jointList)
     {
         Vector3 averageJointPos = new Vector3(0.0f, 0.0f, 0.0f);
@@ -196,20 +271,42 @@ public class PointingModule : ModuleBase
      * The input points should be calibrated so that the bottom left and top right corners of the screen solve this transformation 
      * from kinect space to pixel space
      */
-    private Vector3 ConvertToPixelSpace(Vector3 point, Vector3 kPoint1, Vector3 kPoint2, Vector3 pPoint1, Vector3 pPoint2)
+    private Vector3 ConvertToPixelSpace(Vector3 point, float dx, float dy, float sx, float sy)
     {
-        float dx, dy, sx, sy, x, y;
-
-        dx = (pPoint2.x * kPoint1.x - pPoint1.x * kPoint2.x) / (kPoint1.x - kPoint2.x);
-        dy = (pPoint2.y * kPoint1.y - pPoint1.y * kPoint2.y) / (kPoint1.y - kPoint2.y);
-
-        sx = (pPoint1.x - dx) / kPoint1.x;
-        sy = (pPoint1.y - dy) / kPoint1.y;
-
+        float x, y;
 
         x = point.x * sx + dx;
         y = point.y * sy + dy;
 
         return new Vector3(x, y, 0.0f);
     }
+
+    /*
+     * This function sets up translation and scaling paramters for both the left and the right hand transformations
+     * I was originally recalculating this information on every frame, but the repeated computation was not necessary.
+     */
+    private void SetUpTransformations()
+    {
+        leftDx = (pixSpaceTopRight.x * lHKinSpaceBotLeft.x - pixSpaceBotLeft.x * lHKinSpaceTopRight.x) / (lHKinSpaceBotLeft.x - lHKinSpaceTopRight.x);
+        leftDy = (pixSpaceTopRight.y * lHKinSpaceBotLeft.y - pixSpaceBotLeft.y * lHKinSpaceTopRight.y) / (lHKinSpaceBotLeft.y - lHKinSpaceTopRight.y);
+        rightDx = (pixSpaceTopRight.x * rHKinSpaceBotLeft.x - pixSpaceBotLeft.x * rHKinSpaceTopRight.x) / (rHKinSpaceBotLeft.x - rHKinSpaceTopRight.x);
+        rightDy = (pixSpaceTopRight.y * rHKinSpaceBotLeft.y - pixSpaceBotLeft.y * rHKinSpaceTopRight.y) / (rHKinSpaceBotLeft.y - rHKinSpaceTopRight.y);
+
+        leftSx = (pixSpaceBotLeft.x - leftDx) / lHKinSpaceBotLeft.x;
+        leftSy = (pixSpaceBotLeft.y - leftDy) / lHKinSpaceBotLeft.y;
+        rightSx = (pixSpaceBotLeft.x - rightDx) / rHKinSpaceBotLeft.x;
+        rightSy = (pixSpaceBotLeft.y - rightDy) / rHKinSpaceBotLeft.y;
+    }
+    
+
+    // this function checks if the point position is in valid pixel space
+    private bool CheckValidRange(Vector3 pointPos)
+    {
+        if (pointPos.x >= pixSpaceBotLeft.x && pointPos.x <= pixSpaceTopRight.x)
+            if (pointPos.y >= pixSpaceBotLeft.y && pointPos.y <= pixSpaceTopRight.y)
+                return true;
+        return false;
+    }
+
+
 }

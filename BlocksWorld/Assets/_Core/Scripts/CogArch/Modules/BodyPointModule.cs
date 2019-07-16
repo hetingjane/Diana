@@ -22,6 +22,10 @@ public class BodyPointModule : ModuleBase
     {
         base.Start();
         DataStore.Subscribe("user:pointpos:right", NoteScreenOrDeskMode);
+        DataStore.Subscribe("user:pointpos:left", NoteScreenOrDeskMode);
+
+        DataStore.Subscribe("user:pointpos:right:valid", NoteScreenOrDeskMode);
+        DataStore.Subscribe("user:pointpos:left:valid", NoteScreenOrDeskMode);
     }
 
     void NoteScreenOrDeskMode(string key, DataStore.IValue value)
@@ -31,9 +35,16 @@ public class BodyPointModule : ModuleBase
 
     protected void Update()
     {
-        if (DataStore.HasValue("user:pointpos:right")) pointing = true;
+        if (DataStore.HasValue("user:pointpos:right") || DataStore.HasValue("user:pointpos:left")) pointing = true;
         {
-            Vector3 screenPos = DataStore.GetVector3Value("user:pointpos:right");
+            Vector3 screenPos;
+
+            if (DataStore.GetBoolValue("user:pointpos:right:valid"))
+                screenPos = DataStore.GetVector3Value("user:pointpos:right");
+            else if (DataStore.GetBoolValue("user:pointpos:left:valid"))
+                screenPos = DataStore.GetVector3Value("user:pointpos:left");
+            else
+                screenPos = new Vector3(0, 0, 0);
 
             Ray ray = Camera.main.ScreenPointToRay(screenPos);
             RaycastHit hit;
