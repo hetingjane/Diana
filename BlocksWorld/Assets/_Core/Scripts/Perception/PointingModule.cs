@@ -32,9 +32,11 @@ public class PointingModule : ModuleBase
 
     private float leftDx, leftDy, rightDx, rightDy, leftSx, leftSy, rightSx, rightSy;
 
-    public Vector3 pixSpaceTopRight = new Vector3(Screen.width, Screen.height, 1),
-                   pixSpaceBotLeft = new Vector3(0, 0, 1),
-                   rHKinSpaceTopRight = new Vector3(0.4f, -0.6f, 1),
+    private Vector3 pixSpaceTopRight = new Vector3(Screen.width, Screen.height, 1),
+                    pixSpaceBotLeft = new Vector3(0, 0, 1);
+
+
+    public Vector3 rHKinSpaceTopRight = new Vector3(0.4f, -0.6f, 1),
                    rHKinSpaceBotLeft = new Vector3(-0.5f, -0.9f, 1),
                    lHKinSpaceTopRight = new Vector3(0.4f, -0.6f, 1),
                    lHKinSpaceBotLeft = new Vector3(-0.5f, -0.9f, 1);
