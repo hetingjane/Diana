@@ -3,6 +3,13 @@ This module computes pointing position based on joint locations converts to pixe
 
 Writes:		user:pointpos:right = Vector3
             user:pointpos:left = Vector3
+            user:pointpos:right:valid = boolean
+            user:pointpos:left:valid = boolean
+
+Reads:      user:joint:HandTipLeft
+            user:joint:ShoulderLeft
+            user:joint:HandTipRight
+            user:joint:ShoulderRight
 
 We will further use this module when we can recognize gestures again.  
 */
@@ -32,9 +39,10 @@ public class PointingModule : ModuleBase
 
     private float leftDx, leftDy, rightDx, rightDy, leftSx, leftSy, rightSx, rightSy;
 
-    public Vector3 pixSpaceTopRight = new Vector3(Screen.width, Screen.height, 1),
-                   pixSpaceBotLeft = new Vector3(0, 0, 1),
-                   rHKinSpaceTopRight = new Vector3(0.4f, -0.6f, 1),
+    private Vector3 pixSpaceTopRight = new Vector3(Screen.width, Screen.height, 1),
+                    pixSpaceBotLeft = new Vector3(0, 0, 1);
+
+    public Vector3 rHKinSpaceTopRight = new Vector3(0.4f, -0.6f, 1),
                    rHKinSpaceBotLeft = new Vector3(-0.5f, -0.9f, 1),
                    lHKinSpaceTopRight = new Vector3(0.4f, -0.6f, 1),
                    lHKinSpaceBotLeft = new Vector3(-0.5f, -0.9f, 1);
@@ -64,6 +72,7 @@ public class PointingModule : ModuleBase
     {
         // May add some handler here for different settings.  Need to discuss. 
     }
+
     protected void Update()
     {
         Vector3 avgHandTipLeft, avgShoulderLeft, avgHandTipRight, avgShoulderRight, rightPointPos, leftPointPos;
@@ -146,13 +155,8 @@ public class PointingModule : ModuleBase
                 if(rightValid) rightPointList.Insert(0, rightPointPos);
 
                 if (rightPointList.Count > windowSize) rightPointList.RemoveAt(windowSize);
-                Debug.Log("before smooothing: " + rightPointList[0].ToString());
-                SmoothJoint(rightPointList);
-                //Debug.Log("After: " + rightPointList[0].ToString());
-                //Debug.Log("After: " + rightPointList[0].ToString());
 
-                //rightPointList[0] = AverageJoint(rightPointList);
-                Debug.Log("final point: " + rightPointList[0].ToString());
+                SmoothJoint(rightPointList);
 
                 if (CheckValidRange(rightPointList[0]) || calibrationMode)
                 {

@@ -45,12 +45,13 @@ public class SkeletonFrame : ModuleBase
             {
                 var jointVectorValue = new DataStore.Vector3Value(new Vector3(joint.Value.Position.X, joint.Value.Position.Y, joint.Value.Position.Z));
                 DataStore.SetValue("user:joint:" + joint.Key.ToString(), jointVectorValue, this, joint.Value.JointType.ToString());
-                var isTracked = new DataStore.BoolValue(joint.Value.TrackingState == Windows.Kinect.TrackingState.Tracked);
-                var isInferred = new DataStore.BoolValue(joint.Value.TrackingState == Windows.Kinect.TrackingState.Inferred);
+                //var isTracked = new DataStore.BoolValue(joint.Value.TrackingState == Windows.Kinect.TrackingState.Tracked);
+                //var isInferred = new DataStore.BoolValue(joint.Value.TrackingState == Windows.Kinect.TrackingState.Inferred);
                 //DataStore.SetValue("user:joint:tracked:" + joint.Key.ToString(), isTracked, this, "");
                 //DataStore.SetValue("user:joint:inferred:" + joint.Key.ToString(), isInferred, this, "");
             }
-            //DataStore.SetValue("user:joint:handLeftState", bodyFrame.HandLeftState, this, enum   "decode with Windows.Kinect.HandState");
+            DataStore.SetValue("user:joint:timestamp", new DataStore.StringValue(e.Timestamp.ToString()), this, e.Timestamp.ToString());
+            DataStore.SetValue("user:engaged", new DataStore.BoolValue(bodyFrame.Engaged), this, bodyFrame.Engaged.ToString());
         }
     }
 
