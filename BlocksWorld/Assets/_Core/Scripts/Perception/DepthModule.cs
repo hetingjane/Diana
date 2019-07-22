@@ -18,7 +18,7 @@ using Perception.Frames;
 public class DepthModule : ModuleBase
 {
     private Perception.Kinect.KinectSensor sensor;
-    private MultiSourceFrameReader multiSourceFrameReader;\
+
     private Perception.Frames.DepthFrame depthFrame;
     private Windows.Kinect.DepthFrame underlyingDepthFrame;
 
@@ -73,7 +73,10 @@ public class DepthModule : ModuleBase
         }
     }
 
-    private Vector3 GetHandPosition(string )
+    private Vector3 GetHandPosition(string temp)
+    {
+        return new Vector3();
+    }
 
 
     private void OnApplicationQuit()
