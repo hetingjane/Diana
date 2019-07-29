@@ -174,7 +174,8 @@ public class SocketInterfaceModule : ModuleBase
                 {
                     if (parts.Length > 2)
                     {
-                        float[] floats = parts[2].Split(',').Cast<float>().ToArray();  // this could fail if the message is malformed
+                        //float[] floats = parts[2].Split(',').Select(x => Single.Parse(x).ToArray();  // this could fail if the message is malformed
+                        float[] floats = Array.ConvertAll<string, float>(parts[2].Split(','), float.Parse);
                         SetValue(parts[1], floats, "Set by client " + client.clientID);
                         client.WriteLine("OK");
                     }

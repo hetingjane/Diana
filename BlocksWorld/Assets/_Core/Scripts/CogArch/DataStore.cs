@@ -81,7 +81,7 @@ public class DataStore : MonoBehaviour {
     {
         public float[] val;
         public FloatArrayValue(float[] inVal) { this.val = inVal; }
-        public override string ToString() { return base.ToString(); }
+        public override string ToString() { return string.Join(",", val); }
         public bool Equals(IValue other) { return other is FloatArrayValue && val == ((FloatArrayValue)other).val; }
         public bool IsEmpty() { return false; }
     }
