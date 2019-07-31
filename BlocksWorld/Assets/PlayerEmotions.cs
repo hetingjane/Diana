@@ -13,25 +13,23 @@ public class PlayerEmotions : ImageResultsListener
 {
     float currentJoy = 0f;
     float currentAnger = 0f;
-    //float currentFear = 0f;
-    //float currentContempt = 0f;
     //public FeaturePoint[] featurePointsList;
 
     public Emotion dominantEmotion = Emotion.Neutral;
 
     [Range(0, 100)]
-    public float happyThreshold = 80f;
+    public float happyThreshold = 5f;
 
     [Range(0, 100)]
-    public float angryThreshold = 5f;
+    public float angryThreshold = 10f;
     public override void onFaceFound(float timestamp, int faceId)
     {
-        Debug.Log("Found the face");
+        Debug.LogWarning("Found the face");
     }
 
     public override void onFaceLost(float timestamp, int faceId)
     {
-        Debug.Log("Lost the face");
+        Debug.LogWarning("Lost the face");
     }
 
     public override void onImageResults(Dictionary<int, Face> faces)
@@ -44,13 +42,8 @@ public class PlayerEmotions : ImageResultsListener
             Face face = pair.Value;    // Instance of the face class containing emotions, and facial expression values.
 
             //Retrieve the Emotions Scores
-            //face.Emotions.TryGetValue(Emotions.Contempt, out currentContempt);
             face.Emotions.TryGetValue(Emotions.Joy, out currentJoy);
-            face.Emotions.TryGetValue(Emotions.Anger, out currentAnger);
-            //face.Emotions.TryGetValue(Emotions.Fear, out currentFear);
-
-            //Retrieve the Smile Score
-            //face.Expressions.TryGetValue(Expressions.Smile, out currentSmile);
+            face.Emotions.TryGetValue(Emotions.Valence, out currentAnger);
 
 
 
@@ -63,10 +56,10 @@ public class PlayerEmotions : ImageResultsListener
                 DataStore.SetValue("user:dominant emotion:" + dominantEmotion.ToString(), EmotionValue, null, dominantEmotion.ToString());
 
             }
-            else if (currentAnger > angryThreshold)
+            else if ((-currentAnger) > angryThreshold)
             {
                 dominantEmotion = Emotion.Angry;
-                var EmotionValue = new DataStore.IntValue((int)currentAnger);
+                var EmotionValue = new DataStore.IntValue((int)-currentAnger);
                 DataStore.SetValue("user:dominant emotion:" + dominantEmotion.ToString(), EmotionValue, null, dominantEmotion.ToString());
 
             }

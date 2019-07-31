@@ -8,12 +8,12 @@ public class Listener : ImageResultsListener
     public Text textArea;
     public override void onFaceFound(float timestamp, int faceId)
     {
-        Debug.Log("Found the face");
+        Debug.LogWarning("Found the face");
     }
 
     public override void onFaceLost(float timestamp, int faceId)
     {
-        Debug.Log("Lost the face");
+        Debug.LogWarning("Lost the face");
     }
     
     public override void onImageResults(Dictionary<int, Face> faces)
