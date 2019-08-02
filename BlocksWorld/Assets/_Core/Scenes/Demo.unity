@@ -7057,6 +7057,12 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 571049119}
   m_PrefabAsset: {fileID: 0}
+--- !u!137 &799875429 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 8099405383717301183, guid: 5513b84b0fc9b4d2c8a2f2d54403a352,
+    type: 3}
+  m_PrefabInstance: {fileID: 1102099334}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &810066799
 GameObject:
   m_ObjectHideFlags: 0
@@ -25002,6 +25008,32 @@ Material:
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 0.99999994}
     - _EmissionColorUI: {r: 0, g: 0, b: 0, a: 1}
     - _EmissionColorWithMapUI: {r: 1, g: 1, b: 1, a: 1}
+--- !u!1 &1981404308 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8099405383720478391, guid: 5513b84b0fc9b4d2c8a2f2d54403a352,
+    type: 3}
+  m_PrefabInstance: {fileID: 1102099334}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1981404309
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1981404308}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e58da6dcc25df4f7ab2323a6a32c4265, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sourceMesh: {fileID: 799875429}
+  blendShapesToTrack:
+  - Blink_Left
+  - Blink_Right
+  - EyesWide_Left
+  - EyesWide_Right
+  - Squint_Left
+  - Squint_Right
 --- !u!1 &1984948991
 GameObject:
   m_ObjectHideFlags: 0
