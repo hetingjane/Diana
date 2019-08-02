@@ -58,7 +58,7 @@ public class SkeletonFrame : ModuleBase
     private void OnApplicationQuit()
     {
         Debug.Log("Closing sensor");
-        sensor.Close();
+	    if (sensor != null) sensor.Close();
         Debug.Log("Closed the sensor");
     }
 }
