@@ -75,9 +75,19 @@ public class DataStore : MonoBehaviour {
 		public static Vector3Value Zero = new Vector3Value(Vector3.zero);
 		public static Vector3Value One = new Vector3Value(Vector3.one);
 	}
-	
-	// Singleton instance of the DataStore class.
-	public static DataStore instance { get; private set; }
+
+    // FloatArrayValue: data storage of an arbitrary length 32-bit float array
+    public class FloatArrayValue : IValue
+    {
+        public float[] val;
+        public FloatArrayValue(float[] inVal) { this.val = inVal; }
+        public override string ToString() { return string.Join(",", val); }
+        public bool Equals(IValue other) { return other is FloatArrayValue && val == ((FloatArrayValue)other).val; }
+        public bool IsEmpty() { return false; }
+    }
+
+    // Singleton instance of the DataStore class.
+    public static DataStore instance { get; private set; }
 	
 	[Header("Configuration")]
 	[Tooltip("Whether to log all value changes with Debug.Log")]

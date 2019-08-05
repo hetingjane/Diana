@@ -21,6 +21,7 @@ and it should work.  Or use Python or whatever.
 */
 
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
@@ -168,22 +169,41 @@ public class SocketInterfaceModule : ModuleBase
 					client.WriteLine("Invalid argument to SETS command");
 				}
 			} break;
-		
-		case "SETV":		// set vector
-			{
-				string[] valparts = null;
-				if (parts.Length > 2) valparts = parts[2].Split(new char[]{' '});
-				Vector3 v;
-				if (valparts != null && valparts.Length > 2 && float.TryParse(valparts[0], out v.x)
-					&& float.TryParse(valparts[1], out v.y) && float.TryParse(valparts[2], out v.z)) {
-					SetValue(parts[1], v, "Set by client " + client.clientID);
-					client.WriteLine("OK");
-				} else {
-					client.WriteLine("Invalid argument to SETV command");
-				}
-			} break;
-		
-		case "SUB":			// subscribe
+
+            case "SETV":
+                {
+                    if (parts.Length > 2)
+                    {
+                        //float[] floats = parts[2].Split(',').Select(x => Single.Parse(x).ToArray();  // this could fail if the message is malformed
+                        float[] floats = Array.ConvertAll<string, float>(parts[2].Split(','), float.Parse);
+                        SetValue(parts[1], floats, "Set by client " + client.clientID);
+                        client.WriteLine("OK");
+                    }
+                    else
+                    {
+                        client.WriteLine("Invalid argument to SETV command");
+                    }
+                } break;
+
+            case "SETV3":       // set 3d vector
+                {
+                    string[] valparts = null;
+                    if (parts.Length > 2) valparts = parts[2].Split(new char[] { ' ' });
+                    Vector3 v;
+                    if (valparts != null && valparts.Length > 2 && float.TryParse(valparts[0], out v.x)
+                        && float.TryParse(valparts[1], out v.y) && float.TryParse(valparts[2], out v.z))
+                    {
+                        SetValue(parts[1], v, "Set by client " + client.clientID);
+                        client.WriteLine("OK");
+                    }
+                    else
+                    {
+                        client.WriteLine("Invalid argument to SETV command");
+                    }
+                }
+                break;
+
+            case "SUB":			// subscribe
 			{
 				string key = parts[1];
 				List<Client> clients;
