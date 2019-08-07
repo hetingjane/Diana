@@ -9,10 +9,12 @@ public class FaceUpdate : MonoBehaviour
     M3DCharacterManager charMgr;
     PlayerEmotions playerEmotions;
 
+    //DataStore dataStore;
     void Start()
     {
         playerEmotions = GetComponent<PlayerEmotions>();
         charMgr = GetComponent<M3DCharacterManager>();
+        //dataStore = GetComponent<DataStore>();
         Debug.Assert(playerEmotions != null);
         Debug.Assert(charMgr != null);
 
@@ -31,16 +33,17 @@ public class FaceUpdate : MonoBehaviour
                 if (score > 90)
                 {
                     charMgr.SetBlendshapeValue("eCTRLHappy", 100);
-
                 }
                 else
                 {
                     charMgr.SetBlendshapeValue("eCTRLHappy", 50);
 
                 }
+                //charMgr.SetBlendshapeValue("eCTRLSad", 0);
+
                 break;
             case Emotion.Angry:
-                if (score > 30)
+                if (score > 5)
                 {
                     charMgr.SetBlendshapeValue("eCTRLSad", 100);
                 }
@@ -49,6 +52,7 @@ public class FaceUpdate : MonoBehaviour
                     charMgr.SetBlendshapeValue("eCTRLSad", 50);
 
                 }
+                //charMgr.SetBlendshapeValue("eCTRLHappy", 0);
                 break;
             default:
                 break;
