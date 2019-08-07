@@ -13,17 +13,15 @@ public class PlayerEmotions : ImageResultsListener
 {
     float currentJoy = 0f;
     float currentAnger = 0f;
-    //float currentFear = 0f;
-    //float currentContempt = 0f;
     //public FeaturePoint[] featurePointsList;
 
     public Emotion dominantEmotion = Emotion.Neutral;
 
     [Range(0, 100)]
-    public float happyThreshold = 80f;
+    public float happyThreshold = 10f;
 
     [Range(0, 100)]
-    public float angryThreshold = 5f;
+    public float angryThreshold = 20f;
     public override void onFaceFound(float timestamp, int faceId)
     {
         Debug.Log("Found the face");
@@ -36,7 +34,6 @@ public class PlayerEmotions : ImageResultsListener
 
     public override void onImageResults(Dictionary<int, Face> faces)
     {
-        //Debug.Log("Got face results");
 
         foreach (KeyValuePair<int, Face> pair in faces)
         {
@@ -44,10 +41,8 @@ public class PlayerEmotions : ImageResultsListener
             Face face = pair.Value;    // Instance of the face class containing emotions, and facial expression values.
 
             //Retrieve the Emotions Scores
-            //face.Emotions.TryGetValue(Emotions.Contempt, out currentContempt);
             face.Emotions.TryGetValue(Emotions.Joy, out currentJoy);
             face.Emotions.TryGetValue(Emotions.Anger, out currentAnger);
-            //face.Emotions.TryGetValue(Emotions.Fear, out currentFear);
 
             //Retrieve the Smile Score
             //face.Expressions.TryGetValue(Expressions.Smile, out currentSmile);
