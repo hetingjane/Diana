@@ -13,18 +13,15 @@ public class PlayerEmotions : ImageResultsListener
 {
     float currentJoy = 0f;
     float currentAnger = 0f;
-    //float currentFear = 0f;
-    //float currentContempt = 0f;
     //public FeaturePoint[] featurePointsList;
 
     public Emotion dominantEmotion = Emotion.Neutral;
 
     [Range(0, 100)]
-    public float happyThreshold = 70f;
+    public float happyThreshold = 10f;
 
     [Range(0, 100)]
-    public float angryThreshold = 10f;
-
+    public float angryThreshold = 20f;
     public override void onFaceFound(float timestamp, int faceId)
     {
         Debug.Log("Found the face");
@@ -37,7 +34,6 @@ public class PlayerEmotions : ImageResultsListener
 
     public override void onImageResults(Dictionary<int, Face> faces)
     {
-        //Debug.Log("Got face results");
 
         foreach (KeyValuePair<int, Face> pair in faces)
         {
@@ -45,31 +41,40 @@ public class PlayerEmotions : ImageResultsListener
             Face face = pair.Value;    // Instance of the face class containing emotions, and facial expression values.
 
             //Retrieve the Emotions Scores
-            //face.Emotions.TryGetValue(Emotions.Contempt, out currentContempt);
             face.Emotions.TryGetValue(Emotions.Joy, out currentJoy);
             face.Emotions.TryGetValue(Emotions.Anger, out currentAnger);
-            //face.Emotions.TryGetValue(Emotions.Fear, out currentFear);
 
             //Retrieve the Smile Score
             //face.Expressions.TryGetValue(Expressions.Smile, out currentSmile);
 
-            if (currentJoy >= currentAnger)
+
+
+            if (currentJoy > happyThreshold)
             {
-                if (currentJoy > happyThreshold)
-                    dominantEmotion = Emotion.Happy;
+                dominantEmotion = Emotion.Happy;
+
+
+                var EmotionValue = new DataStore.IntValue((int)currentJoy);
+                DataStore.SetValue("user:dominant emotion:" + dominantEmotion.ToString(), EmotionValue, null, dominantEmotion.ToString());
+
             }
             else if (currentAnger > angryThreshold)
             {
                 dominantEmotion = Emotion.Angry;
+                var EmotionValue = new DataStore.IntValue((int)currentAnger);
+                DataStore.SetValue("user:dominant emotion:" + dominantEmotion.ToString(), EmotionValue, null, dominantEmotion.ToString());
+
             }
             else
             {
                 dominantEmotion = Emotion.Neutral;
-            }
+                DataStore.SetValue("user:dominant emotion:Happy" , new DataStore.IntValue(0), null, dominantEmotion.ToString());
+                DataStore.SetValue("user:dominant emotion:Angry", new DataStore.IntValue(0), null, dominantEmotion.ToString());
 
+            }
             //Retrieve the coordinates of the facial landmarks (face feature points)
             //featurePointsList = face.FeaturePoints;
-
         }
+
     }
 }
