@@ -22,8 +22,14 @@ public class SkeletonFrame : ModuleBase
 
     protected override void Start()
     {
-        base.Start();
-        sensor = new Perception.Kinect.KinectSensor(Perception.Kinect.KinectSensor.FrameType.Body);
+	    base.Start();
+	    try {
+		    sensor = new Perception.Kinect.KinectSensor(Perception.Kinect.KinectSensor.FrameType.Body);
+	    } catch (System.DllNotFoundException e) {
+	    	Debug.LogWarning("Kinect DLL not available; SkeletonFrame module disabled");
+	    	gameObject.SetActive(false);
+	    	return;
+	    }
         
         //This code sets the function to be executed on the arribal of a frame
         sensor.MultiSourceFrameArrived += OnMultiSourceFrameArrived;
