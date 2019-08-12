@@ -115,7 +115,7 @@ namespace Affdex
             }
             lib = NativeMethods.LoadLibrary (filename);
             if (lib == IntPtr.Zero) {
-                Debug.LogError ("Failed to load native library!");
+	            Debug.LogWarning("Failed to load native library!");
                 return false;
             }
             return true;
@@ -203,8 +203,8 @@ namespace Affdex
                 case State.STOPPED:
                     break;
                 case State.STARTING:
-                    StopCoroutine(startDetectorCoroutine);
-                    StopCoroutine(initializeCoroutine);
+	                if (startDetectorCoroutine != null) StopCoroutine(startDetectorCoroutine);
+	                if (initializeCoroutine != null) StopCoroutine(initializeCoroutine);
                     state = State.STOPPED;
                     break;
                 case State.STARTED:
@@ -293,7 +293,7 @@ namespace Affdex
                 yield return initializeCoroutine;
             }
 
-            if (nativePlatform.StartDetector() == 1)
+	        if (nativePlatform != null && nativePlatform.StartDetector() == 1)
             {
                 state = State.STARTED;
             }
@@ -501,7 +501,7 @@ namespace Affdex
             IntPtr retVal = dlopen (fileName, RTLD_NOW);
             var errPtr = dlerror ();
             if (errPtr != IntPtr.Zero) {
-                Debug.LogError (Marshal.PtrToStringAnsi (errPtr));
+	            Debug.LogWarning(Marshal.PtrToStringAnsi (errPtr));
             }
             return retVal;
         }
