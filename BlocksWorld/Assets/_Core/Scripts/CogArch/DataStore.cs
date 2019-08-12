@@ -191,7 +191,7 @@ public class DataStore : MonoBehaviour {
 			if (logFileStream == null) logFileStream = System.IO.File.AppendText("DataStore.log");
 			string line = string.Format("[{0}] {1} := {2} ({3}: {4})",
 				now.ToString("yyyy-MM-dd HH:mm:ss"),
-				key, value.ToString(), module.name, comment);
+				key, value.ToString(), module?.name ?? "", comment);
 			// under some circumstances the file may be busy, causing this to throw an error;
 			// in that case, we'd rather lose a line of logging than cause problems for the app
 			try {
