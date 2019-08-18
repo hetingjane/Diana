@@ -21,7 +21,7 @@ public class PlayerEmotions : ImageResultsListener
     public float happyThreshold = 10f;
 
     [Range(0, 100)]
-    public float angryThreshold = 20f;
+    public float angryThreshold = 10f;
     public override void onFaceFound(float timestamp, int faceId)
     {
         Debug.Log("Found the face");

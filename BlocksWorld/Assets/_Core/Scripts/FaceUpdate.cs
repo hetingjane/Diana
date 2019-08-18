@@ -1,20 +1,51 @@
 ﻿using UnityEngine;
 using MORPH3D;
 using System;
+using System.Collections.Generic;
 
 public class FaceUpdate : MonoBehaviour
 {
 
 
-    M3DCharacterManager charMgr;
+    // List of SkinnedMeshRenderers to change blend shapes on
+    List<SkinnedMeshRenderer> renderers;
+
+    // Index of the left and right blend shapes to set for each renderer above.
+    List<int> smileLeftIndex;
+    List<int> smileRightIndex;
+    List<int> frownLeftIndex;
+    List<int> frownRightIndex;
+
     PlayerEmotions playerEmotions;
 
     void Start()
     {
+        renderers = new List<SkinnedMeshRenderer>();
+        smileLeftIndex = new List<int>();
+        smileRightIndex = new List<int>();
+        frownLeftIndex = new List<int>();
+        frownRightIndex = new List<int>();
+
+        foreach (var smr in GetComponentsInChildren<SkinnedMeshRenderer>())
+        {
+            Mesh mesh = smr.sharedMesh;
+            int sleftIdx = mesh.GetBlendShapeIndex("Smile_Left");
+            int srightIdx = mesh.GetBlendShapeIndex("Smile_Right");
+            int fleftIdx = mesh.GetBlendShapeIndex("Frown_Left");
+            int frightIdx = mesh.GetBlendShapeIndex("Frown_Right");
+
+            if (sleftIdx >= 0 && srightIdx >= 0 && fleftIdx >= 0 && frightIdx >= 0)
+            {
+                renderers.Add(smr);
+                smileLeftIndex.Add(sleftIdx);
+                smileRightIndex.Add(srightIdx);
+                frownLeftIndex.Add(fleftIdx);
+                frownRightIndex.Add(frightIdx);
+            }
+        }
+
         playerEmotions = GetComponent<PlayerEmotions>();
-        charMgr = GetComponent<M3DCharacterManager>();
         Debug.Assert(playerEmotions != null);
-        Debug.Assert(charMgr != null);
 
     }
 
@@ -24,29 +55,54 @@ public class FaceUpdate : MonoBehaviour
         switch (playerEmotions.dominantEmotion)
         {
             case Emotion.Neutral:
-                charMgr.SetBlendshapeValue("eCTRLHappy", 0);
-                charMgr.SetBlendshapeValue("eCTRLSad", 0);
+                for (int i = 0; i < renderers.Count; i++)
+                {
+                    renderers[i].SetBlendShapeWeight(smileLeftIndex[i], 0);
+                    renderers[i].SetBlendShapeWeight(smileRightIndex[i], 0);
+                    renderers[i].SetBlendShapeWeight(frownLeftIndex[i], 0);
+                    renderers[i].SetBlendShapeWeight(frownRightIndex[i], 0);
+
+                }
                 break;
             case Emotion.Happy:
                 if (score > 90)
                 {
-                    charMgr.SetBlendshapeValue("eCTRLHappy", 100);
+                    for (int i = 0; i < renderers.Count; i++)
+                    {
+                        renderers[i].SetBlendShapeWeight(smileLeftIndex[i], 70);
+                        renderers[i].SetBlendShapeWeight(smileRightIndex[i], 70);
+
+                    }
                 }
                 else
                 {
-                    charMgr.SetBlendshapeValue("eCTRLHappy", 50);
+
+                    for (int i = 0; i < renderers.Count; i++)
+                    {
+                        renderers[i].SetBlendShapeWeight(smileLeftIndex[i], 30);
+                        renderers[i].SetBlendShapeWeight(smileRightIndex[i], 30);
+
+                    }
 
                 }
                 break;
             case Emotion.Angry:
-                if (score > 30)
+                if (score > 20)
                 {
-                    charMgr.SetBlendshapeValue("eCTRLSad", 100);
+                    for (int i = 0; i < renderers.Count; i++)
+                    {
+                        renderers[i].SetBlendShapeWeight(frownLeftIndex[i], 100);
+                        renderers[i].SetBlendShapeWeight(frownRightIndex[i], 100);
+
+                    }
                 }
                 else
                 {
-                    charMgr.SetBlendshapeValue("eCTRLSad", 50);
-
+                    for (int i = 0; i < renderers.Count; i++)
+                    {
+                        renderers[i].SetBlendShapeWeight(frownLeftIndex[i], 50);
+                        renderers[i].SetBlendShapeWeight(frownRightIndex[i], 50);
+                    }
                 }
                 break;
             default:
