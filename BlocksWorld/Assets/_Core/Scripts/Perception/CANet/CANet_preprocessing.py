@@ -15,6 +15,8 @@ import numpy as np
 import _ctypes
 import sys
 import time
+import threading
+import queue
 
 
 class Closest_Body_Frame(object):
@@ -72,8 +74,9 @@ class Preprocessed_Frame(object):
             return True
         return False
 
-class CANet_Preprocessor(object):
+class CANet_Preprocessor(threading.Thread):
     def __init__(self, engage_min, engage_max):
+        threading.Thread.__init__(self)
         self.kinect = PyKinectRuntime.PyKinectRuntime(PyKinectV2.FrameSourceTypes_Depth | PyKinectV2.FrameSourceTypes_Body)
         self.engage_min = engage_min
         self.engage_max = engage_max
@@ -84,6 +87,9 @@ class CANet_Preprocessor(object):
         self.cube_size = 396
         self.fallback_size = 200
         self.frames = []
+        self.queue = queue.Queue()
+        self.event = threading.Event()
+        self.frame = None
 
     def get_hand_positions(self):
         joint_points = self.kinect.body_joints_to_depth_space(self.cbf.closest_body.joints)
@@ -94,6 +100,13 @@ class CANet_Preprocessor(object):
 
     def new_body_frame_arrived(self):
         return self.kinect.has_new_body_frame()
+
+    def get_frame(self):
+        self.event.clear()
+        return self.frame
+
+    def event_set(self):
+        return self.event.is_set()
 
     def body_engaged(self):
         if self.cbf:
@@ -129,30 +142,37 @@ class CANet_Preprocessor(object):
         
         return mask
 
-    def get_frames(self):
-        if self.kinect.has_new_body_frame():
-            self.cbf = Closest_Body_Frame(self.kinect.get_last_body_frame(), self.engage_min, self.engage_max)
+    def run(self):
+        while True:
+            if self.kinect.has_new_body_frame():
+                self.cbf = Closest_Body_Frame(self.kinect.get_last_body_frame(), self.engage_min, self.engage_max)
 
-        if self.cbf and self.cbf.check_for_bodies():
-            if self.kinect.has_new_depth_frame():
-                self.df = self.kinect.get_last_depth_frame()
-                timestamp = time.time()
-                self.df = np.resize(self.df, (424, 512))
-                right_pos, left_pos = self.get_hand_positions()
-                left_mask = self.segment(left_pos)
-                right_mask = self.segment(right_pos)
+            if self.cbf and self.cbf.check_for_bodies():
+                if self.kinect.has_new_depth_frame():
+                    self.df = self.kinect.get_last_depth_frame()
+                    timestamp = time.time()
+                    self.df = np.resize(self.df, (424, 512))
+                    right_pos, left_pos = self.get_hand_positions()
+                    left_mask = self.segment(left_pos)
+                    right_mask = self.segment(right_pos)
 
-                return Preprocessed_Frame(self.df, left_mask, right_mask, timestamp, self.cbf.engaged)
+                    self.frame = Preprocessed_Frame(self.df, left_mask, right_mask, timestamp, self.cbf.engaged)
+                    self.event.set()
 
 
 
 class_instance = CANet_Preprocessor(0.0, 10.0)
+class_instance.start()
 total_time = 0
 frame_count = 0
 start = time.time()
 while True:
-    frame = class_instance.get_frames()
-    if frame:
+    if class_instance.event.is_set():
+        start = time.time()
+        frame_count+=1
+        class_instance.event.clear()
+        frame = class_instance.frame
+        print(1/(time.time() - start+.00001))
         cv2.imshow("frame", frame.frame)
         cv2.imshow("left mask", np.multiply(frame.left_mask, frame.frame))
         cv2.imshow("right mask", np.multiply(frame.right_mask, frame.frame))
