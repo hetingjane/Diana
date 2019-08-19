@@ -51,7 +51,7 @@ public class FaceUpdate : MonoBehaviour
 
     void Update()
     {
-        int score = DataStore.GetIntValue("user:dominant emotion:" + playerEmotions.dominantEmotion.ToString());
+        int score = DataStore.GetIntValue("user:dominantEmotion:" + playerEmotions.dominantEmotion.ToString());
         switch (playerEmotions.dominantEmotion)
         {
             case Emotion.Neutral:

@@ -55,21 +55,21 @@ public class PlayerEmotions : ImageResultsListener
 
 
                 var EmotionValue = new DataStore.IntValue((int)currentJoy);
-                DataStore.SetValue("user:dominant emotion:" + dominantEmotion.ToString(), EmotionValue, null, dominantEmotion.ToString());
+                DataStore.SetValue("user:dominantEmotion:" + dominantEmotion.ToString(), EmotionValue, null, dominantEmotion.ToString());
 
             }
             else if (currentAnger > angryThreshold)
             {
                 dominantEmotion = Emotion.Angry;
                 var EmotionValue = new DataStore.IntValue((int)currentAnger);
-                DataStore.SetValue("user:dominant emotion:" + dominantEmotion.ToString(), EmotionValue, null, dominantEmotion.ToString());
+                DataStore.SetValue("user:dominantEmotion:" + dominantEmotion.ToString(), EmotionValue, null, dominantEmotion.ToString());
 
             }
             else
             {
                 dominantEmotion = Emotion.Neutral;
-                DataStore.SetValue("user:dominant emotion:Happy" , new DataStore.IntValue(0), null, dominantEmotion.ToString());
-                DataStore.SetValue("user:dominant emotion:Angry", new DataStore.IntValue(0), null, dominantEmotion.ToString());
+                DataStore.SetValue("user:dominantEmotion:Happy" , new DataStore.IntValue(0), null, dominantEmotion.ToString());
+                DataStore.SetValue("user:dominantEmotion:Angry", new DataStore.IntValue(0), null, dominantEmotion.ToString());
 
             }
             //Retrieve the coordinates of the facial landmarks (face feature points)
