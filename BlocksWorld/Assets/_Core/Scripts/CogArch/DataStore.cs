@@ -45,25 +45,41 @@ public class DataStore : MonoBehaviour {
 		// For convenience (and efficiency), we define a couple of static 
 		// instances that represent True and False.
 		public static BoolValue True = new BoolValue(true);
-		public static BoolValue False = new BoolValue(false);		
-	}
-	
-	// IntValue: data storage of an integer value.
-	public class IntValue : IValue {
-		public int val;
-		public IntValue(int inVal) { this.val = inVal; }
-		public override string ToString() { return val.ToString(); }
-		public bool Equals(IValue other) { return other is IntValue && val == ((IntValue)other).val; }
-		public bool IsEmpty() { return false; }
-		
-		// Also for convenience, here are a couple of static instances
-		// that represent 0 and 1.  Use them when it's convenient.
-		public static IntValue Zero = new IntValue(0);
-		public static IntValue One = new IntValue(1);		
-	}
-	
-	// Vector3Value: data storage of a Vector3 (i.e. an x,y,z 3-tuple).
-	public class Vector3Value : IValue {
+		public static BoolValue False = new BoolValue(false);
+    }
+
+    // IntValue: data storage of an integer value.
+    public class IntValue : IValue
+    {
+        public int val;
+        public IntValue(int inVal) { this.val = inVal; }
+        public override string ToString() { return val.ToString(); }
+        public bool Equals(IValue other) { return other is IntValue && val == ((IntValue)other).val; }
+        public bool IsEmpty() { return false; }
+
+        // Also for convenience, here are a couple of static instances
+        // that represent 0 and 1.  Use them when it's convenient.
+        public static IntValue Zero = new IntValue(0);
+        public static IntValue One = new IntValue(1);
+    }
+
+    // IntValue: data storage of an integer value.
+    public class FloatValue : IValue
+    {
+        public float val;
+        public FloatValue(float inVal) { this.val = inVal; }
+        public override string ToString() { return val.ToString(); }
+        public bool Equals(IValue other) { return other is IntValue && val == ((IntValue)other).val; }
+        public bool IsEmpty() { return false; }
+
+        // Also for convenience, here are a couple of static instances
+        // that represent 0 and 1.  Use them when it's convenient.
+        public static FloatValue Zero = new FloatValue(0);
+        public static FloatValue One = new FloatValue(1);
+    }
+
+    // Vector3Value: data storage of a Vector3 (i.e. an x,y,z 3-tuple).
+    public class Vector3Value : IValue {
 		public Vector3 val;
 		public Vector3Value(Vector3 inVal) { this.val = inVal; }
 		public override string ToString() { return val.ToString(); }
@@ -191,7 +207,7 @@ public class DataStore : MonoBehaviour {
 			if (logFileStream == null) logFileStream = System.IO.File.AppendText("DataStore.log");
 			string line = string.Format("[{0}] {1} := {2} ({3}: {4})",
 				now.ToString("yyyy-MM-dd HH:mm:ss"),
-				key, value.ToString(), module.name, comment);
+				key, value.ToString(), module?.name ?? "", comment);
 			// under some circumstances the file may be busy, causing this to throw an error;
 			// in that case, we'd rather lose a line of logging than cause problems for the app
 			try {
@@ -246,41 +262,71 @@ public class DataStore : MonoBehaviour {
 		IValue value;
 		if (!store.TryGetValue(key, out value)) return defaultValue;
 		return value.ToString();
-	}
+    }
 
-	/// <summary>
-	/// Get an integer value associated with a given key.
-	/// </summary>
-	/// <param name="key">key of interest</param>
-	/// <param name="defaultValue">value to return if key is not found (or not integer)</param>
-	/// <returns>value for that key, or defaultValue</returns>
-	public int IGetIntValue(string key, int defaultValue=0) {
-		IValue value;
-		if (!store.TryGetValue(key, out value)) return defaultValue;
-		if (value is IntValue) return ((IntValue)value).val;
-		return defaultValue;
-	}
-	
-	/// <summary>
-	/// Get a Vector3 value associated with a given key.
-	/// </summary>
-	/// <param name="key">key of interest</param>
-	/// <param name="defaultValue">value to return if key is not found (or not Vector3)</param>
-	/// <returns>value for that key, or defaultValue</returns>
-	public Vector3 IGetVector3Value(string key, Vector3 defaultValue=default(Vector3)) {
-		IValue value;
-		if (!store.TryGetValue(key, out value)) return defaultValue;
-		if (value is Vector3Value) return ((Vector3Value)value).val;
-		return defaultValue;
-	}
+    /// <summary>
+    /// Get an integer value associated with a given key.
+    /// </summary>
+    /// <param name="key">key of interest</param>
+    /// <param name="defaultValue">value to return if key is not found (or not integer)</param>
+    /// <returns>value for that key, or defaultValue</returns>
+    public int IGetIntValue(string key, int defaultValue = 0)
+    {
+        IValue value;
+        if (!store.TryGetValue(key, out value)) return defaultValue;
+        if (value is IntValue) return ((IntValue)value).val;
+        return defaultValue;
+    }
 
-	/// <summary>
-	/// Return whether the given key exists in this DataStore, AND
-	/// has a non-empty value.
-	/// </summary>
-	/// <param name="key">key of interest</param>
-	/// <returns>true if key is found; false otherwise</returns>
-	public bool IHasValue(string key) {
+    /// <summary>
+    /// Get an integer value associated with a given key.
+    /// </summary>
+    /// <param name="key">key of interest</param>
+    /// <param name="defaultValue">value to return if key is not found (or not float)</param>
+    /// <returns>value for that key, or defaultValue</returns>
+    public float IGetFloatValue(string key, float defaultValue = 0)
+    {
+        IValue value;
+        if (!store.TryGetValue(key, out value)) return defaultValue;
+        if (value is FloatValue) return ((FloatValue)value).val;
+        return defaultValue;
+    }
+
+    /// <summary>
+    /// Get a Vector3 value associated with a given key.
+    /// </summary>
+    /// <param name="key">key of interest</param>
+    /// <param name="defaultValue">value to return if key is not found (or not Vector3)</param>
+    /// <returns>value for that key, or defaultValue</returns>
+    public Vector3 IGetVector3Value(string key, Vector3 defaultValue = default(Vector3))
+    {
+        IValue value;
+        if (!store.TryGetValue(key, out value)) return defaultValue;
+        if (value is Vector3Value) return ((Vector3Value)value).val;
+        return defaultValue;
+    }
+
+    /// <summary>
+    /// Get a FloatArray value associated with a given key.
+    /// </summary>
+    /// <param name="key">key of interest</param>
+    /// <param name="defaultValue">value to return if key is not found (or not Vector3)</param>
+    /// <returns>value for that key, or defaultValue</returns>
+    public float[] IGetFloatArrayValue(string key, float[] defaultValue = default(float[]))
+    {
+        IValue value;
+        if (!store.TryGetValue(key, out value)) return defaultValue;
+        if (value is FloatArrayValue) return ((FloatArrayValue)value).val;
+        return defaultValue;
+    }
+
+    /// <summary>
+    /// Return whether the given key exists in this DataStore, AND
+    /// has a non-empty value.
+    /// </summary>
+    /// <param name="key">key of interest</param>
+    /// <returns>true if key is found; false otherwise</returns>
+    public bool IHasValue(string key) {
 		IValue value;
 		if (!store.TryGetValue(key, out value)) return false;
 		return !value.IsEmpty();
@@ -342,35 +388,59 @@ public class DataStore : MonoBehaviour {
 	/// <returns>value for that key, or defaultValue</returns>
 	public static string GetStringValue(string key, string defaultValue=null) {
 		return instance.IGetStringValue(key, defaultValue);
-	}
-	
-	/// <summary>
-	/// Get an integer value associated with a given key.
-	/// </summary>
-	/// <param name="key">key of interest</param>
-	/// <param name="defaultValue">value to return if key is not found (or not integer)</param>
-	/// <returns>value for that key, or defaultValue</returns>
-	public static int GetIntValue(string key, int defaultValue=0) {
-		return instance.IGetIntValue(key, defaultValue);
-	}
-	
-	/// <summary>
-	/// Get a Vector3 value associated with a given key.
-	/// </summary>
-	/// <param name="key">key of interest</param>
-	/// <param name="defaultValue">value to return if key is not found (or not Vector3)</param>
-	/// <returns>value for that key, or defaultValue</returns>
-	public static Vector3 GetVector3Value(string key, Vector3 defaultValue=default(Vector3)) {
-		return instance.IGetVector3Value(key, defaultValue);
-	}
+    }
 
-	/// <summary>
-	/// Return whether the given key exists in this DataStore, AND
-	/// has a non-empty value.
-	/// </summary>
-	/// <param name="key">key of interest</param>
-	/// <returns>true if key is found; false otherwise</returns>
-	public static bool HasValue(string key) {
+    /// <summary>
+    /// Get an integer value associated with a given key.
+    /// </summary>
+    /// <param name="key">key of interest</param>
+    /// <param name="defaultValue">value to return if key is not found (or not integer)</param>
+    /// <returns>value for that key, or defaultValue</returns>
+    public static int GetIntValue(string key, int defaultValue = 0)
+    {
+        return instance.IGetIntValue(key, defaultValue);
+    }
+
+    /// <summary>
+    /// Get an integer value associated with a given key.
+    /// </summary>
+    /// <param name="key">key of interest</param>
+    /// <param name="defaultValue">value to return if key is not found (or not float)</param>
+    /// <returns>value for that key, or defaultValue</returns>
+    public static float GetFloatValue(string key, float defaultValue = 0)
+    {
+        return instance.IGetFloatValue(key, defaultValue);
+    }
+
+    /// <summary>
+    /// Get a Vector3 value associated with a given key.
+    /// </summary>
+    /// <param name="key">key of interest</param>
+    /// <param name="defaultValue">value to return if key is not found (or not Vector3)</param>
+    /// <returns>value for that key, or defaultValue</returns>
+    public static Vector3 GetVector3Value(string key, Vector3 defaultValue = default(Vector3))
+    {
+        return instance.IGetVector3Value(key, defaultValue);
+    }
+
+    /// <summary>
+    /// Get a float array value associated with a given key.
+    /// </summary>
+    /// <param name="key">key of interest</param>
+    /// <param name="defaultValue">value to return if key is not found (or not FloatArray)</param>
+    /// <returns>value for that key, or defaultValue</returns>
+    public static float[] GetFloatArrayValue(string key, float[] defaultValue = default(float[]))
+    {
+        return instance.IGetFloatArrayValue(key, defaultValue);
+    }
+
+    /// <summary>
+    /// Return whether the given key exists in this DataStore, AND
+    /// has a non-empty value.
+    /// </summary>
+    /// <param name="key">key of interest</param>
+    /// <returns>true if key is found; false otherwise</returns>
+    public static bool HasValue(string key) {
 		return instance.IHasValue(key);
 	}
 

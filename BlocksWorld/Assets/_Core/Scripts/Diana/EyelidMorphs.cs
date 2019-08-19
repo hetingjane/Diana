@@ -31,7 +31,6 @@ public class EyelidMorphs : MonoBehaviour
 				renderers.Add(smr);
 				blinkLeftIndex.Add(leftIdx);
 				blinkRightIndex.Add(rightIdx);
-				Debug.Log("EyelidMorphs: noted renderer " + smr + " with blend shapes " + leftIdx + " and " + rightIdx);
 			}
 		}
 	}
