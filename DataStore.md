@@ -32,6 +32,10 @@
 |user:joint:timestamp       |String |Reals>=0|Timestamp of arrival of body frame                                        |
 |user:engaged               |Boolean|T or F  |True if closest body frame is engaged and false otherwise                 |
 |user:pointPos:right        |Vector3|Reals   |Location of right hand pointing position in pixel space. (z==0)           |
-|user:pointPos:right:valid  |Boolean|T or F  |Tells whether or not the user's right hand is pointing at the screen      |
+|user:pointPos:right:valid  |Boolean|T or F  |True if pointing at screen and false if not pointing at screen            |
 |user:pointPos:left         |Vector3|Reals   |Location of left hand pointing position in pixel space. (z==0)            |
-|user:pointPos:left:valid   |Boolean|T or F  |Tells whether or not the user's left hand is pointing at the screen       |
+|user:pointPos:left:valid   |Boolean|T or F  |True if pointing at screen and false if not pointing at screen            |
+|user:isPointing            |Boolean|T or F  |True if ray cast into scene hits something and False otherwise            |
+|user:pointPos              |Vector3|        |Location of pointing position in the scene                                |
+|user:pointValid            |Boolean|T or F  |True if the user is pointing at a valid location (Table) false otherwise  |
+
