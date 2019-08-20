@@ -69,7 +69,7 @@ public class ModuleBase : MonoBehaviour {
 		SetValue(key, new DataStore.Vector3Value(value), comment);
     }
 
-    /// Set a Vector3 value in the data store, and also update our module display (if any).
+    /// Set a float array value in the data store, and also update our module display (if any).
     protected void SetValue(string key, float[] value, string comment) {
         SetValue(key, new DataStore.FloatArrayValue(value), comment);
     }
