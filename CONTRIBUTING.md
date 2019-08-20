@@ -36,5 +36,11 @@ Source: [chris.beams.io](https://chris.beams.io/posts/git-commit/)
 ## BlocksWorld
 
 ### Modules
-Modules are the preferred way to communicate with `DataStore`.
-- A module class should always a `Module` suffix.
+Modules (i.e. subclasses of `ModuleBase`) are the preferred way to communicate with `DataStore` (the blackboard).
+- A module class name should always end with a `Module` suffix.
+- Header comments should briefly explain what the module does, and list the blackboard values that the module reads and writes.
+- If a class can't derive from `ModuleBase` (for example because it needs to subclass something else for important functionality), that's OK.  Note what blackboard values it reads and writes in the header anyway.
+
+### Capitalization
+- Class and method names should always begin with an uppercase letter: `SampleClass`, `SampleMethod`.
+- Field/property names should begin with lower case: `sampleProperty`.
