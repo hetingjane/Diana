@@ -2,7 +2,14 @@
 This file summarizes any code conventions being followed in the individual projects and Git in general.
 
 ## Git
+
+### Small commits
+A commit should only have related changes. Any time you find yourself using a `;` or `and` in your commit message, think if you can separate the commit into multiple commits. This doesn't mean that small commits can't change multiple files. In fact, they often do. However, the focus of the commit should always be that _one_ bug fix or feature addition.
+
+Small commits are easy to revert, and reduce project maintenance pain in the long run.
+
 ### Write a good Git commit message
+
 - **Limit the subject line to 50 characters** Keeping subject lines at this length ensures that they are readable, and forces the author to think for a moment about the most concise way to explain what’s going on. However, consider 72 the hard limit.
 
 - **Do not end the subject line with a period** Trailing punctuation is unnecessary in subject lines. Besides, space is precious when you’re trying to keep them to 50 chars or less.
