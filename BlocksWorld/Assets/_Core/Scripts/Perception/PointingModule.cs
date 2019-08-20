@@ -101,7 +101,7 @@ public class PointingModule : ModuleBase
 
             if (calibrationMode)
             {
-                DataStore.SetValue("user:pointpos:left", new DataStore.Vector3Value(leftPointPos), this, leftPointPos.ToString());
+                DataStore.SetValue("user:pointPos:left", new DataStore.Vector3Value(leftPointPos), this, leftPointPos.ToString());
             }
             else
             {
@@ -115,13 +115,13 @@ public class PointingModule : ModuleBase
 
                 if (CheckValidRange(leftPointList[0]))
                 {
-                    DataStore.SetValue("user:pointpos:left", new DataStore.Vector3Value(leftPointList[0]), this, leftPointList[0].ToString());
-                    DataStore.SetValue("user:pointpos:left:valid", new DataStore.BoolValue(true), this, leftPointList[0].ToString() + " is valid");
+                    DataStore.SetValue("user:pointPos:left", new DataStore.Vector3Value(leftPointList[0]), this, leftPointList[0].ToString());
+                    DataStore.SetValue("user:pointPos:left:valid", new DataStore.BoolValue(true), this, leftPointList[0].ToString() + " is valid");
                 }
                 else
                 {
-                    DataStore.SetValue("user:pointpos:left", new DataStore.Vector3Value(leftPointList[0]), this, leftPointList[0].ToString());
-                    DataStore.SetValue("user:pointpos:left:valid", new DataStore.BoolValue(false), this, leftPointList[0].ToString() + " is valid");
+                    DataStore.SetValue("user:pointPos:left", new DataStore.Vector3Value(leftPointList[0]), this, leftPointList[0].ToString());
+                    DataStore.SetValue("user:pointPos:left:valid", new DataStore.BoolValue(false), this, leftPointList[0].ToString() + " is valid");
                 }
             }
         }
