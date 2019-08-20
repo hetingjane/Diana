@@ -300,7 +300,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 37968907}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b84d28caaf304074b8960e55d1768e83, type: 3}
+  m_Script: {fileID: 11500000, guid: 289bb248cae794441882a99c68e2c865, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   comment: 
@@ -25620,11 +25620,11 @@ MonoBehaviour:
   comment: 
   display: {fileID: 0}
   calibrationMode: 0
-  windowSize: 5
-  rHKinSpaceTopRight: {x: 0.2, y: -0.2, z: 1}
-  rHKinSpaceBotLeft: {x: -0.2, y: -0.4, z: 1}
-  lHKinSpaceTopRight: {x: 0.5, y: -0.2, z: 1}
-  lHKinSpaceBotLeft: {x: 0.0001, y: -0.4, z: 1}
+  windowSize: 3
+  rHKinSpaceTopRight: {x: 0.1, y: -0.2, z: 1}
+  rHKinSpaceBotLeft: {x: -0.3, y: -0.4, z: 1}
+  lHKinSpaceTopRight: {x: 0.4, y: -0.2, z: 1}
+  lHKinSpaceBotLeft: {x: 0.0001, y: -0.5, z: 1}
 --- !u!4 &1805515788 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400200, guid: fd057c956d7529e4eac402957038c900,
