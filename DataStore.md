@@ -1,3 +1,15 @@
+# General Principles
+
+Data store keys form a hierarchy, with two or more parts separated by colons.  
+The top-level part is always either "me" (refers to something about Diana) or
+"user" (refers to the human participant).
+
+Groupings at the second level are somewhat arbitrary, but do try to group related things together.
+
+As a general rule, each part of a key should be named like a variable or property in C#, i.e., lowerCamelCase.
+(But we haven't been entirely consistent about this, and it's no big deal.)
+
+
 # Key-Value Pairs
 
 |Key                        |Type   |Value(s)|Meaning                                                                   |
