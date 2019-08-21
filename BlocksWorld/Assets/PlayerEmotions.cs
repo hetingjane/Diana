@@ -54,15 +54,15 @@ public class PlayerEmotions : ImageResultsListener
                 dominantEmotion = Emotion.Happy;
 
 
-                var EmotionValue = new DataStore.IntValue((int)currentJoy);
-                DataStore.SetValue("user:dominantEmotion:" + dominantEmotion.ToString(), EmotionValue, null, dominantEmotion.ToString());
+                var emotionValue = new DataStore.IntValue((int)currentJoy);
+                DataStore.SetValue("user:dominantEmotion:" + dominantEmotion.ToString(), emotionValue, null, dominantEmotion.ToString());
 
             }
             else if (currentAnger > angryThreshold)
             {
                 dominantEmotion = Emotion.Angry;
-                var EmotionValue = new DataStore.IntValue((int)currentAnger);
-                DataStore.SetValue("user:dominantEmotion:" + dominantEmotion.ToString(), EmotionValue, null, dominantEmotion.ToString());
+                var emotionValue = new DataStore.IntValue((int)currentAnger);
+                DataStore.SetValue("user:dominantEmotion:" + dominantEmotion.ToString(), emotionValue, null, dominantEmotion.ToString());
 
             }
             else

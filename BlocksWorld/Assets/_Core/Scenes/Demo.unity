@@ -7319,6 +7319,7 @@ GameObject:
   - component: {fileID: 534669903}
   - component: {fileID: 534669908}
   - component: {fileID: 534669906}
+  - component: {fileID: 534669909}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -7422,6 +7423,21 @@ MonoBehaviour:
   discrete: 0
   emotions: 17
   expressions: 0
+--- !u!114 &534669909
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 534669902}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b8f165f41e3ddb46afb727bd1f52d22, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dominantEmotion: 0
+  happyThreshold: 10
+  angryThreshold: 10
 --- !u!21 &563496597
 Material:
   serializedVersion: 6
@@ -20936,21 +20952,6 @@ MonoBehaviour:
   head: {fileID: 0}
   leftEye: {fileID: 1175045825}
   rightEye: {fileID: 1843018822}
---- !u!114 &1463965743
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1463965736}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4b8f165f41e3ddb46afb727bd1f52d22, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  dominantEmotion: 0
-  happyThreshold: 10
-  angryThreshold: 10
 --- !u!1 &1475041667
 GameObject:
   m_ObjectHideFlags: 0

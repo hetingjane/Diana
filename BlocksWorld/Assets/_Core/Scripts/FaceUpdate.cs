@@ -17,6 +17,7 @@ public class FaceUpdate : MonoBehaviour
     List<int> frownRightIndex;
 
     PlayerEmotions playerEmotions;
+    GameObject player;
 
     void Start()
     {
@@ -43,9 +44,12 @@ public class FaceUpdate : MonoBehaviour
                 frownRightIndex.Add(frightIdx);
             }
         }
-
-        playerEmotions = GetComponent<PlayerEmotions>();
-        Debug.Assert(playerEmotions != null);
+        player = GameObject.Find("Main Camera");
+        playerEmotions = player.GetComponent<PlayerEmotions>();
+        if (playerEmotions == null)
+        {
+            Debug.LogError("No playerEmotions component found.");
+        }
 
     }
 
