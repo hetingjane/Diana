@@ -15,7 +15,6 @@ As a general rule, each part of a key should be named like a variable or propert
 |Key                        |Type   |Value(s)|Meaning                                                                   |
 |---------------------------|-------|--------|--------------------------------------------------------------------------|
 |me:alertness               |Integer|0 to 10 |How alert Diana is; 0 = asleep, 7 = normal, 10 = hyperexcited             |
-|me:alertness               |Integer|0 to 10 |How alert Diana is; 0 = asleep, 7 = normal, 10 = hyperexcited             |
 |me:attending               |String |        |What Diana is paying attention to: "none", "user"                         |
 |me:eyes:open               |Integer|0 to 100|Current position of Diana's eyelids; 0 = closed, 100 = wide open          |
 |me:gesture                 |String |        |Name of gesture user is currently doing, e.g. "stop", "servo left", etc.  |
