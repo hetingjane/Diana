@@ -2,9 +2,9 @@ import threading
 import queue
 import sys
 
-from .base_classifier import BaseClassifier
-from . import RandomForest
-from .RandomForest.threaded_one_shot import OneShotWorker
+from base_classifier import BaseClassifier
+import RandomForest
+from RandomForest.threaded_one_shot import OneShotWorker
 
 sys.modules['RandomForest'] = RandomForest  # to load the pickle file
 

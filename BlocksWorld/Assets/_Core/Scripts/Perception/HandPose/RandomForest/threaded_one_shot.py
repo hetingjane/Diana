@@ -6,7 +6,7 @@ import queue
 import os
 import time
 
-from components.handRecognition.depth_client import is_gesture, is_bright
+from depth_client import is_gesture, is_bright
 
 
 class OneShotWorker(threading.Thread):

@@ -6,14 +6,58 @@ from pykinect2.PyKinectV2 import *
 from pykinect2 import PyKinectRuntime
 
 
+class Closest_Body_Frame(object):
+    def __init__(self, body_frame, engage_min, engage_max):
+        self.body_frame = body_frame
+        self.engage_min = engage_min
+        self.engage_max = engage_max
+        self.engaged = False
+        self.bodies_tracked = 0
+        self.closest_body = None
+
+        tracked_bodies = {}
+        for body in self.body_frame.bodies:
+            if body.is_tracked:
+                tracked_bodies[self.distance_from_kinect(body)] = body
+                self.bodies_tracked += 1
+
+        if self.bodies_tracked > 0:
+            self.closest_body = tracked_bodies[min(tracked_bodies.keys())]
+            self.engaged = self.is_engaged(self.closest_body)
+
+    def distance_from_kinect(self, body):
+        pos = body.joints[JointType_SpineBase].Position
+        return pos.x ** 2 + pos.y ** 2 + pos.z ** 2
+
+    def is_engaged(self, body):
+        if body is None:
+            return False
+        dist = self.distance_from_kinect(body)
+        return self.engage_min < dist and self.engage_max > dist
+
+    def check_for_bodies(self):
+        if self.bodies_tracked > 0:
+            return True
+        return False
+
 class Kinect:
-    def __init__(self, segment_size):
+    def __init__(self, segment_size, engage_min, engage_max):
         self.segment_size = segment_size
         self.kinect = PyKinectRuntime.PyKinectRuntime(PyKinectV2.FrameSourceTypes_Depth | PyKinectV2.FrameSourceTypes_Body)
         self.latest_frames = None
 
         self.active_arm_threshold = 0.16
         self.pixel_intensity_threshold = 0.4
+        self.engage_min = engage_min
+        self.engage_max = engage_max
+        self.sensor_height = 424
+        self.sensor_width = 512
+        self.cbf = None
+        self.df = None
+        self.fx = 288.03
+        self.fy = 287.07
+        self.cube_size = 396
+        self.fallback_size = 200
 
     @staticmethod
     def _threshold(value, minimum, maximum):
@@ -52,55 +96,68 @@ class Kinect:
             return False
         return True
 
-    def _preprocess_hand_arr(self, depth_data, posx, posy, height, width):
-        hand_arr = np.array(depth_data, dtype=np.float32).reshape((height, width))
-        posz = hand_arr[int(posx), int(posy)]
-        hand_arr -= posz
-        hand_arr /= 150
-        hand_arr = np.clip(hand_arr, -1, 1)
+    def _segment(self, depth_data, joints, joints_to_segment):
+        x_start = 0
+        y_start = 0
+        x_end = self.fallback_size
+        y_end = self.fallback_size
+        depth_valid = True
+
+        hand_arr = np.array(depth_data, dtype=np.float32).reshape((self.sensor_height, self.sensor_width))
+        segmented_frames = []
+        for joint in joints_to_segment:
+            x = joints[joint].x
+            y = joints[joint].y
+
+            if x < 0 or x >= self.sensor_width or y < 0 or y >=self.sensor_height:
+                continue
+
+            z = hand_arr[int(x), int(y)]
+
+            if z == 0:
+                continue
+
+            segmented = np.copy(hand_arr)
+            segmented -= z
+            segmented /= 150
+            segmented = np.clip(segmented, -1, 1)
+
+            x_start = int(x - (self.cube_size * self.fx) / (2 * z))
+            x_start = max(x_start, 0)
+            x_end = int(x + (self.cube_size * self.fx) / (2 * z))
+            x_end = min(x_end, self.sensor_width - 1)
+
+            y_start = int(y - (self.cube_size * self.fy) / (2 * z))
+            y_start = max(y_start, 0)
+            y_end = int(y + (self.cube_size * self.fy) / (2 * z))
+            y_end = min(y_end, self.sensor_height - 1)
+
+            segmented = segmented[y_start:y_end, x_start, x_end]
+
+
+            segmented = np.pad(segmented)
+
         hand_arr = resize(hand_arr, (168, 168))
         hand_arr = hand_arr[20:-20, 20:-20]
         hand_arr = hand_arr.reshape((1, 128, 128, 1))
 
-        return hand_arr
-
-    def _segment(self, joint, joint_points, frame):
-        point = joint_points[joint]
-        height = frame.shape[0]
-        width = frame.shape[1]
-        x_min = self._threshold(point.x - self.segment_size // 2, 0, width)
-        x_max = self._threshold(point.x + self.segment_size // 2, 0, width)
-        y_min = self._threshold(point.y - self.segment_size // 2, 0, height)
-        y_max = self._threshold(point.y - self.segment_size // 2, 0, height)
-        seg_frame = frame[y_min:y_max, x_min:x_max, :]
-        seg_frame = self._preprocess_hand_arr(seg_frame, point.x, point.y, self.segment_size, self.segment_size)
-        return seg_frame
-
-    def _get_closest_body(self):
-        closest_head_z = float('inf')
-        closest_body = None
-        for body in self.kinect.get_last_body_frame().bodies():
-            if body.joints[JointType_Head].z < closest_head_z:
-                closest_body = body
-        return closest_body
+        return mask
 
     def get(self):
         if not self.kinect.has_new_body_frame():
-            time.sleep(1/120)
             return self.latest_frames
 
-        closest_body = self._get_closest_body()
+        closest_body = Closest_Body_Frame(self.kinect.get_last_body_frame(), self.engage_min, self.engage_max)
 
-        joint_points = self.kinect.body_joints_to_depth_space(closest_body.joints)
+        if not closest_body or not closest_body.check_for_bodies():
+            return self.latest_frames
+
+        joint_points = self.kinect.body_joints_to_depth_space(closest_body.closest_body.joints)
         frame = self.kinect.get_last_depth_frame()
 
-        # segment depth frame around hands
-        # TODO base image size on Z distance, then up/downscale to standard size
-        LH_frame = self._segment(JointType_HandLeft, joint_points, frame)
-        RH_frame = self._segment(JointType_HandRight, joint_points, frame)
-
+        # segment and preprocess depth frame around hands
+        self.latest_frames = self._segment(frame, joint_points, [JointType_HandLeft, JointType_HandRight])
         # this is where we could add a routine for queuing frames or something, right now is LILO
-        self.latest_frames = LH_frame, RH_frame
 
         return self.latest_frames
 
