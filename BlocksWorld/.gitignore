@@ -37,3 +37,7 @@ sysinfo.txt
 
 # Ignore the Logs
 Logs/
+
+# Ignore python cache
+__pycache__/
+*.py[cod]

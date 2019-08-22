@@ -1,0 +1,48 @@
+import time
+import numpy as np
+from realtime_hand_recognition import RealTimeHandRecognition, RealTimeHandRecognitionOneShot
+from kinect import Kinect
+from socket_api import SocketAPI
+from postures import left_hand_postures, right_hand_postures
+
+# kinect frame processing settings
+SEGMENT_SIZE = 224  # the resulting size of the segmented depth frame (square)
+ENGAGE_MIN = 0
+ENGAGE_MAX = 10
+
+# socket interface settings
+TCP_IP = '127.0.0.1'  # IP address to connect to
+TCP_PORT = 38276  # port number to connect to
+BUFFER_SIZE = 1024  # size of receive buffer (1k should be plenty)
+TERMINATOR = "\r\n"  # message terminator (required)
+ACK_TIMEOUT = 2  # how long to wait for a response from the server
+
+class DepthClient:
+    def __init__(self):
+        self.kinect = Kinect(SEGMENT_SIZE, ENGAGE_MIN, ENGAGE_MAX)
+        self.socket_api = SocketAPI(TCP_IP, TCP_PORT, BUFFER_SIZE, ACK_TIMEOUT, TERMINATOR)
+        self.HandModel = RealTimeHandRecognition("RH", 32, 2)
+
+    def run(self):
+        while True:
+            frames = self.kinect.get()
+            if frames is None:
+                print("waiting for frames...")
+                time.sleep(1/30)
+                continue
+            (LH_probs, LH_out), (RH_probs, RH_out) = self.HandModel.classifyLR(frames[0], frames[1])
+            LH_idx = np.argmax(LH_out)
+            LH_label = left_hand_postures[LH_idx]
+            RH_idx = np.argmax(RH_out)
+            RH_label = right_hand_postures[RH_idx]
+            #self.socket_api.send_to_server("user:hands:left:probs", LH_out)
+            self.socket_api.set("user:hands:left:argmax", int(LH_idx))
+            self.socket_api.set("user:hands:left:label", LH_label)
+            #self.socket_api.send_to_server("user:hands:right:probs", RH_out)
+            self.socket_api.set("user:hands:right:argmax", int(RH_idx))
+            self.socket_api.set("user:hands:right:label", RH_label)
+            print(left_hand_postures[np.argmax(LH_out)], right_hand_postures[np.argmax(RH_out)])
+
+if __name__ == '__main__':
+    client = DepthClient()
+    client.run()
