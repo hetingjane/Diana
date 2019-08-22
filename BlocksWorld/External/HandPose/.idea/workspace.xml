@@ -3,40 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="3b3d1d30-805d-4662-a3eb-d73120095f9a" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/../../Assets/Watson/Scripts/Editor/Help/LastBuild.log.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Assets/_Core/Scripts/Perception/HandPose.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Assets/_Core/Scripts/Perception/HandPose/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Assets/_Core/Scripts/Perception/HandPose/README.md.meta" beforeDir="false" afterPath="$PROJECT_DIR$/README.md.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Assets/_Core/Scripts/Perception/HandPose/RandomForest.meta" beforeDir="false" afterPath="$PROJECT_DIR$/RandomForest.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Assets/_Core/Scripts/Perception/HandPose/RandomForest/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/RandomForest/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Assets/_Core/Scripts/Perception/HandPose/RandomForest/__init__.py.meta" beforeDir="false" afterPath="$PROJECT_DIR$/RandomForest/__init__.py.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Assets/_Core/Scripts/Perception/HandPose/RandomForest/forest.py" beforeDir="false" afterPath="$PROJECT_DIR$/RandomForest/forest.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Assets/_Core/Scripts/Perception/HandPose/RandomForest/forest.py.meta" beforeDir="false" afterPath="$PROJECT_DIR$/RandomForest/forest.py.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Assets/_Core/Scripts/Perception/HandPose/RandomForest/node.py" beforeDir="false" afterPath="$PROJECT_DIR$/RandomForest/node.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Assets/_Core/Scripts/Perception/HandPose/RandomForest/node.py.meta" beforeDir="false" afterPath="$PROJECT_DIR$/RandomForest/node.py.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Assets/_Core/Scripts/Perception/HandPose/RandomForest/parameters.py" beforeDir="false" afterPath="$PROJECT_DIR$/RandomForest/parameters.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Assets/_Core/Scripts/Perception/HandPose/RandomForest/parameters.py.meta" beforeDir="false" afterPath="$PROJECT_DIR$/RandomForest/parameters.py.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Assets/_Core/Scripts/Perception/HandPose/RandomForest/threaded_one_shot.py" beforeDir="false" afterPath="$PROJECT_DIR$/RandomForest/threaded_one_shot.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Assets/_Core/Scripts/Perception/HandPose/RandomForest/threaded_one_shot.py.meta" beforeDir="false" afterPath="$PROJECT_DIR$/RandomForest/threaded_one_shot.py.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Assets/_Core/Scripts/Perception/HandPose/RandomForest/tree.py" beforeDir="false" afterPath="$PROJECT_DIR$/RandomForest/tree.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Assets/_Core/Scripts/Perception/HandPose/RandomForest/tree.py.meta" beforeDir="false" afterPath="$PROJECT_DIR$/RandomForest/tree.py.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Assets/_Core/Scripts/Perception/HandPose/base_classifier.py" beforeDir="false" afterPath="$PROJECT_DIR$/base_classifier.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Assets/_Core/Scripts/Perception/HandPose/base_classifier.py.meta" beforeDir="false" afterPath="$PROJECT_DIR$/base_classifier.py.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Assets/_Core/Scripts/Perception/HandPose/blacklist.py" beforeDir="false" afterPath="$PROJECT_DIR$/blacklist.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Assets/_Core/Scripts/Perception/HandPose/blacklist.py.meta" beforeDir="false" afterPath="$PROJECT_DIR$/blacklist.py.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Assets/_Core/Scripts/Perception/HandPose/depth_client.py" beforeDir="false" afterPath="$PROJECT_DIR$/depth_client.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Assets/_Core/Scripts/Perception/HandPose/depth_client.py.meta" beforeDir="false" afterPath="$PROJECT_DIR$/depth_client.py.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Assets/_Core/Scripts/Perception/HandPose/hands_resnet_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/hands_resnet_model.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Assets/_Core/Scripts/Perception/HandPose/hands_resnet_model.py.meta" beforeDir="false" afterPath="$PROJECT_DIR$/hands_resnet_model.py.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Assets/_Core/Scripts/Perception/HandPose/kinect.py" beforeDir="false" afterPath="$PROJECT_DIR$/kinect.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Assets/_Core/Scripts/Perception/HandPose/kinect.py.meta" beforeDir="false" afterPath="$PROJECT_DIR$/kinect.py.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Assets/_Core/Scripts/Perception/HandPose/one_shot_classifier.py" beforeDir="false" afterPath="$PROJECT_DIR$/one_shot_classifier.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Assets/_Core/Scripts/Perception/HandPose/one_shot_classifier.py.meta" beforeDir="false" afterPath="$PROJECT_DIR$/one_shot_classifier.py.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Assets/_Core/Scripts/Perception/HandPose/postures.py" beforeDir="false" afterPath="$PROJECT_DIR$/postures.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Assets/_Core/Scripts/Perception/HandPose/postures.py.meta" beforeDir="false" afterPath="$PROJECT_DIR$/postures.py.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Assets/_Core/Scripts/Perception/HandPose/realtime_hand_recognition.py" beforeDir="false" afterPath="$PROJECT_DIR$/realtime_hand_recognition.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Assets/_Core/Scripts/Perception/HandPose/realtime_hand_recognition.py.meta" beforeDir="false" afterPath="$PROJECT_DIR$/realtime_hand_recognition.py.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Assets/_Core/Scripts/Perception/HandPose/socket_api.py" beforeDir="false" afterPath="$PROJECT_DIR$/socket_api.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Assets/_Core/Scripts/Perception/HandPose/socket_api.py.meta" beforeDir="false" afterPath="$PROJECT_DIR$/socket_api.py.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/depth_client.py" beforeDir="false" afterPath="$PROJECT_DIR$/depth_client.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/postures.py" beforeDir="false" afterPath="$PROJECT_DIR$/postures.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -58,14 +27,23 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/depth_client.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="564">
-              <caret line="39" column="54" selection-start-line="39" selection-start-column="33" selection-end-line="39" selection-end-column="54" />
+            <state relative-caret-position="110">
+              <caret line="5" column="75" selection-start-line="5" selection-start-column="75" selection-end-line="5" selection-end-column="75" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/postures.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="352">
+              <caret line="28" column="51" lean-forward="true" selection-start-line="28" selection-start-column="51" selection-end-line="28" selection-end-column="51" />
             </state>
           </provider>
         </entry>
@@ -86,10 +64,10 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/realtime_hand_recognition.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="298">
+            <state relative-caret-position="628">
               <caret line="32" column="52" selection-start-line="32" selection-start-column="52" selection-end-line="32" selection-end-column="52" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
@@ -134,8 +112,9 @@
         <option value="C:/Program Files (x86)/Microsoft Visual Studio/Shared/Anaconda3_64/Lib/site-packages/pykinect2/PyKinectV2.py" />
         <option value="$PROJECT_DIR$/kinect.py" />
         <option value="$PROJECT_DIR$/socket_api.py" />
-        <option value="$PROJECT_DIR$/depth_client.py" />
         <option value="$PROJECT_DIR$/realtime_hand_recognition.py" />
+        <option value="$PROJECT_DIR$/postures.py" />
+        <option value="$PROJECT_DIR$/depth_client.py" />
       </list>
     </option>
   </component>
@@ -151,10 +130,10 @@
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="-8" />
-    <option name="y" value="-8" />
-    <option name="width" value="1936" />
-    <option name="height" value="1056" />
+    <option name="x" value="-10" />
+    <option name="y" value="-10" />
+    <option name="width" value="2420" />
+    <option name="height" value="1320" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -180,7 +159,7 @@
     <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../.." />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="restartRequiresConfirmation" value="false" />
@@ -207,7 +186,7 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="C:\ProgramData\Anaconda3\python.exe" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/../.." />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
@@ -238,7 +217,7 @@
       <workItem from="1566496783315" duration="668000" />
       <workItem from="1566499547301" duration="271000" />
       <workItem from="1566499937976" duration="5282000" />
-      <workItem from="1566505775599" duration="94000" />
+      <workItem from="1566505775599" duration="975000" />
     </task>
     <task id="LOCAL-00001" summary="mid-change commit--fixing segmentation">
       <created>1566420955950</created>
@@ -258,18 +237,18 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="22747000" />
+    <option name="totallyTimeSpent" value="23628000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
+    <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.20415778" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.25670242" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.35102925" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.35077792" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.37378114" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -300,7 +279,7 @@
     <option name="LAST_COMMIT_MESSAGE" value="mid-change again--segmentation is improving" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/HandPose$depth_client.coverage" NAME="depth_client Coverage Results" MODIFIED="1566503851421" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/HandPose$depth_client.coverage" NAME="depth_client Coverage Results" MODIFIED="1566516592694" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../.." />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/blacklist.py">
@@ -353,9 +332,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/postures.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/kinect.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="3036">
@@ -376,16 +352,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/depth_client.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="564">
-          <caret line="39" column="54" selection-start-line="39" selection-start-column="33" selection-end-line="39" selection-end-column="54" />
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/hands_resnet_model.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-5618" />
@@ -400,10 +366,27 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/realtime_hand_recognition.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="298">
+        <state relative-caret-position="628">
           <caret line="32" column="52" selection-start-line="32" selection-start-column="52" selection-end-line="32" selection-end-column="52" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/postures.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="352">
+          <caret line="28" column="51" lean-forward="true" selection-start-line="28" selection-start-column="51" selection-end-line="28" selection-end-column="51" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/depth_client.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="110">
+          <caret line="5" column="75" selection-start-line="5" selection-start-column="75" selection-end-line="5" selection-end-column="75" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
           </folding>
         </state>
       </provider>

@@ -26,6 +26,8 @@ right_hand_postures = ['rh blank', 'rh hands together', 'rh other', 'rh beckon',
                        'rh taught gesture 1', 'rh taught gesture 2', 'rh taught gesture 3',
                        'rh blind']
 
+hand_postures = [p[3:] for p in left_hand_postures]
+
 left_arm_motions = ['la move right', 'la move left', 'la move up', 'la move down', 'la move back',
                     'la move front', 'la move right up', 'la move right down', 'la move right back',
                     'la move right front', 'la move left up', 'la move left down', 'la move left back',

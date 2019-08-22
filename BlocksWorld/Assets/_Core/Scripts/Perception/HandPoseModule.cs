@@ -24,11 +24,11 @@ public class HandPoseModule : ModuleBase
         base.Start();
         process = Process.Start(new ProcessStartInfo
         {
-            FileName = "python",
+            FileName = "python.exe",
             Arguments = "External/HandPose/depth_client.py",
-            UseShellExecute = false,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true
+            UseShellExecute = true,
+            //RedirectStandardOutput = true,
+            //RedirectStandardError = true
         });
         started = true;
         UnityEngine.Debug.Log("Started hand pose client");
@@ -38,10 +38,7 @@ public class HandPoseModule : ModuleBase
     {
         if (process.HasExited && started)
         {
-            string message = process.StandardOutput.ReadToEnd();
-            UnityEngine.Debug.Log("Hand pose client exited unexpectedly, see output:" + message);
-            string error = process.StandardError.ReadToEnd();
-            UnityEngine.Debug.LogError("Hand pose client error message:\n" + error);
+            UnityEngine.Debug.Log("Hand pose client exited unexpectedly");
             started = false;
         }
     }
