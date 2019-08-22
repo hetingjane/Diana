@@ -10,6 +10,8 @@ Small commits are easy to revert, and reduce project maintenance pain in the lon
 
 ### Write a good Git commit message
 
+![xkcd_git_commits](https://imgs.xkcd.com/comics/git_commit.png)
+
 - **Limit the subject line to 50 characters** Keeping subject lines at this length ensures that they are readable, and forces the author to think for a moment about the most concise way to explain what’s going on. However, consider 72 the hard limit.
 
 - **Do not end the subject line with a period** Trailing punctuation is unnecessary in subject lines. Besides, space is precious when you’re trying to keep them to 50 chars or less.
