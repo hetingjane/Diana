@@ -110,38 +110,51 @@ class Kinect:
             y = joints[joint].y
 
             if x < 0 or x >= self.sensor_width or y < 0 or y >=self.sensor_height:
-                continue
+                return None
 
             z = hand_arr[int(x), int(y)]
 
             if z == 0:
-                continue
+                return None
 
-            segmented = np.copy(hand_arr)
-            segmented -= z
-            segmented /= 150
-            segmented = np.clip(segmented, -1, 1)
+            pad_left, pad_right, pad_top, pad_bottom = 0, 0, 0, 0
 
             x_start = int(x - (self.cube_size * self.fx) / (2 * z))
-            x_start = max(x_start, 0)
+            if x_start < 0:
+                pad_left = -x_start
+                x_start = 0
             x_end = int(x + (self.cube_size * self.fx) / (2 * z))
-            x_end = min(x_end, self.sensor_width - 1)
+
+            if x_end >= self.sensor_width:
+                pad_right = x_end - self.sensor_width - 1
+                x_end = self.sensor_width - 1
 
             y_start = int(y - (self.cube_size * self.fy) / (2 * z))
-            y_start = max(y_start, 0)
+            if y_start < 0:
+                pad_top = -y_start
+                y_start = 0
+
             y_end = int(y + (self.cube_size * self.fy) / (2 * z))
             y_end = min(y_end, self.sensor_height - 1)
+            if y_end >= self.sensor_height:
+                pad_bottom = y_end - self.sensor_height - 1
+                y_end = 0
 
-            segmented = segmented[y_start:y_end, x_start, x_end]
 
+            segmented = np.copy(hand_arr)
+            segmented = segmented[y_start:y_end, x_start:x_end]
+            segmented -= z
+            segmented /= 2**8
+            segmented = np.clip(segmented, -1, 1)
 
-            segmented = np.pad(segmented)
+            segmented = np.pad(segmented, ((pad_top, pad_bottom), (pad_left, pad_right)), 'minimum')
 
-        hand_arr = resize(hand_arr, (168, 168))
-        hand_arr = hand_arr[20:-20, 20:-20]
-        hand_arr = hand_arr.reshape((1, 128, 128, 1))
+            segmented = resize(segmented, (168, 168))
+            segmented = segmented[20:-20, 20:-20]
+            segmented = segmented.reshape((1, 128, 128, 1))
+            segmented_frames.append(segmented)
 
-        return mask
+        return segmented_frames
 
     def get(self):
         if not self.kinect.has_new_body_frame():

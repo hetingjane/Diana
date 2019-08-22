@@ -24,14 +24,18 @@ class DepthClient:
         self.HandModel = RealTimeHandRecognition("RH", 32, 2)
 
     def run(self):
+        cv2.namedWindow("left")
+        cv2.moveWindow("left", 20, 20)
+        cv2.namedWindow("right")
+        cv2.moveWindow("right", 200, 20)
         while True:
             frames = self.kinect.get()
             if frames is None:
                 print("waiting for frames...")
                 time.sleep(1/30)
                 continue
-            cv2.imshow("left", frames[0].reshape((128,128,1)))
-            cv2.imshow("right", frames[1].reshape((128,128,1)))
+            cv2.imshow("left", frames[0].reshape((128,128,1))/2+.5)
+            cv2.imshow("right", frames[1].reshape((128, 128, 1))/2+.5)
             (LH_probs, LH_out), (RH_probs, RH_out) = self.HandModel.classifyLR(frames[0], frames[1])
             #self.socket_api.send_to_server(self, "pose:leftHand", LH_out)
             #self.socket_api.send_to_server(self, "pose:rightHand", RH_out)
