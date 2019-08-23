@@ -19,9 +19,10 @@ public class GestureStandInModule : ModuleBase
 		public string gesture;
 	}
 
-	[Header("Configuration")]
-	[Tooltip("Blackboard key to set")]
-	public string blackboardKey = "user.gesture";
+    /// <summary>
+    /// Blackboard key to set
+    /// </summary>
+    private string blackboardKey = "user.gesture";
 	
 	[Tooltip("Key-gesture pairs")]
 	public KeyToGestureEntry[] gestures;
