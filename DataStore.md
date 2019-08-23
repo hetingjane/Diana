@@ -17,7 +17,6 @@ As a general rule, each part of a key should be named like a variable or propert
 |`me:alertness`               |Integer      |0 to 10 |How alert Diana is; 0 = asleep, 7 = normal, 10 = hyperexcited             |
 |`me:attending`               |String       |        |What Diana is paying attention to: "none", "user"                         |
 |`me:eyes:open`               |Integer      |0 to 100|Current position of Diana's eyelids; 0 = closed, 100 = wide open          |
-|`me:gesture`                 |String       |        |Name of gesture user is currently doing, e.g. "stop", "servo left", etc.  |
 |`me:intent:action`           |String       |        |What action Diana intends to do: "point", "grab", etc.                    |
 |`me:intent:eyesClosed`       |Boolean      |T or F  |Whether Diana intends to close her eyes (e.g. because told to do so)      |
 |`me:intent:lookAt`           |String       |        |Name of what Diana intends to look at, e.g. "userPoint"                   |
@@ -31,6 +30,7 @@ As a general rule, each part of a key should be named like a variable or propert
 |`user:engaged`               |Boolean      |T or F  |True if closest body frame is engaged and false otherwise                 |
 |`user:isPointing`            |Boolean      |T or F  |Whether the user appears to be pointing (anywhere at all)                 |
 |`user:isSpeaking`            |Boolean      |T or F  |Whether the user appears to be speaking                                   |
+|`user:hands:[right,left]`    |String       |        |Current hand pose for either left or right hand							|
 |`user:joint:AnkleLeft`       |Vector3      |Reals   |Location of left ankle point of closest body frame in "camera space"      |
 |`user:joint:AnkleRight`      |Vector3      |Reals   |Location of right ankle point of closest body frame in "camera space"     |
 |`user:joint:ElbowLeft`       |Vector3      |Reals   |Location of left elbow point of closest body frame in "camera space"      |
