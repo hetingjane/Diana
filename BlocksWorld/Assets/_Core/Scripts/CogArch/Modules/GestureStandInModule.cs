@@ -22,7 +22,7 @@ public class GestureStandInModule : ModuleBase
     /// <summary>
     /// Blackboard key to set
     /// </summary>
-    private string blackboardKey = "user.gesture";
+    private string blackboardKey = "user:gesture";
 	
 	[Tooltip("Key-gesture pairs")]
 	public KeyToGestureEntry[] gestures;
