@@ -39,6 +39,7 @@ public class BipedIKGrab : MonoBehaviour
 	public State state;
 	Transform targetBlock;
 	Vector3 curReachTarget;
+	Vector3 originalPos;		// position at which we picked up the object
 	
 	protected void Start() {
 		var ik = GetComponent<FullBodyBipedIK>();
@@ -60,6 +61,7 @@ public class BipedIKGrab : MonoBehaviour
 					// ToDo: if targetBlock not found or not specified, then pick the closest
 					// block to curReachTarget.
 				}
+				originalPos = curReachTarget;
 				
 				// Position the hand slightly above the target position.
 				curReachTarget += Vector3.up * 0.20f;
@@ -85,16 +87,39 @@ public class BipedIKGrab : MonoBehaviour
 			}
 			break;
 		case State.Lifting:
+			if (Vector3.Distance(reachPos, curReachTarget) < 0.02f) {
+				state = State.Holding;
+				DataStore.SetValue("me:holding", new DataStore.StringValue(targetBlock.name), null, "BipedIKGrab");
+			}
+			break;
+		case State.Holding:
+			if (DataStore.GetStringValue("me:intent:action") == "setDown") {
+				curReachTarget = originalPos + Vector3.up * 0.08f;
+				state = State.Lowering;
+			}
+			break;
+		case State.Lowering:
+			if (Vector3.Distance(reachPos, curReachTarget) < 0.02f) {
+				Debug.Log("Drop!");
+				// ToDo: open hand animation
+				targetBlock.SetParent(grabbableBlocks);
+				targetBlock.GetComponent<Rigidbody>().isKinematic = false;
+				state = State.Releasing;
+				curReachTarget = targetBlock.position + Vector3.up * 0.2f;
+			}
+			break;
+		case State.Releasing:
+			if (Vector3.Distance(reachPos, curReachTarget) < 0.05f) {
+				curReachTarget = relaxedPos;
+				state = State.Unreaching;
+			}
+			break;	
+		case State.Unreaching:
+			if (Vector3.Distance(reachPos, curReachTarget) < 0.1f) {
+				state = State.Idle;
+			}
 			break;
 		}
-		/*		if (DataStore.GetStringValue("me:intent:action") != "pickUp") {
-			target = relaxedPos;
-		} else {
-			target = DataStore.GetVector3Value("me:intent:target");
-			// Position the hand slightly above the target position.
-			target += Vector3.up * 0.20f;
-		}
-		*/
 		
 		// Move smoothly towards the target position.
 		reachPos = Vector3.SmoothDamp(reachPos, curReachTarget, ref reachV, smoothTime, maxSpeed);

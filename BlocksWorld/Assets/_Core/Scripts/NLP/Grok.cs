@@ -180,6 +180,14 @@ namespace CWCNLP
 					// For now, we'll assume any "where" clause boils down to:
 					act.direction = new DirectionSpec(DirectionSpec.Direction.WhereUserPoints);
 				}
+				if (st.partOfSpeech[i] == PartOfSpeech.RB) {
+					UnityEngine.Debug.Log("Noted RB in " + st.TreeForm(verbIdx));
+					if (st.words[i] == "up" && verb == "pick") {
+						act.action = Action.PickUp;
+					} else if (st.words[i] == "down" && (verb == "put" || verb == "set")) {
+						act.action = Action.SetDown;
+					}
+				}
 			}			
 			
 			return act;
@@ -253,6 +261,9 @@ namespace CWCNLP
 			Test("stop", "Command : [Act:Stop]");
 			Test("that's enough", "Command : [Act:Stop]");
 			Test("pick up this block", "Command : [Act:PickUp Obj:[single block]]");
+			Test("put it down", "Command : [Act:SetDown Obj:[single it]]");
+			Test("set it down", "Command : [Act:SetDown Obj:[single it]]");
+			Test("pick it up", "Command : [Act:PickUp Obj:[single it]]");
 		}
 	}
 }

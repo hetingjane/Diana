@@ -93,6 +93,17 @@ public class CommandsModule : ModuleBase
 				SetValue("me:intent:target", obj.position, comment);
 			}
 			break;
+		case Action.SetDown:
+			// For now we'll assume we're being told to set down whatever we're holding.
+			// But let's verify anyway.
+			obj = FindObjectFromSpec(act.directObject);
+			if (obj != null && obj.name != DataStore.GetStringValue("me:holding")) {
+				SetValue("me:speech:intent", "I'm not holding that.", comment);
+			} else {
+				SetValue("me:speech:intent", "OK.", comment);		
+				SetValue("me:intent:action", "setDown", comment);
+			}
+			break;
 		default:
 			// Let's not say "I can't" to every unknown command.
 			// At least not yet ... it gets pretty annoying.
@@ -102,6 +113,7 @@ public class CommandsModule : ModuleBase
 	}
 	
 	Transform FindObjectFromSpec(Semantics.ObjSpec objSpec) {
+		if (objSpec == null) return null;
 		Debug.Log("Looking for object fitting: " + objSpec);
 		Transform foundObject = null;
 		for (int i=0; i<manipulableObjects.childCount; i++) {
@@ -109,7 +121,7 @@ public class CommandsModule : ModuleBase
 			Renderer r = candidate.GetComponentInChildren<Renderer>();
 			if (r == null) continue;
 			string matName = r.sharedMaterial.name.ToLower();
-			if (matName == objSpec.color.ToString().ToLower()) {
+			if (objSpec.color != null && matName == objSpec.color.ToString().ToLower()) {
 				// Looks like a good match!
 				foundObject = candidate;
 			}

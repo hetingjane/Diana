@@ -7,7 +7,14 @@ namespace Semantics
 		Red,
 		Green,
 		Blue,
-		Yellow
+		Yellow,
+		Gray,
+		Grey,
+		White,
+		Orange,
+		Purple,
+		Brown,
+		Black
 	}
 	
 	public enum VagueSize {

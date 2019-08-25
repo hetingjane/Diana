@@ -122,7 +122,8 @@ namespace CWCNLP
 			RemoveSetPhrase("seven times");
 			RemoveSetPhrase("eight times");
 			RemoveSetPhrase("nine times");
-			RemoveSetPhrase("ten times");			
+			RemoveSetPhrase("ten times");
+			RemoveSetPhrase("the blue");
 			
 			// And add some additional set phrases they missed
 			AddSetPhrase("to the right of", "right_of", "IN=1");
