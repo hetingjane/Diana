@@ -252,6 +252,7 @@ namespace CWCNLP
 		protected override void Run() {
 			Test("stop", "Command : [Act:Stop]");
 			Test("that's enough", "Command : [Act:Stop]");
+			Test("pick up this block", "Command : [Act:PickUp Obj:[single block]]");
 		}
 	}
 }

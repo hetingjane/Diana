@@ -139,6 +139,7 @@ namespace CWCNLP
 			AddSetPhrase("southwest of", "southwest_of", "IN=1");
 			AddSetPhrase("divided by", "divided_by", "CC=1");
 			AddSetPhrase("multiplied by", "multiplied_by", "CC=1");
+			AddSetPhrase("pick up", "pick_up", "VB=0.9;NN=0.1");
 			
 			// Sort the set phrases by length, longest ones first.
 			setPhrases.Sort((a,b) => (b.orig.Length.CompareTo(a.orig.Length)));
