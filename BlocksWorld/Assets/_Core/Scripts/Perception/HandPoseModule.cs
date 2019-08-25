@@ -21,22 +21,27 @@ public class HandPoseModule : ModuleBase
 
     protected override void Start()
     {
-        base.Start();
-        process = Process.Start(new ProcessStartInfo
-        {
-            FileName = "python.exe",
-            Arguments = "External/HandPose/depth_client.py",
-            UseShellExecute = true,
-            //RedirectStandardOutput = true,
-            //RedirectStandardError = true
-        });
-        started = true;
-        UnityEngine.Debug.Log("Started hand pose client");
-    }
+	    base.Start();
+	    try {
+	        process = Process.Start(new ProcessStartInfo
+	        {
+		        FileName = "python.exe",
+	            Arguments = "External/HandPose/depth_client.py",
+	            UseShellExecute = true,
+	            //RedirectStandardOutput = true,
+	            //RedirectStandardError = true
+	        });
+	        started = true;
+		    UnityEngine.Debug.Log("Started hand pose client");
+	    } catch (System.Exception e) {
+	    	UnityEngine.Debug.LogWarning("Error starting hand pose client: " + e);
+	    	started = false;
+	    }
+	}
 
     protected void Update()
     {
-        if (process.HasExited && started)
+	    if (started && process.HasExited)
         {
             UnityEngine.Debug.Log("Hand pose client exited unexpectedly");
             started = false;
@@ -44,9 +49,11 @@ public class HandPoseModule : ModuleBase
     }
 
     private void OnApplicationQuit()
-    {
-        UnityEngine.Debug.Log("Closing hand pose client");
-        process.Close();
-        UnityEngine.Debug.Log("Hand pose client closed");
+	{
+		if (process != null) {
+	        UnityEngine.Debug.Log("Closing hand pose client");
+		    process.Close();
+			UnityEngine.Debug.Log("Hand pose client closed");
+		}
     }
 }
