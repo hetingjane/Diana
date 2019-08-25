@@ -34,6 +34,7 @@ public class CommandsModule : ModuleBase
 	void HandleCommand(ComCommand cmd) {
 		ActionSpec act = cmd.action;
 		if (act == null) return;
+		Transform obj;
 		string comment = "handling " + act;
 		switch (act.action) {
 		case Action.Close:
@@ -53,7 +54,7 @@ public class CommandsModule : ModuleBase
 		case Action.Point:
 			if (act.location != null && act.location.obj != null	) {
 				// Point at the indicated object.
-				Transform obj = FindObjectFromSpec(act.location.obj);
+				obj = FindObjectFromSpec(act.location.obj);
 				if (obj == null) {
 					SetValue("me:speech:intent", "I can't find that.", comment);
 				} else {
@@ -78,6 +79,19 @@ public class CommandsModule : ModuleBase
 			SetValue("me:intent:lookAt", "", comment);
 			SetValue("me:intent:pointAt", "", comment);
 			SetValue("me:intent:action", "", comment);
+			break;
+		case Action.PickUp:
+			// See if we can determine what object to pick up, based on spec.
+			if (act.directObject == null) return;	// (user is probably not done speaking)
+			obj = FindObjectFromSpec(act.directObject);
+			if (obj == null) {
+				SetValue("me:speech:intent", "I don't know what block you mean.", comment);
+			} else {
+				SetValue("me:speech:intent", "OK.", comment);		
+				SetValue("me:intent:action", "pickUp", comment);
+				SetValue("me:intent:targetName", obj.name, comment);					
+				SetValue("me:intent:target", obj.position, comment);
+			}
 			break;
 		default:
 			// Let's not say "I can't" to every unknown command.

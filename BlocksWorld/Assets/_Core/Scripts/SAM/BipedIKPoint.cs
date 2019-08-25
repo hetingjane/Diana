@@ -2,7 +2,7 @@
 This script makes a humanoid (using a FinalIK FullBodyBipedIK component) 
 point at the location specified by the blackboard.
 
-Reads:		me:intent:action (StringValue; watching for "point")
+Reads:		me:intent:action (StringValue; watching for "point" or "pickUp")
 			me:intent:target (Vector3d, position to point at)
 Writes:		(nothing)
 */
