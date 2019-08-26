@@ -28762,7 +28762,7 @@ MonoBehaviour:
   isFrontFacing: 1
   targetWidth: 1920
   targetHeight: 1080
-  cameraName: HP Webcam HD 4310
+  cameraName: Kinect V2 Video Sensor
 --- !u!114 &2018350973
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -28795,7 +28795,7 @@ MonoBehaviour:
   display: {fileID: 0}
   dominantEmotion: 0
   happyThreshold: 10
-  angryThreshold: 10
+  angryThreshold: 1
 --- !u!1 &2035735264
 GameObject:
   m_ObjectHideFlags: 0
