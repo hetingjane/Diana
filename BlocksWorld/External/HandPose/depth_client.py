@@ -37,10 +37,10 @@ class DepthClient:
             RH_label = hand_postures[RH_idx]
             #self.socket_api.send_to_server("user:hands:left:probs", LH_out)
             #self.socket_api.set("user:hands:left:argmax", int(LH_idx))
-            self.socket_api.set("user:hands:left:", LH_label)
+            self.socket_api.set("user:hands:left", LH_label)
             #self.socket_api.send_to_server("user:hands:right:probs", RH_out)
             #self.socket_api.set("user:hands:right:argmax", int(RH_idx))
-            self.socket_api.set("user:hands:right:", RH_label)
+            self.socket_api.set("user:hands:right", RH_label)
             print(LH_label, RH_label)
 
 if __name__ == '__main__':

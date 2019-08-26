@@ -27,6 +27,9 @@ public class PointingModule : ModuleBase
     string shoulderLeftKey = "user:joint:ShoulderLeft";
     string handTipRightKey = "user:joint:HandTipRight";
     string shoulderRightKey = "user:joint:ShoulderRight";
+    string rightHandKey = "user:hands:right";
+    string leftHandKey = "user:hands:left";
+    string handPoseValue = "point front";
 
     private bool leftPoint = false;
     private bool rightPoint = false;
@@ -77,9 +80,23 @@ public class PointingModule : ModuleBase
     {
         Vector3 avgHandTipLeft, avgShoulderLeft, avgHandTipRight, avgShoulderRight, rightPointPos, leftPointPos;
 
-        if (DataStore.HasValue(handTipLeftKey) && DataStore.HasValue(shoulderLeftKey)) leftPoint = true;
-        if (DataStore.HasValue(handTipRightKey) && DataStore.HasValue(shoulderRightKey)) rightPoint = true;
+        bool handTipLeftExists = DataStore.HasValue(handTipLeftKey);
+        bool shoulderLeftExists = DataStore.HasValue(shoulderLeftKey);
+        bool leftHandPoseExists = DataStore.HasValue(leftHandKey);
+        string leftHandValue = "";
+        if (leftHandPoseExists)
+            leftHandValue = DataStore.GetStringValue(leftHandKey);
 
+        leftPoint = handTipLeftExists && shoulderLeftExists && leftHandValue == handPoseValue;
+
+        bool handTipRightExists = DataStore.HasValue(handTipRightKey);
+        bool shoulderRightExists = DataStore.HasValue(shoulderRightKey);
+        bool rightHandPoseExists = DataStore.HasValue(rightHandKey);
+        string rightHandValue = "";
+        if (rightHandPoseExists)
+            rightHandValue = DataStore.GetStringValue(rightHandKey);
+
+        rightPoint = handTipRightExists && shoulderRightExists && rightHandValue == handPoseValue;
 
         if (leftPoint)
         {

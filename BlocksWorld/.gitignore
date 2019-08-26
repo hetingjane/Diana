@@ -41,3 +41,6 @@ Logs/
 # Ignore python cache
 __pycache__/
 *.py[cod]
+
+# Ignore PyCharm files
+.idea/
