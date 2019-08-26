@@ -1,5 +1,5 @@
 /**
-* Copyright 2018 IBM Corp. All Rights Reserved.
+* Copyright 2018, 2019 IBM Corp. All Rights Reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -15,35 +15,43 @@
 *
 */
 
-using FullSerializer;
 using System.Collections.Generic;
+using Newtonsoft.Json;
+using System;
 
-namespace IBM.Watson.DeveloperCloud.Services.Assistant.v1
+namespace IBM.Watson.Assistant.V1.Model
 {
     /// <summary>
     /// CreateIntent.
     /// </summary>
-    [fsObject]
     public class CreateIntent
     {
         /// <summary>
-        /// The name of the intent. This string must conform to the following restrictions:  - It can contain only Unicode alphanumeric, underscore, hyphen, and dot characters.  - It cannot begin with the reserved prefix `sys-`.  - It must be no longer than 128 characters.
+        /// The name of the intent. This string must conform to the following restrictions:
+        /// - It can contain only Unicode alphanumeric, underscore, hyphen, and dot characters.
+        /// - It cannot begin with the reserved prefix `sys-`.
         /// </summary>
-        /// <value>The name of the intent. This string must conform to the following restrictions:  - It can contain only Unicode alphanumeric, underscore, hyphen, and dot characters.  - It cannot begin with the reserved prefix `sys-`.  - It must be no longer than 128 characters.</value>
-        [fsProperty("intent")]
+        [JsonProperty("intent", NullValueHandling = NullValueHandling.Ignore)]
         public string Intent { get; set; }
         /// <summary>
-        /// The description of the intent. This string cannot contain carriage return, newline, or tab characters, and it must be no longer than 128 characters.
+        /// The description of the intent. This string cannot contain carriage return, newline, or tab characters.
         /// </summary>
-        /// <value>The description of the intent. This string cannot contain carriage return, newline, or tab characters, and it must be no longer than 128 characters.</value>
-        [fsProperty("description")]
+        [JsonProperty("description", NullValueHandling = NullValueHandling.Ignore)]
         public string Description { get; set; }
+        /// <summary>
+        /// The timestamp for creation of the object.
+        /// </summary>
+        [JsonProperty("created", NullValueHandling = NullValueHandling.Ignore)]
+        public virtual DateTime? Created { get; private set; }
+        /// <summary>
+        /// The timestamp for the most recent update to the object.
+        /// </summary>
+        [JsonProperty("updated", NullValueHandling = NullValueHandling.Ignore)]
+        public virtual DateTime? Updated { get; private set; }
         /// <summary>
         /// An array of user input examples for the intent.
         /// </summary>
-        /// <value>An array of user input examples for the intent.</value>
-        [fsProperty("examples")]
-        public List<CreateExample> Examples { get; set; }
+        [JsonProperty("examples", NullValueHandling = NullValueHandling.Ignore)]
+        public List<Example> Examples { get; set; }
     }
-
 }

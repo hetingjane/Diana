@@ -135,7 +135,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &10100818
 Transform:
   m_ObjectHideFlags: 0
@@ -164,14 +164,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   comment: 
   display: {fileID: 0}
-  _username: 5b7d6ce1-31d3-49b4-b3c8-ad79cf736117
-  _password: 
-  _url: 'https://stream.watsonplatform.net/speech-to-text/api '
-  pushToTalk: 1
+  _apiKey: aS4HL_ZB0NncX1G6twfzexZJT1Rj9JnUeDlQFfAZbyBy
+  _url: https://stream.watsonplatform.net/speech-to-text/api
+  pushToTalk: 0
   talkKey: 303
   keywords:
   - Diana
   - block
+  keywordThreshold: 0.5
   levelMeter: {fileID: 456999825}
   aboveThresholdMeterColor: {r: 0, g: 0.7, b: 0, a: 1}
   belowThresholdMeterColor: {r: 0, g: 0, b: 0.4, a: 1}
@@ -12923,8 +12923,8 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1172847502}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: 0.105118595, y: 0, z: 0, w: 0.9944597}
+  m_LocalPosition: {x: 0, y: 0, z: 6.7110243}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 810066800}
@@ -12932,10 +12932,10 @@ RectTransform:
   - {fileID: 119281410}
   m_Father: {fileID: 6261051345947285020}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 12.068001, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 1.8184814, y: 4.750183}
   m_SizeDelta: {x: 550, y: 50}
   m_Pivot: {x: 0, y: 0}
 --- !u!1001 &1175002054
@@ -28762,7 +28762,7 @@ MonoBehaviour:
   isFrontFacing: 1
   targetWidth: 1920
   targetHeight: 1080
-  cameraName: HP Webcam HD 4310
+  cameraName: Kinect V2 Video Sensor
 --- !u!114 &2018350973
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -28795,7 +28795,7 @@ MonoBehaviour:
   display: {fileID: 0}
   dominantEmotion: 0
   happyThreshold: 10
-  angryThreshold: 10
+  angryThreshold: 1
 --- !u!1 &2035735264
 GameObject:
   m_ObjectHideFlags: 0

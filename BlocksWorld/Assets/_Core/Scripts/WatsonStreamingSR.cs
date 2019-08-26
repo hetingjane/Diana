@@ -7,10 +7,10 @@ Writes:		user:isSpeaking (BoolValue)
 */
 using UnityEngine;
 using System.Collections;
-using IBM.Watson.DeveloperCloud.Logging;
-using IBM.Watson.DeveloperCloud.Services.SpeechToText.v1;
-using IBM.Watson.DeveloperCloud.Utilities;
-using IBM.Watson.DeveloperCloud.DataTypes;
+using IBM.Watson.SpeechToText.V1;
+using IBM.Cloud.SDK;
+using IBM.Cloud.SDK.Utilities;
+using IBM.Cloud.SDK.DataTypes;
 using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine.Events;
@@ -18,8 +18,7 @@ using UnityEngine.Events;
 public class WatsonStreamingSR : ModuleBase
 {
 	[Header("Service Credentials")]
-	public string _username = null;
-	public string _password = null;
+	public string _apiKey = null;
 	public string _url = null;
 	
 	[Header("Control Options")]
@@ -28,6 +27,7 @@ public class WatsonStreamingSR : ModuleBase
 	
 	[Header("SR Options")]
 	public string[] keywords;
+	[Range(0,1)] public float keywordThreshold = 0.5f;
 	
 	[Header("Feedback")]
 	public Image levelMeter;
@@ -49,15 +49,22 @@ public class WatsonStreamingSR : ModuleBase
 	private int _recordingBufferSize = 1;
     private int _recordingHZ = 22050;
 	
-    private SpeechToText _speechToText;
+    private SpeechToTextService _speechToText;
 
-	void Start() {
+	IEnumerator Start() {
         LogSystem.InstallDefaultReactors();
 
         //  Create credential and instantiate service
-	    Credentials credentials = new Credentials(_username.Trim(), _password.Trim(), _url.Trim());
+		TokenOptions tokenOptions = new TokenOptions() { IamApiKey = _apiKey };
+		var credentials = new Credentials(tokenOptions, _url);
 
-	    _speechToText = new SpeechToText(credentials);
+		//  Wait for tokendata
+		Debug.Log("Watson: waiting for token data");
+		while (!credentials.HasIamTokenData())
+			yield return null;
+		Debug.Log("Watson: got token data; starting service");
+
+		_speechToText = new SpeechToTextService(credentials);
 	    alternatives = new List<string>();
 
 	    if (!pushToTalk) {
@@ -99,7 +106,10 @@ public class WatsonStreamingSR : ModuleBase
                 _speechToText.SmartFormatting = true;
                 _speechToText.SpeakerLabels = false;
 	            _speechToText.WordAlternativesThreshold = null;
-	            if (keywords != null) _speechToText.Keywords = keywords;
+	            if (keywords != null) {
+	            	_speechToText.Keywords = keywords;
+	            	_speechToText.KeywordsThreshold = keywordThreshold;
+	            }
                 _speechToText.StartListening(OnRecognize, OnRecognizeSpeaker);
             }
             else if (!value && _speechToText.IsListening)

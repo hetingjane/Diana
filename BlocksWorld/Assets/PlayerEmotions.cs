@@ -21,7 +21,7 @@ public class PlayerEmotions : ImageResultsListener
     public float happyThreshold = 10f;
 
     [Range(0, 100)]
-    public float angryThreshold = 10f;
+    public float angryThreshold = 1f;
     public override void onFaceFound(float timestamp, int faceId)
     {
         Debug.Log("Found the face");
@@ -55,21 +55,23 @@ public class PlayerEmotions : ImageResultsListener
 
 
                 var emotionValue = new DataStore.IntValue((int)currentJoy);
-                DataStore.SetValue("user:dominantEmotion:" + dominantEmotion.ToString(), emotionValue, null, dominantEmotion.ToString());
-
+                DataStore.SetValue("user:dominantEmotion:" + dominantEmotion.ToString(), emotionValue, this, emotionValue.ToString());
+                DataStore.SetStringValue("user:dominantEmotion:", new DataStore.StringValue(dominantEmotion.ToString()), this, dominantEmotion.ToString());
             }
             else if (currentAnger > angryThreshold)
             {
                 dominantEmotion = Emotion.Angry;
                 var emotionValue = new DataStore.IntValue((int)currentAnger);
-                DataStore.SetValue("user:dominantEmotion:" + dominantEmotion.ToString(), emotionValue, null, dominantEmotion.ToString());
+                DataStore.SetValue("user:dominantEmotion:" + dominantEmotion.ToString(), emotionValue, this, emotionValue.ToString());
+                DataStore.SetStringValue("user:dominantEmotion:", new DataStore.StringValue(dominantEmotion.ToString()), this, dominantEmotion.ToString());
 
             }
             else
             {
                 dominantEmotion = Emotion.Neutral;
-                DataStore.SetValue("user:dominantEmotion:Happy" , new DataStore.IntValue(0), null, dominantEmotion.ToString());
-                DataStore.SetValue("user:dominantEmotion:Angry", new DataStore.IntValue(0), null, dominantEmotion.ToString());
+                DataStore.SetValue("user:dominantEmotion:Happy" , new DataStore.IntValue(0), this, "0");
+                DataStore.SetValue("user:dominantEmotion:Angry", new DataStore.IntValue(0), this, "0");
+                DataStore.SetStringValue("user:dominantEmotion:", new DataStore.StringValue(dominantEmotion.ToString()), this, dominantEmotion.ToString());
 
             }
             //Retrieve the coordinates of the facial landmarks (face feature points)

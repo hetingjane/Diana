@@ -1,5 +1,5 @@
 /**
-* Copyright 2018 IBM Corp. All Rights Reserved.
+* Copyright 2018, 2019 IBM Corp. All Rights Reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -15,129 +15,76 @@
 *
 */
 
-using FullSerializer;
-using System;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
+using Newtonsoft.Json;
+using System;
 
-namespace IBM.Watson.DeveloperCloud.Services.Assistant.v1
+namespace IBM.Watson.Assistant.V1.Model
 {
     /// <summary>
     /// CreateValue.
     /// </summary>
-    [fsObject(Converter = typeof(CreateValueConverter))]
     public class CreateValue
     {
         /// <summary>
-        /// Specifies the type of value.
+        /// Specifies the type of entity value.
         /// </summary>
-        /// <value>Specifies the type of value.</value>
-        public enum ValueTypeEnum
+        public class ValueTypeValue
         {
-
             /// <summary>
-            /// Enum SYNONYMS for synonyms
+            /// Constant SYNONYMS for synonyms
             /// </summary>
-            [EnumMember(Value = "synonyms")]
-            SYNONYMS,
-
+            public const string SYNONYMS = "synonyms";
             /// <summary>
-            /// Enum PATTERNS for patterns
+            /// Constant PATTERNS for patterns
             /// </summary>
-            [EnumMember(Value = "patterns")]
-            PATTERNS
+            public const string PATTERNS = "patterns";
+            
         }
 
         /// <summary>
-        /// Specifies the type of value.
+        /// Specifies the type of entity value.
+        /// Constants for possible values can be found using CreateValue.ValueTypeValue
         /// </summary>
-        /// <value>Specifies the type of value.</value>
-        [fsProperty("type")]
-        public ValueTypeEnum? ValueType { get; set; }
+        [JsonProperty("type", NullValueHandling = NullValueHandling.Ignore)]
+        public string ValueType { get; set; }
         /// <summary>
-        /// The text of the entity value. This string must conform to the following restrictions:  - It cannot contain carriage return, newline, or tab characters.  - It cannot consist of only whitespace characters.  - It must be no longer than 64 characters.
+        /// The text of the entity value. This string must conform to the following restrictions:
+        /// - It cannot contain carriage return, newline, or tab characters.
+        /// - It cannot consist of only whitespace characters.
         /// </summary>
-        /// <value>The text of the entity value. This string must conform to the following restrictions:  - It cannot contain carriage return, newline, or tab characters.  - It cannot consist of only whitespace characters.  - It must be no longer than 64 characters.</value>
-        [fsProperty("value")]
+        [JsonProperty("value", NullValueHandling = NullValueHandling.Ignore)]
         public string Value { get; set; }
         /// <summary>
         /// Any metadata related to the entity value.
         /// </summary>
-        /// <value>Any metadata related to the entity value.</value>
-        [fsProperty("metadata")]
-        public object Metadata { get; set; }
+        [JsonProperty("metadata", NullValueHandling = NullValueHandling.Ignore)]
+        public Dictionary<string, object> Metadata { get; set; }
         /// <summary>
-        /// An array containing any synonyms for the entity value. You can provide either synonyms or patterns (as indicated by **type**), but not both. A synonym must conform to the following restrictions:  - It cannot contain carriage return, newline, or tab characters.  - It cannot consist of only whitespace characters.  - It must be no longer than 64 characters.
+        /// An array of synonyms for the entity value. A value can specify either synonyms or patterns (depending on the
+        /// value type), but not both. A synonym must conform to the following resrictions:
+        /// - It cannot contain carriage return, newline, or tab characters.
+        /// - It cannot consist of only whitespace characters.
         /// </summary>
-        /// <value>An array containing any synonyms for the entity value. You can provide either synonyms or patterns (as indicated by **type**), but not both. A synonym must conform to the following restrictions:  - It cannot contain carriage return, newline, or tab characters.  - It cannot consist of only whitespace characters.  - It must be no longer than 64 characters.</value>
-        [fsProperty("synonyms")]
+        [JsonProperty("synonyms", NullValueHandling = NullValueHandling.Ignore)]
         public List<string> Synonyms { get; set; }
         /// <summary>
-        /// An array of patterns for the entity value. You can provide either synonyms or patterns (as indicated by **type**), but not both. A pattern is a regular expression no longer than 128 characters. For more information about how to specify a pattern, see the [documentation](https://console.bluemix.net/docs/services/conversation/entities.html#creating-entities).
+        /// An array of patterns for the entity value. A value can specify either synonyms or patterns (depending on the
+        /// value type), but not both. A pattern is a regular expression; for more information about how to specify a
+        /// pattern, see the
+        /// [documentation](https://cloud.ibm.com/docs/services/assistant?topic=assistant-entities#entities-create-dictionary-based).
         /// </summary>
-        /// <value>An array of patterns for the entity value. You can provide either synonyms or patterns (as indicated by **type**), but not both. A pattern is a regular expression no longer than 128 characters. For more information about how to specify a pattern, see the [documentation](https://console.bluemix.net/docs/services/conversation/entities.html#creating-entities).</value>
-        [fsProperty("patterns")]
+        [JsonProperty("patterns", NullValueHandling = NullValueHandling.Ignore)]
         public List<string> Patterns { get; set; }
-    }
-
-    #region Create Value Converter
-    public class CreateValueConverter : fsConverter
-    {
-        private fsSerializer _serializer = new fsSerializer();
-
-        public override bool CanProcess(Type type)
-        {
-            return type == typeof(CreateValue);
-        }
-
-        public override fsResult TryDeserialize(fsData data, ref object instance, Type storageType)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override fsResult TrySerialize(object instance, out fsData serialized, Type storageType)
-        {
-            CreateValue createValue = (CreateValue)instance;
-            serialized = null;
-
-            Dictionary<string, fsData> serialization = new Dictionary<string, fsData>();
-
-            fsData tempData = null;
-
-            if (createValue.Metadata != null)
-            {
-                _serializer.TrySerialize(createValue.Metadata, out tempData);
-                serialization.Add("metadata", tempData);
-            }
-
-            if (createValue.Patterns != null)
-            {
-                _serializer.TrySerialize(createValue.Patterns, out tempData);
-                serialization.Add("patterns", tempData);
-            }
-
-            if (createValue.Synonyms != null)
-            {
-                _serializer.TrySerialize(createValue.Synonyms, out tempData);
-                serialization.Add("synonyms", tempData);
-            }
-
-            if (createValue.ValueType != null)
-            {
-                _serializer.TrySerialize(createValue.ValueType, out tempData);
-                serialization.Add("type", tempData);
-            }
-
-            if (createValue.Value != null)
-            {
-                _serializer.TrySerialize(createValue.Value, out tempData);
-                serialization.Add("value", tempData);
-            }
-
-            serialized = new fsData(serialization);
-
-            return fsResult.Success;
-        }
-        #endregion
+        /// <summary>
+        /// The timestamp for creation of the object.
+        /// </summary>
+        [JsonProperty("created", NullValueHandling = NullValueHandling.Ignore)]
+        public virtual DateTime? Created { get; private set; }
+        /// <summary>
+        /// The timestamp for the most recent update to the object.
+        /// </summary>
+        [JsonProperty("updated", NullValueHandling = NullValueHandling.Ignore)]
+        public virtual DateTime? Updated { get; private set; }
     }
 }

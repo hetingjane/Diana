@@ -16,8 +16,8 @@ public class FaceUpdate : MonoBehaviour
     List<int> frownLeftIndex;
     List<int> frownRightIndex;
 
-    PlayerEmotions playerEmotions;
-    GameObject player;
+    //PlayerEmotions playerEmotions;
+    //GameObject player;
 
     void Start()
     {
@@ -50,21 +50,22 @@ public class FaceUpdate : MonoBehaviour
                 frownRightIndex.Add(frightIdx);
             }
         }
-        player = GameObject.Find("AffectivaModule");
-        playerEmotions = player.GetComponent<PlayerEmotions>();
-        if (playerEmotions == null)
-        {
-            Debug.LogError("No playerEmotions component found.");
-        }
+        //player = GameObject.Find("AffectivaModule");
+        //playerEmotions = player.GetComponent<PlayerEmotions>();
+        //if (playerEmotions == null)
+        //{
+        //    Debug.LogError("No playerEmotions component found.");
+        //}
 
     }
 
     void Update()
     {
-        int score = DataStore.GetIntValue("user:dominantEmotion:" + playerEmotions.dominantEmotion.ToString());
-        switch (playerEmotions.dominantEmotion)
+        string dominantEmotion = DataStore.GetStringValue("user:dominantEmotion:");
+        int score = DataStore.GetIntValue("user:dominantEmotion:" + dominantEmotion);
+        switch (dominantEmotion)
         {
-            case Emotion.Neutral:
+            case "Neutral":
                 for (int i = 0; i < renderers.Count; i++)
                 {
                     renderers[i].SetBlendShapeWeight(smileLeftIndex[i], 0);
@@ -74,7 +75,7 @@ public class FaceUpdate : MonoBehaviour
 
                 }
                 break;
-            case Emotion.Happy:
+            case "Happy":
                 if (score > 90)
                 {
                     for (int i = 0; i < renderers.Count; i++)
@@ -96,7 +97,7 @@ public class FaceUpdate : MonoBehaviour
 
                 }
                 break;
-            case Emotion.Angry:
+            case "Angry":
                 if (score > 20)
                 {
                     for (int i = 0; i < renderers.Count; i++)

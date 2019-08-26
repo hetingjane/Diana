@@ -1,5 +1,5 @@
 /**
-* Copyright 2018 IBM Corp. All Rights Reserved.
+* Copyright 2018, 2019 IBM Corp. All Rights Reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -15,29 +15,24 @@
 *
 */
 
-using FullSerializer;
-using System.Collections.Generic;
+using Newtonsoft.Json;
 
-namespace IBM.Watson.DeveloperCloud.Services.Assistant.v1
+namespace IBM.Watson.Assistant.V1.Model
 {
     /// <summary>
     /// An intent identified in the user input.
     /// </summary>
-    [fsObject]
     public class RuntimeIntent
     {
         /// <summary>
         /// The name of the recognized intent.
         /// </summary>
-        /// <value>The name of the recognized intent.</value>
-        [fsProperty("intent")]
-        public Dictionary<string, object> Intent { get; set; }
+        [JsonProperty("intent", NullValueHandling = NullValueHandling.Ignore)]
+        public string Intent { get; set; }
         /// <summary>
         /// A decimal percentage that represents Watson's confidence in the intent.
         /// </summary>
-        /// <value>A decimal percentage that represents Watson's confidence in the intent.</value>
-        [fsProperty("confidence")]
-        public Dictionary<string, object> Confidence { get; set; }
+        [JsonProperty("confidence", NullValueHandling = NullValueHandling.Ignore)]
+        public double? Confidence { get; set; }
     }
-
 }

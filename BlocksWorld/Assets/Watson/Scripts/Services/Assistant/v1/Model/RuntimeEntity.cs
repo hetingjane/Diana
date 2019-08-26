@@ -1,5 +1,5 @@
 /**
-* Copyright 2018 IBM Corp. All Rights Reserved.
+* Copyright 2018, 2019 IBM Corp. All Rights Reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -15,53 +15,53 @@
 *
 */
 
-using FullSerializer;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
-namespace IBM.Watson.DeveloperCloud.Services.Assistant.v1
+namespace IBM.Watson.Assistant.V1.Model
 {
     /// <summary>
     /// A term from the request that was identified as an entity.
     /// </summary>
-    [fsObject]
     public class RuntimeEntity
     {
         /// <summary>
         /// An entity detected in the input.
         /// </summary>
-        /// <value>An entity detected in the input.</value>
-        [fsProperty("entity")]
-        public Dictionary<string, object> Entity { get; set; }
+        [JsonProperty("entity", NullValueHandling = NullValueHandling.Ignore)]
+        public string Entity { get; set; }
         /// <summary>
-        /// An array of zero-based character offsets that indicate where the detected entity values begin and end in the input text.
+        /// An array of zero-based character offsets that indicate where the detected entity values begin and end in the
+        /// input text.
         /// </summary>
-        /// <value>An array of zero-based character offsets that indicate where the detected entity values begin and end in the input text.</value>
-        [fsProperty("location")]
-        public Dictionary<string, object> Location { get; set; }
+        [JsonProperty("location", NullValueHandling = NullValueHandling.Ignore)]
+        public List<long?> Location { get; set; }
         /// <summary>
-        /// The term in the input text that was recognized as an entity value.
+        /// The entity value that was recognized in the user input.
         /// </summary>
-        /// <value>The term in the input text that was recognized as an entity value.</value>
-        [fsProperty("value")]
-        public Dictionary<string, object> Value { get; set; }
+        [JsonProperty("value", NullValueHandling = NullValueHandling.Ignore)]
+        public string Value { get; set; }
         /// <summary>
-        /// A decimal percentage that represents Watson's confidence in the entity.
+        /// A decimal percentage that represents Watson's confidence in the recognized entity.
         /// </summary>
-        /// <value>A decimal percentage that represents Watson's confidence in the entity.</value>
-        [fsProperty("confidence")]
-        public Dictionary<string, object> Confidence { get; set; }
+        [JsonProperty("confidence", NullValueHandling = NullValueHandling.Ignore)]
+        public float? Confidence { get; set; }
         /// <summary>
         /// Any metadata for the entity.
         /// </summary>
-        /// <value>Any metadata for the entity.</value>
-        [fsProperty("metadata")]
+        [JsonProperty("metadata", NullValueHandling = NullValueHandling.Ignore)]
         public Dictionary<string, object> Metadata { get; set; }
         /// <summary>
         /// The recognized capture groups for the entity, as defined by the entity pattern.
         /// </summary>
-        /// <value>The recognized capture groups for the entity, as defined by the entity pattern.</value>
-        [fsProperty("groups")]
-        public Dictionary<string, object> Groups { get; set; }
+        [JsonProperty("groups", NullValueHandling = NullValueHandling.Ignore)]
+        public List<CaptureGroup> Groups { get; set; }
+        /// <summary>
+        /// An object containing detailed information about the entity recognized in the user input.
+        ///
+        /// This property is a part of the new system entities, which are a beta feature.
+        /// </summary>
+        [JsonProperty("interpretation", NullValueHandling = NullValueHandling.Ignore)]
+        public RuntimeEntityInterpretation Interpretation { get; set; }
     }
-
 }
