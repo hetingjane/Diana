@@ -1,5 +1,5 @@
 /**
-* Copyright 2018 IBM Corp. All Rights Reserved.
+* Copyright 2018, 2019 IBM Corp. All Rights Reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -15,53 +15,52 @@
 *
 */
 
-using FullSerializer;
 using System.Collections.Generic;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
-namespace IBM.Watson.DeveloperCloud.Services.Assistant.v1
+namespace IBM.Watson.Assistant.V1.Model
 {
     /// <summary>
-    /// A response from the Assistant service.
+    /// The response sent by the workspace, including the output text, detected intents and entities, and context.
     /// </summary>
-    [fsObject]
     public class MessageResponse
     {
         /// <summary>
-        /// The user input from the request.
+        /// An input object that includes the input text.
         /// </summary>
-        /// <value>The user input from the request.</value>
-        [fsProperty("input")]
-        public Dictionary<string, object> Input { get; set; }
+        [JsonProperty("input", NullValueHandling = NullValueHandling.Ignore)]
+        public JObject Input { get; set; }
         /// <summary>
         /// An array of intents recognized in the user input, sorted in descending order of confidence.
         /// </summary>
-        /// <value>An array of intents recognized in the user input, sorted in descending order of confidence.</value>
-        [fsProperty("intents")]
-        public Dictionary<string, object> Intents { get; set; }
+        [JsonProperty("intents", NullValueHandling = NullValueHandling.Ignore)]
+        public List<JObject> Intents { get; set; }
         /// <summary>
         /// An array of entities identified in the user input.
         /// </summary>
-        /// <value>An array of entities identified in the user input.</value>
-        [fsProperty("entities")]
-        public Dictionary<string, object> Entities { get; set; }
+        [JsonProperty("entities", NullValueHandling = NullValueHandling.Ignore)]
+        public List<JObject> Entities { get; set; }
         /// <summary>
         /// Whether to return more than one intent. A value of `true` indicates that all matching intents are returned.
         /// </summary>
-        /// <value>Whether to return more than one intent. A value of `true` indicates that all matching intents are returned.</value>
-        [fsProperty("alternate_intents")]
-        public Dictionary<string, object> AlternateIntents { get; set; }
+        [JsonProperty("alternate_intents", NullValueHandling = NullValueHandling.Ignore)]
+        public bool? AlternateIntents { get; set; }
         /// <summary>
-        /// State information for the conversation.
+        /// State information for the conversation. To maintain state, include the context from the previous response.
         /// </summary>
-        /// <value>State information for the conversation.</value>
-        [fsProperty("context")]
-        public Dictionary<string, object> Context { get; set; }
+        [JsonProperty("context", NullValueHandling = NullValueHandling.Ignore)]
+        public JObject Context { get; set; }
         /// <summary>
-        /// Output from the dialog, including the response to the user, the nodes that were triggered, and log messages.
+        /// An output object that includes the response to the user, the dialog nodes that were triggered, and messages
+        /// from the log.
         /// </summary>
-        /// <value>Output from the dialog, including the response to the user, the nodes that were triggered, and log messages.</value>
-        [fsProperty("output")]
-        public Dictionary<string, object> Output { get; set; }
+        [JsonProperty("output", NullValueHandling = NullValueHandling.Ignore)]
+        public JObject Output { get; set; }
+        /// <summary>
+        /// An array of objects describing any actions requested by the dialog node.
+        /// </summary>
+        [JsonProperty("actions", NullValueHandling = NullValueHandling.Ignore)]
+        public virtual List<DialogNodeAction> Actions { get; private set; }
     }
-
 }

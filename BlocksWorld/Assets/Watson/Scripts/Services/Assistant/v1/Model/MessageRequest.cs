@@ -1,5 +1,5 @@
 /**
-* Copyright 2018 IBM Corp. All Rights Reserved.
+* Copyright 2018, 2019 IBM Corp. All Rights Reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -15,53 +15,54 @@
 *
 */
 
-using FullSerializer;
 using System.Collections.Generic;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
-namespace IBM.Watson.DeveloperCloud.Services.Assistant.v1
+namespace IBM.Watson.Assistant.V1.Model
 {
     /// <summary>
-    /// A request formatted for the Assistant service.
+    /// A request sent to the workspace, including the user input and context.
     /// </summary>
-    [fsObject]
     public class MessageRequest
     {
         /// <summary>
         /// An input object that includes the input text.
         /// </summary>
-        /// <value>An input object that includes the input text.</value>
-        [fsProperty("input")]
-        public Dictionary<string, object> Input { get; set; }
+        [JsonProperty("input", NullValueHandling = NullValueHandling.Ignore)]
+        public JObject Input { get; set; }
         /// <summary>
-        /// Whether to return more than one intent. Set to `true` to return all matching intents.
+        /// Intents to use when evaluating the user input. Include intents from the previous response to continue using
+        /// those intents rather than trying to recognize intents in the new input.
         /// </summary>
-        /// <value>Whether to return more than one intent. Set to `true` to return all matching intents.</value>
-        [fsProperty("alternate_intents")]
+        [JsonProperty("intents", NullValueHandling = NullValueHandling.Ignore)]
+        public List<JObject> Intents { get; set; }
+        /// <summary>
+        /// Entities to use when evaluating the message. Include entities from the previous response to continue using
+        /// those entities rather than detecting entities in the new input.
+        /// </summary>
+        [JsonProperty("entities", NullValueHandling = NullValueHandling.Ignore)]
+        public List<JObject> Entities { get; set; }
+        /// <summary>
+        /// Whether to return more than one intent. A value of `true` indicates that all matching intents are returned.
+        /// </summary>
+        [JsonProperty("alternate_intents", NullValueHandling = NullValueHandling.Ignore)]
         public bool? AlternateIntents { get; set; }
         /// <summary>
-        /// State information for the conversation. Continue a conversation by including the context object from the previous response.
+        /// State information for the conversation. To maintain state, include the context from the previous response.
         /// </summary>
-        /// <value>State information for the conversation. Continue a conversation by including the context object from the previous response.</value>
-        [fsProperty("context")]
-        public Dictionary<string, object> Context { get; set; }
+        [JsonProperty("context", NullValueHandling = NullValueHandling.Ignore)]
+        public JObject Context { get; set; }
         /// <summary>
-        /// Entities to use when evaluating the message. Include entities from the previous response to continue using those entities rather than detecting entities in the new input.
+        /// An output object that includes the response to the user, the dialog nodes that were triggered, and messages
+        /// from the log.
         /// </summary>
-        /// <value>Entities to use when evaluating the message. Include entities from the previous response to continue using those entities rather than detecting entities in the new input.</value>
-        [fsProperty("entities")]
-        public List<RuntimeEntity> Entities { get; set; }
+        [JsonProperty("output", NullValueHandling = NullValueHandling.Ignore)]
+        public JObject Output { get; set; }
         /// <summary>
-        /// Intents to use when evaluating the user input. Include intents from the previous response to continue using those intents rather than trying to recognize intents in the new input.
+        /// An array of objects describing any actions requested by the dialog node.
         /// </summary>
-        /// <value>Intents to use when evaluating the user input. Include intents from the previous response to continue using those intents rather than trying to recognize intents in the new input.</value>
-        [fsProperty("intents")]
-        public List<RuntimeIntent> Intents { get; set; }
-        /// <summary>
-        /// System output. Include the output from the previous response to maintain intermediate information over multiple requests.
-        /// </summary>
-        /// <value>System output. Include the output from the previous response to maintain intermediate information over multiple requests.</value>
-        [fsProperty("output")]
-        public OutputData Output { get; set; }
+        [JsonProperty("actions", NullValueHandling = NullValueHandling.Ignore)]
+        public virtual List<DialogNodeAction> Actions { get; private set; }
     }
-
 }

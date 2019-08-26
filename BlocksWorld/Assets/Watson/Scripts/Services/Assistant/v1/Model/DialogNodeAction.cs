@@ -1,5 +1,5 @@
 /**
-* Copyright 2018 IBM Corp. All Rights Reserved.
+* Copyright 2018, 2019 IBM Corp. All Rights Reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -15,67 +15,65 @@
 *
 */
 
-using FullSerializer;
-using System.Runtime.Serialization;
+using System.Collections.Generic;
+using Newtonsoft.Json;
 
-namespace IBM.Watson.DeveloperCloud.Services.Assistant.v1
+namespace IBM.Watson.Assistant.V1.Model
 {
     /// <summary>
     /// DialogNodeAction.
     /// </summary>
-    [fsObject]
     public class DialogNodeAction
     {
         /// <summary>
         /// The type of action to invoke.
         /// </summary>
-        /// <value>The type of action to invoke.</value>
-        public enum ActionTypeEnum
+        public class ActionTypeValue
         {
-            
             /// <summary>
-            /// Enum CLIENT for client
+            /// Constant CLIENT for client
             /// </summary>
-            [EnumMember(Value = "client")]
-            CLIENT,
-            
+            public const string CLIENT = "client";
             /// <summary>
-            /// Enum SERVER for server
+            /// Constant SERVER for server
             /// </summary>
-            [EnumMember(Value = "server")]
-            SERVER
+            public const string SERVER = "server";
+            /// <summary>
+            /// Constant CLOUD_FUNCTION for cloud_function
+            /// </summary>
+            public const string CLOUD_FUNCTION = "cloud_function";
+            /// <summary>
+            /// Constant WEB_ACTION for web_action
+            /// </summary>
+            public const string WEB_ACTION = "web_action";
+            
         }
 
         /// <summary>
         /// The type of action to invoke.
+        /// Constants for possible values can be found using DialogNodeAction.ActionTypeValue
         /// </summary>
-        /// <value>The type of action to invoke.</value>
-        [fsProperty("type")]
-        public ActionTypeEnum? ActionType { get; set; }
+        [JsonProperty("type", NullValueHandling = NullValueHandling.Ignore)]
+        public string ActionType { get; set; }
         /// <summary>
         /// The name of the action.
         /// </summary>
-        /// <value>The name of the action.</value>
-        [fsProperty("name")]
+        [JsonProperty("name", NullValueHandling = NullValueHandling.Ignore)]
         public string Name { get; set; }
         /// <summary>
         /// A map of key/value pairs to be provided to the action.
         /// </summary>
-        /// <value>A map of key/value pairs to be provided to the action.</value>
-        [fsProperty("parameters")]
-        public object Parameters { get; set; }
+        [JsonProperty("parameters", NullValueHandling = NullValueHandling.Ignore)]
+        public Dictionary<string, object> Parameters { get; set; }
         /// <summary>
         /// The location in the dialog context where the result of the action is stored.
         /// </summary>
-        /// <value>The location in the dialog context where the result of the action is stored.</value>
-        [fsProperty("result_variable")]
+        [JsonProperty("result_variable", NullValueHandling = NullValueHandling.Ignore)]
         public string ResultVariable { get; set; }
         /// <summary>
         /// The name of the context variable that the client application will use to pass in credentials for the action.
         /// </summary>
-        /// <value>The name of the context variable that the client application will use to pass in credentials for the action.</value>
-        [fsProperty("credentials")]
-        public string Credentials { get; set; }
+        [JsonProperty("credentials", NullValueHandling = NullValueHandling.Ignore)]
+        public string _Credentials { get; set; }
     }
-
 }

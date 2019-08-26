@@ -1,162 +1,164 @@
-Change Log
-==========
-
-## Version 2.1.0
-_2018-03-06_
-New: Abstract Watson Assistant service.
-New: External credentials in integration tests.
-New: Documentation on publishing a release.
-Fixed: Visual Recognition Classify method sends byte[] data in form data instead of body data.
-Fixed: Redirect Speech to Text streaming requests to TLS 1.0 streaming endpoint.
-Deprecated: Document Conversion - Please use Discovery.
-Removed: Language Translation - Please use Langauge Translator.
-
-## Version 2.0.0
-_2017-11-20_ MAJOR RELEASE, BREAKING CHANGES
-* New: Implemented error callbacks in each call
-* New: Implemented generic type success callbacks
-* New: Implemented `Dictionary<string, object>` to hold custom data for each call
-* New: Support for `Hololens`
-* New: Abstracted custom acoustic models for `SpeechToText`
-* New: Addition of streaming example where the sample is split up to improve latency
-* New: Transition to dll for `WebSocketSharp`
-* New: Added support for decoding unicode characters in `TextToSpeech`
-* Fixed: Transition `Delete` methods to `UnityWebRequest`
-* Fixed: Improvements to `SpeechToText` streaming
-* Fixed: `SpeechToText` streaming parameters
-* Fixed: Improvements to `ExampleStreaming`
-* Fixed: `SpeechToText` custom corpus
-* Fixed: Allow empty string to be sent when invoking `Message` from the `Conversation` service
-* Fixed: Standardized `Debug.Log` output throughout SDK
-* Fixed: Fix all integration tests
-
-## Version 1.0.0
-_2017-08-31_ MAJOR RELEASE, BREAKING CHANGES
-
-* New: Abstracted `Natural Language Understanding` service.
-* New: Removed higher level `Widget` architecture - Will create a separate package to add in this functionality.
-* New: Removed dependency on `config.json` file for credentials.
-* New: Removed the `Configuration Editor`.
-* New: Removed the `Natural Language Classifier Editor`.
-* New: Added `KeywordSpotting` functionality to `Speech to Text`.
-* New: Support authentication tokens.
-* New: Remove `Touchscript` and `Watson Camera` scripts.
-* New: Revised all services to directly take credentials.
-* New: Data models to support credentials through `VCAP_SERVICES`.
-* Fixed: Updated examples, tests and ReadMe.md files.
-* Fixed: Updated 3rd party plugins.
-* Fixed: Removed deprecated services.
+# [3.5.0](https://github.com/watson-developer-cloud/unity-sdk/compare/v3.4.0...v3.5.0) (2019-08-22)
 
 
-## Version 0.13.0
-_2017-01-25_
+### Bug Fixes
 
-* New: Abstracted `Discovery` service.
-* Fix: Updated TouchScript plugin.
-* New: Updated builds to use Unity 5.5.
-* Fix: TextToSpeech Widget now has multi output.
-* Fix: Added custom scenes in build editor.
-
-## Version 0.13.0
-_2016-12-02_
-
-* Fix: Increased conversation version.
-* Fix: Fixed infinite loop in Conversation service example.
-
-## Version 0.12.0
-_2016-11-04_
-
-* New: Added streaming `SpeechToText` example.
-* New: Abstraction for `Personality Insights V3`
-
-## Version 0.11.0
-_2016-10-27_
-
-* New: Abstracted `Speech to Text` customization methods.
-
-## Version 0.10.0
-_2016-09-23_
-
-* New: Added `similarity search` to the `Visual Recognition` service.
-* Fix: `Touch Widget` improvements.
-* Fix: Disabled 3rd Party plugin warnings.
-* Fix: Removed `Conversation` Message overload method that takes only input and conversationID.
-* Fix: Rewrote `Conversation` example script to show how to create MessageRequest object.
-
-## Version 0.9.0
-_2016-08-26_
-
-* Deprecated: Retired `Dialog` service.
-* Fix: `ExampleLanguageTranslation` now is using `LanguageTranslator` before `LanguageTranslation` service goes live.
-* Fix: Abstracted custom voice model methods in `Text to Speech` service.
-* Fix: Error when pasting credentials from the new IBM Cloud site into the `Config Editor`.
-* New: Added `CameraWidget` and `CameraDisplayWidget` to get video from device camera.
-* New: Added test scene for using the device camera with the `Visual Recognition` service.
-
-## Version 0.8.0
-_2016-08-12_
-
-* Fix: Removed tag stripping from `ToSpeech()` method of the `TextToSpeech` service.
-* New: The `Conversation` service now accepts full conversation payload in overloaded `Message()` method.
-* Fix: Removed `SetLastWriteTime()` for Android platform  in the data cache because of a known android issue.
-```https://code.google.com/p/android/issues/detail?id=15480```
+* **build:** make assembly definitions compatible to unity 2018 and 2019 ([a6064b1](https://github.com/watson-developer-cloud/unity-sdk/commit/a6064b1))
 
 
-## Version 0.7.0
-_2016-07-29_
+### Features
 
-* New: Visual Recognition: Added retraining functionality.
-* New: Visual Recognition: Use byteArray data to classify, detect faces and recognize text.
-* Fix: Updated integration testing.
+* **compare-comply:** add ContractCurrentcies model ([57677db](https://github.com/watson-developer-cloud/unity-sdk/commit/57677db))
+
+## [3.4.1](https://github.com/watson-developer-cloud/unity-sdk/compare/v3.4.0...v3.4.1) (2019-08-05)
 
 
-## Version 0.6.1
-_2016-07-17_
+### Bug Fixes
 
-* Fix: Updated documentation
+* **build:** make assembly definitions compatible to unity 2018 and 2019 ([a6064b1](https://github.com/watson-developer-cloud/unity-sdk/commit/a6064b1))
 
-## Version 0.6.0
+# [3.4.0](https://github.com/watson-developer-cloud/unity-sdk/compare/v3.3.0...v3.4.0) (2019-07-25)
 
-_2016-07-15_
 
-* New: Added `Document Conversion` abstraction
-* New: Added `AlchemyData News` abstraction
-* New: Added `Retrieve and Rank` abstraction
-* New: Added `Conversation` abstraction
-* Fix: Added `LanguageTranslation` and `LanguageTranslator`
+### Features
 
-## Version 0.5.0
+* **NaturalLanguageUnderstanding:** add examples for NaturalLanguageUnderstanding ([4bf9c54](https://github.com/watson-developer-cloud/unity-sdk/commit/4bf9c54))
+* **regenerate:** updates for regular release 4 ([10c4529](https://github.com/watson-developer-cloud/unity-sdk/commit/10c4529))
 
-_2016-06-24_
+# [3.3.0](https://github.com/watson-developer-cloud/unity-sdk/compare/v3.2.0...v3.3.0) (2019-06-26)
 
- * New: Added `Alchemy Language` abstraction
- * New: Added `Personality Insights` abstraction
- * Fix: Added `Tone Analyzer` to the Configuration Editor
- * Fix: Added `Tradeoff Analytics` to the Configuration Editor
- * Fix: Added `Conversation` to the Configuration Editor
- * Fix: Added `Personality Insights` to the Configuration Editor
- * Fix: Added `Alchemy Language` to the Configuration Editor
- * Fix: Added `Visual Recognition` to the Configuration Editor
 
-## Version 0.4.0
+### Features
 
-_2016-06-09_
+* **icp4d:** add support for icp4d ([ba8044d](https://github.com/watson-developer-cloud/unity-sdk/commit/ba8044d))
 
- * New: Added `Tone Analyzer v3` abstraction
- * New: Added `Tradeoff Analytics` abstraction
- * New: Added `Conversation` abstraction
- * New: Added `Visual Recognition v3` abstraction
- * Fix: Creating test project dynamically for Travis CL integration
- * Fix: Refactored Language Translation to Language Translator
- * Fix: Widget examples sprite references were disconnected
+# [3.2.0](https://github.com/watson-developer-cloud/unity-sdk/compare/v3.1.0...v3.2.0) (2019-06-14)
 
-## Version 0.3.0
 
-_2016-04-29_
+### Bug Fixes
 
- * Fix: Make SDK application agnostic
- * Fix: Rewrite README
- * New: Added example code snippets showing how to access low level services
- * Fix: Restructured SDK to put non-core components in Examples
- * Fix: Fixed several usability issues
- * Fix: Revised several aspects of the SDK to match the formats of other WDC SDKs
+* **Version:** Manually bumpversion to 3.1.0 ([0330079](https://github.com/watson-developer-cloud/unity-sdk/commit/0330079))
+
+
+### Features
+
+* **regenerate:** updates based on latest API definitions ([dc40499](https://github.com/watson-developer-cloud/unity-sdk/commit/dc40499))
+* **Regeneration:** Regenerated SDK based on the latest API definitions ([192c13b](https://github.com/watson-developer-cloud/unity-sdk/commit/192c13b))
+
+# [3.1.0](https://github.com/watson-developer-cloud/unity-sdk/compare/v3.0.0...v3.1.0) (2019-06-14)
+
+
+### Bug Fixes
+
+* **ExampleAssistantV1:** Added missing param names ([5fac56c](https://github.com/watson-developer-cloud/unity-sdk/commit/5fac56c))
+
+
+### Features
+
+* **Core:** Removed Core submodule ([2eab8e7](https://github.com/watson-developer-cloud/unity-sdk/commit/2eab8e7))
+* **regenerate:** updates based on latest API definitions ([dc40499](https://github.com/watson-developer-cloud/unity-sdk/commit/dc40499))
+* **Regeneration:** Regenerated SDK based on the latest API definitions ([192c13b](https://github.com/watson-developer-cloud/unity-sdk/commit/192c13b))
+
+# [3.1.0](https://github.com/watson-developer-cloud/unity-sdk/compare/v3.0.0...v3.1.0) (2019-05-10)
+
+
+### Bug Fixes
+
+* **ExampleAssistantV1:** Added missing param names ([5fac56c](https://github.com/watson-developer-cloud/unity-sdk/commit/5fac56c))
+
+
+### Features
+
+* **Core:** Removed Core submodule ([2eab8e7](https://github.com/watson-developer-cloud/unity-sdk/commit/2eab8e7))
+
+# [3.1.0](https://github.com/watson-developer-cloud/unity-sdk/compare/v3.0.0...v3.1.0) (2019-05-07)
+
+
+### Bug Fixes
+
+* **ExampleAssistantV1:** Added missing param names ([5fac56c](https://github.com/watson-developer-cloud/unity-sdk/commit/5fac56c))
+
+
+### Features
+
+* **Core:** Removed Core submodule ([2eab8e7](https://github.com/watson-developer-cloud/unity-sdk/commit/2eab8e7))
+
+# [3.1.0](https://github.com/watson-developer-cloud/unity-sdk/compare/v3.0.0...v3.1.0) (2019-04-22)
+
+
+### Bug Fixes
+
+* **ExampleAssistantV1:** Added missing param names ([5fac56c](https://github.com/watson-developer-cloud/unity-sdk/commit/5fac56c))
+
+
+### Features
+
+* **Core:** Removed Core submodule ([2eab8e7](https://github.com/watson-developer-cloud/unity-sdk/commit/2eab8e7))
+
+# [3.1.0](https://github.com/watson-developer-cloud/unity-sdk/compare/v3.0.0...v3.1.0) (2019-04-09)
+
+
+### Bug Fixes
+
+* **ExampleAssistantV1:** Added missing param names ([5fac56c](https://github.com/watson-developer-cloud/unity-sdk/commit/5fac56c))
+
+
+### Features
+
+* **Core:** Removed Core submodule ([2eab8e7](https://github.com/watson-developer-cloud/unity-sdk/commit/2eab8e7))
+
+# [3.1.0](https://github.com/watson-developer-cloud/unity-sdk/compare/v3.0.0...v3.1.0) (2019-04-03)
+
+
+### Bug Fixes
+
+* **ExampleAssistantV1:** Added missing param names ([5fac56c](https://github.com/watson-developer-cloud/unity-sdk/commit/5fac56c))
+
+
+### Features
+
+* **Core:** Removed Core submodule ([2eab8e7](https://github.com/watson-developer-cloud/unity-sdk/commit/2eab8e7))
+
+# [3.1.0](https://github.com/watson-developer-cloud/unity-sdk/compare/v3.0.0...v3.1.0) (2019-04-01)
+
+
+### Bug Fixes
+
+* **ExampleAssistantV1:** Added missing param names ([5fac56c](https://github.com/watson-developer-cloud/unity-sdk/commit/5fac56c))
+
+
+### Features
+
+* **Core:** Removed Core submodule ([2eab8e7](https://github.com/watson-developer-cloud/unity-sdk/commit/2eab8e7))
+
+# [3.0.0](https://github.com/watson-developer-cloud/unity-sdk/compare/v2.15.3...v3.0.0) (2019-03-29)
+
+
+### Bug Fixes
+
+* **Speech to Text V1:** Parsing response to double because of casting issues ([b89709f](https://github.com/watson-developer-cloud/unity-sdk/commit/b89709f))
+
+
+### Features
+
+* Added WatsonResponse and WatsonError ([f16890a](https://github.com/watson-developer-cloud/unity-sdk/commit/f16890a))
+* Created a commmon class to get default headers ([1be31bf](https://github.com/watson-developer-cloud/unity-sdk/commit/1be31bf))
+* Generated services ([d8244f8](https://github.com/watson-developer-cloud/unity-sdk/commit/d8244f8))
+* Regenerated the SDK based on the lateset definitions and unity generator ([ed1acb9](https://github.com/watson-developer-cloud/unity-sdk/commit/ed1acb9))
+* Removed customData from operations ([d1bbee8](https://github.com/watson-developer-cloud/unity-sdk/commit/d1bbee8))
+* Removed customData from response, added response json to response object ([e78754e](https://github.com/watson-developer-cloud/unity-sdk/commit/e78754e))
+* Separating core from sdk ([53e8b1e](https://github.com/watson-developer-cloud/unity-sdk/commit/53e8b1e))
+* **All services:** Exploded body parameters in service methods ([714b31e](https://github.com/watson-developer-cloud/unity-sdk/commit/714b31e))
+* Simplified namespaces ([3798616](https://github.com/watson-developer-cloud/unity-sdk/commit/3798616))
+* **Assistant V2:** Deserializing Dictionaries ([add8b46](https://github.com/watson-developer-cloud/unity-sdk/commit/add8b46))
+* **Core:** Added submodule for core class ([4c18480](https://github.com/watson-developer-cloud/unity-sdk/commit/4c18480))
+* **Core:** Separated core from the services ([f5f4791](https://github.com/watson-developer-cloud/unity-sdk/commit/f5f4791))
+* **Regeneration:** Regenerated all services using API definition commit 0baaf120beb3852ab9557e700f5 ([7d60d7f](https://github.com/watson-developer-cloud/unity-sdk/commit/7d60d7f))
+* **Regeneration:** Regenerated SDK with the latest API definitions ([9bdcfce](https://github.com/watson-developer-cloud/unity-sdk/commit/9bdcfce))
+* **Regeneration:** This PR adds the newest generated code using API definition commit `0baaf120beb3 ([85cf79c](https://github.com/watson-developer-cloud/unity-sdk/commit/85cf79c))
+* **Serialization:** Transitioned from FullSerializer to Json.net ([9ceeb61](https://github.com/watson-developer-cloud/unity-sdk/commit/9ceeb61))
+
+
+### BREAKING CHANGES
+
+* **Regeneration:** Regenerated SDK
