@@ -1,5 +1,5 @@
 /**
-* Copyright 2018 IBM Corp. All Rights Reserved.
+* Copyright 2018, 2019 IBM Corp. All Rights Reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -15,47 +15,54 @@
 *
 */
 
-using FullSerializer;
 using System.Collections.Generic;
+using Newtonsoft.Json;
+using System;
 
-namespace IBM.Watson.DeveloperCloud.Services.Assistant.v1
+namespace IBM.Watson.Assistant.V1.Model
 {
     /// <summary>
     /// CreateEntity.
     /// </summary>
-    [fsObject]
     public class CreateEntity
     {
         /// <summary>
-        /// The name of the entity. This string must conform to the following restrictions:  - It can contain only Unicode alphanumeric, underscore, and hyphen characters.  - It cannot begin with the reserved prefix `sys-`.  - It must be no longer than 64 characters.
+        /// The name of the entity. This string must conform to the following restrictions:
+        /// - It can contain only Unicode alphanumeric, underscore, and hyphen characters.
+        /// - If you specify an entity name beginning with the reserved prefix `sys-`, it must be the name of a system
+        /// entity that you want to enable. (Any entity content specified with the request is ignored.).
         /// </summary>
-        /// <value>The name of the entity. This string must conform to the following restrictions:  - It can contain only Unicode alphanumeric, underscore, and hyphen characters.  - It cannot begin with the reserved prefix `sys-`.  - It must be no longer than 64 characters.</value>
-        [fsProperty("entity")]
+        [JsonProperty("entity", NullValueHandling = NullValueHandling.Ignore)]
         public string Entity { get; set; }
         /// <summary>
-        /// The description of the entity. This string cannot contain carriage return, newline, or tab characters, and it must be no longer than 128 characters.
+        /// The description of the entity. This string cannot contain carriage return, newline, or tab characters.
         /// </summary>
-        /// <value>The description of the entity. This string cannot contain carriage return, newline, or tab characters, and it must be no longer than 128 characters.</value>
-        [fsProperty("description")]
+        [JsonProperty("description", NullValueHandling = NullValueHandling.Ignore)]
         public string Description { get; set; }
         /// <summary>
-        /// Any metadata related to the value.
+        /// Any metadata related to the entity.
         /// </summary>
-        /// <value>Any metadata related to the value.</value>
-        [fsProperty("metadata")]
-        public object Metadata { get; set; }
-        /// <summary>
-        /// An array of objects describing the entity values.
-        /// </summary>
-        /// <value>An array of objects describing the entity values.</value>
-        [fsProperty("values")]
-        public List<CreateValue> Values { get; set; }
+        [JsonProperty("metadata", NullValueHandling = NullValueHandling.Ignore)]
+        public Dictionary<string, object> Metadata { get; set; }
         /// <summary>
         /// Whether to use fuzzy matching for the entity.
         /// </summary>
-        /// <value>Whether to use fuzzy matching for the entity.</value>
-        [fsProperty("fuzzy_match")]
+        [JsonProperty("fuzzy_match", NullValueHandling = NullValueHandling.Ignore)]
         public bool? FuzzyMatch { get; set; }
+        /// <summary>
+        /// The timestamp for creation of the object.
+        /// </summary>
+        [JsonProperty("created", NullValueHandling = NullValueHandling.Ignore)]
+        public virtual DateTime? Created { get; private set; }
+        /// <summary>
+        /// The timestamp for the most recent update to the object.
+        /// </summary>
+        [JsonProperty("updated", NullValueHandling = NullValueHandling.Ignore)]
+        public virtual DateTime? Updated { get; private set; }
+        /// <summary>
+        /// An array of objects describing the entity values.
+        /// </summary>
+        [JsonProperty("values", NullValueHandling = NullValueHandling.Ignore)]
+        public List<CreateValue> Values { get; set; }
     }
-
 }

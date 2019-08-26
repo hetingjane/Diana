@@ -1,5 +1,5 @@
 /**
-* Copyright 2018 IBM Corp. All Rights Reserved.
+* Copyright 2018, 2019 IBM Corp. All Rights Reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -15,29 +15,25 @@
 *
 */
 
-using FullSerializer;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
-namespace IBM.Watson.DeveloperCloud.Services.Assistant.v1
+namespace IBM.Watson.Assistant.V1.Model
 {
     /// <summary>
     /// LogCollection.
     /// </summary>
-    [fsObject]
     public class LogCollection
     {
         /// <summary>
         /// An array of objects describing log events.
         /// </summary>
-        /// <value>An array of objects describing log events.</value>
-        [fsProperty("logs")]
-        public List<LogExport> Logs { get; set; }
+        [JsonProperty("logs", NullValueHandling = NullValueHandling.Ignore)]
+        public List<ModelLog> Logs { get; set; }
         /// <summary>
         /// The pagination data for the returned objects.
         /// </summary>
-        /// <value>The pagination data for the returned objects.</value>
-        [fsProperty("pagination")]
+        [JsonProperty("pagination", NullValueHandling = NullValueHandling.Ignore)]
         public LogPagination Pagination { get; set; }
     }
-
 }

@@ -1,5 +1,5 @@
 /**
-* Copyright 2018 IBM Corp. All Rights Reserved.
+* Copyright 2018, 2019 IBM Corp. All Rights Reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -15,35 +15,38 @@
 *
 */
 
-using FullSerializer;
+using System.Collections.Generic;
+using Newtonsoft.Json;
 using System;
 
-namespace IBM.Watson.DeveloperCloud.Services.Assistant.v1
+namespace IBM.Watson.Assistant.V1.Model
 {
     /// <summary>
     /// Example.
     /// </summary>
-    [fsObject]
     public class Example
     {
         /// <summary>
-        /// The text of the user input example.
+        /// The text of a user input example. This string must conform to the following restrictions:
+        /// - It cannot contain carriage return, newline, or tab characters.
+        /// - It cannot consist of only whitespace characters.
         /// </summary>
-        /// <value>The text of the user input example.</value>
-        [fsProperty("text")]
-        public string ExampleText { get; set; }
+        [JsonProperty("text", NullValueHandling = NullValueHandling.Ignore)]
+        public string Text { get; set; }
         /// <summary>
-        /// The timestamp for creation of the example.
+        /// An array of contextual entity mentions.
         /// </summary>
-        /// <value>The timestamp for creation of the example.</value>
-        [fsProperty("created")]
-        public virtual DateTime Created { get; private set; }
+        [JsonProperty("mentions", NullValueHandling = NullValueHandling.Ignore)]
+        public List<Mention> Mentions { get; set; }
         /// <summary>
-        /// The timestamp for the last update to the example.
+        /// The timestamp for creation of the object.
         /// </summary>
-        /// <value>The timestamp for the last update to the example.</value>
-        [fsProperty("updated")]
-        public virtual DateTime Updated { get; private set; }
+        [JsonProperty("created", NullValueHandling = NullValueHandling.Ignore)]
+        public virtual DateTime? Created { get; private set; }
+        /// <summary>
+        /// The timestamp for the most recent update to the object.
+        /// </summary>
+        [JsonProperty("updated", NullValueHandling = NullValueHandling.Ignore)]
+        public virtual DateTime? Updated { get; private set; }
     }
-
 }

@@ -181,7 +181,6 @@ namespace CWCNLP
 					act.direction = new DirectionSpec(DirectionSpec.Direction.WhereUserPoints);
 				}
 				if (st.partOfSpeech[i] == PartOfSpeech.RB) {
-					UnityEngine.Debug.Log("Noted RB in " + st.TreeForm(verbIdx));
 					if (st.words[i] == "up" && verb == "pick") {
 						act.action = Action.PickUp;
 					} else if (st.words[i] == "down" && (verb == "put" || verb == "set")) {

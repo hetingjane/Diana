@@ -1,5 +1,5 @@
 /**
-* Copyright 2018 IBM Corp. All Rights Reserved.
+* Copyright 2018, 2019 IBM Corp. All Rights Reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -15,40 +15,44 @@
 *
 */
 
-using FullSerializer;
+using Newtonsoft.Json;
 
-namespace IBM.Watson.DeveloperCloud.Services.Assistant.v1
+namespace IBM.Watson.Assistant.V1.Model
 {
     /// <summary>
     /// The pagination data for the returned objects.
     /// </summary>
-    [fsObject]
     public class Pagination
     {
         /// <summary>
         /// The URL that will return the same page of results.
         /// </summary>
-        /// <value>The URL that will return the same page of results.</value>
-        [fsProperty("refresh_url")]
+        [JsonProperty("refresh_url", NullValueHandling = NullValueHandling.Ignore)]
         public string RefreshUrl { get; set; }
         /// <summary>
         /// The URL that will return the next page of results.
         /// </summary>
-        /// <value>The URL that will return the next page of results.</value>
-        [fsProperty("next_url")]
+        [JsonProperty("next_url", NullValueHandling = NullValueHandling.Ignore)]
         public string NextUrl { get; set; }
         /// <summary>
         /// Reserved for future use.
         /// </summary>
-        /// <value>Reserved for future use.</value>
-        [fsProperty("total")]
+        [JsonProperty("total", NullValueHandling = NullValueHandling.Ignore)]
         public long? Total { get; set; }
         /// <summary>
         /// Reserved for future use.
         /// </summary>
-        /// <value>Reserved for future use.</value>
-        [fsProperty("matched")]
+        [JsonProperty("matched", NullValueHandling = NullValueHandling.Ignore)]
         public long? Matched { get; set; }
+        /// <summary>
+        /// A token identifying the current page of results.
+        /// </summary>
+        [JsonProperty("refresh_cursor", NullValueHandling = NullValueHandling.Ignore)]
+        public string RefreshCursor { get; set; }
+        /// <summary>
+        /// A token identifying the next page of results.
+        /// </summary>
+        [JsonProperty("next_cursor", NullValueHandling = NullValueHandling.Ignore)]
+        public string NextCursor { get; set; }
     }
-
 }
