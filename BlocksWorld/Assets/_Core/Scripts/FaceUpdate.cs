@@ -26,8 +26,14 @@ public class FaceUpdate : MonoBehaviour
         smileRightIndex = new List<int>();
         frownLeftIndex = new List<int>();
         frownRightIndex = new List<int>();
+        var avatar = GameObject.Find("Diana2");
+        if (avatar == null)
+        {
+            Debug.LogError("EmotionModule: Cannot find Diana object!");
+            return;
+        }
 
-        foreach (var smr in GetComponentsInChildren<SkinnedMeshRenderer>())
+        foreach (var smr in avatar.GetComponentsInChildren<SkinnedMeshRenderer>())
         {
             Mesh mesh = smr.sharedMesh;
             int sleftIdx = mesh.GetBlendShapeIndex("Smile_Left");
@@ -44,7 +50,7 @@ public class FaceUpdate : MonoBehaviour
                 frownRightIndex.Add(frightIdx);
             }
         }
-        player = GameObject.Find("Main Camera");
+        player = GameObject.Find("AffectivaModule");
         playerEmotions = player.GetComponent<PlayerEmotions>();
         if (playerEmotions == null)
         {

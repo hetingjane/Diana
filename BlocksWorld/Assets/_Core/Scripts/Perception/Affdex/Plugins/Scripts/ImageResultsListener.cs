@@ -6,8 +6,8 @@ namespace Affdex
     /// <summary>
     /// Class that contains callback methods for asset results
     /// </summary>
-    public abstract class ImageResultsListener
-    {
+    public abstract class ImageResultsListener : ModuleBase
+    { 
         /// <summary>
         /// Indicates image results are available.
         /// </summary>
