@@ -6,7 +6,7 @@ namespace Affdex
     /// <summary>
     /// Class that contains callback methods for asset results
     /// </summary>
-    public abstract class ImageResultsListener : MonoBehaviour
+    public abstract class ImageResultsListener
     {
         /// <summary>
         /// Indicates image results are available.

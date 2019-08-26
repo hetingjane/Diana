@@ -21,7 +21,7 @@ public class PlayerEmotions : ImageResultsListener
     public float happyThreshold = 10f;
 
     [Range(0, 100)]
-    public float angryThreshold = 20f;
+    public float angryThreshold = 10f;
     public override void onFaceFound(float timestamp, int faceId)
     {
         Debug.Log("Found the face");
@@ -54,22 +54,22 @@ public class PlayerEmotions : ImageResultsListener
                 dominantEmotion = Emotion.Happy;
 
 
-                var EmotionValue = new DataStore.IntValue((int)currentJoy);
-                DataStore.SetValue("user:dominant emotion:" + dominantEmotion.ToString(), EmotionValue, null, dominantEmotion.ToString());
+                var emotionValue = new DataStore.IntValue((int)currentJoy);
+                DataStore.SetValue("user:dominantEmotion:" + dominantEmotion.ToString(), emotionValue, null, dominantEmotion.ToString());
 
             }
             else if (currentAnger > angryThreshold)
             {
                 dominantEmotion = Emotion.Angry;
-                var EmotionValue = new DataStore.IntValue((int)currentAnger);
-                DataStore.SetValue("user:dominant emotion:" + dominantEmotion.ToString(), EmotionValue, null, dominantEmotion.ToString());
+                var emotionValue = new DataStore.IntValue((int)currentAnger);
+                DataStore.SetValue("user:dominantEmotion:" + dominantEmotion.ToString(), emotionValue, null, dominantEmotion.ToString());
 
             }
             else
             {
                 dominantEmotion = Emotion.Neutral;
-                DataStore.SetValue("user:dominant emotion:Happy" , new DataStore.IntValue(0), null, dominantEmotion.ToString());
-                DataStore.SetValue("user:dominant emotion:Angry", new DataStore.IntValue(0), null, dominantEmotion.ToString());
+                DataStore.SetValue("user:dominantEmotion:Happy" , new DataStore.IntValue(0), null, dominantEmotion.ToString());
+                DataStore.SetValue("user:dominantEmotion:Angry", new DataStore.IntValue(0), null, dominantEmotion.ToString());
 
             }
             //Retrieve the coordinates of the facial landmarks (face feature points)
