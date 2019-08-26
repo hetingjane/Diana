@@ -18,7 +18,7 @@ using UnityEngine.Events;
 public class WatsonStreamingSR : ModuleBase
 {
 	[Header("Service Credentials")]
-	public string _apiKey = null;
+	public string _apiKey = "aS4HL_ZB0NncX1G6twfzexZJT1Rj9JnUeDlQFfAZbyBy";
 	public string _url = null;
 	
 	[Header("Control Options")]
