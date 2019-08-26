@@ -475,9 +475,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dffcb047c29a9d04fbe134c6109b2c22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _serviceUrl: 
+  _serviceUrl: https://stream.watsonplatform.net/speech-to-text/api
   ResultsField: {fileID: 1863902092}
-  _iamApikey: 
+  _iamApikey: aS4HL_ZB0NncX1G6twfzexZJT1Rj9JnUeDlQFfAZbyBy
   _recognizeModel: 
 --- !u!4 &1646685151
 Transform:
