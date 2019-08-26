@@ -34,6 +34,8 @@ namespace Affdex
         /// </summary>
         public int targetHeight = 480;
 
+        public string cameraName = "HP Webcam HD 4310";
+
 #if UNITY_XBOXONE
         /// <summary>
         /// Kinect texture
@@ -120,13 +122,13 @@ namespace Affdex
         /// </summary>
         /// <param name="isFrontFacing">Should the device be forward facing?</param>
         /// <param name="name">The name of the webcam to select.</param>
-        public void SelectCamera(bool isFrontFacing, string name = "Kinect V2 Video Sensor")
+        public void SelectCamera(bool isFrontFacing)
         {
 #if !UNITY_XBOXONE && UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN || UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX || UNITY_IOS || UNITY_ANDROID
             foreach (WebCamDevice d in devices)
             {
                 Debug.Log(d.name);
-                if (d.name.Length > 1 && d.name == name)
+                if (d.name.Length > 1 && d.name == this.cameraName)
                 {
                         //cameraTexture.Stop();
                         device = d;
