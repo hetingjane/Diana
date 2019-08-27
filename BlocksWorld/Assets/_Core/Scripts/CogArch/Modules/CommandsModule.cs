@@ -85,6 +85,7 @@ public class CommandsModule : ModuleBase
 			SetValue("me:intent:action", "", comment);
 			break;
 		case Action.PickUp:
+		case Action.Raise:
 			// See if we can determine what object to pick up, based on spec.
 			if (act.directObject == null) return;	// (user is probably not done speaking)
 			obj = FindObjectFromSpec(act.directObject);
