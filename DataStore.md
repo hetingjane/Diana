@@ -25,6 +25,7 @@ As a general rule, each part of a key should be named like a variable or propert
 |`me:speech:current`          |String       |        |Text that Diana is currently speaking                                     |
 |`me:speech:intent`           |String       |        |Text that Diana intends to speak                                          |
 |`user:communication`         |Communication|        |Semantic representation of the user's last utterance                      |
+|`user:dominantEmotion:`     |String       |        |Current user dominant emotion, e.g. "Happy", "Angry"                      |
 |`user:dominantEmotion:Angry`|Integer      |0 to 100|Measure of how angry the user looks                                       |
 |`user:dominantEmotion:Happy`|Integer      |0 to 100|Measure of how happy the user looks                                       |
 |`user:engaged`               |Boolean      |T or F  |True if closest body frame is engaged and false otherwise                 |
