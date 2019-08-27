@@ -119,6 +119,7 @@ namespace CWCNLP
 		}
 		
 		public static ActionSpec GrokAction(ParseState st, int verbIdx) {
+			UnityEngine.Debug.Log("GrokAction: " + st.ToString() + " with verb at " + verbIdx);
 			var act = new ActionSpec();
 			string verb = st.words[verbIdx].ToLower();
 			switch (verb) {
@@ -256,6 +257,7 @@ namespace CWCNLP
 		void Test(string input, string expectedComm) {
 			ParseState st = Parser.Parse(input);
 			string s = st.TreeForm();
+			UnityEngine.Debug.Log("Parse of " + input + " = " + s);
 			Communication comm = Grok.GrokInput(input, st);
 			if (comm.ToString() == expectedComm) return;
 			Fail("Grok failed on: " + input);
@@ -267,11 +269,13 @@ namespace CWCNLP
 			Test("stop", "Command : [Act:Stop]");
 			Test("that's enough", "Command : [Act:Stop]");
 			Test("pick up this block", "Command : [Act:PickUp Obj:[the single block]]");
+			Test("pick up that one", "Command : [Act:PickUp Obj:[the single one]]");
 			Test("put it down", "Command : [Act:SetDown Obj:[single it]]");
 			Test("set it down", "Command : [Act:SetDown Obj:[single it]]");
 			Test("pick it up", "Command : [Act:PickUp Obj:[single it]]");
 			Test("place it on this one", "Command : [Act:Put Obj:[single it] Loc:[OnTopOf [the single one]]]");			
 			Test("set it down over here", "Command : [Act:SetDown Obj:[single it] Loc:[Indicated ]]");
+			Test("put it over there", "Command : [Act:Put Obj:[single it] Loc:[Indicated ]]");
 		}
 	}
 }
