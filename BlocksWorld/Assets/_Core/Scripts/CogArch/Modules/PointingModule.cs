@@ -33,12 +33,15 @@ public class PointingModule : ModuleBase
 
     private bool leftPoint = false;
     private bool rightPoint = false;
+    private bool isBodyMode;
     private bool filterInitialized = false;
     private bool leftValid = true;
     private bool rightValid = true;
     public bool calibrationMode = false;
 
     public int windowSize = 10;
+    public float maxDistance = 10;
+    public LayerMask layerMask = -1;
 
     private float leftDx, leftDy, rightDx, rightDy, leftSx, leftSy, rightSx, rightSy;
 
@@ -56,7 +59,10 @@ public class PointingModule : ModuleBase
     List<Vector3> shoulderRightList = new List<Vector3>();
     List<Vector3> rightPointList = new List<Vector3>();
     List<Vector3> leftPointList = new List<Vector3>();
-
+    private Vector3 pointPosLeft;
+    private bool isPointPosLeftValid;
+    private Vector3 pointPosRight;
+    private bool isPointPosRightValid;
 
     protected override void Start()
     {
@@ -78,6 +84,70 @@ public class PointingModule : ModuleBase
 
     protected void Update()
     {
+        GetPixelSpaceCoordinates();
+        SetValue("bodymode", this.isBodyMode.ToString(), "");
+        SetValue("left valid", this.isPointPosLeftValid.ToString(), "");
+        SetValue("right valid", this.isPointPosRightValid.ToString(), "");
+        SetValue("left pos", this.pointPosLeft.ToString(), "");
+        SetValue("right pos", this.pointPosRight.ToString(), "");
+        ShowCoordinates();
+    }
+
+    // by default use mouse mode
+    // if bodyMode, disable mouse mode
+    // reenable mouse mode if not bodymode and detect mouse movement ( if(Input.GetAxis("Mouse X")<0))
+    private void ShowCoordinates()
+    {
+        Vector3 screenPos;
+        Vector3 mousePos = Input.mousePosition;
+        bool mouseMoved = Math.Abs(Input.GetAxis("Mouse X")) > 0 || Math.Abs(Input.GetAxis("Mouse Y")) > 0;
+        bool mouseInScreen = mousePos.x >= 0 && mousePos.x < Screen.width && mousePos.y >= 0 && mousePos.y < Screen.height;
+
+        if (this.isBodyMode)
+        {
+            screenPos = this.isPointPosRightValid ? this.pointPosRight : this.pointPosLeft;
+        }
+        else if (mouseMoved && mouseInScreen)
+        {
+            screenPos = mousePos;
+        }
+        else
+        {
+            SetValue("user:isPointing", false, "no mouse/kinect input");
+            return;
+        }
+
+        Ray ray = Camera.main.ScreenPointToRay(screenPos);
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit, maxDistance, layerMask))
+        {
+            if (hit.collider.name.EndsWith("Backstop"))
+            {
+                // We have an invisible pointer backstop wall behind Diana.  This
+                // is to give the user some feedback when they're pointing to high.
+                // When the ray hits this, we want to show a "no bueno" indicator
+                // and report the point as invalid.
+                var comment = "hit pointer backstop";
+                SetValue("user:isPointing", true, comment);
+                SetValue("user:pointPos", hit.point, comment);
+                SetValue("user:pointValid", false, comment);
+            }
+            else
+            {
+                var comment = "ray hit " + hit.collider.name;
+                SetValue("user:isPointing", true, comment);
+                SetValue("user:pointPos", hit.point, comment);
+                SetValue("user:pointValid", true, comment);
+            }
+        }
+        else
+        {
+            SetValue("user:isPointing", false, "no ray hit");
+        }
+    }
+
+    private void GetPixelSpaceCoordinates()
+    {
         Vector3 avgHandTipLeft, avgShoulderLeft, avgHandTipRight, avgShoulderRight, rightPointPos, leftPointPos;
 
         bool handTipLeftExists = DataStore.HasValue(handTipLeftKey);
@@ -98,10 +168,12 @@ public class PointingModule : ModuleBase
 
         rightPoint = handTipRightExists && shoulderRightExists && rightHandValue == handPoseValue;
 
+        this.isBodyMode = leftPoint || rightPoint;
+
         if (leftPoint)
         {
             handTipLeftList.Insert(0, DataStore.GetVector3Value(handTipLeftKey));
-            shoulderLeftList.Insert(0,DataStore.GetVector3Value(shoulderLeftKey));
+            shoulderLeftList.Insert(0, DataStore.GetVector3Value(shoulderLeftKey));
 
             if (handTipLeftList.Count > windowSize) handTipLeftList.RemoveAt(windowSize);
             if (shoulderLeftList.Count > windowSize) shoulderLeftList.RemoveAt(windowSize);
@@ -118,7 +190,8 @@ public class PointingModule : ModuleBase
 
             if (calibrationMode)
             {
-                DataStore.SetValue("user:pointPos:left", new DataStore.Vector3Value(leftPointPos), this, leftPointPos.ToString());
+                DataStore.SetValue("user:pointPos:left", new DataStore.Vector3Value(leftPointPos), this, leftPointPos[0].ToString());
+                this.isPointPosLeftValid = true;
             }
             else
             {
@@ -130,20 +203,11 @@ public class PointingModule : ModuleBase
 
                 SmoothJoint(leftPointList);
 
-                if (CheckValidRange(leftPointList[0]))
-                {
-                    DataStore.SetValue("user:pointPos:left", new DataStore.Vector3Value(leftPointList[0]), this, leftPointList[0].ToString());
-                    DataStore.SetValue("user:pointPos:left:valid", new DataStore.BoolValue(true), this, leftPointList[0].ToString() + " is valid");
-                }
-                else
-                {
-                    DataStore.SetValue("user:pointPos:left", new DataStore.Vector3Value(leftPointList[0]), this, leftPointList[0].ToString());
-                    DataStore.SetValue("user:pointPos:left:valid", new DataStore.BoolValue(false), this, leftPointList[0].ToString() + " is valid");
-                }
+                this.pointPosLeft = leftPointList[0];
+                this.isPointPosLeftValid = CheckValidRange(leftPointList[0]);
             }
         }
-
-        if (rightPoint)
+        else if (rightPoint)
         {
             handTipRightList.Insert(0, DataStore.GetVector3Value(handTipRightKey));
             shoulderRightList.Insert(0, DataStore.GetVector3Value(shoulderRightKey));
@@ -164,31 +228,23 @@ public class PointingModule : ModuleBase
             if (calibrationMode)
             {
                 DataStore.SetValue("user:pointPos:right", new DataStore.Vector3Value(rightPointPos), this, rightPointPos[0].ToString());
+                this.isPointPosRightValid = true;
             }
             else
             {
                 rightPointPos = ConvertToPixelSpace(rightPointPos, rightDx, rightDy, rightSx, rightSy);
 
-                if(rightValid) rightPointList.Insert(0, rightPointPos);
+                if (rightValid) rightPointList.Insert(0, rightPointPos);
 
                 if (rightPointList.Count > windowSize) rightPointList.RemoveAt(windowSize);
 
                 SmoothJoint(rightPointList);
 
-                if (CheckValidRange(rightPointList[0]) || calibrationMode)
-                {
-                    DataStore.SetValue("user:pointPos:right", new DataStore.Vector3Value(rightPointList[0]), this, rightPointList[0].ToString());
-                    DataStore.SetValue("user:pointPos:right:valid", new DataStore.BoolValue(true), this, rightPointList[0].ToString() + " is valid");
-                }
-                else
-                {
-                    DataStore.SetValue("user:pointPos:right", new DataStore.Vector3Value(rightPointList[0]), this, rightPointList[0].ToString());
-                    DataStore.SetValue("user:pointPos:right:valid", new DataStore.BoolValue(false), this, rightPointList[0].ToString() + " is not valid");
-                }
+                this.pointPosRight = rightPointList[0];
+                this.isPointPosRightValid = CheckValidRange(rightPointList[0]);
             }
         }
     }
-
  
     /* 
      * Smooth the joint using an implementation of the Savitsky Golay filter.

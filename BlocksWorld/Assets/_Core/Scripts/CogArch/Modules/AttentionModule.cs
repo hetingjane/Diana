@@ -10,6 +10,7 @@ Writes:		me:attending (StringValue)
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static DataStore;
 
 public class AttentionModule : ModuleBase {
 
@@ -27,6 +28,7 @@ public class AttentionModule : ModuleBase {
 		lastSalientTime = Time.time;
 		DataStore.Subscribe("user:isSpeaking", NoteUserIsSpeaking);
 		DataStore.Subscribe("me:intent:action", NoteIntent);
+        DataStore.Subscribe("user:isPointing", NoteUserIsPointing);
 	}
 
 	void NoteUserIsSpeaking(string key, DataStore.IValue value) {
@@ -46,6 +48,17 @@ public class AttentionModule : ModuleBase {
 			SetValue("me:attending", "user", "pointing");
 		}
 	}
+
+    void NoteUserIsPointing(string key, DataStore.IValue value)
+    {
+        //TODO make Diana look forward if value is false
+        if ((value as DataStore.BoolValue).val)
+        {
+            SetValue("me:alertness", 7, "user is pointing");
+            SetValue("me:attending", "user", "user is pointing");
+            lastSalientTime = Time.time;
+        }
+    }
 	
 	protected void Update() {
 		// When nothing of interest has happened for a while, change attention
