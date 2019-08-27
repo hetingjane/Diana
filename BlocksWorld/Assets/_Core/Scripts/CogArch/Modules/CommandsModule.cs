@@ -4,6 +4,10 @@ appropriately (by setting me:intent values on the blackboard).
 
 Reads:		user:communication (Communication)
 Writes:		me:intent:eyesClosed (BoolValue)
+			me:speech:intent (StringValue)
+			me:intent:pointAt (StringValue, name of thing to point at)
+			me:intent:action (StringValue: "point", "pickUp", "setDown")
+			me:intent:target (Vector3Value)
 */
 
 using System.Collections;
@@ -94,14 +98,32 @@ public class CommandsModule : ModuleBase
 			}
 			break;
 		case Action.SetDown:
+		case Action.Put:
 			// For now we'll assume we're being told to set down whatever we're holding.
 			// But let's verify anyway.
 			obj = FindObjectFromSpec(act.directObject);
 			if (obj != null && obj.name != DataStore.GetStringValue("me:holding")) {
 				SetValue("me:speech:intent", "I'm not holding that.", comment);
 			} else {
-				SetValue("me:speech:intent", "OK.", comment);		
-				SetValue("me:intent:action", "setDown", comment);
+				bool allGood = true;
+				if (act.location == null) {
+					// No location specified.
+					SetValue("me:intent:targetName", "", comment);
+					SetValue("me:intent:target", "", comment);
+				} else {
+					// Location specified.
+					Transform relObj = FindObjectFromSpec(act.location.obj);
+					if (relObj == null && act.location.obj != null) {
+						SetValue("me:speech:intent", "I don't know where you mean.", comment);
+						allGood = false;
+					}
+					SetValue("me:intent:target", relObj.position, comment);
+					SetValue("me:intent:targetName", relObj == null ? "" : relObj.name, comment);
+				}
+				if (allGood) {
+					SetValue("me:speech:intent", "OK.", comment);		
+					SetValue("me:intent:action", "setDown", comment);
+				}
 			}
 			break;
 		default:
