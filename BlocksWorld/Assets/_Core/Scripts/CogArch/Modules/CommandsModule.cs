@@ -138,7 +138,21 @@ public class CommandsModule : ModuleBase
 	Transform FindObjectFromSpec(Semantics.ObjSpec objSpec) {
 		if (objSpec == null) return null;
 		Debug.Log("Looking for object fitting: " + objSpec);
+		
 		Transform foundObject = null;
+		
+		if (objSpec.referredToAs == "it") {
+			// If user says "it" while the agent is holding a block,
+			// then let's assume they mean the held block.
+			foundObject = BipedIKGrab.heldObject;	// unfortunate coupling... ToDo: improve this.
+			if (foundObject != null) return foundObject;
+			Debug.Log("Noted \"it\", but heldObject is null");
+		}
+		
+		bool userIsPointing = DataStore.GetBoolValue("user:isPointing");
+		Vector3 pointPos = DataStore.GetVector3Value("user:pointPos");
+		float bestDistance = 1f;	// ignore anything more than 1 meter away
+		
 		for (int i=0; i<manipulableObjects.childCount; i++) {
 			Transform candidate = manipulableObjects.GetChild(i);
 			Renderer r = candidate.GetComponentInChildren<Renderer>();
@@ -147,6 +161,21 @@ public class CommandsModule : ModuleBase
 			if (objSpec.color != null && matName == objSpec.color.ToString().ToLower()) {
 				// Looks like a good match!
 				foundObject = candidate;
+				break;
+			}
+			if (objSpec.plurality == Plurality.Singular && objSpec.color == Semantics.Color.Unspecified) {
+				// If no color was specified, but the user has indicated a single
+				// item and is pointing, then pick the block closest to the point position.
+				float dist = Vector3.Distance(candidate.position, pointPos);
+				if (dist < bestDistance) {
+					Debug.Log(candidate.name + " looks good at " + dist + " m away");
+					foundObject = candidate;
+					bestDistance = dist;
+				} else {
+					Debug.Log(candidate.name + " is no good, it's " + dist + " m away");
+				}
+			} else {
+				Debug.Log("Not looking for points because plurality=" + objSpec.plurality + " and color=" + objSpec.color);
 			}
 		}
 		Debug.Log("Found: " + foundObject);

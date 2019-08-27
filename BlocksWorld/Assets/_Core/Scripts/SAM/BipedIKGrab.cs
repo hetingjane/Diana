@@ -4,8 +4,14 @@ pick up or put down an object specified by the blackboard.
 
 Reads:		me:intent:action (StringValue; watching for "pickUp" or "putDown")
 			me:intent:target (Vector3d, position of object to pick up or set down)
-			me:intent:targetName (string, name of object to pick up, or to set down on)
-Writes:		(nothing)
+			me:intent:targetName (StringValue; name of object to pick up, or to set down on)
+Writes:		me:holding (StringValue; name of object we're holding)
+
+Note that this module *also* provides a static Transform reference which
+is the object it's currently holding.  That's important, since such a block
+is currently inside the avatar hierarchy, and can't be found in the usual
+part of the scene hierarchy.
+
 */
 using System.Collections;
 using System.Collections.Generic;
@@ -43,6 +49,9 @@ public class BipedIKGrab : MonoBehaviour
 	
 	Transform setDownTarget;		// object to place ours on top of
 	Vector3 setDownPos;				// location to place our block in
+	
+	// Public, static reference to the block currently being held.
+	public static Transform heldObject = null;
 	
 	protected void Start() {
 		var ik = GetComponent<FullBodyBipedIK>();
@@ -93,6 +102,7 @@ public class BipedIKGrab : MonoBehaviour
 			if (Vector3.Distance(reachPos, curReachTarget) < 0.02f) {
 				state = State.Holding;
 				DataStore.SetValue("me:holding", new DataStore.StringValue(targetBlock.name), null, "BipedIKGrab");
+				heldObject = targetBlock;
 			}
 			break;
 		case State.Holding:
@@ -134,6 +144,8 @@ public class BipedIKGrab : MonoBehaviour
 				targetBlock.SetParent(grabbableBlocks);
 				targetBlock.eulerAngles = Vector3.zero;
 				targetBlock.GetComponent<Rigidbody>().isKinematic = false;
+				DataStore.SetValue("me:holding", new DataStore.StringValue(""), null, "BipedIKGrab released " + targetBlock.name);
+				heldObject = null;
 				state = State.Releasing;
 				curReachTarget = targetBlock.position + Vector3.up * 0.2f;
 			}
