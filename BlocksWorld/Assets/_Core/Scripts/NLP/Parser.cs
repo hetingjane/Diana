@@ -59,8 +59,12 @@ namespace CWCNLP
 			}
 			
 			// Let's initialize by assigning the primary POS for each word.
+			// (Capitalize the first word in the sentence, as that's an 
+			// assumption baked into the SEMCOR dataset.)
 			for (int i=0; i<words.Length; i++) {
-				partOfSpeech[i] = PartOfSpeech.PrimaryPOS(words[i]);
+				string w = words[i];
+				if (i == 0) w = w[0].ToString().ToUpper() + w.Substring(1);
+				partOfSpeech[i] = PartOfSpeech.PrimaryPOS(w);
 			}
 
 			CalculateScore();

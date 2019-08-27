@@ -18,9 +18,9 @@ namespace CWCNLP
 			if (EqualsAny(obj.referredToAs, "i", "me", "you", "it", "they", "them")) {
 				obj.specificity = Specificity.Named;
 			}
-			if (EqualsAny(obj.referredToAs, "block", "one", "cube", "thing", "i", "me", "it")) {
+			if (EqualsAny(obj.referredToAs, "block", "one", "cube", "thing", "i", "me", "it", "box", "book")) {
 				obj.plurality = Plurality.Singular;
-			} else if (EqualsAny(obj.referredToAs, "blocks", "ones", "cubes", "things")) {
+			} else if (EqualsAny(obj.referredToAs, "blocks", "ones", "cubes", "things", "boxes", "books")) {
 				obj.plurality = Plurality.Plural;
 				obj.referredToAs = obj.referredToAs.Substring(0, obj.referredToAs.Length-1);
 			} else if (EqualsAny(obj.referredToAs, "they", "them")) {
@@ -32,7 +32,7 @@ namespace CWCNLP
 				string pos = st.partOfSpeech[i];
 				string word = st.words[i].ToLower();
 				if (pos == PartOfSpeech.DT) {
-					if (EqualsAny(word, "the", "that", "those")) {
+					if (EqualsAny(word, "the", "that", "this", "those")) {
 						obj.specificity = Specificity.Specific;
 					} else if (EqualsAny(word, "a", "some", "any")) {
 						obj.specificity = Specificity.Nonspecific;
@@ -71,6 +71,8 @@ namespace CWCNLP
 						}
 						break;
 					}
+				} else if (pos == PartOfSpeech.RB) {
+					UnityEngine.Debug.Log("Looking at RB: " + word);
 				}
 			}
 			return obj;
@@ -133,6 +135,8 @@ namespace CWCNLP
 					act.action = Action.Say;
 					break;
 				case "put":
+				case "set":
+				case "place":
 					act.action = Action.Put;
 					break;
 				case "close":
@@ -183,8 +187,11 @@ namespace CWCNLP
 				if (st.partOfSpeech[i] == PartOfSpeech.RB) {
 					if (st.words[i] == "up" && verb == "pick") {
 						act.action = Action.PickUp;
-					} else if (st.words[i] == "down" && (verb == "put" || verb == "set")) {
+					} else if (st.words[i] == "down" && (verb == "put" || verb == "set" || verb == "place")) {
 						act.action = Action.SetDown;
+					} else if (st.words[i] == "here" || st.words[i] == "there"
+					|| st.words[i] == "over_here" || st.words[i] == "over_there") {
+						act.location = new LocationSpec() { relation = LocationSpec.Relation.Indicated };
 					}
 				}
 			}			
@@ -259,10 +266,12 @@ namespace CWCNLP
 		protected override void Run() {
 			Test("stop", "Command : [Act:Stop]");
 			Test("that's enough", "Command : [Act:Stop]");
-			Test("pick up this block", "Command : [Act:PickUp Obj:[single block]]");
+			Test("pick up this block", "Command : [Act:PickUp Obj:[the single block]]");
 			Test("put it down", "Command : [Act:SetDown Obj:[single it]]");
 			Test("set it down", "Command : [Act:SetDown Obj:[single it]]");
 			Test("pick it up", "Command : [Act:PickUp Obj:[single it]]");
+			Test("place it on this one", "Command : [Act:Put Obj:[single it] Loc:[OnTopOf [the single one]]]");			
+			Test("set it down over here", "Command : [Act:SetDown Obj:[single it] Loc:[Indicated ]]");
 		}
 	}
 }
