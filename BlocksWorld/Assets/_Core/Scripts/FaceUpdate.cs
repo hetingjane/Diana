@@ -26,10 +26,14 @@ public class FaceUpdate : MonoBehaviour
         smileRightIndex = new List<int>();
         frownLeftIndex = new List<int>();
         frownRightIndex = new List<int>();
-        var avatar = GameObject.Find("Diana2");
+
+	    // Find the avatar.  Currently this works only with Diana2.
+	    // If using some other avatar, log a warning, and disable this module.
+	    var avatar = GameObject.Find("Diana2");
         if (avatar == null)
         {
-            Debug.LogError("EmotionModule: Cannot find Diana object!");
+	        Debug.LogWarning("EmotionModule: Cannot find Diana object!  (Disabling EmotionModule.)", this);
+	        gameObject.SetActive(false);
             return;
         }
 
