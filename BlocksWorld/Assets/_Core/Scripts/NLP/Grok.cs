@@ -71,6 +71,8 @@ namespace CWCNLP
 						}
 						break;
 					}
+				} else if (pos == PartOfSpeech.RB) {
+					UnityEngine.Debug.Log("Looking at RB: " + word);
 				}
 			}
 			return obj;
@@ -187,6 +189,9 @@ namespace CWCNLP
 						act.action = Action.PickUp;
 					} else if (st.words[i] == "down" && (verb == "put" || verb == "set" || verb == "place")) {
 						act.action = Action.SetDown;
+					} else if (st.words[i] == "here" || st.words[i] == "there"
+					|| st.words[i] == "over_here" || st.words[i] == "over_there") {
+						act.location = new LocationSpec() { relation = LocationSpec.Relation.Indicated };
 					}
 				}
 			}			
@@ -266,6 +271,7 @@ namespace CWCNLP
 			Test("set it down", "Command : [Act:SetDown Obj:[single it]]");
 			Test("pick it up", "Command : [Act:PickUp Obj:[single it]]");
 			Test("place it on this one", "Command : [Act:Put Obj:[single it] Loc:[OnTopOf [the single one]]]");			
+			Test("set it down over here", "Command : [Act:SetDown Obj:[single it] Loc:[Indicated ]]");
 		}
 	}
 }

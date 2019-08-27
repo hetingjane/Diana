@@ -113,13 +113,25 @@ public class CommandsModule : ModuleBase
 					SetValue("me:intent:target", "", comment);
 				} else {
 					// Location specified.
-					Transform relObj = FindObjectFromSpec(act.location.obj);
-					if (relObj == null && act.location.obj != null) {
-						SetValue("me:speech:intent", "I don't know where you mean.", comment);
-						allGood = false;
+					if (act.location.relation == LocationSpec.Relation.Indicated) {
+						// User is saying "here" or "there" and should be pointing.
+						if (!DataStore.GetBoolValue("user:isPointing")) {
+							SetValue("me:speech:intent", "I don't know where you mean.", comment);
+							allGood = false;
+						} else {
+							SetValue("me:intent:targetName", "", comment);
+							SetValue("me:intent:target", DataStore.GetVector3Value("user:pointPos"), comment);
+						}
+					} else {
+						// User specified an object to set it on.
+						Transform relObj = FindObjectFromSpec(act.location.obj);
+						if (relObj == null && act.location.obj != null) {
+							SetValue("me:speech:intent", "I don't know where you mean.", comment);
+							allGood = false;
+						}
+						SetValue("me:intent:target", relObj.position, comment);
+						SetValue("me:intent:targetName", relObj == null ? "" : relObj.name, comment);
 					}
-					SetValue("me:intent:target", relObj.position, comment);
-					SetValue("me:intent:targetName", relObj == null ? "" : relObj.name, comment);
 				}
 				if (allGood) {
 					SetValue("me:speech:intent", "OK.", comment);		
