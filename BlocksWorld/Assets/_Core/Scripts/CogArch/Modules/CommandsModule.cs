@@ -129,7 +129,7 @@ public class CommandsModule : ModuleBase
 							SetValue("me:speech:intent", "I don't know where you mean.", comment);
 							allGood = false;
 						}
-						SetValue("me:intent:target", relObj.position, comment);
+						SetValue("me:intent:target", relObj == null ? "" : relObj.position, comment);
 						SetValue("me:intent:targetName", relObj == null ? "" : relObj.name, comment);
 					}
 				}
