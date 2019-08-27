@@ -59,9 +59,7 @@ As a general rule, each part of a key should be named like a variable or propert
 |`user:joint:WristLeft`       |Vector3      |Reals   |Location of left wrist point of closest body frame in "camera space"      |
 |`user:joint:WristRight`      |Vector3      |Reals   |Location of right wrist point of closest body frame in "camera space"     |
 |`user:pointPos`              |Vector3      |        |Position the user is pointing at in the scene                             |
-|`user:pointPos:left`         |Vector3      |Reals   |Location of left hand pointing position in pixel space. (z==0)            |
-|`user:pointPos:left:valid`   |Boolean      |T or F  |True if pointing at screen and false if not pointing at screen            |
-|`user:pointPos:right`        |Vector3      |Reals   |Location of right hand pointing position in pixel space. (z==0)           |
-|`user:pointPos:right:valid`  |Boolean      |T or F  |True if pointing at screen and false if not pointing at screen            |
+|`user:pointPos:left`         |Vector3      |Reals   |Location of left hand pointing position in pixel space, calibration only. (z==0)            |
+|`user:pointPos:right`        |Vector3      |Reals   |Location of right hand pointing position in pixel space, calibration only. (z==0)           |
 |`user:pointValid`            |Boolean      |T or F  |True if the user is pointing at a valid location (Table) false otherwise  |
 |`user:speech`                |String       |        |Text of utterance user has just spoken (or typed)                         |

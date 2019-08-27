@@ -60,9 +60,10 @@ public class PointingModule : ModuleBase
     List<Vector3> rightPointList = new List<Vector3>();
     List<Vector3> leftPointList = new List<Vector3>();
     private Vector3 pointPosLeft;
-    private bool isPointPosLeftValid;
+    private bool isPointPosLeftValid = false;
     private Vector3 pointPosRight;
-    private bool isPointPosRightValid;
+    private bool isPointPosRightValid = false;
+    private bool mousePreviouslyMoved = false;
 
     protected override void Start()
     {
@@ -85,17 +86,12 @@ public class PointingModule : ModuleBase
     protected void Update()
     {
         GetPixelSpaceCoordinates();
-        SetValue("bodymode", this.isBodyMode.ToString(), "");
-        SetValue("left valid", this.isPointPosLeftValid.ToString(), "");
-        SetValue("right valid", this.isPointPosRightValid.ToString(), "");
-        SetValue("left pos", this.pointPosLeft.ToString(), "");
-        SetValue("right pos", this.pointPosRight.ToString(), "");
         ShowCoordinates();
     }
 
     // by default use mouse mode
     // if bodyMode, disable mouse mode
-    // reenable mouse mode if not bodymode and detect mouse movement ( if(Input.GetAxis("Mouse X")<0))
+    // reenable mouse mode if not bodymode and detect mouse movement 
     private void ShowCoordinates()
     {
         Vector3 screenPos;
@@ -106,13 +102,16 @@ public class PointingModule : ModuleBase
         if (this.isBodyMode)
         {
             screenPos = this.isPointPosRightValid ? this.pointPosRight : this.pointPosLeft;
+            this.mousePreviouslyMoved = false;
         }
-        else if (mouseMoved && mouseInScreen)
+        else if ((this.mousePreviouslyMoved || mouseMoved) && mouseInScreen)
         {
+            this.mousePreviouslyMoved = true; // to allow mouse movement to cease and remain in this mode
             screenPos = mousePos;
         }
         else
         {
+            this.mousePreviouslyMoved = true;
             SetValue("user:isPointing", false, "no mouse/kinect input");
             return;
         }
