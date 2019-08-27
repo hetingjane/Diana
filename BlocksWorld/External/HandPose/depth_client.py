@@ -20,7 +20,16 @@ ACK_TIMEOUT = 2  # how long to wait for a response from the server
 class DepthClient:
     def __init__(self):
         self.kinect = Kinect(SEGMENT_SIZE, ENGAGE_MIN, ENGAGE_MAX)
-        self.socket_api = SocketAPI(TCP_IP, TCP_PORT, BUFFER_SIZE, ACK_TIMEOUT, TERMINATOR)
+        socket_started = False
+        self.socket_api = None
+        while (not socket_started):
+            try:
+                self.socket_api = SocketAPI(TCP_IP, TCP_PORT, BUFFER_SIZE, ACK_TIMEOUT, TERMINATOR)
+                socket_started = True
+            except:
+                print("Socket didn't start, waiting 3 seconds...")
+                time.sleep(3)
+        print("Connected!")
         self.HandModel = RealTimeHandRecognition("RH", 32, 2)
 
     def run(self):
@@ -45,5 +54,9 @@ class DepthClient:
 
 if __name__ == '__main__':
     print("starting")
-    client = DepthClient()
-    client.run()
+    client = None
+    try:
+        client = DepthClient()
+        client.run()
+    finally:
+        client.socket_api.close()
