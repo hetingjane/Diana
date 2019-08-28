@@ -117,6 +117,8 @@ namespace CWCNLP
 			AddEntry("point", "VB=0.6;NN=0.4");
 			AddEntry("Point", "VB=0.9;NN=0.1");
 			AddEntry("Pick", "VB=0.8;NN=0.2");
+			AddEntry("thank_you", "VB=1");
+			AddEntry("Thank_you", "VB=1");
 			RemoveSetPhrase("two times");
 			RemoveSetPhrase("three times");
 			RemoveSetPhrase("four times");

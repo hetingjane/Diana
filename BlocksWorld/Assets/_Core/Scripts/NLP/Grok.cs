@@ -152,6 +152,7 @@ namespace CWCNLP
 					act.action = Action.Lower;
 					break;
 				case "look":
+				case "look_at":
 					act.action = Action.Look;
 					break;
 				case "point":
@@ -161,6 +162,7 @@ namespace CWCNLP
 					act.action = Action.Stop;
 					break;
 				case "thank":
+				case "thank_you":
 					// whoops, this isn't an action, it's a phatic comment.
 					return null;
 			}
@@ -237,6 +239,7 @@ namespace CWCNLP
 				} else if (st.partOfSpeech[child] == PartOfSpeech.VB) {
 					switch (st.words[child].ToLower()) {
 					case "thank":
+					case "thank_you":
 						comm = new ComPhatic(text, st, ComPhatic.Type.ThankYou);
 						break;
 					}

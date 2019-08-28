@@ -21795,10 +21795,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cd7081ba24c74edabd4cc3fe41d1d7d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 1612287377}
+  comment: 
+  display: {fileID: 0}
+  target: {x: 0, y: 0, z: 0}
   head: {fileID: 0}
   leftEye: {fileID: 1175045825}
   rightEye: {fileID: 1843018822}
+  lookableObjects: {fileID: 184680267}
+  mode: 1
 --- !u!114 &1463965743
 MonoBehaviour:
   m_ObjectHideFlags: 0

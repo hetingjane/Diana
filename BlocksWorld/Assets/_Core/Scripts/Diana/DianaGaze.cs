@@ -47,7 +47,7 @@ public class DianaGaze : ModuleBase
 		string atWhat = value.ToString();
 		if (atWhat == "userPoint") {
 			mode = Mode.LookingAtUserPoint;
-		} else if (string.IsNullOrEmpty(atWhat)) {
+		} else if (string.IsNullOrEmpty(atWhat) || atWhat == "user") {
 			mode = Mode.Engaged;
 			target = Camera.main.transform.position;
 		} else {
