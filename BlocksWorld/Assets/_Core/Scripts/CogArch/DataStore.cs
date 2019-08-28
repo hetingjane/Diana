@@ -332,6 +332,14 @@ public class DataStore : MonoBehaviour {
 		return !value.IsEmpty();
 	}
 
+	/// <summary>
+	/// Remove a key from the blackboard.
+	/// </summary>
+	/// <param name="key"></param>
+	public void IClearValue(string key) {
+		if (store.ContainsKey(key)) store.Remove(key);
+	}
+
 	#endregion
 	//--------------------------------------------------------------------------------
 	#region Static Interface
@@ -457,6 +465,15 @@ public class DataStore : MonoBehaviour {
     /// <returns>true if key is found; false otherwise</returns>
     public static bool HasValue(string key) {
 		return instance.IHasValue(key);
+    }
+	
+	
+	/// <summary>
+	/// Clear (erase) a value from the blackboard.
+	/// </summary>
+	/// <param name="key"></param>
+	public static void ClearValue(string key) {
+		instance.IClearValue(key);
 	}
 
 	#endregion

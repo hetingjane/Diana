@@ -158,7 +158,7 @@ public class CommandsModule : ModuleBase
 		if (objSpec.referredToAs == "it") {
 			// If user says "it" while the agent is holding a block,
 			// then let's assume they mean the held block.
-			foundObject = BipedIKGrab.heldObject;	// unfortunate coupling... ToDo: improve this.
+			foundObject = GrabPlaceModule.heldObject;	// unfortunate coupling... ToDo: improve this.
 			if (foundObject != null) return foundObject;
 			Debug.Log("Noted \"it\", but heldObject is null");
 		}
