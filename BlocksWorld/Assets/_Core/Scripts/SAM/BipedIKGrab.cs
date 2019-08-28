@@ -57,6 +57,7 @@ public class BipedIKGrab : MonoBehaviour
 		var ik = GetComponent<FullBodyBipedIK>();
 		var solver = ik.GetIKSolver() as IKSolverFullBodyBiped;
 		reachingHand = solver.rightHandEffector;
+		reachingHand.positionWeight = 0;
 		relaxedPos = curReachTarget = reachPos = reachingHand.bone.position;
 		state = State.Idle;
 	}
@@ -81,10 +82,12 @@ public class BipedIKGrab : MonoBehaviour
 			}
 			break;
 		case State.Reaching:
+			reachingHand.positionWeight = Mathf.MoveTowards(reachingHand.positionWeight, 1, 4 * Time.deltaTime);
 			if (Vector3.Distance(reachPos, curReachTarget) < 0.05f) {
 				curReachTarget = DataStore.GetVector3Value("me:intent:target");
 				if (targetBlock != null) curReachTarget = targetBlock.position + Vector3.up * 0.08f;				
 				state = State.Grabbing;
+				reachingHand.positionWeight = 1;
 			}
 			// ToDo: check for interrupt.
 			break;
@@ -157,6 +160,7 @@ public class BipedIKGrab : MonoBehaviour
 			}
 			break;	
 		case State.Unreaching:
+			reachingHand.positionWeight = Mathf.MoveTowards(reachingHand.positionWeight, 0, 2 * Time.deltaTime);
 			if (Vector3.Distance(reachPos, curReachTarget) < 0.1f) {
 				state = State.Idle;
 			}
