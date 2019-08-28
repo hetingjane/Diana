@@ -30,6 +30,7 @@ public class BipedIKPoint : MonoBehaviour
 		var ik = GetComponent<FullBodyBipedIK>();
 		var solver = ik.GetIKSolver() as IKSolverFullBodyBiped;
 		reachingHand = solver.rightHandEffector;
+		reachingHand.positionWeight = 0;
 		relaxedPos = reachPos = reachingHand.bone.position;
 	}
 	
@@ -37,11 +38,13 @@ public class BipedIKPoint : MonoBehaviour
 		Vector3 target;
 		if (DataStore.GetStringValue("me:intent:action") != "point") {
 			target = relaxedPos;
+			reachingHand.positionWeight = Mathf.MoveTowards(reachingHand.positionWeight, 0, 2 * Time.deltaTime);
 		} else {
 			target = DataStore.GetVector3Value("me:intent:target");
 			// Position the hand slightly above the target position, and a bit closer to the agent.
 			target += Vector3.up * 0.10f;
 			target += (backoffTowards.position - target).normalized * 0.20f;
+			reachingHand.positionWeight = Mathf.MoveTowards(reachingHand.positionWeight, 1, 4 * Time.deltaTime);
 		}
 
 		// Move smoothly towards the target position.
