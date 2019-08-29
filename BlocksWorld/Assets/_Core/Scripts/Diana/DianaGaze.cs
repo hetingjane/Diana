@@ -16,6 +16,7 @@ public class DianaGaze : ModuleBase
 	public Transform rightEye;
 
 	public Transform lookableObjects;
+	public Transform idleGazePosition;
 	
 	protected Animator animator;
 
@@ -47,9 +48,18 @@ public class DianaGaze : ModuleBase
 		string atWhat = value.ToString();
 		if (atWhat == "userPoint") {
 			mode = Mode.LookingAtUserPoint;
-		} else if (string.IsNullOrEmpty(atWhat) || atWhat == "user") {
+		} else if (atWhat == "user") {
 			mode = Mode.Engaged;
 			target = Camera.main.transform.position;
+		} else if (string.IsNullOrEmpty(atWhat)) {
+			// Nothing specific to look at; check attention.
+			if (DataStore.GetStringValue("me:attending") == "user") {
+				mode = Mode.Engaged;
+				target = Camera.main.transform.position;				
+			} else {
+				mode = Mode.Disengaged;
+				target = idleGazePosition.position;
+			}
 		} else {
 			Transform t = lookableObjects.Find(atWhat);
 			if (t != null) {
@@ -81,7 +91,8 @@ public class DianaGaze : ModuleBase
 			if (target == default(Vector3)) target = Camera.main.transform.position;
 			targetWeight = 0.5f;
 		} else if (mode == Mode.Disengaged) {
-			targetWeight = 0;
+			targetWeight = 0.5f;
+			target = idleGazePosition.position;
 		}
 		
 		weight = Mathf.MoveTowards(weight, targetWeight, 2 * Time.deltaTime);

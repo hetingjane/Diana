@@ -28,7 +28,8 @@ public class AttentionModule : ModuleBase {
 		lastSalientTime = Time.time;
 		DataStore.Subscribe("user:isSpeaking", NoteUserIsSpeaking);
 		DataStore.Subscribe("me:intent:action", NoteIntent);
-        DataStore.Subscribe("user:isPointing", NoteUserIsPointing);
+		DataStore.Subscribe("user:isPointing", NoteUserIsPointing);
+		DataStore.Subscribe("user:isEngaged", NoteUserIsEngaged);
 	}
 
 	void NoteUserIsSpeaking(string key, DataStore.IValue value) {
@@ -59,6 +60,20 @@ public class AttentionModule : ModuleBase {
             lastSalientTime = Time.time;
         }
     }
+	
+	void NoteUserIsEngaged(string key, DataStore.IValue value) {
+		if ((value as DataStore.BoolValue).val) {
+			// User has just approached the table.  Better perk up.
+			SetValue("me:alertness", 7, "user arrived");
+			SetValue("me:attending", "user", "user arrived");
+			SetValue("me:intent:lookAt", "user", "user arrived");
+		} else {
+			// User has disappeared.  Quit trying to look at them.
+			SetValue("me:alertness", 6, "user departed");
+			SetValue("me:attending", "none", "user departed");
+			SetValue("me:intent:lookAt", "", "user departed");
+		}
+	}
 	
 	protected void Update() {
 		// When nothing of interest has happened for a while, change attention
