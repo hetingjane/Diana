@@ -437,8 +437,8 @@ namespace CWCNLP
 		}
 		
 		protected override void Run() {
-			Test("thank you", "[NN[thank_you]]");
-			Test("no thank you", "[UH[no] NN[thank_you]]");
+			Test("thank you", "[VB[thank_you]]");
+			Test("no thank you", "[UH[no] VB[thank_you]]");
 			Test("pick up this block", "[VB[pick_up NN[DT[this] block]]]");
 			Test("pick up that block", "[VB[pick_up NN[DT[that] block]]]");
 			Test("pick up that one", "[VB[pick_up NN[DT[that] one]]]");

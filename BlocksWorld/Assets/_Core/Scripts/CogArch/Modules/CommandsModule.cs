@@ -74,9 +74,23 @@ public class CommandsModule : ModuleBase
 			}
 			break;
 		case Action.Look:
-			// For now we assume the direction to point is always where the user is pointing.
-			SetValue("me:speech:intent", "OK.", comment);		
-			SetValue("me:intent:lookAt", "userPoint", comment);
+			Debug.Log("<color=green>Look object: " + act.directObject + "</color>");
+			if (act.directObject == null) {
+				// For now, if not otherwise specified, we assume the direction 
+				// to point is whereever the user is pointing.
+				SetValue("me:speech:intent", "OK.", comment);		
+				SetValue("me:intent:lookAt", "userPoint", comment);
+			} else if (act.directObject.referredToAs == "me") {
+				SetValue("me:intent:lookAt", "user", comment);
+			} else {
+				obj = FindObjectFromSpec(act.directObject);
+				if (obj == null) {
+					SetValue("me:speech:intent", "I don't understand what block you mean.", comment);
+				} else {
+					SetValue("me:intent:lookAt", obj.name, comment);
+					SetValue("me:speech:intent", "OK.", comment);		
+				}
+			}
 			break;
 		case Action.Stop:
 			SetValue("me:speech:intent", "OK.", comment);		
@@ -158,7 +172,7 @@ public class CommandsModule : ModuleBase
 		if (objSpec.referredToAs == "it") {
 			// If user says "it" while the agent is holding a block,
 			// then let's assume they mean the held block.
-			foundObject = BipedIKGrab.heldObject;	// unfortunate coupling... ToDo: improve this.
+			foundObject = GrabPlaceModule.heldObject;	// unfortunate coupling... ToDo: improve this.
 			if (foundObject != null) return foundObject;
 			Debug.Log("Noted \"it\", but heldObject is null");
 		}

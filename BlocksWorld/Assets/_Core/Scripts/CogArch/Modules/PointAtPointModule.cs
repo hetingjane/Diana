@@ -48,7 +48,7 @@ public class PointAtPointModule : ModuleBase
 		if (DataStore.GetIntValue("me:eyes:open") < 5) eyesClosedTime += Time.deltaTime;
 		else eyesClosedTime = 0;
 		
-		if (mode == Mode.Off) return;
+		if (mode == Mode.Off || mode == Mode.Looking) return;
 		
 		if (DataStore.GetBoolValue("user:isPointing") && DataStore.GetBoolValue("user:pointValid")) {
 			if (eyesClosedTime > 0.2f) {

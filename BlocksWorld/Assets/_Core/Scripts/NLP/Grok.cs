@@ -71,8 +71,6 @@ namespace CWCNLP
 						}
 						break;
 					}
-				} else if (pos == PartOfSpeech.RB) {
-					UnityEngine.Debug.Log("Looking at RB: " + word);
 				}
 			}
 			return obj;
@@ -119,7 +117,7 @@ namespace CWCNLP
 		}
 		
 		public static ActionSpec GrokAction(ParseState st, int verbIdx) {
-			UnityEngine.Debug.Log("GrokAction: " + st.ToString() + " with verb at " + verbIdx);
+			//UnityEngine.Debug.Log("GrokAction: " + st.ToString() + " with verb at " + verbIdx);
 			var act = new ActionSpec();
 			string verb = st.words[verbIdx].ToLower();
 			switch (verb) {
@@ -154,6 +152,7 @@ namespace CWCNLP
 					act.action = Action.Lower;
 					break;
 				case "look":
+				case "look_at":
 					act.action = Action.Look;
 					break;
 				case "point":
@@ -163,6 +162,7 @@ namespace CWCNLP
 					act.action = Action.Stop;
 					break;
 				case "thank":
+				case "thank_you":
 					// whoops, this isn't an action, it's a phatic comment.
 					return null;
 			}
@@ -179,6 +179,10 @@ namespace CWCNLP
 				if (st.partOfSpeech[i] == PartOfSpeech.NN) {
 					ObjSpec obj = GrokObject(st, i);
 					act.directObject = obj;
+					if (obj.referredToAs == "hand" && verb == "follow") {
+						// "Follow my hand" idiom
+						act.action = Action.Point;
+					}
 				}
 				if (st.partOfSpeech[i] == PartOfSpeech.WRB) {
 					// e.g.: [VB[point WRB[where]] VB[NN[I] point]]
@@ -235,6 +239,7 @@ namespace CWCNLP
 				} else if (st.partOfSpeech[child] == PartOfSpeech.VB) {
 					switch (st.words[child].ToLower()) {
 					case "thank":
+					case "thank_you":
 						comm = new ComPhatic(text, st, ComPhatic.Type.ThankYou);
 						break;
 					}
@@ -257,7 +262,6 @@ namespace CWCNLP
 		void Test(string input, string expectedComm) {
 			ParseState st = Parser.Parse(input);
 			string s = st.TreeForm();
-			UnityEngine.Debug.Log("Parse of " + input + " = " + s);
 			Communication comm = Grok.GrokInput(input, st);
 			if (comm.ToString() == expectedComm) return;
 			Fail("Grok failed on: " + input);

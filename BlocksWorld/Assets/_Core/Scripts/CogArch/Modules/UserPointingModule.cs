@@ -20,7 +20,7 @@ using System;
 using MathNet.Numerics;
 using UnityEngine;
 
-public class PointingModule : ModuleBase
+public class UserPointingModule : ModuleBase
 {
 
     string handTipLeftKey = "user:joint:HandTipLeft";
