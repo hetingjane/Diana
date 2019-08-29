@@ -25,7 +25,17 @@ public class PleasantriesModule : ModuleBase {
 
 	void NoteUserCommunication(string key, DataStore.IValue value) {
 		var comVal = value as CommunicationValue;
-		if (comVal != null) HandleInput(comVal.val);
+		if (comVal == null) return;
+		
+		// if we're standing by, then ignore anything that's not a direct address.
+		if (DataStore.GetBoolValue("me:standingBy")) {
+			if (!comVal.val.directAddress) return;
+			// Note that we do NOT change me:standingBy here.  That's the 
+			// responsibility of CommandsModule.  Doing it in both places
+			// causes grief.
+		}
+
+		HandleInput(comVal.val);
 	}
 
 	void HandleInput(Communication comm) {

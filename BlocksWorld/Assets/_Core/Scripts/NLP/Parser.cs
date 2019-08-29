@@ -65,6 +65,9 @@ namespace CWCNLP
 				string w = words[i];
 				if (i == 0) w = w[0].ToString().ToUpper() + w.Substring(1);
 				partOfSpeech[i] = PartOfSpeech.PrimaryPOS(w);
+				if (partOfSpeech[i] == null && i == 0) {
+					partOfSpeech[i] = PartOfSpeech.PrimaryPOS(words[i]);
+				}
 			}
 
 			CalculateScore();
@@ -452,6 +455,8 @@ namespace CWCNLP
 			Test("look where I point", "[VB[look WRB[where]] VB[NN[I] point]]");
 			Test("look at the green block", "[VB[look_at NN[DT[the] JJ[green] block]]]");
 			Test("point to the green block", "[VB[point] IN[to NN[DT[the] JJ[green] block]]]");
+			Test("diana stand by", "[[diana] VB[stand_by]]");
+			Test("stand by", "[VB[stand_by]]");
 		}
 
 	}

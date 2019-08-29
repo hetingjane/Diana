@@ -165,6 +165,9 @@ namespace CWCNLP
 				case "thank_you":
 					// whoops, this isn't an action, it's a phatic comment.
 					return null;
+				case "stand_by":
+					act.action = Action.StandBy;
+					break;
 			}
 
 			// Check for specific action idioms.
@@ -253,6 +256,14 @@ namespace CWCNLP
 				// Not sure what to do with this.  Wrap it in the base class.
 				comm = new Communication(text, st);
 			}
+			
+			// Check for a direct address.
+			// ToDo: find and use user self-knowledge, rather than hard-coded names.
+			var firstWord = st.words[0].ToLower();
+			if (firstWord == "diana" || firstWord == "sam") {
+				comm.directAddress = true;
+			}
+			
 			return comm;
 		}
 
@@ -280,6 +291,7 @@ namespace CWCNLP
 			Test("place it on this one", "Command : [Act:Put Obj:[single it] Loc:[OnTopOf [the single one]]]");			
 			Test("set it down over here", "Command : [Act:SetDown Obj:[single it] Loc:[Indicated ]]");
 			Test("put it over there", "Command : [Act:Put Obj:[single it] Loc:[Indicated ]]");
+			Test("stand by", "Command : [Act:StandBy]");
 		}
 	}
 }

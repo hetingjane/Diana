@@ -13,7 +13,9 @@ namespace Semantics
 		Close,
 		Point,
 		Look,
-		Stop
+		Stop,
+		StandBy,
+		Resume
 	}
 	
 	

@@ -8,6 +8,7 @@ namespace Semantics
 	public class Communication {
 		public string originalText;
 		public ParseState parse;
+		public bool directAddress;	// addressed by name, e.g. "Diana, say hello"
 		
 		public Communication(string originalText, ParseState parse) {
 			this.originalText = originalText;

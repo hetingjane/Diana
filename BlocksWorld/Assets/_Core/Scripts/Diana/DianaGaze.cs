@@ -42,6 +42,7 @@ public class DianaGaze : ModuleBase
 		base.Start();
 		DataStore.Subscribe("me:intent:lookAt", NoteLookAt);
 		DataStore.Subscribe("me:intent:pointAt", NotePointAt);
+		DataStore.Subscribe("me:standingBy", NoteStandingBy);
 	}
 	
 	void NoteLookAt(string key, DataStore.IValue value) {
@@ -78,6 +79,15 @@ public class DianaGaze : ModuleBase
 			}
 		} else {
 			mode = Mode.LookingAtMyPoint;
+		}
+	}
+	
+	void NoteStandingBy(string key, DataStore.IValue value) {
+		if ((value as DataStore.BoolValue).val) {
+			mode = Mode.Disengaged;
+		} else {
+			mode = Mode.Engaged;
+			target = Camera.main.transform.position;
 		}
 	}
 
