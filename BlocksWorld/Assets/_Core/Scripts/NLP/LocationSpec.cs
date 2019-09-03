@@ -8,7 +8,8 @@ namespace Semantics
 			NextTo,
 			Under,
 			Inside,
-			Towards
+			Towards,
+			Indicated  // i.e. pointed at: "here", "there", etc.
 		}
 		
 		public Relation relation;

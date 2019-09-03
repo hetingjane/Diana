@@ -101,7 +101,9 @@ namespace CWCNLP
 			// Replace ones that we just flat-out disagree with (like "no" being 
 			// overwhelmingly a DT, while "yes" is an UH).
 			AddEntry("no", "UH=0.6;DT=0.3;NN=0.1");
+			AddEntry("No", "UH=0.6;DT=0.3;NN=0.1");
 			AddEntry("how_many", "WQL=1");
+			AddEntry("that", "DT=1");
 			AddEntry("plus", "CC=1");
 			AddEntry("minus", "CC=1");
 			AddEntry("times", "CC=1");
@@ -114,6 +116,9 @@ namespace CWCNLP
 			AddEntry("Open", "VB=0.9;RB=0.1");
 			AddEntry("point", "VB=0.6;NN=0.4");
 			AddEntry("Point", "VB=0.9;NN=0.1");
+			AddEntry("Pick", "VB=0.8;NN=0.2");
+			AddEntry("thank_you", "VB=1");
+			AddEntry("Thank_you", "VB=1");
 			RemoveSetPhrase("two times");
 			RemoveSetPhrase("three times");
 			RemoveSetPhrase("four times");
@@ -122,7 +127,8 @@ namespace CWCNLP
 			RemoveSetPhrase("seven times");
 			RemoveSetPhrase("eight times");
 			RemoveSetPhrase("nine times");
-			RemoveSetPhrase("ten times");			
+			RemoveSetPhrase("ten times");
+			RemoveSetPhrase("the blue");
 			
 			// And add some additional set phrases they missed
 			AddSetPhrase("to the right of", "right_of", "IN=1");
@@ -139,6 +145,9 @@ namespace CWCNLP
 			AddSetPhrase("southwest of", "southwest_of", "IN=1");
 			AddSetPhrase("divided by", "divided_by", "CC=1");
 			AddSetPhrase("multiplied by", "multiplied_by", "CC=1");
+			AddSetPhrase("pick up", "pick_up", "VB=0.7;NN=0.3");
+			AddSetPhrase("Pick up", "pick_up", "VB=0.9;NN=0.1");
+			AddSetPhrase("over there", "over_there", "RB=1.000");
 			
 			// Sort the set phrases by length, longest ones first.
 			setPhrases.Sort((a,b) => (b.orig.Length.CompareTo(a.orig.Length)));

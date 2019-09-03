@@ -41,10 +41,13 @@ public class DataStoreDisplay : MonoBehaviour {
 		var sb = new System.Text.StringBuilder();
 		sb.Append("<margin-left=10em><line-indent=-10em>");
 		foreach (string k in keys) {
-			sb.Append(k);
-			sb.Append(" = ");
-			sb.Append(kvData[k]);
-			sb.Append("\n");
+            if (!k.StartsWith("user:joint"))
+            {
+                sb.Append(k);
+                sb.Append(" = ");
+                sb.Append(kvData[k]);
+                sb.Append("\n");
+            }
 		}
 		outputText.text = sb.ToString();
 	}

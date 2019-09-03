@@ -1,5 +1,5 @@
 /**
-* Copyright 2018 IBM Corp. All Rights Reserved.
+* Copyright 2018, 2019 IBM Corp. All Rights Reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -15,56 +15,45 @@
 *
 */
 
-using FullSerializer;
-using System.Collections.Generic;
-using System.Runtime.Serialization;
+using Newtonsoft.Json;
 
-namespace IBM.Watson.DeveloperCloud.Services.Assistant.v1
+namespace IBM.Watson.Assistant.V1.Model
 {
     /// <summary>
     /// Log message details.
     /// </summary>
-    [fsObject]
     public class LogMessage
     {
         /// <summary>
         /// The severity of the log message.
         /// </summary>
-        /// <value>The severity of the log message.</value>
-        public enum LevelEnum
+        public class LevelValue
         {
-            
             /// <summary>
-            /// Enum INFO for info
+            /// Constant INFO for info
             /// </summary>
-            [EnumMember(Value = "info")]
-            INFO,
-            
+            public const string INFO = "info";
             /// <summary>
-            /// Enum ERROR for error
+            /// Constant ERROR for error
             /// </summary>
-            [EnumMember(Value = "error")]
-            ERROR,
-            
+            public const string ERROR = "error";
             /// <summary>
-            /// Enum WARN for warn
+            /// Constant WARN for warn
             /// </summary>
-            [EnumMember(Value = "warn")]
-            WARN
+            public const string WARN = "warn";
+            
         }
 
         /// <summary>
         /// The severity of the log message.
+        /// Constants for possible values can be found using LogMessage.LevelValue
         /// </summary>
-        /// <value>The severity of the log message.</value>
-        [fsProperty("level")]
-        public LevelEnum? Level { get; set; }
+        [JsonProperty("level", NullValueHandling = NullValueHandling.Ignore)]
+        public string Level { get; set; }
         /// <summary>
         /// The text of the log message.
         /// </summary>
-        /// <value>The text of the log message.</value>
-        [fsProperty("msg")]
-        public Dictionary<string, object> Msg { get; set; }
+        [JsonProperty("msg", NullValueHandling = NullValueHandling.Ignore)]
+        public string Msg { get; set; }
     }
-
 }

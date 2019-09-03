@@ -332,6 +332,14 @@ public class DataStore : MonoBehaviour {
 		return !value.IsEmpty();
 	}
 
+	/// <summary>
+	/// Remove a key from the blackboard.
+	/// </summary>
+	/// <param name="key"></param>
+	public void IClearValue(string key) {
+		if (store.ContainsKey(key)) store.Remove(key);
+	}
+
 	#endregion
 	//--------------------------------------------------------------------------------
 	#region Static Interface
@@ -360,13 +368,28 @@ public class DataStore : MonoBehaviour {
 	public static bool SetValue(string key, IValue value, ModuleBase module, string comment) {
 		return instance.ISetValue(key, value, module, comment);
 	}
-
-	/// <summary>
-	/// Get the IValue reference associated with a given key.
+    /// <summary>
+	/// Set a string indicates the dominant emotion of user associated with a key.  Note that if the string is unchanged
+	/// from its previous string, this method does nothing.
+	/// 
+	/// Also note that this method currently must be called only on the main thread.
+	/// (ToDo: make it safe to call from subthreads.)
 	/// </summary>
-	/// <param name="key">key of interest</param>
-	/// <returns>value for that key, or null if key is not found</returns>
-	public static IValue GetValue(string key) {
+	/// <param name="key">string key</param>
+	/// <param name="value">new string value</param>
+	/// <param name="module">module causing this change</param>
+	/// <param name="comment">commment from that module, for logging/debugging</param>
+	/// <returns>true if the value was changed, false if it was unchanged</returns>
+    public static bool SetStringValue(string key, StringValue value, ModuleBase module, string comment)
+    {
+        return instance.ISetValue(key, value, module, comment);
+    }
+    /// <summary>
+    /// Get the IValue reference associated with a given key.
+    /// </summary>
+    /// <param name="key">key of interest</param>
+    /// <returns>value for that key, or null if key is not found</returns>
+    public static IValue GetValue(string key) {
 		return instance.IGetValue(key);
 	}
 
@@ -442,6 +465,15 @@ public class DataStore : MonoBehaviour {
     /// <returns>true if key is found; false otherwise</returns>
     public static bool HasValue(string key) {
 		return instance.IHasValue(key);
+    }
+	
+	
+	/// <summary>
+	/// Clear (erase) a value from the blackboard.
+	/// </summary>
+	/// <param name="key"></param>
+	public static void ClearValue(string key) {
+		instance.IClearValue(key);
 	}
 
 	#endregion

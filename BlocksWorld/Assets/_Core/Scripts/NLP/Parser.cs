@@ -59,8 +59,15 @@ namespace CWCNLP
 			}
 			
 			// Let's initialize by assigning the primary POS for each word.
+			// (Capitalize the first word in the sentence, as that's an 
+			// assumption baked into the SEMCOR dataset.)
 			for (int i=0; i<words.Length; i++) {
-				partOfSpeech[i] = PartOfSpeech.PrimaryPOS(words[i]);
+				string w = words[i];
+				if (i == 0) w = w[0].ToString().ToUpper() + w.Substring(1);
+				partOfSpeech[i] = PartOfSpeech.PrimaryPOS(w);
+				if (partOfSpeech[i] == null && i == 0) {
+					partOfSpeech[i] = PartOfSpeech.PrimaryPOS(words[i]);
+				}
 			}
 
 			CalculateScore();
@@ -159,15 +166,15 @@ namespace CWCNLP
 		}
 		
 		public ParseState InitState(string input) {
+			string s = PartOfSpeech.CollapseSetPhrases(input);
 			ParseState st = new ParseState();
-			st.Init(input);
+			st.Init(s);
 			return st;
 		}
 		
 		public static ParseState Parse(string input) {
-			string s = PartOfSpeech.CollapseSetPhrases(input);
 			var parser = new Parser();
-			var st = parser.InitState(s);
+			var st = parser.InitState(input);
 			
 			int rule;
 			while ((rule = parser.NextStep(st)) > 0) {
@@ -433,8 +440,11 @@ namespace CWCNLP
 		}
 		
 		protected override void Run() {
-			Test("thank you", "[NN[thank_you]]");
-			Test("no thank you", "[UH[no] NN[thank_you]]");
+			Test("thank you", "[VB[thank_you]]");
+			Test("no thank you", "[UH[no] VB[thank_you]]");
+			Test("pick up this block", "[VB[pick_up NN[DT[this] block]]]");
+			Test("pick up that block", "[VB[pick_up NN[DT[that] block]]]");
+			Test("pick up that one", "[VB[pick_up NN[DT[that] one]]]");
 			Test("pick up the big red block", "[VB[pick_up NN[DT[the] JJ[big] JJ[red] block]]]");
 			Test("pick the two big ones up", "[VB[pick NN[DT[the] CD[two] JJ[big] ones] RB[up]]]");
 			Test("now put one of them down", "[VB[RB[now] put NN[one] RB[down]] IN[of NN[them]]]");
@@ -445,6 +455,8 @@ namespace CWCNLP
 			Test("look where I point", "[VB[look WRB[where]] VB[NN[I] point]]");
 			Test("look at the green block", "[VB[look_at NN[DT[the] JJ[green] block]]]");
 			Test("point to the green block", "[VB[point] IN[to NN[DT[the] JJ[green] block]]]");
+			Test("diana stand by", "[[diana] VB[stand_by]]");
+			Test("stand by", "[VB[stand_by]]");
 		}
 
 	}

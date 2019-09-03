@@ -10,6 +10,7 @@ Writes:		me:attending (StringValue)
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static DataStore;
 
 public class AttentionModule : ModuleBase {
 
@@ -27,6 +28,8 @@ public class AttentionModule : ModuleBase {
 		lastSalientTime = Time.time;
 		DataStore.Subscribe("user:isSpeaking", NoteUserIsSpeaking);
 		DataStore.Subscribe("me:intent:action", NoteIntent);
+		DataStore.Subscribe("user:isPointing", NoteUserIsPointing);
+		DataStore.Subscribe("user:isEngaged", NoteUserIsEngaged);
 	}
 
 	void NoteUserIsSpeaking(string key, DataStore.IValue value) {
@@ -44,6 +47,31 @@ public class AttentionModule : ModuleBase {
 			SetValue("me:attending", "none", "me:intent:action is empty");
 		} else if (action == "point") {
 			SetValue("me:attending", "user", "pointing");
+		}
+	}
+
+    void NoteUserIsPointing(string key, DataStore.IValue value)
+    {
+        //TODO make Diana look forward if value is false
+        if ((value as DataStore.BoolValue).val)
+        {
+            SetValue("me:alertness", 7, "user is pointing");
+            SetValue("me:attending", "user", "user is pointing");
+            lastSalientTime = Time.time;
+        }
+    }
+	
+	void NoteUserIsEngaged(string key, DataStore.IValue value) {
+		if ((value as DataStore.BoolValue).val) {
+			// User has just approached the table.  Better perk up.
+			SetValue("me:alertness", 7, "user arrived");
+			SetValue("me:attending", "user", "user arrived");
+			SetValue("me:intent:lookAt", "user", "user arrived");
+		} else {
+			// User has disappeared.  Quit trying to look at them.
+			SetValue("me:alertness", 6, "user departed");
+			SetValue("me:attending", "none", "user departed");
+			SetValue("me:intent:lookAt", "", "user departed");
 		}
 	}
 	

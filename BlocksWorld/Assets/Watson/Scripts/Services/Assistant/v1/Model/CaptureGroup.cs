@@ -1,5 +1,5 @@
 /**
-* Copyright 2018 IBM Corp. All Rights Reserved.
+* Copyright 2018, 2019 IBM Corp. All Rights Reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -15,29 +15,25 @@
 *
 */
 
-using FullSerializer;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
-namespace IBM.Watson.DeveloperCloud.Services.Assistant.v1
+namespace IBM.Watson.Assistant.V1.Model
 {
     /// <summary>
-    /// CaptureGroup.
+    /// A recognized capture group for a pattern-based entity.
     /// </summary>
-    [fsObject]
     public class CaptureGroup
     {
         /// <summary>
         /// A recognized capture group for the entity.
         /// </summary>
-        /// <value>A recognized capture group for the entity.</value>
-        [fsProperty("group")]
+        [JsonProperty("group", NullValueHandling = NullValueHandling.Ignore)]
         public string Group { get; set; }
         /// <summary>
         /// Zero-based character offsets that indicate where the entity value begins and ends in the input text.
         /// </summary>
-        /// <value>Zero-based character offsets that indicate where the entity value begins and ends in the input text.</value>
-        [fsProperty("location")]
+        [JsonProperty("location", NullValueHandling = NullValueHandling.Ignore)]
         public List<long?> Location { get; set; }
     }
-
 }

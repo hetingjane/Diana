@@ -47,3 +47,6 @@ If you have any errors, let @dwhite54 know. From here on out, follow the git flo
   git mergetool.meld.keepTemporaries false
   ```
   However, the latter means you have to invoke `git mergetool` after `git merge` if there are conflicts to start the merge tool.
+
+## Contributing
+See [CONTRIBUTING.md](./CONTRIBUTING.md).

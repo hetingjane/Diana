@@ -1,5 +1,5 @@
 /**
-* Copyright 2018 IBM Corp. All Rights Reserved.
+* Copyright 2018, 2019 IBM Corp. All Rights Reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -15,29 +15,30 @@
 *
 */
 
-using FullSerializer;
-using System.Collections.Generic;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
-namespace IBM.Watson.DeveloperCloud.Services.Assistant.v1
+namespace IBM.Watson.Assistant.V1.Model
 {
     /// <summary>
     /// State information for the conversation. To maintain state, include the context from the previous response.
     /// </summary>
-    [fsObject]
     public class Context
     {
         /// <summary>
         /// The unique identifier of the conversation.
         /// </summary>
-        /// <value>The unique identifier of the conversation.</value>
-        [fsProperty("conversation_id")]
-        public Dictionary<string, object> ConversationId { get; set; }
+        [JsonProperty("conversation_id", NullValueHandling = NullValueHandling.Ignore)]
+        public string ConversationId { get; set; }
         /// <summary>
         /// For internal use only.
         /// </summary>
-        /// <value>For internal use only.</value>
-        [fsProperty("system")]
-        public Dictionary<string, object> System { get; set; }
+        [JsonProperty("system", NullValueHandling = NullValueHandling.Ignore)]
+        public JObject System { get; set; }
+        /// <summary>
+        /// Metadata related to the message.
+        /// </summary>
+        [JsonProperty("metadata", NullValueHandling = NullValueHandling.Ignore)]
+        public MessageContextMetadata Metadata { get; set; }
     }
-
 }
