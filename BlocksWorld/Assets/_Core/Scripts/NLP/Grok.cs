@@ -246,6 +246,17 @@ namespace CWCNLP
 						comm = new ComPhatic(text, st, ComPhatic.Type.ThankYou);
 						break;
 					}
+				} else if (st.partOfSpeech[child] == PartOfSpeech.NP) {
+					switch (st.words[child].ToLower()) {
+					case "bye":
+					case "goodbye":
+					case "good-bye":
+						comm = new ComPhatic(text, st, ComPhatic.Type.Goodbye);
+						break;
+					default:
+						break;
+					}
+					
 				}
 			}
 			
