@@ -17,6 +17,7 @@ import sys
 import time
 import threading
 import queue
+from skimage.transform import resize
 
 
 class Closest_Body_Frame(object):
@@ -55,7 +56,7 @@ class Closest_Body_Frame(object):
 
 class Preprocessed_Frame(object):
     def __init__(self, frame, left_mask, right_mask, timestamp, engagement):
-        self.frame = frame
+        self.depth_frame = frame
         self.left_mask = left_mask
         self.right_mask = right_mask
         self.timestamp = timestamp
@@ -85,15 +86,15 @@ class CANet_Preprocessor(threading.Thread):
         self.fx = 288.03
         self.fy = 287.07
         self.cube_size = 396
-        self.fallback_size = 200
-        self.frames = []
-        self.queue = queue.Queue()
+        self.cube_sizeZ = 3000000
+        self.fallback_size = 168
+        self.fallback_value = 255
+        self.depth_valid = False
         self.event = threading.Event()
         self.frame = None
 
-    def get_hand_positions(self):
-        joint_points = self.kinect.body_joints_to_depth_space(self.cbf.closest_body.joints)
-        return joint_points[JointType_HandRight], joint_points[JointType_HandLeft]
+    def get_joint_positions(self):
+        return self.kinect.body_joints_to_depth_space(self.cbf.closest_body.joints)#JointType_HandRight
 
     def new_depth_frame_arrived(self):
         return self.kinect.has_new_depth_frame()
@@ -112,14 +113,24 @@ class CANet_Preprocessor(threading.Thread):
         if self.cbf:
             return self.cbf.engaged
         return False
-    
+
+    def crop_frame(self, frame, joint_to_crop_around):
+        x = int(joint_to_crop_around.x)
+        y = int(joint_to_crop_around.y)
+        z = self.df[y,x]
+        x_start = int(x - (1500*self.fx)/(2*z))
+        x_end = int(joint_to_crop_around.x + (1500*self.fx)/(2*z))
+        y_start = int(joint_to_crop_around.y - (1500*self.fy)/(2*z))
+        y_end = int(joint_to_crop_around.y + (1500*self.fy)/(2*z))
+        return frame[max(0, y_start):min(frame.shape[0]-1, y_end), max(0, x_start):min(frame.shape[1]-1, x_end)]
+
     def segment(self, hand_pos):
         x_start = 0
         y_start = 0
         x_end = self.fallback_size
         y_end = self.fallback_size
         mask = np.zeros(self.df.shape)
-        depth_valid = True
+        self.depth_valid = True
         
         x = int(hand_pos.x)
         y = int(hand_pos.y)
@@ -129,18 +140,36 @@ class CANet_Preprocessor(threading.Thread):
         z = self.df[y, x]
         
         if z == 0:
-            depth_valid = False
+            self.depth_valid = False
             
-        if depth_valid:
+        if self.depth_valid:
             x_start = int(x - (self.cube_size*self.fx)/(2*z))
             x_end = int(x + (self.cube_size*self.fx)/(2*z))
 
             y_start = int(y - (self.cube_size*self.fy)/(2*z))
             y_end = int(y + (self.cube_size*self.fy)/(2*z))
             
-        mask[max(y_start, 0):min(y_end, mask.shape[0]-1), max(x_start, 0):min(x_end, mask.shape[1]-1)] = 255
+        mask[max(y_start, 0):min(y_end, mask.shape[0]-1), max(x_start, 0):min(x_end, mask.shape[1]-1)] = 1
         
         return mask
+
+    def threshold(self, joint_points):
+        x = int(joint_points[JointType_SpineBase].x)
+        y = int(joint_points[JointType_SpineBase].y)
+        try:
+            pos_z = self.df[y,x]
+        except:
+            return
+
+        z_start = pos_z - self.cube_sizeZ / 2.0
+        z_end   = pos_z + self.cube_sizeZ / 2.0
+
+        if not self.depth_valid:
+            self.df[:,:] = self.fallback_value
+            return
+        self.df[self.df == 0] = z_end
+        self.df[self.df > z_end] = z_end
+        self.df[self.df <= z_start] = z_start
 
     def run(self):
         while True:
@@ -151,32 +180,54 @@ class CANet_Preprocessor(threading.Thread):
                 if self.kinect.has_new_depth_frame():
                     self.df = self.kinect.get_last_depth_frame()
                     timestamp = time.time()
-                    self.df = np.resize(self.df, (424, 512))
-                    right_pos, left_pos = self.get_hand_positions()
-                    left_mask = self.segment(left_pos)
-                    right_mask = self.segment(right_pos)
+                    self.df = np.reshape(self.df, (424, 512))
+                    joint_points = self.get_joint_positions()
+                    self.threshold(joint_points)
+                    left_mask = self.segment(joint_points[JointType_HandLeft])
+                    right_mask = self.segment(joint_points[JointType_HandRight])
 
-                    self.frame = Preprocessed_Frame(self.df, left_mask, right_mask, timestamp, self.cbf.engaged)
+                    cropped_df = self.crop_frame(self.df, joint_points[JointType_SpineMid])
+                    cropped_left_mask = self.crop_frame(left_mask, joint_points[JointType_SpineMid])
+                    cropped_right_mask = self.crop_frame(right_mask, joint_points[JointType_SpineMid])
+
+                    #self.frame = Preprocessed_Frame(self.df,
+                    #                                left_mask,
+                    #                                right_mask,
+                    #                                timestamp,
+                    #                                self.cbf.engaged)
+
+                    self.frame = Preprocessed_Frame(resize(cropped_df, (424, 512), preserve_range=True),
+                                                    resize(cropped_left_mask, (424, 512), preserve_range=True),
+                                                    resize(cropped_right_mask, (424,512), preserve_range=True),
+                                                    timestamp,
+                                                    self.cbf.engaged)
                     self.event.set()
 
 
+def preprocess_image(image):
+    image = np.clip(image, 400, 1800)
+    image = np.multiply(image, 1.0)
+    image -= np.min(image)
+    image /= np.max(image+0.00001)
+    image = np.multiply(image, 255)
+    return image.astype("uint8")
 
-class_instance = CANet_Preprocessor(0.0, 10.0)
-class_instance.start()
-total_time = 0
-frame_count = 0
-start = time.time()
-while True:
-    if class_instance.event.is_set():
-        start = time.time()
-        frame_count+=1
-        class_instance.event.clear()
-        frame = class_instance.frame
-        print(1/(time.time() - start+.00001))
-        cv2.imshow("frame", frame.frame)
-        cv2.imshow("left mask", np.multiply(frame.left_mask, frame.frame))
-        cv2.imshow("right mask", np.multiply(frame.right_mask, frame.frame))
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+if __name__=='__main__':
+    class_instance = CANet_Preprocessor(0.0, 10.0)
+    class_instance.start()
+    total_time = 0
+    frame_count = 0
+    start = time.time()
+
+    while True:
+        if class_instance.event.is_set():
+            frame = class_instance.get_frame()
+            frame.depth_frame = preprocess_image(frame.depth_frame)
+            cv2.imshow("frame", frame.depth_frame)
+            cv2.imshow("left mask", np.multiply(frame.left_mask, frame.depth_frame))
+            cv2.imshow("right mask", np.multiply(frame.right_mask, frame.depth_frame))
+
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
 
