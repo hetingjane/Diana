@@ -16,9 +16,9 @@ import _ctypes
 import sys
 import time
 import threading
-import queue
-from skimage.transform import resize
+from collections import namedtuple
 
+joint_3d = namedtuple("joint_3d", "x y z")
 
 class Closest_Body_Frame(object):
     def __init__(self, body_frame, engage_min, engage_max):
@@ -66,12 +66,12 @@ class Preprocessed_Frame(object):
         return self.left_mask_valid and self.right_mask_valid
 
     def left_mask_valid(self):
-        if left_mask:
+        if self.left_mask:
             return True
         return False
 
     def right_mask_valid(self):
-        if right_mask:
+        if self.right_mask:
             return True
         return False
 
@@ -85,16 +85,17 @@ class CANet_Preprocessor(threading.Thread):
         self.df = None
         self.fx = 288.03
         self.fy = 287.07
-        self.cube_size = 396
+        self.sensor_height = 424
+        self.sensor_width = 512
+        self.z_space = 3
+        self.hand_cube_size = 300
+        self.body_cube_size = 1500
         self.cube_sizeZ = 3000000
         self.fallback_size = 168
         self.fallback_value = 255
         self.depth_valid = False
         self.event = threading.Event()
         self.frame = None
-
-    def get_joint_positions(self):
-        return self.kinect.body_joints_to_depth_space(self.cbf.closest_body.joints)#JointType_HandRight
 
     def new_depth_frame_arrived(self):
         return self.kinect.has_new_depth_frame()
@@ -114,62 +115,74 @@ class CANet_Preprocessor(threading.Thread):
             return self.cbf.engaged
         return False
 
-    def crop_frame(self, frame, joint_to_crop_around):
-        x = int(joint_to_crop_around.x)
-        y = int(joint_to_crop_around.y)
-        z = self.df[y,x]
-        x_start = int(x - (1500*self.fx)/(2*z))
-        x_end = int(joint_to_crop_around.x + (1500*self.fx)/(2*z))
-        y_start = int(joint_to_crop_around.y - (1500*self.fy)/(2*z))
-        y_end = int(joint_to_crop_around.y + (1500*self.fy)/(2*z))
+    def get_3d_joint_positions(self):
+        joint_points = self.kinect.body_joints_to_depth_space(self.cbf.closest_body.joints)
+        joint_points_3d = {}
+        for joint in range(joint_points.shape[0]):
+            try:
+                x = int(joint_points[joint].x)
+                y = int(joint_points[joint].y)
+            except:
+                x = self.sensor_width
+                y = self.sensor_height
+            if (self.z_space <= x < self.sensor_width - self.z_space) and (self.z_space <= y < self.sensor_height - self.z_space):
+                z = np.mean(self.df[y - self.z_space:y + self.z_space, x - self.z_space:x + self.z_space])
+                joint_points_3d[joint] = joint_3d(x, y, z)
+        return joint_points_3d
+
+    def preprocess_frame(self, joint_points):
+        potential_joints = [JointType_SpineBase, JointType_SpineMid, JointType_SpineShoulder]
+        pot_z = []
+
+        self.df = np.array(self.df, dtype=np.float32).reshape((self.sensor_height, self.sensor_width))
+        for joint in potential_joints:
+            if joint in joint_points.keys():
+                pot_z.append(joint_points[joint].z)
+
+        if len(pot_z) == 0 or np.max(pot_z) == 0:
+            self.depth_valid = False
+            z = (np.max(self.df) + np.min(self.df))/2
+        else:
+            z = np.max(pot_z) + 100
+
+        self.df = np.clip(self.df, z - 600, z + 600)
+        self.df -= z
+        self.df /= 600
+        # switch all black (-1.0) to white (1.0)
+        self.df = np.where(self.df == -1, 1, self.df)
+
+    def crop_frame(self, frame, x_start, x_end, y_start, y_end):
         return frame[max(0, y_start):min(frame.shape[0]-1, y_end), max(0, x_start):min(frame.shape[1]-1, x_end)]
 
-    def segment(self, hand_pos):
+    def segment(self, joint_points, joint, cube_size):
         x_start = 0
         y_start = 0
-        x_end = self.fallback_size
-        y_end = self.fallback_size
-        mask = np.zeros(self.df.shape)
+        x_end = self.sensor_width
+        y_end = self.sensor_height
         self.depth_valid = True
-        
-        x = int(hand_pos.x)
-        y = int(hand_pos.y)
-        
-        if x < 0 or x >= mask.shape[1] or y < 0 or y >= mask.shape[0]:
-            return mask
-        z = self.df[y, x]
-        
-        if z == 0:
-            self.depth_valid = False
-            
-        if self.depth_valid:
-            x_start = int(x - (self.cube_size*self.fx)/(2*z))
-            x_end = int(x + (self.cube_size*self.fx)/(2*z))
 
-            y_start = int(y - (self.cube_size*self.fy)/(2*z))
-            y_end = int(y + (self.cube_size*self.fy)/(2*z))
+        if joint in joint_points:
+            x = joint_points[joint].x
+            y = joint_points[joint].y
+            z = joint_points[joint].z
+        
+            if z == 0:
+                self.depth_valid = False
             
+            if self.depth_valid:
+                x_start = int(x - (cube_size*self.fx)/(2*z))
+                x_end = int(x + (cube_size*self.fx)/(2*z))
+
+                y_start = int(y - (cube_size*self.fy)/(2*z))
+                y_end = int(y + (cube_size*self.fy)/(2*z))
+
+        return x_start, x_end, y_start, y_end
+
+    def gen_mask(self, joint_points, joint, cube_size):
+        mask = np.zeros(self.df.shape, dtype=np.float32)
+        x_start, x_end, y_start, y_end = self.segment(joint_points, joint, cube_size)
         mask[max(y_start, 0):min(y_end, mask.shape[0]-1), max(x_start, 0):min(x_end, mask.shape[1]-1)] = 1
-        
         return mask
-
-    def threshold(self, joint_points):
-        x = int(joint_points[JointType_SpineBase].x)
-        y = int(joint_points[JointType_SpineBase].y)
-        try:
-            pos_z = self.df[y,x]
-        except:
-            return
-
-        z_start = pos_z - self.cube_sizeZ / 2.0
-        z_end   = pos_z + self.cube_sizeZ / 2.0
-
-        if not self.depth_valid:
-            self.df[:,:] = self.fallback_value
-            return
-        self.df[self.df == 0] = z_end
-        self.df[self.df > z_end] = z_end
-        self.df[self.df <= z_start] = z_start
 
     def run(self):
         while True:
@@ -178,39 +191,31 @@ class CANet_Preprocessor(threading.Thread):
 
             if self.cbf and self.cbf.check_for_bodies():
                 if self.kinect.has_new_depth_frame():
-                    self.df = self.kinect.get_last_depth_frame()
+                    self.df = self.kinect.get_last_depth_frame().reshape((424, 512))
                     timestamp = time.time()
-                    self.df = np.reshape(self.df, (424, 512))
-                    joint_points = self.get_joint_positions()
-                    self.threshold(joint_points)
-                    left_mask = self.segment(joint_points[JointType_HandLeft])
-                    right_mask = self.segment(joint_points[JointType_HandRight])
+                    joint_points = self.get_3d_joint_positions()
+                    left_mask = self.gen_mask(joint_points, JointType_HandLeft, self.hand_cube_size)
+                    right_mask = self.gen_mask(joint_points, JointType_HandRight, self.hand_cube_size)
 
-                    cropped_df = self.crop_frame(self.df, joint_points[JointType_SpineMid])
-                    cropped_left_mask = self.crop_frame(left_mask, joint_points[JointType_SpineMid])
-                    cropped_right_mask = self.crop_frame(right_mask, joint_points[JointType_SpineMid])
+                    crop_dimensions = self.segment(joint_points, JointType_SpineMid, self.body_cube_size)
+                    self.preprocess_frame(joint_points)
+                    self.df = self.crop_frame(self.df, *crop_dimensions)
+                    left_mask = self.crop_frame(left_mask, *crop_dimensions)
+                    right_mask = self.crop_frame(right_mask, *crop_dimensions)
 
-                    #self.frame = Preprocessed_Frame(self.df,
-                    #                                left_mask,
-                    #                                right_mask,
-                    #                                timestamp,
-                    #                                self.cbf.engaged)
+                    self.df = cv2.resize(self.df, (self.sensor_width, self.sensor_height), interpolation=cv2.INTER_CUBIC)#, preserve_range=True)
+                    left_mask = cv2.resize(left_mask, (self.sensor_width, self.sensor_height), interpolation=cv2.INTER_CUBIC)#, preserve_range=True)
+                    right_mask = cv2.resize(right_mask, (self.sensor_width, self.sensor_height), interpolation=cv2.INTER_CUBIC)#, preserve_range=True)
 
-                    self.frame = Preprocessed_Frame(resize(cropped_df, (424, 512), preserve_range=True),
-                                                    resize(cropped_left_mask, (424, 512), preserve_range=True),
-                                                    resize(cropped_right_mask, (424,512), preserve_range=True),
+
+                    self.frame = Preprocessed_Frame(self.df,
+                                                    left_mask,
+                                                    right_mask,
                                                     timestamp,
                                                     self.cbf.engaged)
                     self.event.set()
 
 
-def preprocess_image(image):
-    image = np.clip(image, 400, 1800)
-    image = np.multiply(image, 1.0)
-    image -= np.min(image)
-    image /= np.max(image+0.00001)
-    image = np.multiply(image, 255)
-    return image.astype("uint8")
 
 
 if __name__=='__main__':
@@ -223,7 +228,6 @@ if __name__=='__main__':
     while True:
         if class_instance.event.is_set():
             frame = class_instance.get_frame()
-            frame.depth_frame = preprocess_image(frame.depth_frame)
             cv2.imshow("frame", frame.depth_frame)
             cv2.imshow("left mask", np.multiply(frame.left_mask, frame.depth_frame))
             cv2.imshow("right mask", np.multiply(frame.right_mask, frame.depth_frame))
