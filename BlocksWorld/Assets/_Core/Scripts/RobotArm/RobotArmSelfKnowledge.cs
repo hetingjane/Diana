@@ -13,7 +13,8 @@ using UnityEngine;
 
 public class RobotArmSelfKnowledge : ModuleBase
 {
-	protected void Start() {
+	protected override void Start() {
+		base.Start();
 		SetValue("me:name", "Botarm", "initial state");
 		SetValue("me:voice", "Fred;Microsoft David Desktop;english;en;Daniel", "initial state");
     }

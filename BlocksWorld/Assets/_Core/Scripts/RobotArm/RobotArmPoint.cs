@@ -1,7 +1,7 @@
 ﻿/*
 This script makes the robot arm point at the location specified by the blackboard.
 
-Reads:		me:intent:action (StringValue; watching for "point")
+Reads:		me:intent:action (StringValue; watching for "point" or "reach")
 			me:intent:target (Vector3d, position to point at)
 Writes:		(nothing)
 */

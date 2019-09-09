@@ -122,3 +122,68 @@ and this is grokked as the following ActionSpec:
 The latter is the string form of a data structure that actually represents all those parts in (strongly-typed) symbolic form, and would be easy for the avatar to carry out.
 
 
+5/22/19
+=======
+Added a Communication class hierarchy, with subclasses for the seven subtypes of communication (command, query, etc.).  The main Grok method has been updated to grok both commands and phatic greetings/goodbyes.  So when you enter "hello", it now gets reduced to:
+
+  --> Phatic(Greeting) : [hello(UH:-1)](Score=0)
+
+I think this is about ready to integrate with the main BlocksWorld (Diana 2.0) Unity project.  There's still a lot more to be done on it, but the foundation is solid and it will already be a fine replacement for the current StanfordNLP-based language modules in there now.
+
+
+5/23/19
+=======
+I've begun integration of the new parser module with the main BlocksWorld project.  So far, I have only a couple of phatic responses hooked up in the PleasantriesModule.
+
+
+5/24/19
+=======
+I've added a CommandsModule, which processes direct commands from the user (grokked as ComCommand objects).  Right now you can tell the avatar "open your eyes" or "close your eyes", and it will do it (works for both Diana and SAM, though SAM does a better job of resting when his eyes are closed, and so he can no longer see where you are pointing).  Any other command (including, for example "close my eyes") and the avatar will respond "I can't."
+
+Still need to do anaphora resolution, so that after saying "close your eyes" you could then say "open them."  And of course we will want many more commands, such as "raise your left hand" and "point where I point."
+
+
+5/30/19
+=======
+As another example of how a traditional corpus fails to serve our needs well, I discovered today that the word "Point" in the SEMCOR database works out to these parts of speech:
+
+Point:NNP=1.000
+point:NN=0.970;VB=0.030
+
+In other words, overwhelmingly a noun, even when capitalized (as in the start of a sentence).  That's because SEMCOR includes very few imperative statements.  Yet in a command context, "point" is almost always a verb (point at the red block, look where I point, etc.).  We really need a corpus of imperative and interrogative dialog.
+
+But for now, I just added "point" to the list of words I have manually overridden in PartOfSpeech.cs.
+
+
+6/01/19
+=======
+There's been a suggestion that we should replace the working DataStore implementation with an external dependency on Redis.  This would be a mistake, for a number of reasons:
+
+- the C# implementation is already working perfectly
+- the code is simple and trivial to maintain or extend (for example, I just added file logging and timestamping in about 15 minutes)
+- an in-memory store will always be more performant than requesting data over the network, and in some cases we request values on every frame
+- currently Diana can be built as a simple stand-alone app with no external dependencies; that will be impossible, even for a reduced set of cognitive modules, if the whole system is built on Redis
+- David is already running into difficulties working out a cross-platform build system for Redis (a non-issue with Unity code)
+
+I've seen so many projects flounder because they were assembled as a tottering structure of external libraries and dependencies.  Using a third-party library for some small, encapsulated piece of functionality that can easily be replaced (e.g. speech recognition or synthesis) is safe; building your whole architecture around it, in a way that can't be encapsulated, is costly and runs a serious risk of ruining the project.
+
+But apparently we're going to discuss it at the lab meeting on Monday; I'll present the case for keeping our current approach there.
+
+
+6/10/19
+=======
+After much discussion -- and Dave's discovery that Redis doesn't support Windows very well -- we finally decided to proceed with the current DataStore implementation, and a TCP socket interface for communicating with external processes.  Implemented that over the weekend, including a Python demo.
+
+
+6/18/19
+=======
+I've been tasked with migrating KSIM (currently a standalone Windows executable) into Unity.  KSIM's job is mainly to read the Kinect sensor, and provide frames or skeleton data to clients that need it.  We should be able to do that in Unity.
+
+The "normal" way of starting Kinect development appears to be using the Kinect for Windows SDK (https://www.microsoft.com/en-us/download/details.aspx?id=44561).  But Microsoft also provides a Unity plugin (http://go.microsoft.com/fwlink/?LinkID=513177).  I've downloaded the latter, and imported both:
+
+	Kinect.2.0.1410.19000.unitypackage
+	Kinect.Face.2.0.1410.19000.unitypackage
+
+(the latter because I see that our KinectSensor.cs script in the KSIM project is using Microsoft.Kinect.Face).
+
+Project still runs fine on my Mac.  So I'm going to check that in and call it a good start.

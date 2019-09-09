@@ -283,7 +283,14 @@ namespace Windows.Kinect
                         {
                             Windows_Kinect_AudioBeamFrameReader_add_FrameArrived(_pNative, Windows_Kinect_AudioBeamFrameArrivedEventArgs_Delegate_Handler, true);
                         }
-                        _Windows_Kinect_AudioBeamFrameArrivedEventArgs_Delegate_Handle.Free();
+                        try
+                        {
+                            _Windows_Kinect_AudioBeamFrameArrivedEventArgs_Delegate_Handle.Free();
+                        }
+                        catch
+                        {
+
+                        }
                     }
                 }
             }
@@ -299,7 +306,14 @@ namespace Windows.Kinect
                         {
                             Windows_Kinect_AudioBeamFrameReader_add_PropertyChanged(_pNative, Windows_Data_PropertyChangedEventArgs_Delegate_Handler, true);
                         }
-                        _Windows_Data_PropertyChangedEventArgs_Delegate_Handle.Free();
+                        try
+                        {
+                            _Windows_Data_PropertyChangedEventArgs_Delegate_Handle.Free();
+                        }
+                        catch
+                        {
+
+                        }
                     }
                 }
             }

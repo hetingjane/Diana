@@ -13,7 +13,8 @@ using UnityEngine;
 
 public class SamSelfKnowledge : ModuleBase
 {
-	protected void Start() {
+	protected override void Start() {
+		base.Start();
 		SetValue("me:name", "Sam", "initial state");
 		SetValue("me:voice", "Alex;Microsoft David Desktop;english;en;Daniel", "initial state");
     }

@@ -8,6 +8,7 @@ It derives from MonoBehaviour so it can be configured and provide events in the 
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class DataStore : MonoBehaviour {
 
@@ -28,7 +29,7 @@ public class DataStore : MonoBehaviour {
 	public class StringValue : IValue {
 		public string val;
 		public StringValue(string inVal) { this.val = inVal; }
-		public string ToString() { return val; }
+		public override string ToString() { return val; }
 		public bool Equals(IValue other) { return other is StringValue && val == ((StringValue)other).val; }
 		public bool IsEmpty() { return string.IsNullOrEmpty(val); }
 	}
@@ -37,35 +38,51 @@ public class DataStore : MonoBehaviour {
 	public class BoolValue : IValue {
 		public bool val;
 		public BoolValue(bool inVal) { this.val = inVal; }
-		public string ToString() { return val ? "True" : "False"; }
+		public override string ToString() { return val ? "True" : "False"; }
 		public bool Equals(IValue other) { return other is BoolValue && val == ((BoolValue)other).val; }
 		public bool IsEmpty() { return false; }
 		
 		// For convenience (and efficiency), we define a couple of static 
 		// instances that represent True and False.
 		public static BoolValue True = new BoolValue(true);
-		public static BoolValue False = new BoolValue(false);		
-	}
-	
-	// IntValue: data storage of an integer value.
-	public class IntValue : IValue {
-		public int val;
-		public IntValue(int inVal) { this.val = inVal; }
-		public string ToString() { return val.ToString(); }
-		public bool Equals(IValue other) { return other is IntValue && val == ((IntValue)other).val; }
-		public bool IsEmpty() { return false; }
-		
-		// Also for convenience, here are a couple of static instances
-		// that represent 0 and 1.  Use them when it's convenient.
-		public static IntValue Zero = new IntValue(0);
-		public static IntValue One = new IntValue(1);		
-	}
-	
-	// Vector3Value: data storage of a Vector3 (i.e. an x,y,z 3-tuple).
-	public class Vector3Value : IValue {
+		public static BoolValue False = new BoolValue(false);
+    }
+
+    // IntValue: data storage of an integer value.
+    public class IntValue : IValue
+    {
+        public int val;
+        public IntValue(int inVal) { this.val = inVal; }
+        public override string ToString() { return val.ToString(); }
+        public bool Equals(IValue other) { return other is IntValue && val == ((IntValue)other).val; }
+        public bool IsEmpty() { return false; }
+
+        // Also for convenience, here are a couple of static instances
+        // that represent 0 and 1.  Use them when it's convenient.
+        public static IntValue Zero = new IntValue(0);
+        public static IntValue One = new IntValue(1);
+    }
+
+    // IntValue: data storage of an integer value.
+    public class FloatValue : IValue
+    {
+        public float val;
+        public FloatValue(float inVal) { this.val = inVal; }
+        public override string ToString() { return val.ToString(); }
+        public bool Equals(IValue other) { return other is IntValue && val == ((IntValue)other).val; }
+        public bool IsEmpty() { return false; }
+
+        // Also for convenience, here are a couple of static instances
+        // that represent 0 and 1.  Use them when it's convenient.
+        public static FloatValue Zero = new FloatValue(0);
+        public static FloatValue One = new FloatValue(1);
+    }
+
+    // Vector3Value: data storage of a Vector3 (i.e. an x,y,z 3-tuple).
+    public class Vector3Value : IValue {
 		public Vector3 val;
 		public Vector3Value(Vector3 inVal) { this.val = inVal; }
-		public string ToString() { return val.ToString(); }
+		public override string ToString() { return val.ToString(); }
 		public bool Equals(IValue other) { return other is Vector3Value && val == ((Vector3Value)other).val; }
 		public bool IsEmpty() { return false; }
 		
@@ -74,27 +91,68 @@ public class DataStore : MonoBehaviour {
 		public static Vector3Value Zero = new Vector3Value(Vector3.zero);
 		public static Vector3Value One = new Vector3Value(Vector3.one);
 	}
-	
-	// Singleton instance of the DataStore class.
-	public static DataStore instance { get; private set; }
+
+    // FloatArrayValue: data storage of an arbitrary length 32-bit float array
+    public class FloatArrayValue : IValue
+    {
+        public float[] val;
+        public FloatArrayValue(float[] inVal) { this.val = inVal; }
+        public override string ToString() { return string.Join(",", val); }
+        public bool Equals(IValue other) { return other is FloatArrayValue && val == ((FloatArrayValue)other).val; }
+        public bool IsEmpty() { return false; }
+    }
+
+    // Singleton instance of the DataStore class.
+    public static DataStore instance { get; private set; }
 	
 	[Header("Configuration")]
 	[Tooltip("Whether to log all value changes with Debug.Log")]
-	public bool logChanges = false;
-	
+	public bool logWithDebugLog = false;
+	[Tooltip("Whether to log all value changes to a \"DataStore.log\" file")]
+	public bool logToFile = false;
+
 	[Header("Events")]
 	// fires when any value is changed, with the key:
 	public StringEvent onValueChanged;
-	
+		
 	// Delegate used when subscribing to a specific key; receives both key and value changed
 	public delegate void ChangeHandler(string key, IValue value);
 	Dictionary<string, List<ChangeHandler>> subscriptions = new Dictionary<string, List<ChangeHandler>>();
 	
 	// Here's the actual data storage:
 	Dictionary<string, IValue> store = new Dictionary<string, IValue>();
+	Dictionary<string, DateTime> changeTime = new Dictionary<string, DateTime>();
+
+	// Stream to the log file
+	System.IO.StreamWriter logFileStream;
+	
+	static bool didRunUnitTests = false;
 	
 	protected void Awake() {
-		instance = this;
+		// Because this is a MonoBehavior, we can't unit test it at static
+		// initialization time (as most of our unit tests do).  Instead we
+		// must do it here, from Awake.  Careful to only do it once.
+		if (!didRunUnitTests) {
+			didRunUnitTests = true;
+			QA.UnitTest.RunUnitTest(new UnitTest());
+		}
+		
+		// become the standard (singleton-ish) instance
+		instance = this;		
+	}
+
+	protected void Update() {
+		// Flush our log file once per frame
+		if (logFileStream != null) {
+			try {
+				logFileStream.FlushAsync();
+			} catch (InvalidOperationException e) {				
+			}
+		}
+	}
+	
+	protected void OnDestroy() {
+		if (logFileStream != null) logFileStream.Close();
 	}
 
 	//--------------------------------------------------------------------------------
@@ -136,12 +194,26 @@ public class DataStore : MonoBehaviour {
 		IValue oldVal;
 		if (store.TryGetValue(key, out oldVal) && oldVal.Equals(value)) return false;	// no change
 		
-		// Store the data
+		// Store the data (and the change time)
+		var now = DateTime.Now;
 		store[key] = value;
+		changeTime[key] = now;
 		
 		// Log the changes for debugging purposes (if desired)
-		if (logChanges) {
+		if (logWithDebugLog) {
 			Debug.Log(string.Format("{0} := {1} ({2}: {3})", key, value.ToString(), module.name, comment), module);
+		}
+		if (logToFile) {
+			if (logFileStream == null) logFileStream = System.IO.File.AppendText("DataStore.log");
+			string line = string.Format("[{0}] {1} := {2} ({3}: {4})",
+				now.ToString("yyyy-MM-dd HH:mm:ss"),
+				key, value.ToString(), module?.name ?? "", comment);
+			// under some circumstances the file may be busy, causing this to throw an error;
+			// in that case, we'd rather lose a line of logging than cause problems for the app
+			try {
+				logFileStream.WriteLine(line);
+			} catch (InvalidOperationException e) {				
+			}
 		}
 		
 		// Invoke the general value-changed event handler
@@ -190,44 +262,82 @@ public class DataStore : MonoBehaviour {
 		IValue value;
 		if (!store.TryGetValue(key, out value)) return defaultValue;
 		return value.ToString();
-	}
+    }
 
-	/// <summary>
-	/// Get an integer value associated with a given key.
-	/// </summary>
-	/// <param name="key">key of interest</param>
-	/// <param name="defaultValue">value to return if key is not found (or not integer)</param>
-	/// <returns>value for that key, or defaultValue</returns>
-	public int IGetIntValue(string key, int defaultValue=0) {
-		IValue value;
-		if (!store.TryGetValue(key, out value)) return defaultValue;
-		if (value is IntValue) return ((IntValue)value).val;
-		return defaultValue;
-	}
-	
-	/// <summary>
-	/// Get a Vector3 value associated with a given key.
-	/// </summary>
-	/// <param name="key">key of interest</param>
-	/// <param name="defaultValue">value to return if key is not found (or not Vector3)</param>
-	/// <returns>value for that key, or defaultValue</returns>
-	public Vector3 IGetVector3Value(string key, Vector3 defaultValue=default(Vector3)) {
-		IValue value;
-		if (!store.TryGetValue(key, out value)) return defaultValue;
-		if (value is Vector3Value) return ((Vector3Value)value).val;
-		return defaultValue;
-	}
+    /// <summary>
+    /// Get an integer value associated with a given key.
+    /// </summary>
+    /// <param name="key">key of interest</param>
+    /// <param name="defaultValue">value to return if key is not found (or not integer)</param>
+    /// <returns>value for that key, or defaultValue</returns>
+    public int IGetIntValue(string key, int defaultValue = 0)
+    {
+        IValue value;
+        if (!store.TryGetValue(key, out value)) return defaultValue;
+        if (value is IntValue) return ((IntValue)value).val;
+        return defaultValue;
+    }
 
-	/// <summary>
-	/// Return whether the given key exists in this DataStore, AND
-	/// has a non-empty value.
-	/// </summary>
-	/// <param name="key">key of interest</param>
-	/// <returns>true if key is found; false otherwise</returns>
-	public bool IHasValue(string key) {
+    /// <summary>
+    /// Get an integer value associated with a given key.
+    /// </summary>
+    /// <param name="key">key of interest</param>
+    /// <param name="defaultValue">value to return if key is not found (or not float)</param>
+    /// <returns>value for that key, or defaultValue</returns>
+    public float IGetFloatValue(string key, float defaultValue = 0)
+    {
+        IValue value;
+        if (!store.TryGetValue(key, out value)) return defaultValue;
+        if (value is FloatValue) return ((FloatValue)value).val;
+        return defaultValue;
+    }
+
+    /// <summary>
+    /// Get a Vector3 value associated with a given key.
+    /// </summary>
+    /// <param name="key">key of interest</param>
+    /// <param name="defaultValue">value to return if key is not found (or not Vector3)</param>
+    /// <returns>value for that key, or defaultValue</returns>
+    public Vector3 IGetVector3Value(string key, Vector3 defaultValue = default(Vector3))
+    {
+        IValue value;
+        if (!store.TryGetValue(key, out value)) return defaultValue;
+        if (value is Vector3Value) return ((Vector3Value)value).val;
+        return defaultValue;
+    }
+
+    /// <summary>
+    /// Get a FloatArray value associated with a given key.
+    /// </summary>
+    /// <param name="key">key of interest</param>
+    /// <param name="defaultValue">value to return if key is not found (or not Vector3)</param>
+    /// <returns>value for that key, or defaultValue</returns>
+    public float[] IGetFloatArrayValue(string key, float[] defaultValue = default(float[]))
+    {
+        IValue value;
+        if (!store.TryGetValue(key, out value)) return defaultValue;
+        if (value is FloatArrayValue) return ((FloatArrayValue)value).val;
+        return defaultValue;
+    }
+
+    /// <summary>
+    /// Return whether the given key exists in this DataStore, AND
+    /// has a non-empty value.
+    /// </summary>
+    /// <param name="key">key of interest</param>
+    /// <returns>true if key is found; false otherwise</returns>
+    public bool IHasValue(string key) {
 		IValue value;
 		if (!store.TryGetValue(key, out value)) return false;
 		return !value.IsEmpty();
+	}
+
+	/// <summary>
+	/// Remove a key from the blackboard.
+	/// </summary>
+	/// <param name="key"></param>
+	public void IClearValue(string key) {
+		if (store.ContainsKey(key)) store.Remove(key);
 	}
 
 	#endregion
@@ -258,13 +368,28 @@ public class DataStore : MonoBehaviour {
 	public static bool SetValue(string key, IValue value, ModuleBase module, string comment) {
 		return instance.ISetValue(key, value, module, comment);
 	}
-
-	/// <summary>
-	/// Get the IValue reference associated with a given key.
+    /// <summary>
+	/// Set a string indicates the dominant emotion of user associated with a key.  Note that if the string is unchanged
+	/// from its previous string, this method does nothing.
+	/// 
+	/// Also note that this method currently must be called only on the main thread.
+	/// (ToDo: make it safe to call from subthreads.)
 	/// </summary>
-	/// <param name="key">key of interest</param>
-	/// <returns>value for that key, or null if key is not found</returns>
-	public static IValue GetValue(string key) {
+	/// <param name="key">string key</param>
+	/// <param name="value">new string value</param>
+	/// <param name="module">module causing this change</param>
+	/// <param name="comment">commment from that module, for logging/debugging</param>
+	/// <returns>true if the value was changed, false if it was unchanged</returns>
+    public static bool SetStringValue(string key, StringValue value, ModuleBase module, string comment)
+    {
+        return instance.ISetValue(key, value, module, comment);
+    }
+    /// <summary>
+    /// Get the IValue reference associated with a given key.
+    /// </summary>
+    /// <param name="key">key of interest</param>
+    /// <returns>value for that key, or null if key is not found</returns>
+    public static IValue GetValue(string key) {
 		return instance.IGetValue(key);
 	}
 
@@ -286,36 +411,69 @@ public class DataStore : MonoBehaviour {
 	/// <returns>value for that key, or defaultValue</returns>
 	public static string GetStringValue(string key, string defaultValue=null) {
 		return instance.IGetStringValue(key, defaultValue);
-	}
-	
-	/// <summary>
-	/// Get an integer value associated with a given key.
-	/// </summary>
-	/// <param name="key">key of interest</param>
-	/// <param name="defaultValue">value to return if key is not found (or not integer)</param>
-	/// <returns>value for that key, or defaultValue</returns>
-	public static int GetIntValue(string key, int defaultValue=0) {
-		return instance.IGetIntValue(key, defaultValue);
-	}
-	
-	/// <summary>
-	/// Get a Vector3 value associated with a given key.
-	/// </summary>
-	/// <param name="key">key of interest</param>
-	/// <param name="defaultValue">value to return if key is not found (or not Vector3)</param>
-	/// <returns>value for that key, or defaultValue</returns>
-	public static Vector3 GetVector3Value(string key, Vector3 defaultValue=default(Vector3)) {
-		return instance.IGetVector3Value(key, defaultValue);
-	}
+    }
 
-	/// <summary>
-	/// Return whether the given key exists in this DataStore, AND
-	/// has a non-empty value.
-	/// </summary>
-	/// <param name="key">key of interest</param>
-	/// <returns>true if key is found; false otherwise</returns>
-	public static bool HasValue(string key) {
+    /// <summary>
+    /// Get an integer value associated with a given key.
+    /// </summary>
+    /// <param name="key">key of interest</param>
+    /// <param name="defaultValue">value to return if key is not found (or not integer)</param>
+    /// <returns>value for that key, or defaultValue</returns>
+    public static int GetIntValue(string key, int defaultValue = 0)
+    {
+        return instance.IGetIntValue(key, defaultValue);
+    }
+
+    /// <summary>
+    /// Get an integer value associated with a given key.
+    /// </summary>
+    /// <param name="key">key of interest</param>
+    /// <param name="defaultValue">value to return if key is not found (or not float)</param>
+    /// <returns>value for that key, or defaultValue</returns>
+    public static float GetFloatValue(string key, float defaultValue = 0)
+    {
+        return instance.IGetFloatValue(key, defaultValue);
+    }
+
+    /// <summary>
+    /// Get a Vector3 value associated with a given key.
+    /// </summary>
+    /// <param name="key">key of interest</param>
+    /// <param name="defaultValue">value to return if key is not found (or not Vector3)</param>
+    /// <returns>value for that key, or defaultValue</returns>
+    public static Vector3 GetVector3Value(string key, Vector3 defaultValue = default(Vector3))
+    {
+        return instance.IGetVector3Value(key, defaultValue);
+    }
+
+    /// <summary>
+    /// Get a float array value associated with a given key.
+    /// </summary>
+    /// <param name="key">key of interest</param>
+    /// <param name="defaultValue">value to return if key is not found (or not FloatArray)</param>
+    /// <returns>value for that key, or defaultValue</returns>
+    public static float[] GetFloatArrayValue(string key, float[] defaultValue = default(float[]))
+    {
+        return instance.IGetFloatArrayValue(key, defaultValue);
+    }
+
+    /// <summary>
+    /// Return whether the given key exists in this DataStore, AND
+    /// has a non-empty value.
+    /// </summary>
+    /// <param name="key">key of interest</param>
+    /// <returns>true if key is found; false otherwise</returns>
+    public static bool HasValue(string key) {
 		return instance.IHasValue(key);
+    }
+	
+	
+	/// <summary>
+	/// Clear (erase) a value from the blackboard.
+	/// </summary>
+	/// <param name="key"></param>
+	public static void ClearValue(string key) {
+		instance.IClearValue(key);
 	}
 
 	#endregion
@@ -334,8 +492,9 @@ public class DataStore : MonoBehaviour {
 		}
 		
 		protected override void Run() {
-			DataStore ds = new DataStore();
-			ds.logChanges = false;
+			GameObject temp = new GameObject("temp (for DataStore unit test)");
+			DataStore ds = temp.AddComponent<DataStore>();
+			ds.logToFile = ds.logWithDebugLog = false;
 			ds.ISubscribe("foo", NoteChange);
 			ds.ISubscribe("bar", NoteChange);
 			
@@ -363,13 +522,9 @@ public class DataStore : MonoBehaviour {
 			AssertEqual(Vector3.forward, ds.IGetVector3Value("baz"));
 			AssertEqual(changeCount, 2);		// (since we didn't subscribe to "baz")
 			AssertEqual(lastChangedKey, "bar");
+			Destroy(temp);
 		}
 		
-	}
-	
-	// Static constructor for the main class instantiates the unit test class:
-	static DataStore() {
-		QA.UnitTest.RunUnitTest(new UnitTest());
 	}
 	
 	#endregion  // Unit Test

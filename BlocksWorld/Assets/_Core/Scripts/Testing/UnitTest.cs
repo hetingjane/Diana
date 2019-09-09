@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace QA {
 
-	public class UnitTest : MonoBehaviour
+	public class UnitTest
 	{
 		public static void Fail(string message) {
 			Debug.LogError("<color=red>Unit test failure:</color> " + message);

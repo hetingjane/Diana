@@ -2,11 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Linq;
-using UnityEngine;
 
 namespace Helper
 {
-    [ExecuteInEditMode]
     internal class EventPump : UnityEngine.MonoBehaviour
     {
         private static object s_Lock = new object();

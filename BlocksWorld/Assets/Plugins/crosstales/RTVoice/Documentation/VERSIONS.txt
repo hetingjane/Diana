@@ -1,5 +1,8 @@
 ﻿# RT-Voice PRO - Release notes
 
+## 2019.3.1 - tbd
+* Linux: problems under non-Windows platforms solved
+
 ## 2019.3.0 - 08.05.2019
 * New voice provider "WebGL" added! See "3rd party"-folder for the integration
 * Windows: voice selection fixed

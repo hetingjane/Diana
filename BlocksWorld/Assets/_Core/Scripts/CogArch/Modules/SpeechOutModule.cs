@@ -14,18 +14,19 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Crosstales.RTVoice;
+using Crosstales.RTVoice.Model;
 
 public class SpeechOutModule : ModuleBase {
-
+	
 	public StringEvent onSpeaking;
 	
 	float speechStartTime;
 	float speechDuration;
 	string nowSpeaking;
 	
-	Crosstales.RTVoice.Model.Voice voice;
-	Crosstales.RTVoice.Speaker speaker;
-	AudioSource audio;
+	Voice voice;
+	Speaker speaker;
+	new AudioSource audio;
 	
 	protected override void Start() {
 		base.Start();
@@ -52,8 +53,9 @@ public class SpeechOutModule : ModuleBase {
 	}
 
 	void Speak(string speech) {
+		Debug.Log("Speaking: " + speech);
 		if (voice == null) ConfigureVoice();
-		Speaker.Speak(speech, audio, voice);
+		Crosstales.RTVoice.Speaker.Speak(speech, audio, voice);
 		
 		onSpeaking.Invoke(speech);
 		speechStartTime = Time.time;
@@ -77,4 +79,5 @@ public class SpeechOutModule : ModuleBase {
 			StopSpeaking();
 		}
 	}
+	
 }

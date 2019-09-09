@@ -76,7 +76,7 @@ namespace Crosstales.RTVoice.Demo
             if (MaryToogle != null)
             {
                 MaryToogle.isOn = Speaker.isMaryMode;
-                MaryToogle.interactable = Crosstales.RTVoice.Util.Helper.hasBuiltInTTS;
+	            MaryToogle.interactable = Crosstales.RTVoice.Util.Helper.hasBuiltInTTS;
             }
 
             if (Voices != null)
