@@ -1,6 +1,7 @@
 # BlocksWorld
 BlocksWorld (new name in progress) is an interactive gesture- and speech-recognizing intelligent agent. See further information [here](https://www.cs.colostate.edu/~draper/CwC.php).
 
+=======
 ## Requirements
 - You shouldn't need anything else since we've added all assets to the repo.
 
