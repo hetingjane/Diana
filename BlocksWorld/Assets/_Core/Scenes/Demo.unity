@@ -7548,8 +7548,6 @@ GameObject:
   - component: {fileID: 534669905}
   - component: {fileID: 534669904}
   - component: {fileID: 534669903}
-  - component: {fileID: 534669908}
-  - component: {fileID: 534669906}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -7621,39 +7619,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 180.00002, z: 0}
---- !u!114 &534669906
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 534669902}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b58a41d2cccbef14fbba41225e469907, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sampleRate: 20
-  isFrontFacing: 1
-  targetWidth: 640
-  targetHeight: 480
-  cameraName: HP Webcam HD 4310
---- !u!114 &534669908
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 534669902}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c9db04d0f9cdf0c45bab39f4268dc6d9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  startOnWake: 1
-  discrete: 0
-  emotions: 17
-  expressions: 0
 --- !u!21 &563496597
 Material:
   serializedVersion: 6
@@ -12259,7 +12224,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1123557628}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1046713434
 MonoBehaviour:
@@ -13118,7 +13083,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 37968908}
-  - {fileID: 1803021794}
   - {fileID: 1046713433}
   - {fileID: 2018350971}
   m_Father: {fileID: 0}
@@ -22311,7 +22275,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   comment: 
   display: {fileID: 0}
-  calibrationMode: 1
+  calibrationMode: 0
   windowSize: 3
   maxDistance: 10
   layerMask:
@@ -26737,61 +26701,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fb9fefddb78e7bc4da8e32aad5c490f0, type: 3}
---- !u!1 &1803021793
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1803021794}
-  - component: {fileID: 1803021795}
-  m_Layer: 0
-  m_Name: PointingModule
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1803021794
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1803021793}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 1123557628}
-  m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1803021795
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1803021793}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 31c1872d47be281429b6257020a5225a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  comment: 
-  display: {fileID: 0}
-  calibrationMode: 0
-  windowSize: 3
-  maxDistance: 10
-  layerMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  rHKinSpaceTopRight: {x: 0.4, y: 0.1, z: 1}
-  rHKinSpaceBotLeft: {x: -0.8, y: -0.4, z: 1}
-  lHKinSpaceTopRight: {x: 0.7, y: 0.2, z: 1}
-  lHKinSpaceBotLeft: {x: -0.4, y: -0.5, z: 1}
 --- !u!4 &1805515788 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400200, guid: fd057c956d7529e4eac402957038c900,
@@ -29828,7 +29737,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1123557628}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2018350972
 MonoBehaviour:
@@ -29846,7 +29755,7 @@ MonoBehaviour:
   isFrontFacing: 1
   targetWidth: 1920
   targetHeight: 1080
-  cameraName: Kinect V2 Video Sensor
+  cameraName: HP Webcam HD 4310
 --- !u!114 &2018350973
 MonoBehaviour:
   m_ObjectHideFlags: 0
