@@ -14,31 +14,37 @@ AnimatorController:
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   - m_Name: x
     m_Type: 1
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   - m_Name: z
     m_Type: 1
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   - m_Name: RotationWeight
     m_Type: 1
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   - m_Name: PositionWeight
     m_Type: 1
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
+  - m_Name: y
+    m_Type: 1
+    m_DefaultFloat: 0
+    m_DefaultInt: 0
+    m_DefaultBool: 0
+    m_Controller: {fileID: 9100000}
   m_AnimatorLayers:
   - serializedVersion: 5
     m_Name: Base Layer
@@ -1503,7 +1509,7 @@ AnimatorState:
   m_SpeedParameter: grabSpeed
   m_MirrorParameter: grab
   m_CycleOffsetParameter: 
-  m_TimeParameter: 
+  m_TimeParameter: x
 --- !u!1107 &1107021823623523590
 AnimatorStateMachine:
   serializedVersion: 5
@@ -1609,10 +1615,10 @@ AnimatorStateMachine:
     m_Position: {x: -48, y: 132, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 1102950188527520856}
-    m_Position: {x: -216, y: 300, z: 0}
+    m_Position: {x: -264, y: 276, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 1102399826102327556}
-    m_Position: {x: -84, y: 444, z: 0}
+    m_Position: {x: -180, y: 420, z: 0}
   m_ChildStateMachines: []
   m_AnyStateTransitions: []
   m_EntryTransitions: []
