@@ -41,10 +41,15 @@ class Closest_Body_Frame(object):
             return True
         return False
 
+
 class Kinect:
-    def __init__(self, segment_size, engage_min, engage_max):
-        self.segment_size = segment_size
-        self.kinect = PyKinectRuntime.PyKinectRuntime(PyKinectV2.FrameSourceTypes_Depth | PyKinectV2.FrameSourceTypes_Body)
+    def __init__(self, engage_min, engage_max, modality):
+        self.modality = modality
+        if self.modality == 'skeleton':
+            self.kinect = PyKinectRuntime.PyKinectRuntime(PyKinectV2.FrameSourceTypes_Body)
+        elif self.modality == 'depth':
+            self.kinect = PyKinectRuntime.PyKinectRuntime(PyKinectV2.FrameSourceTypes_Depth | PyKinectV2.FrameSourceTypes_Body)
+
         self.latest_frames = None
 
         self.active_arm_threshold = 0.16
@@ -59,6 +64,8 @@ class Kinect:
         self.fy = 287.07
         self.cube_size = 396
         self.fallback_size = 200
+
+        self._bodies = None
 
     def _is_bright(self, depth_frame):
         #hand_arr = np.squeeze(depth_frame)
@@ -161,20 +168,49 @@ class Kinect:
         if not closest_body or not closest_body.check_for_bodies():
             return self.latest_frames
 
-        joint_points = self.kinect.body_joints_to_depth_space(closest_body.closest_body.joints)
-        frame = self.kinect.get_last_depth_frame()
-
-        #test_data = np.array(frame, dtype=np.uint8).reshape((self.sensor_height, self.sensor_width))
-        #cv2.fastNlMeansDenoising(test_data, test_data)
-        #test_data += np.abs(np.min(test_data))
-        #test_data /= np.max(test_data)
-        #cv2.imshow("raw", test_data)
-
-        # segment and preprocess depth frame around hands
-        self.latest_frames = self._segment(frame, joint_points, [JointType_HandLeft, JointType_HandRight])
-        # this is where we could add a routine for queuing frames or something, right now is LILO
-
-        return self.latest_frames
+        if self.modality == 'depth':
+            joint_points = self.kinect.body_joints_to_depth_space(closest_body.closest_body.joints)
+            frame = self.kinect.get_last_depth_frame()
+            self.latest_frames = self._segment(frame, joint_points, [JointType_HandLeft, JointType_HandRight])
+            return self.latest_frames
+        elif self.modality == 'skeleton':
+            return Skeleton_Frame(closest_body.closest_body.joints, closest_body.engaged)
 
 
+class Skeleton_Frame(object):
+    def __init__(self, joints, engagement):
+        self.joints = joints
+        self.engagement = engagement
+        self.skeleton_frame = self.get_skeleton_data()
 
+    def get_skeleton_data(self):
+        spine_base = self.joints[JointType_SpineBase].Position
+        spine_mid = self.joints[JointType_SpineMid].Position
+        neck = self.joints[JointType_Neck].Position
+        head = self.joints[JointType_Head].Position
+        shoulder_left = self.joints[JointType_ShoulderLeft].Position
+        elbow_left = self.joints[JointType_ElbowLeft].Position
+        wrist_left = self.joints[JointType_WristLeft].Position
+        hand_left = self.joints[JointType_HandLeft].Position
+        shoulder_right = self.joints[JointType_ShoulderRight].Position
+        elbow_right = self.joints[JointType_ElbowRight].Position
+        wrist_right = self.joints[JointType_WristRight].Position
+        hand_right = self.joints[JointType_HandRight].Position
+        spine_shoulder = self.joints[JointType_SpineShoulder].Position
+        hand_tip_left = self.joints[JointType_HandTipLeft].Position
+        thumb_left = self.joints[JointType_ThumbLeft].Position
+        hand_tip_right = self.joints[JointType_HandTipRight].Position
+        thumb_right = self.joints[JointType_ThumbRight].Position
+
+        skeleton_frame = [spine_base.x, spine_base.y, spine_base.z, spine_mid.x, spine_mid.y, spine_mid.z, neck.x,
+                          neck.y, neck.z, head.x, head.y, head.z,
+                          shoulder_left.x, shoulder_left.y, shoulder_left.z, elbow_left.x, elbow_left.y, elbow_left.z,
+                          wrist_left.x, wrist_left.y, wrist_left.z,
+                          hand_left.x, hand_left.y, hand_left.z, shoulder_right.x, shoulder_right.y, shoulder_right.z,
+                          elbow_right.x, elbow_right.y, elbow_right.z,
+                          wrist_right.x, wrist_right.y, wrist_right.z, hand_right.x, hand_right.y, hand_right.z,
+                          spine_shoulder.x, spine_shoulder.y, spine_shoulder.z,
+                          hand_tip_left.x, hand_tip_left.y, hand_tip_left.z, thumb_left.x, thumb_left.y, thumb_left.z,
+                          hand_tip_right.x, hand_tip_right.y, hand_tip_right.z,
+                          thumb_right.x, thumb_right.y, thumb_right.z]
+        return skeleton_frame
