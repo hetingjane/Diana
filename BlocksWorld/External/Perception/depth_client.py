@@ -19,7 +19,7 @@ ACK_TIMEOUT = 2  # how long to wait for a response from the server
 
 class DepthClient:
     def __init__(self):
-        self.kinect = Kinect(SEGMENT_SIZE, ENGAGE_MIN, ENGAGE_MAX)
+        self.kinect = Kinect(ENGAGE_MIN, ENGAGE_MAX, modality='depth')
         socket_started = False
         self.socket_api = None
         while (not socket_started):
