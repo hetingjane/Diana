@@ -1,11 +1,9 @@
 ﻿/*
-This module simply starts/stops the hand pose python client.
+This module simply starts/stops the skeleton python client for arm motions.
 
 Writes:		
-    user:hands:left:argmax
-    user:hands:left:label
-    user:hands:right:argmax
-    user:hands:right:label
+    user:arms:left:label
+    user:arms:right:label
 
 Reads: 
     From kinect directly (nothing from blackboard)
@@ -14,7 +12,7 @@ Reads:
 using UnityEngine;
 using System.Diagnostics;
 
-public class HandPoseModule : ModuleBase
+public class ArmMotionsModule : ModuleBase
 {
     Process process;
     bool started;
@@ -26,15 +24,15 @@ public class HandPoseModule : ModuleBase
 	        process = Process.Start(new ProcessStartInfo
 	        {
 		        FileName = "python.exe",
-	            Arguments = "External/Perception/depth_client.py",
+	            Arguments = "External/Perception/skeleton_client.py",
 	            UseShellExecute = true,
 	            //RedirectStandardOutput = true,
 	            //RedirectStandardError = true
 	        });
 	        started = true;
-		    UnityEngine.Debug.Log("Started hand pose client");
+		    UnityEngine.Debug.Log("Started arm motions client");
 	    } catch (System.Exception e) {
-	    	UnityEngine.Debug.LogWarning("Error starting hand pose client: " + e);
+	    	UnityEngine.Debug.LogWarning("Error starting arm motions client: " + e);
 	    	started = false;
 	    }
 	}
@@ -43,7 +41,7 @@ public class HandPoseModule : ModuleBase
     {
 	    if (started && process.HasExited)
         {
-            UnityEngine.Debug.Log("Hand pose client exited unexpectedly");
+            UnityEngine.Debug.Log("arm motions client exited unexpectedly");
             started = false;
         }
     }
@@ -51,9 +49,9 @@ public class HandPoseModule : ModuleBase
     private void OnApplicationQuit()
 	{
 		if (process != null) {
-	        UnityEngine.Debug.Log("Closing hand pose client");
+	        UnityEngine.Debug.Log("Closing arm motions client");
 		    process.Close();
-			UnityEngine.Debug.Log("Hand pose client closed");
+			UnityEngine.Debug.Log("arm motions client closed");
 		}
     }
 }
