@@ -170,14 +170,14 @@ class ArmMotionRecogntion(Solver):
         g1 = tf.Graph()
         with g1.as_default():
             print ('Loading Left arm model')
-            model_left = Arms_LSTM(logs_path=os.path.abspath('./models/body/la/model.ckpt-0'), n_hidden=50, n_layers=2)
+            model_left = Arms_LSTM(logs_path=os.path.abspath('External/Perception/models/body/la/model.ckpt-0'), n_hidden=50, n_layers=2)
         self._left_arm_model = RealTimeArmMotionRecognition(model_left)
 
 
         g2 = tf.Graph()
         with g2.as_default():
             print ('Loading Right arm model')
-            model_right = Arms_LSTM(logs_path=os.path.abspath('./models/body/ra/model.ckpt-0'), n_hidden=75, n_layers=2)
+            model_right = Arms_LSTM(logs_path=os.path.abspath('External/Perception/models/body/ra/model.ckpt-0'), n_hidden=75, n_layers=2)
         self._right_arm_model = RealTimeArmMotionRecognition(model_right)
 
 

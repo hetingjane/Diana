@@ -7,7 +7,7 @@ class RealTimeArmMotionRecognition(object):
         self.batch_size = 1
         self.feature_size = 15
         self.model = model
-        self.classes = np.load(os.path.abspath('./data/labels_body.npy'))
+        self.classes = np.load(os.path.abspath('External/Perception/data/labels_body.npy'))
         self.classes = [x.decode('utf-8') for x in self.classes]
         print ('Classes are: ', self.classes)
         print ('model restored from ', self.model.logs_path)
