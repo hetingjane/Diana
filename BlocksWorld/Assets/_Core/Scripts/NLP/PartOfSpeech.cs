@@ -23,6 +23,8 @@ namespace CWCNLP
 		public const string VB = "VB";		// verb
 		public const string RP = "RP";		// adverb particle (off, up)
 		public const string WRB = "WRB";	// WH-adverb (where)
+		public const string WDT = "WDT";	// WH-determinant (also where)
+		public const string WP = "WP";		// WH-pronoun (who, what)
 		public const string PPS = "PPS";	// singular pronoun (it, one)
 		public const string UH = "UH";		// interjections and greetings
 

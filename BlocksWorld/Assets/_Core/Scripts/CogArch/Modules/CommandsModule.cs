@@ -164,6 +164,27 @@ public class CommandsModule : ModuleBase
 		case Action.StandBy:
 			SetValue("me:standingBy", true, comment);
 			break;
+		case Action.Identify:
+			if (act.directObject != null && act.directObject.ToString().ToLower() == "[name of you]") {
+				string name = DataStore.GetStringValue("me:name");
+				if (string.IsNullOrEmpty(name)) {
+					SetValue("me:speech:intent", "I don't have a name.", "me:name not set");			
+				} else {
+					SetValue("me:speech:intent", "My name is " + name + ".", "was asked my name");
+				}
+				return;
+			}
+			obj = FindObjectFromSpec(act.directObject);
+			if (obj == null) {
+				SetValue("me:speech:intent", "I'm not sure what you are referring to.", comment);
+			} else {
+				// Convert the CamelCase object name into more natural speech.
+				// (reference: https://stackoverflow.com/questions/155303)
+				string name = obj.name;
+				name = System.Text.RegularExpressions.Regex.Replace(name, "([a-z](?=[A-Z])|[A-Z](?=[A-Z][a-z]))", "$1 ");
+				SetValue("me:speech:intent", "That is the " + name + ".", comment);
+			}
+			break;
 		default:
 			// Let's not say "I can't" to every unknown command.
 			// At least not yet ... it gets pretty annoying.

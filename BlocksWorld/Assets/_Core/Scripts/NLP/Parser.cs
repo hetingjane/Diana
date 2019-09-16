@@ -159,6 +159,13 @@ namespace CWCNLP
 			TreeForm(baseIndex, sb);
 			return sb.ToString();
 		}
+		
+		public int FindChildOfType(string typeToFind, int parentIdx=-1) {
+			for (int i=0; i<dependencies.Length; i++) {
+				if (dependencies[i] == parentIdx && partOfSpeech[i] == typeToFind) return i;
+			}
+			return -1;
+		}
 	}
 
 	public class Parser {
@@ -457,6 +464,8 @@ namespace CWCNLP
 			Test("point to the green block", "[VB[point] IN[to NN[DT[the] JJ[green] block]]]");
 			Test("diana stand by", "[[diana] VB[stand_by]]");
 			Test("stand by", "[VB[stand_by]]");
+			Test("what is this block", "[WP[what] VB[is NN[DT[this] block]]]");
+			Test("which block is this", "[WDT[which] VB[NN[block] is] DT[this]]");
 		}
 
 	}

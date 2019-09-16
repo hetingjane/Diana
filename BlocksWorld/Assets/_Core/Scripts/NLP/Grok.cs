@@ -116,6 +116,27 @@ namespace CWCNLP
 			return loc;
 		}
 		
+		public static ActionSpec GrokQuery(ParseState st, int queryWordIdx) {
+			// Although we're grokiing a query, we convert that into an action
+			// that describes what it is the agent should actually do to answer.
+			var act = new ActionSpec();
+
+			// For now, we support only identification queries, so:
+			act.action = Action.Identify;
+			
+			// Find the verb.
+			int verbIdx = st.FindChildOfType(PartOfSpeech.VB);
+			if (verbIdx >= 0) {
+				// Now find the NN of that verb.  This will be the object of the query.
+				int nounIdx = st.FindChildOfType(PartOfSpeech.NN, verbIdx);
+				if (nounIdx >= 0) {
+					act.directObject = GrokObject(st, nounIdx);
+				}
+			}
+			
+			return act;
+		}
+		
 		public static ActionSpec GrokAction(ParseState st, int verbIdx) {
 			//UnityEngine.Debug.Log("GrokAction: " + st.ToString() + " with verb at " + verbIdx);
 			var act = new ActionSpec();
@@ -173,7 +194,7 @@ namespace CWCNLP
 			// Check for specific action idioms.
 			string verbTree = st.TreeForm(verbIdx);
 			if (verbTree == "VB[is RB[enough]]" && verbIdx > 0 && st.words[verbIdx-1] == "that") {
-				// that's enough: idiom for "stop"
+				// "that's enough": idiom for "stop"
 				act.action = Action.Stop;
 			}
 
@@ -211,8 +232,17 @@ namespace CWCNLP
 			Communication comm = null;
 			ActionSpec act = null;
 			foreach (int child in st.ChildrenOf(-1)) {
-				if (st.partOfSpeech[child] == PartOfSpeech.VB && act == null) {
-					act = Grok.GrokAction(st, child);
+				if (act == null) {
+					switch (st.partOfSpeech[child]) {
+					case PartOfSpeech.VB:
+						act = Grok.GrokAction(st, child);
+						break;
+					case PartOfSpeech.WP:
+					case PartOfSpeech.WDT:
+					case PartOfSpeech.WRB:
+						act = Grok.GrokQuery(st, child);
+						break;
+					}
 				}
 				if (st.partOfSpeech[child] == PartOfSpeech.IN) {
 					// Here's where we get fancy: based on the verb, and
@@ -292,6 +322,8 @@ namespace CWCNLP
 			Test("set it down over here", "Command : [Act:SetDown Obj:[single it] Loc:[Indicated ]]");
 			Test("put it over there", "Command : [Act:Put Obj:[single it] Loc:[Indicated ]]");
 			Test("stand by", "Command : [Act:StandBy]");
+			Test("what is this block", "Command : [Act:Identify Obj:[the single block]]");
+			Test("which block is this", "Command : [Act:Identify Obj:[single block]]");
 		}
 	}
 }

@@ -112,15 +112,6 @@ public class PleasantriesModule : ModuleBase {
 		SetValue("me:speech:intent", "Hello!", "responding to Hello");
 	}
 	
-	void HandleAskName() {
-		string name = DataStore.GetStringValue("me:name");
-		if (string.IsNullOrEmpty(name)) {
-			SetValue("me:speech:intent", "I don't have a name.", "me:name not set");			
-		} else {
-			SetValue("me:speech:intent", "My name is " + name + ".", "was asked my name");
-		}
-	}
-
 	void HandleHowAreYou() {
 		SetValue("me:speech:intent", "I am functioning within normal parameters.", "asked how I am");
 	}

@@ -15,7 +15,9 @@ namespace Semantics
 		Look,
 		Stop,
 		StandBy,
-		Resume
+		Resume,
+		Identify,
+		Count
 	}
 	
 	
