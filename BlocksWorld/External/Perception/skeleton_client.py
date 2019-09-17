@@ -33,9 +33,9 @@ class SkeletonClient:
         while True:
             frame = self.kinect.get()
             if frame is None:
-                # print("waiting for frames...")
-                time.sleep(1/30)
+                # print("waiting for frames...")    
                 continue
+            time.sleep(1/60)
 
             engaged = frame.engagement
             skeleton_frame = frame.skeleton_frame

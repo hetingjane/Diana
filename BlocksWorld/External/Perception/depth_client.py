@@ -37,8 +37,8 @@ class DepthClient:
             frames = self.kinect.get()
             if frames is None:
                 print("waiting for frames...")
-                time.sleep(1/30)
                 continue
+            time.sleep(1/60)
             (LH_probs, LH_out), (RH_probs, RH_out) = self.HandModel.classifyLR(frames[0], frames[1])
             LH_idx = np.argmax(LH_out)
             LH_label = hand_postures[LH_idx]

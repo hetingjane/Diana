@@ -105,28 +105,34 @@ public class SocketInterfaceModule : ModuleBase
 	/// </summary>
 	protected void Update() {
 		while (messageQueue.Count > 0) {
-			QueuedMessage qm = messageQueue.Dequeue();
-			HandleMessage(qm.client, qm.message);
-		}
+            QueuedMessage qm;
+            lock (messageQueue)
+            {
+                qm = messageQueue.Dequeue();
+            }
+            HandleMessage(qm.client, qm.message);
+        }
 	}
-	
-	/// <summary>
-	/// Put a message onto the message queue.  This method may be
-	/// called from a thread.
-	/// </summary>
-	/// <param name="client">client that received the message</param>
-	/// <param name="message">message (command) text</param>
-	protected void EnqueueMessage(Client client, string message) {
-		messageQueue.Enqueue(new QueuedMessage(client, message));
-	}
-	
-	/// <summary>
-	/// Handle a message.  This method should be called on the main thread.
-	/// This method defines (and interprets) our command syntax.
-	/// </summary>
-	/// <param name="client">client that received the message</param>
-	/// <param name="message">message (command) text</param>
-	protected void HandleMessage(Client client, string message) {
+
+    /// <summary>
+    /// Put a message onto the message queue.  This method may be
+    /// called from a thread.
+    /// </summary>
+    /// <param name="client">client that received the message</param>
+    /// <param name="message">message (command) text</param>
+    protected void EnqueueMessage(Client client, string message)
+    {
+        lock(messageQueue)
+            messageQueue.Enqueue(new QueuedMessage(client, message));
+    }
+
+    /// <summary>
+    /// Handle a message.  This method should be called on the main thread.
+    /// This method defines (and interprets) our command syntax.
+    /// </summary>
+    /// <param name="client">client that received the message</param>
+    /// <param name="message">message (command) text</param>
+    protected void HandleMessage(Client client, string message) {
 		//Debug.Log("Handling command: " + message);
 		string[] parts = message.Split(new char[]{' '}, 3);
 		if (parts.Length < 2) {
