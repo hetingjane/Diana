@@ -1,4 +1,12 @@
-﻿using Affdex;
+﻿/*
+This script gets all the emotions recognized by Affectiva and determines current dominantEmotion.
+It compares emotion scores of all non-trivial emotions(above a low threshold) and picks the maximum then sets key-value pairs onto BlackBoard.
+
+Writes:		user:dominantEmotion: (StringValue)
+user:dominantEmotion:(enum)Emotion: (IntValue, ranges from 0 to 100)
+TODO: add more emotions			
+*/
+using Affdex;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,7 +21,6 @@ public class PlayerEmotions : ImageResultsListener
 {
     float currentJoy = 0f;
     float currentAnger = 0f;
-    //public FeaturePoint[] featurePointsList;
 
     public Emotion dominantEmotion = Emotion.Neutral;
 
@@ -74,8 +81,7 @@ public class PlayerEmotions : ImageResultsListener
                 DataStore.SetStringValue("user:dominantEmotion:", new DataStore.StringValue(dominantEmotion.ToString()), this, dominantEmotion.ToString());
 
             }
-            //Retrieve the coordinates of the facial landmarks (face feature points)
-            //featurePointsList = face.FeaturePoints;
+
         }
 
     }

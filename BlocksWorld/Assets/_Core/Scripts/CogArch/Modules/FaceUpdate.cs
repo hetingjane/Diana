@@ -1,4 +1,13 @@
-﻿using UnityEngine;
+﻿/*
+This is the module to change Diana's facial expressions based on emotion scores we get from BlackBoard.
+It sets different weights to blend shapes when the score of a certain emotion below/above a certain threshold.
+
+Reads:  user:dominantEmotion: (StringValue)
+user:dominantEmotion:(enum)Emotion: (IntValue, ranges from 0 to 100)
+
+TODO: add more emotions and a dynamic mechanism to let Diana express supportive empathy in appropraite context.
+*/
+using UnityEngine;
 using System;
 using System.Collections.Generic;
 
@@ -15,16 +24,16 @@ public class FaceUpdate : MonoBehaviour
     List<int> frownLeftIndex;
     List<int> frownRightIndex;
 
-    //PlayerEmotions playerEmotions;
-    //GameObject player;
-
     void Start()
     {
         renderers = new List<SkinnedMeshRenderer>();
         smileLeftIndex = new List<int>();
         smileRightIndex = new List<int>();
         frownLeftIndex = new List<int>();
-        frownRightIndex = new List<int>();
+	    frownRightIndex = new List<int>();
+	    
+	    //Find the avatar to change blend shape on
+	    
         var avatar = GameObject.Find("Diana2");
         if (avatar == null)
         {
@@ -49,17 +58,14 @@ public class FaceUpdate : MonoBehaviour
                 frownRightIndex.Add(frightIdx);
             }
         }
-        //player = GameObject.Find("AffectivaModule");
-        //playerEmotions = player.GetComponent<PlayerEmotions>();
-        //if (playerEmotions == null)
-        //{
-        //    Debug.LogError("No playerEmotions component found.");
-        //}
+
 
     }
 
     void Update()
-    {
+	{
+		//Get current dominantEmotion and its measurement score
+		
         string dominantEmotion = DataStore.GetStringValue("user:dominantEmotion:");
         int score = DataStore.GetIntValue("user:dominantEmotion:" + dominantEmotion);
         switch (dominantEmotion)

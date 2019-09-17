@@ -11981,8 +11981,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sampleRate: 20
   isFrontFacing: 1
-  targetWidth: 1920
-  targetHeight: 1080
+  targetWidth: 1024
+  targetHeight: 768
   cameraName: NEC HD WebCam
 --- !u!114 &2018350973
 MonoBehaviour:
