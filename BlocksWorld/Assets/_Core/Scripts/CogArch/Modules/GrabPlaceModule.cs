@@ -167,7 +167,7 @@ public class GrabPlaceModule : ModuleBase
 			break;
 		}
 		
-		if (state != State.Idle) {
+		if (state != State.Idle && state != State.Holding) {
 			SetValue("me:intent:handPosR", curReachTarget, state.ToString());
 		}
 	}
