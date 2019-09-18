@@ -313,7 +313,7 @@ namespace Affdex
             if (RuntimePlatform.OSXPlayer == Application.platform || RuntimePlatform.WindowsPlayer == Application.platform)
                 rootPath = Application.dataPath;
             else
-                rootPath = Path.Combine(Application.dataPath, "Affdex");
+                rootPath = Path.Combine(Application.dataPath, "_Core/Scripts/Perception/Affdex");
 
             rootPath = Path.Combine(rootPath, "Plugins");
 
