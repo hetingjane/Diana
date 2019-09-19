@@ -18,16 +18,11 @@ part of the scene hierarchy.
 using UnityEngine;
 
 public class GrabPlaceModule : ModuleBase
-{
-	public float smoothTime = 0.1f;
-	public float maxSpeed = 20f;
-	
+{	
 	public Transform grabbableBlocks;
 	public Transform hand;
 	
 	Vector3 relaxedPos;
-	Vector3 reachPos;
-	Vector3 reachV;
 	
 	public enum State {
 		Idle,
@@ -59,7 +54,8 @@ public class GrabPlaceModule : ModuleBase
 	}
 	
 	protected void Update() {
-		reachPos = DataStore.GetVector3Value("me:actual:handPosR");
+		string rightArmMotion = DataStore.GetStringValue("me:rightArm:motion");
+
 		switch (currentState) {
 		case State.Idle:
 			if (DataStore.GetStringValue("me:intent:action") == "pickUp") {
@@ -79,18 +75,15 @@ public class GrabPlaceModule : ModuleBase
 			}
 			break;
 		case State.Reaching:
-			if (Vector3.Distance(reachPos, curReachTarget) < 0.05f) {
+			if (rightArmMotion == "reached") {
 				curReachTarget = DataStore.GetVector3Value("me:intent:target");
 				if (targetBlock != null) curReachTarget = targetBlock.position + Vector3.up * 0.08f;
 				currentState = State.Grabbing;
 			}
-			else if (Input.GetKeyDown(KeyCode.Space)) Debug.Log("reachPos:" + reachPos + " curReachTarget:" + curReachTarget + "  distance: " + Vector3.Distance(reachPos, curReachTarget));
 			// ToDo: check for interrupt.
 			break;
 		case State.Grabbing:
-			if (Vector3.Distance(reachPos, curReachTarget) < 0.02f) {
-				Debug.Log("Grab!");
-				// ToDo: grab hand animation
+			if (rightArmMotion == "reached") {
 				targetBlock.GetComponent<Rigidbody>().isKinematic = true;
 				heldObject = targetBlock;
 				holdOffset = heldObject.transform.position - hand.transform.position;
@@ -100,7 +93,7 @@ public class GrabPlaceModule : ModuleBase
 			break;
 		case State.Lifting:
 			heldObject.transform.position = hand.transform.position + holdOffset;
-			if (Vector3.Distance(reachPos, curReachTarget) < 0.02f) {
+			if (rightArmMotion == "reached") {
 				currentState = State.Holding;
 				DataStore.SetValue("me:holding", new DataStore.StringValue(targetBlock.name), null, "BipedIKGrab");
 			}
@@ -134,15 +127,15 @@ public class GrabPlaceModule : ModuleBase
 			break;
 		case State.Traversing:
 			heldObject.transform.position = hand.transform.position + holdOffset;
-				Debug.Log($"Distance: {Vector3.Distance(reachPos, curReachTarget)}");
-			if (Vector3.Distance(reachPos, curReachTarget) < 0.05f) {
+			
+			if (rightArmMotion == "reached") {
 				curReachTarget = setDownPos + Vector3.up * 0.08f;
 				currentState = State.Lowering;
 			}
 			break;		
 		case State.Lowering:
 			heldObject.transform.position = hand.transform.position + holdOffset;
-			if (Vector3.Distance(reachPos, curReachTarget) < 0.02f) {
+			if (rightArmMotion == "reached") {
 				Debug.Log("Drop!");
 				// ToDo: open hand animation
 				targetBlock.SetParent(grabbableBlocks);
@@ -155,21 +148,19 @@ public class GrabPlaceModule : ModuleBase
 			}
 			break;
 		case State.Releasing:
-			if (Vector3.Distance(reachPos, curReachTarget) < 0.05f) {
-				curReachTarget = relaxedPos;
+			if (rightArmMotion == "reached") {
+				curReachTarget = default;
 				currentState = State.Unreaching;
 			}
 			break;	
 		case State.Unreaching:
-			if (Vector3.Distance(reachPos, curReachTarget) < 0.3f) {
+			if (rightArmMotion == "idle") {
 				currentState = State.Idle;
 				DataStore.ClearValue("me:intent:handPosR");
 			}
 			break;
 		}
-		
-		if (currentState != State.Idle) {
-			SetValue("me:intent:handPosR", curReachTarget, currentState.ToString());
-		}
+
+		SetValue("me:intent:handPosR", curReachTarget, currentState.ToString());
 	}
 }
