@@ -32,6 +32,8 @@ public class DataStore : MonoBehaviour {
 		public override string ToString() { return val; }
 		public bool Equals(IValue other) { return other is StringValue && val == ((StringValue)other).val; }
 		public bool IsEmpty() { return string.IsNullOrEmpty(val); }
+
+		public readonly static StringValue Empty = new StringValue("");
 	}
 
 	// BoolValue: data storage of a boolean value.
