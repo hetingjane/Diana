@@ -248,8 +248,6 @@ public class DianaMotorControl : MonoBehaviour
 		}
 	}
 
-	private string state = "";
-
 	/// <summary>
 	/// Sets <c>"me:actual:handPosR"</c> in case a module depends on it.
 	/// </summary>
