@@ -22,8 +22,6 @@ public class GrabPlaceModule : ModuleBase
 	public Transform grabbableBlocks;
 	public Transform hand;
 	
-	Vector3 relaxedPos;
-	
 	public enum State {
 		Idle,
 		Reaching,
@@ -50,7 +48,6 @@ public class GrabPlaceModule : ModuleBase
 	
 	protected void Start() {
 		currentState = State.Idle;
-		relaxedPos = hand.position;
 	}
 	
 	protected void Update() {
@@ -86,7 +83,7 @@ public class GrabPlaceModule : ModuleBase
 			if (rightArmMotion == "reached") {
 				targetBlock.GetComponent<Rigidbody>().isKinematic = true;
 				heldObject = targetBlock;
-				holdOffset = heldObject.transform.position - hand.transform.position;
+				holdOffset = Vector3.Project(heldObject.transform.position - hand.transform.position, Vector3.down);
 				currentState = State.Lifting;
 				curReachTarget = targetBlock.position + Vector3.up * 0.3f;
 			}
