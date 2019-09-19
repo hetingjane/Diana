@@ -98,7 +98,7 @@ public class GrabPlaceModule : ModuleBase
 		case State.Holding:
 			heldObject.transform.position = hand.transform.position + holdOffset;
 			if (DataStore.GetStringValue("me:intent:action") == "setDown") {
-				Vector3 v = DataStore.GetVector3Value("me:intent:target");
+				Vector3 targetPos = DataStore.GetVector3Value("me:intent:target");
 				string name = DataStore.GetStringValue("me:intent:targetName");
 				setDownTarget = string.IsNullOrEmpty(name) ? null : grabbableBlocks.Find(name);
 				if (setDownTarget != null) {
@@ -107,11 +107,11 @@ public class GrabPlaceModule : ModuleBase
 					curReachTarget = setDownPos + Vector3.up * 0.3f;
 					currentState = State.Traversing;
 					Debug.Log("Traversing to " + setDownTarget.name + " at " + setDownPos);
-				} else if (v != default(Vector3)) {
+				} else if (targetPos != default(Vector3)) {
 					// target position specified by location
 					setDownTarget = null;
-					setDownPos = v;
-					curReachTarget = v + Vector3.up * 0.3f;
+					setDownPos = targetPos + Vector3.up * 0.04f;
+					curReachTarget = targetPos + Vector3.up * 0.3f;
 					currentState = State.Traversing;
 					Debug.Log("Traversing to " + setDownPos);
 				} else {
