@@ -241,8 +241,8 @@ public class DianaMotorControl : MonoBehaviour
 				DataStore.SetValue(meRightArmMotion, waving, null, "DianaMotorControl");
 		}
 
-		var curState = DataStore.GetStringValue(meRightArmMotion);
-		if (curState != rightArmState.val)
+		var curState = DataStore.GetStringValue(meRightArmMotion, defaultValue: string.Empty);
+		if (rightArmState == null || curState != rightArmState.val)
 		{
 			Debug.Log($"State: {curState}");
 		}
