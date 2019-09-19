@@ -106,7 +106,7 @@ public class DianaMotorControl : MonoBehaviour
 	/// <returns></returns>
 	IEnumerator LerpAnimatorXYZ(Vector3 intentXYZ)
 	{
-		Debug.Log("LerpAnimatorXYZ");
+		//Debug.Log("LerpAnimatorXYZ");
 		Vector3 originalAnimatorXYZ = new Vector3(
 				animator.GetFloat("x"),
 				animator.GetFloat("y"),
@@ -125,7 +125,7 @@ public class DianaMotorControl : MonoBehaviour
 				t += (Time.deltaTime * movementSpeed) / originalDistance;
 				var animatorXYZ = Vector3.Lerp(originalAnimatorXYZ, intentXYZ, t);
 
-				// Debug.Log($"t: {t}, animatorXYZ: {animatorXYZ}, intentXYZ: {intentXYZ}");
+				//Debug.Log($"t: {t}, animatorXYZ: {animatorXYZ}, intentXYZ: {intentXYZ}");
 
 				SetAnimatorXYZ(x: animatorXYZ.x, y: animatorXYZ.y, z: animatorXYZ.z);
 
@@ -162,7 +162,7 @@ public class DianaMotorControl : MonoBehaviour
 	/// <param name="value"></param>
 	private void OnIntentHandPoseRChanged(string key, DataStore.IValue value)
 	{
-		Debug.Log("OnIntentHandPoseRChanged");
+		//Debug.Log("OnIntentHandPoseRChanged");
 		Vector3 target = (value as DataStore.Vector3Value).val;
 
 		if (!animator.GetBool("grab"))
