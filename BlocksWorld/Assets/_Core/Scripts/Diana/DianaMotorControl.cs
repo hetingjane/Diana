@@ -80,6 +80,8 @@ public class DianaMotorControl : MonoBehaviour
 	/// Note that this does not affect the movement speed for genuine animations
 	/// like grab, ungrab, wave, etc.
 	/// </summary>
+	[Range(.1f, 1f)]
+	[Tooltip("Movement speed when the hand position is manually manipulated")]
 	public float movementSpeed = .5f;
 
 	/// <summary>
