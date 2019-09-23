@@ -15,160 +15,354 @@ is currently inside the avatar hierarchy, and can't be found in the usual
 part of the scene hierarchy.
 
 */
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class GrabPlaceModule : ModuleBase
-{
-	public float smoothTime = 0.1f;
-	public float maxSpeed = 20f;
-	
+{	
+	/// <summary>
+	/// Reference to the manipulable objects in the scene.
+	/// Only these will be searched when an object is referred by name.
+	/// </summary>
 	public Transform grabbableBlocks;
-	public Transform hand;
+
+	/// <summary>
+	/// Reference to the animator attached to the humanoid character
+	/// </summary>
+	[Tooltip("Drag drop the character model here")]
+	public Animator animator;
 	
-	Vector3 relaxedPos;
-	Vector3 reachPos;
-	Vector3 reachV;
-	
+	/// <summary>
+	/// The state of the hand
+	/// </summary>
 	public enum State {
+		/// <summary>
+		/// Hand is in relaxed position
+		/// </summary>
 		Idle,
+		/// <summary>
+		/// Hand begins to be stretched out to reach the object
+		/// </summary>
 		Reaching,
+		/// <summary>
+		/// Hand begins to descend towards the object
+		/// </summary>
 		Grabbing,
+		/// <summary>
+		/// Hand begins to be raised with the object held
+		/// </summary>
 		Lifting,
+		/// <summary>
+		/// Hand is stationary with the object held
+		/// </summary>
 		Holding,
-		Traversing,	// (i.e., moving to new desired location)
+		/// <summary>
+		/// Hand is moving to a new position
+		/// </summary>
+		Traversing,
+		/// <summary>
+		/// Hand begins to descend towards the target object/position
+		/// </summary>
 		Lowering,
+		/// <summary>
+		/// Hand begins to be raised with no object held
+		/// </summary>
 		Releasing,
+		/// <summary>
+		/// Hand begins to retreat towards relaxed position
+		/// </summary>
 		Unreaching
 	}
-	public State state;
-	Transform targetBlock;
-	Vector3 curReachTarget;
-	
-	Transform setDownTarget;		// object to place ours on top of
-	Vector3 setDownPos;				// location to place our block in
-	
-	// Public, static reference to the block currently being held.
+
+	/// <summary>
+	/// Current state
+	/// </summary>
+	private State currentState;
+
+	/// <summary>
+	/// The object to reach
+	/// </summary>
+	private Transform targetBlock;
+
+	/// <summary>
+	/// Placeholder for directing hand movements
+	/// </summary>
+	private Vector3 curReachTarget;
+
+	/// <summary>
+	/// Object to place the held object on top of
+	/// </summary>
+	private Transform setDownTarget; 
+
+	/// <summary>
+	/// Location to place the held object at
+	/// </summary>
+	private Vector3 setDownPos;
+
+	/// <summary>
+	/// Public, static reference to the block currently being held
+	/// </summary>
 	public static Transform heldObject = null;
-	Vector3 holdOffset;
+
+	/// <summary>
+	/// Reference to the effector bone to be used for manipulating objects
+	/// </summary>
+	private Transform hand;
+
+	/// <summary>
+	/// Radius of the sphere to test for objects near to a location
+	/// </summary>
+	[Tooltip("Radius of the sphere to test for objects near to a location")]
+	public float radius = .1f;
+
+	/// <summary>
+	/// Height at which to raise the object while holding and traversing
+	/// relative to object's top surface
+	/// </summary>
+	private const float liftHeight = .3f;
+
+	/// <summary>
+	/// Height at which to reach the object relative to object's top surface
+	/// </summary>
+	private const float reachHeight = .05f;
+
+	/// <summary>
+	/// Offset of the block's position (geometrical center in world coordinates) w.r.t hand bone.
+	/// Hand bone position + hold offset = block position
+	/// (Block) Position - hold offset = Hand bone position 
+	/// </summary>
+	private readonly Vector3 holdOffset = new Vector3(0f, -.08f, .04f);
 	
-	protected void Start() {
-		state = State.Idle;
-		relaxedPos = hand.position;
+	protected override void Start() {
+		base.Start();
+		Debug.Assert(animator != null);
+		hand = animator.GetBoneTransform(HumanBodyBones.RightHand);
+		Debug.Assert(hand != null);
+		currentState = State.Idle;
+	}
+
+	/// <summary>
+	/// Find an object transform nearest to a location within a given radius
+	/// </summary>
+	/// <param name="location">The location around which to search</param>
+	/// <param name="radius">The radius of the sphere which checks for nearby overlapping objects</param>
+	/// <returns>The transform of the closest object to <paramref name="location"/>"/> or <c>null</c> if it can't find any.</returns>
+	private Transform FindTargetByLocation(Vector3 location, float radius)
+	{
+		Transform target = null;
+
+		// Find a block that we can grab
+		Collider[] colliders = Physics.OverlapSphere(location, radius, LayerMask.GetMask("Blocks"));
+
+		if (colliders != null && colliders.Length > 0)
+		{
+			float minDistance = float.MaxValue;
+			foreach (Collider c in colliders)
+			{
+				float distance = Vector3.Distance(c.transform.position, location);
+				if (distance < minDistance)
+				{
+					minDistance = distance;
+					target = c.transform;
+				}
+			}
+		}
+
+		return target;
+	}
+
+	/// <summary>
+	/// Tries to find an object transform nearest to a location within a given radius
+	/// </summary>
+	/// <param name="location">The location around which to search</param>
+	/// <param name="radius">The radius of the sphere which checks for nearby overlapping objects</param>
+	/// <param name="target">The transform of the nearest object if found, <c>null</c> otherwise</param>
+	/// <returns><c>true</c> if the search was successful, <c>false</c> otherwise</returns>
+	private bool TryFindTargetByLocation(Vector3 location, float radius, out Transform target)
+	{
+		target = FindTargetByLocation(location, radius);
+		return target != null;
 	}
 	
-	protected void Update() {
-		reachPos = DataStore.GetVector3Value("me:actual:handPosR");
-		switch (state) {
-		case State.Idle:
-			if (DataStore.GetStringValue("me:intent:action") == "pickUp") {
-				curReachTarget = DataStore.GetVector3Value("me:intent:target");
-				targetBlock = grabbableBlocks.Find(DataStore.GetStringValue("me:intent:targetName"));
-				if (targetBlock != null) {
-					curReachTarget = targetBlock.position;
-				} else {
-					// ToDo: if targetBlock not found or not specified, then pick the closest
-					// block to curReachTarget.
+	protected void Update()
+	{
+		string rightArmMotion = DataStore.GetStringValue("me:rightArm:motion");
+
+		switch (currentState)
+		{
+			case State.Idle:
+				if (DataStore.GetStringValue("me:intent:action") == "pickUp")
+				{
+					// Try to resolve the target by name
+					string name = DataStore.GetStringValue("me:intent:targetName");
+					targetBlock = string.IsNullOrEmpty(name) ? null : grabbableBlocks.Find(name);
+
+					if (targetBlock == null)
+					{
+						// No name for the target, so we resolve by target location
+						var targetLocation = DataStore.GetVector3Value("me:intent:target");
+						if (targetLocation != default)
+						{
+							targetBlock = FindTargetByLocation(targetLocation, radius);
+						}
+					}
+					
+
+					if (targetBlock != null)
+					{
+						// Either by name or location, we successfully resolved the target object
+						var bounds = targetBlock.GetComponent<Collider>().bounds;
+						// The default set down position is the same as the initial position of the block
+						// in case the user backs out of the action
+						setDownPos = bounds.center + Vector3.down * bounds.extents.y;
+
+						// Set the reach target to be high above the set down position accounting for hold offset
+						curReachTarget = setDownPos + Vector3.up * (bounds.size.y + reachHeight) - holdOffset;
+
+						// We go to the next state
+						currentState = State.Reaching;
+					}
+					else
+					{
+						// TODO: Agent wasn't able to resolve the target either by name or by location, so must react accordingly
+					}
 				}
-				setDownPos = curReachTarget;
-				
-				// Position the hand slightly above the target position.
-				curReachTarget += Vector3.up * 0.20f;
-				state = State.Reaching;
-			}
-			break;
-		case State.Reaching:
-			if (Vector3.Distance(reachPos, curReachTarget) < 0.05f) {
-				curReachTarget = DataStore.GetVector3Value("me:intent:target");
-				if (targetBlock != null) curReachTarget = targetBlock.position + Vector3.up * 0.08f;				
-				state = State.Grabbing;
-			}
-			else if (Input.GetKeyDown(KeyCode.Space)) Debug.Log("reachPos:" + reachPos + " curReachTarget:" + curReachTarget + "  distance: " + Vector3.Distance(reachPos, curReachTarget));
-			// ToDo: check for interrupt.
-			break;
-		case State.Grabbing:
-			if (Vector3.Distance(reachPos, curReachTarget) < 0.02f) {
-				Debug.Log("Grab!");
-				// ToDo: grab hand animation
-				targetBlock.GetComponent<Rigidbody>().isKinematic = true;
-				heldObject = targetBlock;
-				holdOffset = heldObject.transform.position - hand.transform.position;
-				state = State.Lifting;
-				curReachTarget = targetBlock.position + Vector3.up * 0.3f;
-			}
-			break;
-		case State.Lifting:
-			heldObject.transform.position = hand.transform.position + holdOffset;
-			if (Vector3.Distance(reachPos, curReachTarget) < 0.02f) {
-				state = State.Holding;
-				DataStore.SetValue("me:holding", new DataStore.StringValue(targetBlock.name), null, "BipedIKGrab");
-			}
-			break;
-		case State.Holding:
-			heldObject.transform.position = hand.transform.position + holdOffset;
-			if (DataStore.GetStringValue("me:intent:action") == "setDown") {
-				Vector3 v = DataStore.GetVector3Value("me:intent:target");
-				string name = DataStore.GetStringValue("me:intent:targetName");
-				setDownTarget = string.IsNullOrEmpty(name) ? null : grabbableBlocks.Find(name);
-				if (setDownTarget != null) {
-					// target position specified as block name
-					setDownPos = setDownTarget.position + Vector3.up * 0.05f;
-					curReachTarget = setDownPos + Vector3.up * 0.3f;
-					state = State.Traversing;
-					Debug.Log("Traversing to " + setDownTarget.name + " at " + setDownPos);
-				} else if (v != default(Vector3)) {
-					// target position specified by location
-					setDownTarget = null;
-					setDownPos = v;
-					curReachTarget = v * 0.3f;
-					state = State.Traversing;
-					Debug.Log("Traversing to " + setDownPos);
-				} else {
-					// no target position specified; put it back where it came from
-					setDownTarget = null;
-					curReachTarget = setDownPos + Vector3.up * 0.08f;
-					state = State.Lowering;
+				break;
+			case State.Reaching:
+				// If the grab animation is completed
+				if (rightArmMotion == "reached")
+				{
+					var bounds = targetBlock.GetComponent<Collider>().bounds;
+					// Lower the reach target to be withing grabbing distance to the target
+					curReachTarget = setDownPos + Vector3.up * bounds.size.y - holdOffset;
+
+					// We go to the next state
+					currentState = State.Grabbing;
 				}
-			}
-			break;
-		case State.Traversing:
-			heldObject.transform.position = hand.transform.position + holdOffset;
-			if (Vector3.Distance(reachPos, curReachTarget) < 0.05f) {
-				curReachTarget = setDownPos + Vector3.up * 0.08f;
-				state = State.Lowering;
-			}
-			break;		
-		case State.Lowering:
-			heldObject.transform.position = hand.transform.position + holdOffset;
-			if (Vector3.Distance(reachPos, curReachTarget) < 0.02f) {
-				Debug.Log("Drop!");
-				// ToDo: open hand animation
-				targetBlock.SetParent(grabbableBlocks);
-				targetBlock.eulerAngles = Vector3.zero;
-				targetBlock.GetComponent<Rigidbody>().isKinematic = false;
-				DataStore.SetValue("me:holding", new DataStore.StringValue(""), null, "BipedIKGrab released " + targetBlock.name);
-				heldObject = null;
-				state = State.Releasing;
-				curReachTarget = targetBlock.position + Vector3.up * 0.2f;
-			}
-			break;
-		case State.Releasing:
-			if (Vector3.Distance(reachPos, curReachTarget) < 0.05f) {
-				curReachTarget = relaxedPos;
-				state = State.Unreaching;
-			}
-			break;	
-		case State.Unreaching:
-			if (Vector3.Distance(reachPos, curReachTarget) < 0.3f) {
-				state = State.Idle;
-				DataStore.ClearValue("me:intent:handPosR");
-			}
-			break;
+				// ToDo: check for interrupt.
+				break;
+			case State.Grabbing:
+				if (rightArmMotion == "reached")
+				{
+					// Do not respond to forces/collisions
+					targetBlock.GetComponent<Rigidbody>().isKinematic = true;
+
+					// Store a reference to the grabbed object
+					heldObject = targetBlock;
+
+					// Raise the reach target to be high above the target
+					var bounds = targetBlock.GetComponent<Collider>().bounds;
+					curReachTarget = setDownPos + Vector3.up * (bounds.size.y + liftHeight) - holdOffset;
+
+					// We go to the next state
+					currentState = State.Lifting;
+				}
+				break;
+			case State.Lifting:
+				// Move the held object along with the hand maintaining the same offset
+				heldObject.transform.position = hand.transform.position + holdOffset;
+				if (rightArmMotion == "reached")
+				{
+					currentState = State.Holding;
+					DataStore.SetValue("me:holding", new DataStore.StringValue(targetBlock.name), null, "BipedIKGrab");
+				}
+				break;
+			case State.Holding:
+				// Deliberation state
+				// We proceed differently depending:
+				//     - if we receive a block to set down the current block on
+				//     - if we receive a location
+				//     - if the user backs out in which case we place the block back where it was
+				if (DataStore.GetStringValue("me:intent:action") == "setDown")
+				{					
+					// Try to resolve set down target block by name
+					string name = DataStore.GetStringValue("me:intent:targetName");
+					setDownTarget = string.IsNullOrEmpty(name) ? null : grabbableBlocks.Find(name);
+					// In case we need to resolve by target location
+					Vector3 targetPos = DataStore.GetVector3Value("me:intent:target");
+
+					if (setDownTarget != null)
+					{
+						// We have the set down target block by name
+
+						// Turn off physical interaction with the set down target block
+						setDownTarget.GetComponent<Rigidbody>().isKinematic = true;
+
+						// Set down position is on the top surface of the set down target block
+						var bounds = setDownTarget.GetComponent<Collider>().bounds;
+						setDownPos = bounds.center + bounds.extents.y * Vector3.up;
+
+						// Set the reach target to be high above the set down position accounting for hold offset
+						curReachTarget = setDownPos + Vector3.up * reachHeight - holdOffset;
+						currentState = State.Traversing;
+					}
+					else if (targetPos != default)
+					{
+						// Set down position is the position on the table
+						setDownPos = targetPos;
+
+						// Set the reach target to be high above the set down position accounting for hold offset
+						curReachTarget = setDownPos + Vector3.up * reachHeight - holdOffset;
+						currentState = State.Traversing;
+					}
+					else
+					{
+						var bounds = heldObject.GetComponent<Collider>().bounds;
+						// Set the reach target to be just above the set down position accounting for hold offset
+						curReachTarget = setDownPos + Vector3.up * bounds.size.y - holdOffset;
+						currentState = State.Lowering;
+					}
+				}
+				break;
+			case State.Traversing:
+				// Move the held object along with the hand maintaining the same offset
+				heldObject.transform.position = hand.transform.position + holdOffset;
+			
+				if (rightArmMotion == "reached")
+				{
+					var bounds = heldObject.GetComponent<Collider>().bounds;
+					// Set the reach target to be just above the set down position accounting for hold offset
+					curReachTarget = setDownPos + Vector3.up * bounds.size.y - holdOffset;
+					currentState = State.Lowering;
+				}
+				break;		
+			case State.Lowering:
+				heldObject.transform.position = hand.transform.position + holdOffset;
+
+				if (rightArmMotion == "reached")
+				{
+					heldObject.SetParent(grabbableBlocks);
+					var bounds = heldObject.GetComponent<Collider>().bounds;
+					heldObject.position = setDownPos + Vector3.up * bounds.extents.y;
+					heldObject.eulerAngles = Vector3.zero;
+
+					heldObject.GetComponent<Rigidbody>().isKinematic = false;
+
+					curReachTarget = heldObject.position + Vector3.up * reachHeight - holdOffset;
+					
+					DataStore.SetValue("me:holding", new DataStore.StringValue(""), null, "BipedIKGrab released " + targetBlock.name);
+					heldObject = null;
+
+					currentState = State.Releasing;
+				}
+				break;
+			case State.Releasing:
+				if (rightArmMotion == "reached")
+				{
+					if (setDownTarget != null)
+						setDownTarget.GetComponent<Rigidbody>().isKinematic = false;
+					curReachTarget = default;
+					currentState = State.Unreaching;
+				}
+				break;	
+			case State.Unreaching:
+				if (rightArmMotion == "idle")
+				{
+					currentState = State.Idle;
+					DataStore.ClearValue("me:intent:handPosR");
+				}
+				break;
 		}
-		
-		if (state != State.Idle && state != State.Holding) {
-			SetValue("me:intent:handPosR", curReachTarget, state.ToString());
-		}
+
+		SetValue("me:intent:handPosR", curReachTarget, currentState.ToString());
 	}
 }

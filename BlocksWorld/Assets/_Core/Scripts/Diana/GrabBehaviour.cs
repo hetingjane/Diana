@@ -17,9 +17,7 @@ public class GrabBehaviour : StateMachineBehaviour
         animator.SetIKPositionWeight(AvatarIKGoal.RightHand, animator.GetFloat("PositionWeight"));
         animator.SetIKRotationWeight(AvatarIKGoal.RightHand, animator.GetFloat("RotationWeight"));
 
-        Vector3 target = DataStore.GetVector3Value("user:pointPos");
-        target += Vector3.up * 0.10f;
-
+        Vector3 target = new Vector3(animator.GetFloat("x"), animator.GetFloat("y"), animator.GetFloat("z"));
         animator.SetIKPosition(AvatarIKGoal.RightHand, target);
         animator.SetIKRotation(AvatarIKGoal.RightHand, Quaternion.identity);
     }
