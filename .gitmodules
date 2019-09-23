@@ -1,3 +1,6 @@
 [submodule "KSIM/SimpleNetworking"]
 	path = KSIM/SimpleNetworking
 	url = git@github.com:bangar1991/SimpleNetworking.git
+[submodule "VoxSim"]
+	path = VoxSim
+	url = git@github.com:VoxML/VoxSim.git
