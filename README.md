@@ -1,9 +1,16 @@
 # BlocksWorld
 BlocksWorld (new name in progress) is an interactive gesture- and speech-recognizing intelligent agent. See further information [here](https://www.cs.colostate.edu/~draper/CwC.php).
 
-=======
 ## Requirements
-- You shouldn't need anything else since we've added all assets to the repo.
+- You shouldn't need any Unity assets since we've added all assets to the repo.
+- For the included Python scripts, the following must be installed:
+   - Latest Python 3 x64
+   - `pip install numpy tensorflow-gpu==1.14.0 opencv-python scipy scikit-image pykinect2`
+   - In the location where `pykinect2` is installed, replace existing files with these:
+   `wget https://raw.githubusercontent.com/Kinect/PyKinect2/master/pykinect2/PyKinectV2.py https://raw.githubusercontent.com/Kinect/PyKinect2/master/pykinect2/PyKinectRuntime.py`
+   - CUDA v10.0
+   - Add `%CUDA_PATH%\bin` to `PATH`
+   - cuDNN v7.6.3 (just extract the archive over CUDA install directory)
 
 # KSIM
 ## Requirements
