@@ -16,6 +16,8 @@ BlocksWorld (new name in progress) is an interactive gesture- and speech-recogni
 ```
 # git pull if you haven't already, then
 git pull --recurse-submodules
+git submodule init
+git submodule update
 ```
 Then from an admin prompt:
 ```
