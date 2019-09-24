@@ -11,6 +11,15 @@ BlocksWorld (new name in progress) is an interactive gesture- and speech-recogni
    - CUDA v10.0
    - Add `%CUDA_PATH%\bin` to `PATH`
    - cuDNN v7.6.3 (just extract the archive over CUDA install directory)
+   
+## VoxSim Submodule Setup
+```
+git checkout voxsim-integration
+git pull --recurse-submodules
+cd BlocksWorld\BlocksWorld\Assets\Plugins
+[this last one must be run from a cmd prompt with admin rights]
+mklink /D VoxSimPlatform ..\..\..\VoxSim\Assets\VoxSimPlatform
+```
 
 # KSIM
 ## Requirements
