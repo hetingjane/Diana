@@ -14,7 +14,7 @@ BlocksWorld (new name in progress) is an interactive gesture- and speech-recogni
    
 ## VoxSim Submodule Setup
 ```
-git checkout voxsim-integration
+# git pull if you haven't already, then
 git pull --recurse-submodules
 ```
 Then from an admin prompt:
