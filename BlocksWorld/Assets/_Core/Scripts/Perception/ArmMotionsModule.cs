@@ -10,48 +10,50 @@ Reads:
 */
 
 using UnityEngine;
-using System.Diagnostics;
 
 public class ArmMotionsModule : ModuleBase
 {
-    Process process;
-    bool started;
+	private ExternalProcess amrMotionsRecognizer;
+	private bool endedExternally = false;
 
-    protected override void Start()
-    {
-	    base.Start();
-	    try {
-	        process = Process.Start(new ProcessStartInfo
-	        {
-		        FileName = "python.exe",
-	            Arguments = "External/Perception/skeleton_client.py",
-	            UseShellExecute = true,
-	            //RedirectStandardOutput = true,
-	            //RedirectStandardError = true
-	        });
-	        started = true;
-		    UnityEngine.Debug.Log("Started arm motions client");
-	    } catch (System.Exception e) {
-	    	UnityEngine.Debug.LogWarning("Error starting arm motions client: " + e);
-	    	started = false;
-	    }
+	protected override void Start()
+	{
+		base.Start();
+
+		amrMotionsRecognizer = new ExternalProcess(
+			pathToExecutable: "python.exe",
+			arguments: "External/Perception/skeleton_client.py"
+		);
+
+		amrMotionsRecognizer.Hide = true;
+
+		amrMotionsRecognizer.Start();
+
+		if (amrMotionsRecognizer.HasStarted)
+		{
+			Debug.Log("Started arm motions client");
+		}
+		else
+		{
+			Debug.LogWarning("Error starting arm motions client: " + amrMotionsRecognizer.ErrorLog);
+		}
 	}
 
-    protected void Update()
-    {
-	    if (started && process.HasExited)
-        {
-            UnityEngine.Debug.Log("arm motions client exited unexpectedly");
-            started = false;
-        }
-    }
-
-    private void OnApplicationQuit()
+	protected void Update()
 	{
-		if (process != null) {
-	        UnityEngine.Debug.Log("Closing arm motions client");
-		    process.Close();
-			UnityEngine.Debug.Log("arm motions client closed");
+		if (!endedExternally && amrMotionsRecognizer.HasExited)
+		{
+			Debug.LogError("Arm motions client exited unexpectedly: " + amrMotionsRecognizer.ErrorLog);
+			endedExternally = true;
 		}
-    }
+	}
+
+	private void OnApplicationQuit()
+	{
+		if (amrMotionsRecognizer.HasStarted && !amrMotionsRecognizer.HasExited)
+		{
+			amrMotionsRecognizer.Close();
+			Debug.Log("Arm motions client closed");
+		}
+	}
 }
