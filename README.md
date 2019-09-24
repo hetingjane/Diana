@@ -13,21 +13,22 @@ BlocksWorld (new name in progress) is an interactive gesture- and speech-recogni
    - cuDNN v7.6.3 (just extract the archive over CUDA install directory)
    
 ## VoxSim Submodule Setup
-1. 
+1. Setup your Git to allow Symbolic link support. 
+```
+git config --global core.symlinks true
+```
+
+2. Open your shell (needs to be "Run as Administrator" on Windows, so that symlinks can be created). Initialize and update the submodules:
 ```
 # git pull if you haven't already, then
 git pull --recurse-submodules
 git submodule init
 git submodule update
 ```
-2. (If not using windows, skip to step 3) Then from an admin prompt:
-```
-cd BlocksWorld\BlocksWorld\Assets\Plugins
-mklink /D VoxSimPlatform ..\..\..\VoxSim\Assets\VoxSimPlatform
-```
-3. Then open the **VOXSIM** project in Unity (not BlocksWorld), and choose Assets->Import Asset Package->Custom, and select "gracesgames-simplefilebrowser.unitypackage" from the BlocksWorld repo root.
 
-Finally, you should be able to open BlocksWorld in Unity and click play after importing. As of writing this no errors persist.
+3. Then open the **VOXSIM** project in Unity (not BlocksWorld), and choose Assets->Import Package->Custom Package, and select "gracesgames-simplefilebrowser.unitypackage" from the BlocksWorld repo root.
+
+Finally, you should be able to open BlocksWorld in Unity and click play after importing. As of writing this, no errors persist.
 
 # KSIM
 ## Requirements
