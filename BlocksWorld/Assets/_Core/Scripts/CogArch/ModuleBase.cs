@@ -119,6 +119,8 @@ public class ModuleBase : MonoBehaviour
 		SetValue(key, new DataStore.Vector3Value(value), comment);
     }
 
+
+
     /// <summary>
     /// Set a float array value in the data store, and also update our module display (if any)
     /// </summary>
@@ -128,5 +130,16 @@ public class ModuleBase : MonoBehaviour
     protected void SetValue(string key, float[] value, string comment)
     {
         SetValue(key, new DataStore.FloatArrayValue(value), comment);
+    }
+
+    /// <summary>
+    /// Set a Quaternion value in the data store, and also update our module display (if any)
+    /// </summary>
+    /// <param name="key">Key of interest</param>
+    /// <param name="value">Value to store</param>
+    /// <param name="comment">Comment explaining the change</param>
+    protected void SetValue(string key, Quaternion value, string comment)
+    {
+        SetValue(key, new DataStore.QuaternionValue(value), comment);
     }
 }
