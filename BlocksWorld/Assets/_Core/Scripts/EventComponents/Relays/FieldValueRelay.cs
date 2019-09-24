@@ -2,10 +2,12 @@
 using UnityEngine.UI;
 using UnityEngine.Events;
 using System.Collections.Generic;
+using TMPro;
 
 public class FieldValueRelay : MonoBehaviour {
 	
 	public InputField field;
+	public TMP_InputField tmpField;
 	
 	public StringEvent onInvokeWithText;
 	public FloatEvent onInvokeWithFloat;
@@ -13,9 +15,10 @@ public class FieldValueRelay : MonoBehaviour {
 	
 	public void Invoke() {
 		if (field == null) field = GetComponent<InputField>();
-		if (field == null) return;
+		if (tmpField == null) tmpField = GetComponent<TMP_InputField>();
+		if (field == null && tmpField == null) return;
 		
-		string text = field.text;
+		string text = (field == null ? tmpField.text : field.text);
 		onInvokeWithText.Invoke(text);
 		
 		if (string.IsNullOrEmpty(text.Trim())) text = "0";

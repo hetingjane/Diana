@@ -22,8 +22,15 @@ public class HandPoseModule : ModuleBase
 	{
 		base.Start();
 
+		string python = PlayerPrefs.GetString("pythonPath", "python.exe");
+		if (string.IsNullOrEmpty(python)) {
+			Debug.Log("Python path is empty; skipping " + gameObject.name);
+			endedExternally = true;
+			return;
+		}
+
 		handPoseRecognizer = new ExternalProcess(
-			pathToExecutable: "python.exe",
+			pathToExecutable: python,
 			arguments: "External/Perception/depth_client.py"
 		);
 

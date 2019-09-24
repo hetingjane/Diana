@@ -13,46 +13,53 @@ using UnityEngine;
 
 public class ArmMotionsModule : ModuleBase
 {
-	private ExternalProcess amrMotionsRecognizer;
+	private ExternalProcess armMotionsRecognizer;
 	private bool endedExternally = false;
 
 	protected override void Start()
 	{
 		base.Start();
 
-		amrMotionsRecognizer = new ExternalProcess(
-			pathToExecutable: "python.exe",
+		string python = PlayerPrefs.GetString("pythonPath", "python.exe");
+		if (string.IsNullOrEmpty(python)) {
+			Debug.Log("Python path is empty; skipping " + gameObject.name);
+			endedExternally = true;
+			return;
+		}
+
+		armMotionsRecognizer = new ExternalProcess(
+			pathToExecutable: python,
 			arguments: "External/Perception/skeleton_client.py"
 		);
 
-		amrMotionsRecognizer.Hide = true;
+		armMotionsRecognizer.Hide = true;
 
-		amrMotionsRecognizer.Start();
+		armMotionsRecognizer.Start();
 
-		if (amrMotionsRecognizer.HasStarted)
+		if (armMotionsRecognizer.HasStarted)
 		{
 			Debug.Log("Started arm motions client");
 		}
 		else
 		{
-			Debug.LogWarning("Error starting arm motions client: " + amrMotionsRecognizer.ErrorLog);
+			Debug.LogWarning("Error starting arm motions client: " + armMotionsRecognizer.ErrorLog);
 		}
 	}
 
 	protected void Update()
 	{
-		if (!endedExternally && amrMotionsRecognizer.HasExited)
+		if (!endedExternally && armMotionsRecognizer.HasExited)
 		{
-			Debug.LogError("Arm motions client exited unexpectedly: " + amrMotionsRecognizer.ErrorLog);
+			Debug.LogError("Arm motions client exited unexpectedly: " + armMotionsRecognizer.ErrorLog);
 			endedExternally = true;
 		}
 	}
 
 	private void OnApplicationQuit()
 	{
-		if (amrMotionsRecognizer.HasStarted && !amrMotionsRecognizer.HasExited)
+		if (armMotionsRecognizer.HasStarted && !armMotionsRecognizer.HasExited)
 		{
-			amrMotionsRecognizer.Close();
+			armMotionsRecognizer.Close();
 			Debug.Log("Arm motions client closed");
 		}
 	}
