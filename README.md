@@ -16,10 +16,15 @@ BlocksWorld (new name in progress) is an interactive gesture- and speech-recogni
 ```
 git checkout voxsim-integration
 git pull --recurse-submodules
+```
+Then from an admin prompt:
+```
 cd BlocksWorld\BlocksWorld\Assets\Plugins
-[this last one must be run from a cmd prompt with admin rights]
 mklink /D VoxSimPlatform ..\..\..\VoxSim\Assets\VoxSimPlatform
 ```
+Then open the **VOXSIM** project in Unity (not BlocksWorld), and choose Assets->Import Asset Package->Custom, and select "gracesgames-simplefilebrowser.unitypackage" from the BlocksWorld repo root.
+
+Finally, you should be able to open BlocksWorld in Unity and click play after importing. As of writing this no errors persist.
 
 # KSIM
 ## Requirements
