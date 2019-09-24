@@ -102,6 +102,20 @@ public class DataStore : MonoBehaviour {
         public bool IsEmpty() { return false; }
     }
 
+    // QuaternionValue: data storage of a Quaternion (i.e. an x,y,z,w 4-tuple).
+    public class QuaternionValue : IValue
+    {
+        public Quaternion val;
+        public QuaternionValue(Quaternion inVal) { this.val = inVal; }
+        public override string ToString() { return val.eulerAngles.ToString();  }
+        public bool Equals(IValue other) { return other is QuaternionValue && val == ((QuaternionValue)other).val; }
+        public bool IsEmpty() { return false; }
+
+        // Also for convenience, here are a couple of static instances
+        // that represent 0,0,0,0 and 1,1,1,1.  Use them when it's convenient.
+        public static QuaternionValue Zero = new QuaternionValue(new Quaternion(0.0f, 0.0f, 0.0f, 0.0f));
+        public static QuaternionValue One = new QuaternionValue(new Quaternion(1.0f, 1.0f, 1.0f, 1.0f));
+    }
     // Singleton instance of the DataStore class.
     public static DataStore instance { get; private set; }
 	
@@ -321,6 +335,20 @@ public class DataStore : MonoBehaviour {
     }
 
     /// <summary>
+    /// Get a Quaternion value associated with a given key.
+    /// </summary>
+    /// <param name="key">key of interest</param>
+    /// <param name="defaultValue">value to return if key is not found (or not Quaternion)</param>
+    /// <returns>value for that key, or defaultValue</returns>
+    public Quaternion IGetQuaternionValue(string key, Quaternion defaultValue = default(Quaternion))
+    {
+        IValue value;
+        if (!store.TryGetValue(key, out value)) return defaultValue;
+        if (value is QuaternionValue) return ((QuaternionValue)value).val;
+        return defaultValue;
+    }
+
+    /// <summary>
     /// Return whether the given key exists in this DataStore, AND
     /// has a non-empty value.
     /// </summary>
@@ -455,6 +483,18 @@ public class DataStore : MonoBehaviour {
     public static float[] GetFloatArrayValue(string key, float[] defaultValue = default(float[]))
     {
         return instance.IGetFloatArrayValue(key, defaultValue);
+    }
+
+
+    /// <summary>
+    /// Get a Quaternion value associated with a given key.
+    /// </summary>
+    /// <param name="key">key of interest</param>
+    /// <param name="defaultValue">value to return if key is not found (or not Quaternion)</param>
+    /// <returns>value for that key, or defaultValue</returns>
+    public static Quaternion GetQuaternionValue(string key, Quaternion defaultValue = default(Quaternion))
+    {
+        return instance.IGetQuaternionValue(key, defaultValue);
     }
 
     /// <summary>
