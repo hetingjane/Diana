@@ -12,48 +12,50 @@ Reads:
 */
 
 using UnityEngine;
-using System.Diagnostics;
 
 public class HandPoseModule : ModuleBase
 {
-    Process process;
-    bool started;
+	private ExternalProcess handPoseRecognizer;
+	private bool endedExternally = false;
 
-    protected override void Start()
-    {
-	    base.Start();
-	    try {
-	        process = Process.Start(new ProcessStartInfo
-	        {
-		        FileName = "python.exe",
-	            Arguments = "External/Perception/depth_client.py",
-	            UseShellExecute = true,
-	            //RedirectStandardOutput = true,
-	            //RedirectStandardError = true
-	        });
-	        started = true;
-		    UnityEngine.Debug.Log("Started hand pose client");
-	    } catch (System.Exception e) {
-	    	UnityEngine.Debug.LogWarning("Error starting hand pose client: " + e);
-	    	started = false;
-	    }
+	protected override void Start()
+	{
+		base.Start();
+
+		handPoseRecognizer = new ExternalProcess(
+			pathToExecutable: "python.exe",
+			arguments: "External/Perception/depth_client.py"
+		);
+
+		handPoseRecognizer.Hide = true;
+
+		handPoseRecognizer.Start();
+
+		if (handPoseRecognizer.HasStarted)
+		{
+			Debug.Log("Started hand pose client");
+		}
+		else
+		{
+			Debug.LogWarning("Error starting hand pose client: " + handPoseRecognizer.ErrorLog);
+		}
 	}
 
-    protected void Update()
-    {
-	    if (started && process.HasExited)
-        {
-            UnityEngine.Debug.Log("Hand pose client exited unexpectedly");
-            started = false;
-        }
-    }
-
-    private void OnApplicationQuit()
+	protected void Update()
 	{
-		if (process != null) {
-	        UnityEngine.Debug.Log("Closing hand pose client");
-		    process.Close();
-			UnityEngine.Debug.Log("Hand pose client closed");
+		if (!endedExternally && handPoseRecognizer.HasExited)
+		{
+			Debug.LogError("Hand pose client exited unexpectedly: " + handPoseRecognizer.ErrorLog);
+			endedExternally = true;
 		}
-    }
+	}
+
+	private void OnApplicationQuit()
+	{
+		if (handPoseRecognizer.HasStarted && !handPoseRecognizer.HasExited)
+		{
+			handPoseRecognizer.Close();
+			Debug.Log("Hand pose client closed");
+		}
+	}
 }
