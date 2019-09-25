@@ -518,6 +518,32 @@ public class DataStore : MonoBehaviour {
 		instance.IClearValue(key);
 	}
 
+	/// <summary>
+	/// Get the date/time at which the given key last changed value.
+	/// </summary>
+	/// <param name="key">key of interest</param>
+	/// <returns>date/time of last change; undefined if key has never been set</returns>
+	public static DateTime GetLastChangeTime(string key) {
+		DateTime dt;
+		instance.changeTime.TryGetValue(key, out dt);
+		return dt;
+	}
+	
+	/// <summary>
+	/// Get the number of seconds since the key was last changed.
+	/// If the key has never been set, this returns Mathf.NegativeInfinity.
+	/// </summary>
+	/// <param name="key">key of interest</param>
+	/// <returns>number of seconds since the key last changed value</returns>
+	public static float GetSecondsSinceLastChange(string key) {
+		DateTime dt;
+		if (instance.changeTime.TryGetValue(key, out dt)) {
+			TimeSpan span = DateTime.Now - dt;
+			return span.Milliseconds * 0.001f;
+		}
+		return Mathf.NegativeInfinity;
+	}
+
 	#endregion
 	//--------------------------------------------------------------------------------
 	#region Unit Test
