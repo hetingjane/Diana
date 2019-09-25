@@ -447,6 +447,8 @@ namespace CWCNLP
 		}
 		
 		protected override void Run() {
+			// Note: these tests will fail if we have not called PartOfSpeech.Init
+			// with the semcor dataset.  That is normally done via ParserModule.Awake.
 			Test("thank you", "[VB[thank_you]]");
 			Test("no thank you", "[UH[no] VB[thank_you]]");
 			Test("pick up this block", "[VB[pick_up NN[DT[this] block]]]");

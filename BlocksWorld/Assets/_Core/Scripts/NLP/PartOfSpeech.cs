@@ -8,6 +8,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace CWCNLP
 {
@@ -27,8 +28,6 @@ namespace CWCNLP
 		public const string WP = "WP";		// WH-pronoun (who, what)
 		public const string PPS = "PPS";	// singular pronoun (it, one)
 		public const string UH = "UH";		// interjections and greetings
-
-		
 		// There are a bunch of others, but these will do for now.
 		
 		struct PosEntry {
@@ -47,6 +46,10 @@ namespace CWCNLP
 		// set phrases in our dictionary, without and with underscores
 		// (e.g. "thank you" -> "thank_you")
 		static List<SetPhrase> setPhrases;
+		
+		// cached regular expressions used for replacing set phrases, etc.
+		static Dictionary<string, Regex> regexCache = new Dictionary<string, Regex>();
+		
 		
 		static void AddEntry(string word, string data) {
 			var list = new List<PosEntry>();
@@ -163,7 +166,7 @@ namespace CWCNLP
 			// replace our set phrases
 			foreach (var sp in setPhrases) {
 				//string s = text;
-				text = System.Text.RegularExpressions.Regex.Replace(text, "\\b" + sp.orig + "\\b", sp.replace);
+				text = ReplaceWholeWord(text, sp.orig, sp.replace);
 				//if (text != s) Console.WriteLine("Applied: " + sp.orig + " --> " + sp.replace);
 			}
 			// special replacements for math operators (which don't work above due to RegEx limitations)
@@ -172,7 +175,7 @@ namespace CWCNLP
 			text = text.Replace("*", " times ");
 			text = text.Replace("/", " divided_by ");
 			// and compress space runs
-			text = System.Text.RegularExpressions.Regex.Replace(text, " +", " ");
+			text = RegexReplace(text, " +", " ");
 			
 			return text;
 		}
@@ -194,6 +197,20 @@ namespace CWCNLP
 				default:
 					return entryList[0].pos;
 			}
+		}
+		
+		static string RegexReplace(string text, string pattern, string replacement) {
+			Regex re = null;
+			if (!regexCache.TryGetValue(pattern, out re)) {
+				re = new Regex(pattern);
+				regexCache[pattern] = re;
+			}
+			return re.Replace(text, replacement);
+		}
+		
+		static string ReplaceWholeWord(string text, string word, string replacement) {
+			if (!text.Contains(word)) return text;	// quick bail-out case
+			return RegexReplace(text, "\\b" + word + "\\b", replacement);
 		}
 	}
 }

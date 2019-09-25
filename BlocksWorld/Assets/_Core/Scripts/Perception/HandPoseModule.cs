@@ -59,7 +59,7 @@ public class HandPoseModule : ModuleBase
 
 	private void OnApplicationQuit()
 	{
-		if (handPoseRecognizer.HasStarted && !handPoseRecognizer.HasExited)
+		if (handPoseRecognizer != null && handPoseRecognizer.HasStarted && !handPoseRecognizer.HasExited)
 		{
 			handPoseRecognizer.Close();
 			Debug.Log("Hand pose client closed");

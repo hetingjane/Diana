@@ -17,12 +17,11 @@ public class DataStoreDisplay : MonoBehaviour {
 	
 	bool needsUpdate = true;
 	
-	Dictionary<string, string> kvData;
+	Dictionary<string, string> kvData = new Dictionary<string, string>();
 	
 	protected void Awake() {
 		outputText = GetComponent<TextMeshProUGUI>();
 		Debug.Assert(outputText != null);
-		kvData = new Dictionary<string, string>();
 	}
 	
 	protected void Update() {

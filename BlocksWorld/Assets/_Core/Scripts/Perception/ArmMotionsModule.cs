@@ -57,7 +57,7 @@ public class ArmMotionsModule : ModuleBase
 
 	private void OnApplicationQuit()
 	{
-		if (armMotionsRecognizer.HasStarted && !armMotionsRecognizer.HasExited)
+		if (armMotionsRecognizer != null && armMotionsRecognizer.HasStarted && !armMotionsRecognizer.HasExited)
 		{
 			armMotionsRecognizer.Close();
 			Debug.Log("Arm motions client closed");

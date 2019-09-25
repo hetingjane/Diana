@@ -19,7 +19,11 @@ public class ParserModule : ModuleBase {
 
 	protected void Awake() {
 		Debug.Assert(semcorWords != null);
+		var timer = new System.Diagnostics.Stopwatch();
+		timer.Start();
 		PartOfSpeech.Init(semcorWords.text);
+		timer.Stop();
+		Debug.Log("PartOfSpeech.Init took " + timer.Elapsed.Seconds + " seconds");
 	}
 	
 	protected override void Start() {
