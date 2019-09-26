@@ -217,7 +217,9 @@ public class DataStore : MonoBehaviour {
 		
 		// Log the changes for debugging purposes (if desired)
 		if (logWithDebugLog) {
-			Debug.Log(string.Format("{0} := {1} ({2}: {3})", key, value.ToString(), module.name, comment), module);
+            if ((value != null) && (module != null)) {
+    			Debug.Log(string.Format("{0} := {1} ({2}: {3})", key, value.ToString(), module.name, comment), module);
+            }
 		}
 		if (logToFile) {
 			if (logFileStream == null) logFileStream = System.IO.File.AppendText("DataStore.log");
