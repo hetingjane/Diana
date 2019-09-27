@@ -28,7 +28,7 @@ As a general rule, each part of a key should be named like a variable or propert
 |`user:dominantEmotion:`     |String       |        |Current user dominant emotion, e.g. "Happy", "Angry"                      |
 |`user:dominantEmotion:Angry`|Integer      |0 to 100|Measure of how angry the user looks                                       |
 |`user:dominantEmotion:Happy`|Integer      |0 to 100|Measure of how happy the user looks                                       |
-|`user:engaged`               |Boolean      |T or F  |True if closest body frame is engaged and false otherwise                 |
+|`user:isEngaged`               |Boolean      |T or F  |True if closest body frame is engaged and false otherwise                 |
 |`user:isPointing`            |Boolean      |T or F  |Whether the user appears to be pointing (anywhere at all)                 |
 |`user:isSpeaking`            |Boolean      |T or F  |Whether the user appears to be speaking                                   |
 |`user:hands:[right,left]`    |String       |        |Current hand pose for either left or right hand							|
