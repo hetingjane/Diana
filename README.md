@@ -28,8 +28,15 @@ git submodule update
 
 3. Then open the **VOXSIM** project in Unity (not BlocksWorld), and choose Assets->Import Package->Custom Package, and select "gracesgames-simplefilebrowser.unitypackage" from the BlocksWorld repo root.
 
-Finally, you should be able to open BlocksWorld in Unity and click play after importing. As of writing this, no errors persist.
+Finally, you should be able to open BlocksWorld in Unity and click play after importing.
 
+### VoxSim Submodule issues
+- **Missing Newtonsoft and other assembly references** From an admin prompt:
+```	```
+cd BlocksWorld\BlocksWorld\Assets\Plugins	cd BlocksWorld\BlocksWorld\Assets\Plugins
+mklink /D VoxSimPlatform ..\..\..\VoxSim\Assets\VoxSimPlatform	mklink /D VoxSimPlatform ..\..\..\VoxSim\Assets\VoxSimPlatform
+
+- **Missing RTVoice and others (but not newtonsoft)** Right now these aren't in either repo. Fix in progress.
 # KSIM
 ## Requirements
 * [MS Kinect SDK (v2)](https://www.microsoft.com/en-us/download/details.aspx?id=44561)
