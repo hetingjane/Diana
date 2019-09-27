@@ -45,3 +45,7 @@ __pycache__/
 # Ignore PyCharm files
 .idea/
 **.idea/*
+
+# Ignore watson build log
+LastBuild.log
+LastBuild.log.meta
