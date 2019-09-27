@@ -35,8 +35,8 @@ Finally, you should be able to open BlocksWorld in Unity and click play after im
 
 From an admin prompt:
 ```
-cd BlocksWorld\BlocksWorld\Assets\Plugins	cd BlocksWorld\BlocksWorld\Assets\Plugins
-mklink /D VoxSimPlatform ..\..\..\VoxSim\Assets\VoxSimPlatform	mklink /D VoxSimPlatform ..\..\..\VoxSim\Assets\VoxSimPlatform
+cd BlocksWorld\BlocksWorld\Assets\Plugins
+mklink /D VoxSimPlatform ..\..\..\VoxSim\Assets\VoxSimPlatform
 ```
 
 - **Missing RTVoice and others (but not newtonsoft)** Right now these aren't in either repo. Fix in progress.
