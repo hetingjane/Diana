@@ -31,10 +31,13 @@ git submodule update
 Finally, you should be able to open BlocksWorld in Unity and click play after importing.
 
 ### VoxSim Submodule issues
-- **Missing Newtonsoft and other assembly references** From an admin prompt:
-```	```
+- **Missing Newtonsoft and other assembly references** The symlink wasn't created for some reason. 
+
+From an admin prompt:
+```
 cd BlocksWorld\BlocksWorld\Assets\Plugins	cd BlocksWorld\BlocksWorld\Assets\Plugins
 mklink /D VoxSimPlatform ..\..\..\VoxSim\Assets\VoxSimPlatform	mklink /D VoxSimPlatform ..\..\..\VoxSim\Assets\VoxSimPlatform
+```
 
 - **Missing RTVoice and others (but not newtonsoft)** Right now these aren't in either repo. Fix in progress.
 # KSIM
