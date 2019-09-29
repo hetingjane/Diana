@@ -57,7 +57,7 @@ public class HandPoseModule : ModuleBase
 		}
 	}
 
-	private void OnApplicationQuit()
+	private void OnDestroy()
 	{
 		if (handPoseRecognizer != null && handPoseRecognizer.HasStarted && !handPoseRecognizer.HasExited)
 		{
