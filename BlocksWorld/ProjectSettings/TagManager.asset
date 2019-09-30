@@ -6,6 +6,9 @@ TagManager:
   tags:
   - Fire
   - Block
+  - robot
+  - UnPhysic
+  - Ground
   layers:
   - Default
   - TransparentFX
