@@ -2,16 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Diagnostics;
-
-#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
 using Windows.Kinect;
-#endif
 
 namespace Perception.Frames
 {
     public class ClosestBodyFrame : Frame
     {
-#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
         private static double engageBeginBoundZ;
         private static double engageEndBoundZ;
 
@@ -223,5 +219,4 @@ namespace Perception.Frames
             }
         }
     }
-#endif
 }
