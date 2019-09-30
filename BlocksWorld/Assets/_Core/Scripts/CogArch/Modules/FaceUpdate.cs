@@ -23,21 +23,17 @@ public class FaceUpdate : MonoBehaviour
     List<int> smileRightIndex;
     List<int> frownLeftIndex;
     List<int> frownRightIndex;
-    float currSmileStrength;
-    float currFrownStrength;
 
-    float maxStrength;
-    float recoveryRate;
     void Start()
     {
         renderers = new List<SkinnedMeshRenderer>();
         smileLeftIndex = new List<int>();
         smileRightIndex = new List<int>();
         frownLeftIndex = new List<int>();
-        frownRightIndex = new List<int>();
-
-        //Find the avatar to change blend shape on
-
+	    frownRightIndex = new List<int>();
+	    
+	    //Find the avatar to change blend shape on
+	    
         var avatar = GameObject.Find("Diana2");
         if (avatar == null)
         {
@@ -67,58 +63,63 @@ public class FaceUpdate : MonoBehaviour
     }
 
     void Update()
-    {
-        //Get current dominantEmotion and its measurement score
-
+	{
+		//Get current dominantEmotion and its measurement score
+		
         string dominantEmotion = DataStore.GetStringValue("user:dominantEmotion:");
         int score = DataStore.GetIntValue("user:dominantEmotion:" + dominantEmotion);
         switch (dominantEmotion)
         {
             case "Neutral":
-                recoveryRate = 10;
-                maxStrength = 0;
-                currSmileStrength = Mathf.MoveTowards(currSmileStrength, maxStrength, recoveryRate * Time.deltaTime);
-                currFrownStrength = Mathf.MoveTowards(currFrownStrength, maxStrength, recoveryRate * Time.deltaTime);
                 for (int i = 0; i < renderers.Count; i++)
                 {
-                    renderers[i].SetBlendShapeWeight(smileLeftIndex[i], currSmileStrength);
-                    renderers[i].SetBlendShapeWeight(smileRightIndex[i], currSmileStrength);
-                    renderers[i].SetBlendShapeWeight(frownLeftIndex[i], currFrownStrength);
-                    renderers[i].SetBlendShapeWeight(frownRightIndex[i], currFrownStrength);
+                    renderers[i].SetBlendShapeWeight(smileLeftIndex[i], 0);
+                    renderers[i].SetBlendShapeWeight(smileRightIndex[i], 0);
+                    renderers[i].SetBlendShapeWeight(frownLeftIndex[i], 0);
+                    renderers[i].SetBlendShapeWeight(frownRightIndex[i], 0);
 
                 }
                 break;
             case "Happy":
-                recoveryRate = score / 5;
-                maxStrength = 100;
-                currSmileStrength = Mathf.MoveTowards(currSmileStrength, maxStrength, recoveryRate * Time.deltaTime);
-                currFrownStrength = Mathf.MoveTowards(currFrownStrength, 0, recoveryRate * Time.deltaTime);
-                for (int i = 0; i < renderers.Count; i++)
+                if (score > 90)
                 {
-                    renderers[i].SetBlendShapeWeight(smileLeftIndex[i], currSmileStrength);
-                    renderers[i].SetBlendShapeWeight(smileRightIndex[i], currSmileStrength);
-                    renderers[i].SetBlendShapeWeight(frownLeftIndex[i], currFrownStrength);
-                    renderers[i].SetBlendShapeWeight(frownRightIndex[i], currFrownStrength);
+                    for (int i = 0; i < renderers.Count; i++)
+                    {
+                        renderers[i].SetBlendShapeWeight(smileLeftIndex[i], 70);
+                        renderers[i].SetBlendShapeWeight(smileRightIndex[i], 70);
+
+                    }
                 }
+                else
+                {
 
+                    for (int i = 0; i < renderers.Count; i++)
+                    {
+                        renderers[i].SetBlendShapeWeight(smileLeftIndex[i], 30);
+                        renderers[i].SetBlendShapeWeight(smileRightIndex[i], 30);
 
+                    }
 
+                }
                 break;
             case "Angry":
-                recoveryRate = score / 5;
-                maxStrength = 100;
-                currFrownStrength = Mathf.MoveTowards(currFrownStrength, maxStrength, recoveryRate * Time.deltaTime);
-                currSmileStrength = Mathf.MoveTowards(currSmileStrength, 0, recoveryRate * Time.deltaTime);
-                for (int i = 0; i < renderers.Count; i++)
+                if (score > 20)
                 {
-                    renderers[i].SetBlendShapeWeight(frownLeftIndex[i], currFrownStrength);
-                    renderers[i].SetBlendShapeWeight(frownRightIndex[i], currFrownStrength);
-                    renderers[i].SetBlendShapeWeight(smileLeftIndex[i], currSmileStrength);
-                    renderers[i].SetBlendShapeWeight(smileRightIndex[i], currSmileStrength);
+                    for (int i = 0; i < renderers.Count; i++)
+                    {
+                        renderers[i].SetBlendShapeWeight(frownLeftIndex[i], 100);
+                        renderers[i].SetBlendShapeWeight(frownRightIndex[i], 100);
 
+                    }
                 }
-
-
+                else
+                {
+                    for (int i = 0; i < renderers.Count; i++)
+                    {
+                        renderers[i].SetBlendShapeWeight(frownLeftIndex[i], 50);
+                        renderers[i].SetBlendShapeWeight(frownRightIndex[i], 50);
+                    }
+                }
                 break;
             default:
                 break;
