@@ -30,6 +30,8 @@ As a general rule, each part of a key should be named like a variable or propert
 |`user:dominantEmotion:Happy`|Integer      |0 to 100|Measure of how happy the user looks                                       |
 |`user:isEngaged`               |Boolean      |T or F  |True if closest body frame is engaged and false otherwise                 |
 |`user:isPointing`            |Boolean      |T or F  |Whether the user appears to be pointing (anywhere at all)                 |
+|`user:isPointing:left`       |Boolean      |T or F  |Whether the user appears to be pointing with left hand (anywhere at all)  |
+|`user:isPointing:right`       |Boolean      |T or F  |Whether the user appears to be pointing with right hand (anywhere at all)  |
 |`user:isSpeaking`            |Boolean      |T or F  |Whether the user appears to be speaking                                   |
 |`user:hands:[right,left]`    |String       |        |Current hand pose for either left or right hand							|
 |`user:joint:AnkleLeft`       |Vector3      |Reals   |Location of left ankle point of closest body frame in "camera space"      |
@@ -59,7 +61,9 @@ As a general rule, each part of a key should be named like a variable or propert
 |`user:joint:WristLeft`       |Vector3      |Reals   |Location of left wrist point of closest body frame in "camera space"      |
 |`user:joint:WristRight`      |Vector3      |Reals   |Location of right wrist point of closest body frame in "camera space"     |
 |`user:pointPos`              |Vector3      |        |Position the user is pointing at in the scene                             |
-|`user:pointPos:left`         |Vector3      |Reals   |Location of left hand pointing position in pixel space, calibration only. (z==0)            |
-|`user:pointPos:right`        |Vector3      |Reals   |Location of right hand pointing position in pixel space, calibration only. (z==0)           |
+|`user:pointPos:left`         |Vector3      |Reals   |Location of left hand pointing position in camera space, calibration only. (z==0)            |
+|`user:pointPos:right`        |Vector3      |Reals   |Location of right hand pointing position in camera space, calibration only. (z==0)           |
 |`user:pointValid`            |Boolean      |T or F  |True if the user is pointing at a valid location (Table) false otherwise  |
+|`user:pointValid:left`       |Boolean      |T or F  |True if user is pointing with their left hand at a valid location (Table) false otherwise |
+|`user:pointValid:right`      |Boolean      |T or F  |True if user is pointing with their right hand at a valid location (Table) false otherwise |
 |`user:speech`                |String       |        |Text of utterance user has just spoken (or typed)                         |
