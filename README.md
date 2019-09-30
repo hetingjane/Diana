@@ -62,28 +62,5 @@ This isn't necessary unless you've not pulled the repo recently. See this file's
 
 If you have any errors, let @dwhite54 know. From here on out, follow the git flow wikis and tutorials as normal (i.e. work from the 'develop' branch, make feature branches). There is basic usage [here](https://github.com/nvie/gitflow).
 
-# Unity merge tool
-- Unity comes with [SmartMerge tool](https://docs.unity3d.com/Manual/SmartMerge.html) to properly merge YAML serialized files.
-- To use SmartMerge, you should set it as a Git Merge driver as:
-  ```
-  git config --local merge.unityyamlmerge.driver "'<path_to_smart_merge>' merge -h -p --force %O %B %A %A"
-  git config --local merge.unityyamlmerge.recursive binary
-  git config --local merge.unityyamlmerge.name "Smart Merge"
-  ```
-- The `.gitattributes` is already configured to use `unityyamlmerge` merge driver for scenes, prefabs, etc. so the above driver will be invoked automatically whenever you do a merge.
-- Additionally, you can modify the `mergespecfile.txt` to enable a fallback merge tool to be run when SmartMerge tool detects merge conflicts. For example, in case of [Meld](http://meldmerge.org) (you can create a similar rule for your own choice of merge tool):
-  ```
-  * use "%programs%\Meld\Meld.exe" "%l" "%b" "%r" --output "%d"
-  ```
-  Alternatively, you could achieve the same effect by configuring a merge tool in Git itself instead of `mergespecfile.txt`:
-  ```
-  git merge.tool meld
-  git mergetool.meld.path <path_to_meld.exe>
-  git mergetool.meld.prompt false
-  git mergetool.meld.keepBackup false
-  git mergetool.meld.keepTemporaries false
-  ```
-  However, the latter means you have to invoke `git mergetool` after `git merge` if there are conflicts to start the merge tool.
-
-## Contributing
-See [CONTRIBUTING.md](./CONTRIBUTING.md).
+# Contributing
+It is highly recommended to read [CONTRIBUTING.md](./CONTRIBUTING.md) before you contribute work to the repository.
