@@ -26,10 +26,21 @@ git submodule init
 git submodule update
 ```
 
-3. Then open the **VOXSIM** project in Unity (not BlocksWorld), and choose Assets->Import Package->Custom Package, and select "gracesgames-simplefilebrowser.unitypackage" from the BlocksWorld repo root.
+2a. If in File Explorer you don't see an icon like [this](https://cs.colostate.edu/~dwhite54/symlink.png), then something wend wrong. Proceed to the manual symlink creation in the troubleshooting section below.
 
-Finally, you should be able to open BlocksWorld in Unity and click play after importing. As of writing this, no errors persist.
+3. Then open the BlocksWorld project in Unity, and choose Assets->Import Package->Custom Package, and select "VoxSimPaidAssets.unitypackage" from the BlocksWorld repo root.
 
+Finally, you should be able to open BlocksWorld in Unity and click play after importing.
+
+### VoxSim Submodule troubleshooting
+- **Missing Newtonsoft and other assembly references** The symlink wasn't created for some reason. 
+
+First remove the file BlocksWorld/BlocksWorld/Assets/Plugins/VoxSimPlatform. 
+Then, from an admin cmd prompt (not tested in git bash/wsl/powershell/mingw):
+```
+cd BlocksWorld\BlocksWorld\Assets\Plugins
+mklink /D VoxSimPlatform ..\..\..\VoxSim\Assets\VoxSimPlatform
+```
 # KSIM
 ## Requirements
 * [MS Kinect SDK (v2)](https://www.microsoft.com/en-us/download/details.aspx?id=44561)

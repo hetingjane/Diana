@@ -11573,8 +11573,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ba19bdc87f684c6a98bacc3d61bc146, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  logWithDebugLog: 1
-  logToFile: 0
+  logWithDebugLog: 0
+  logToFile: 1
   onValueChanged:
     m_PersistentCalls:
       m_Calls:
@@ -12722,51 +12722,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8370107686997645966, guid: 1d104b2c6fd8e45d9a2953c2779e4ad0,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8370107686997645967, guid: 1d104b2c6fd8e45d9a2953c2779e4ad0,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8370107686997645970, guid: 1d104b2c6fd8e45d9a2953c2779e4ad0,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8370107686997645968, guid: 1d104b2c6fd8e45d9a2953c2779e4ad0,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8370107686997645971, guid: 1d104b2c6fd8e45d9a2953c2779e4ad0,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8370107686997645974, guid: 1d104b2c6fd8e45d9a2953c2779e4ad0,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8370107686997645975, guid: 1d104b2c6fd8e45d9a2953c2779e4ad0,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8370107686997645965, guid: 1d104b2c6fd8e45d9a2953c2779e4ad0,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8370107686997645972, guid: 1d104b2c6fd8e45d9a2953c2779e4ad0,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 8370107686997645969, guid: 1d104b2c6fd8e45d9a2953c2779e4ad0, type: 3}
