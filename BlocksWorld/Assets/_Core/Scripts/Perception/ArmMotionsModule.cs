@@ -55,7 +55,7 @@ public class ArmMotionsModule : ModuleBase
 		}
 	}
 
-	private void OnApplicationQuit()
+	private void OnDestroy()
 	{
 		if (armMotionsRecognizer != null && armMotionsRecognizer.HasStarted && !armMotionsRecognizer.HasExited)
 		{

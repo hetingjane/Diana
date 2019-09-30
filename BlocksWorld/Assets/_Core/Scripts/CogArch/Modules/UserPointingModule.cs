@@ -109,7 +109,8 @@ public class UserPointingModule : ModuleBase
             this.mousePreviouslyMoved = true; // to allow mouse movement to cease and remain in this mode
             screenPos = mousePos;
         }
-        else
+        else //in the case of no kinect pointing input (missing joints/hand pose not 'point front'
+            // then either 1) not moving and last movement was BodyMode (kinect pointing) or 2) mouse out of screen
         {
             this.mousePreviouslyMoved = true;
             SetValue("user:isPointing", false, "no mouse/kinect input");
