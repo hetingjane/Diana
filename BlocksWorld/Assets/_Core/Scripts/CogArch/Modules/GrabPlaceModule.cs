@@ -17,6 +17,10 @@ part of the scene hierarchy.
 */
 using UnityEngine;
 
+using VoxSimPlatform.CogPhysics;
+using VoxSimPlatform.Global;
+using VoxSimPlatform.Vox;
+
 public class GrabPlaceModule : ModuleBase
 {	
 	/// <summary>
@@ -81,7 +85,7 @@ public class GrabPlaceModule : ModuleBase
 	/// <summary>
 	/// The object to reach
 	/// </summary>
-	private Transform targetBlock;
+	private Voxeme targetBlock;
 
 	/// <summary>
 	/// Placeholder for directing hand movements
@@ -101,7 +105,7 @@ public class GrabPlaceModule : ModuleBase
 	/// <summary>
 	/// Public, static reference to the block currently being held
 	/// </summary>
-	public static Transform heldObject = null;
+	public static Voxeme heldObject = null;
 
 	/// <summary>
 	/// Reference to the effector bone to be used for manipulating objects
@@ -146,9 +150,9 @@ public class GrabPlaceModule : ModuleBase
 	/// <param name="location">The location around which to search</param>
 	/// <param name="radius">The radius of the sphere which checks for nearby overlapping objects</param>
 	/// <returns>The transform of the closest object to <paramref name="location"/>"/> or <c>null</c> if it can't find any.</returns>
-	private Transform FindTargetByLocation(Vector3 location, float radius)
+	private GameObject FindTargetByLocation(Vector3 location, float radius)
 	{
-		Transform target = null;
+		GameObject target = null;
 
 		// Find a block that we can grab
 		Collider[] colliders = Physics.OverlapSphere(location, radius, LayerMask.GetMask("Blocks"));
@@ -162,7 +166,7 @@ public class GrabPlaceModule : ModuleBase
 				if (distance < minDistance)
 				{
 					minDistance = distance;
-					target = c.transform;
+					target = GlobalHelper.GetMostImmediateParentVoxeme(c.gameObject);
 				}
 			}
 		}
@@ -177,7 +181,7 @@ public class GrabPlaceModule : ModuleBase
 	/// <param name="radius">The radius of the sphere which checks for nearby overlapping objects</param>
 	/// <param name="target">The transform of the nearest object if found, <c>null</c> otherwise</param>
 	/// <returns><c>true</c> if the search was successful, <c>false</c> otherwise</returns>
-	private bool TryFindTargetByLocation(Vector3 location, float radius, out Transform target)
+	private bool TryFindTargetByLocation(Vector3 location, float radius, out GameObject target)
 	{
 		target = FindTargetByLocation(location, radius);
 		return target != null;
@@ -194,7 +198,7 @@ public class GrabPlaceModule : ModuleBase
 				{
 					// Try to resolve the target by name
 					string name = DataStore.GetStringValue("me:intent:targetName");
-					targetBlock = string.IsNullOrEmpty(name) ? null : grabbableBlocks.Find(name);
+					targetBlock = string.IsNullOrEmpty(name) ? null : grabbableBlocks.Find(name).GetComponent<Voxeme>();
 
 					if (targetBlock == null)
 					{
@@ -202,7 +206,7 @@ public class GrabPlaceModule : ModuleBase
 						var targetLocation = DataStore.GetVector3Value("me:intent:target");
 						if (targetLocation != default)
 						{
-							targetBlock = FindTargetByLocation(targetLocation, radius);
+							targetBlock = FindTargetByLocation(targetLocation, radius).GetComponent<Voxeme>();
 						}
 					}
 					
@@ -210,7 +214,11 @@ public class GrabPlaceModule : ModuleBase
 					if (targetBlock != null)
 					{
 						// Either by name or location, we successfully resolved the target object
-						var bounds = targetBlock.GetComponent<Collider>().bounds;
+						//var bounds = targetBlock.GetComponent<Collider>().bounds;
+						
+						//10/1/19 - NK - trying this the VoxSim way
+						var bounds = GlobalHelper.GetObjectWorldSize(targetBlock.gameObject);
+						
 						// The default set down position is the same as the initial position of the block
 						// in case the user backs out of the action
 						setDownPos = bounds.center + Vector3.down * bounds.extents.y;
@@ -231,7 +239,7 @@ public class GrabPlaceModule : ModuleBase
 				// If the grab animation is completed
 				if (rightArmMotion == "reached")
 				{
-					var bounds = targetBlock.GetComponent<Collider>().bounds;
+					var bounds = GlobalHelper.GetObjectWorldSize(targetBlock.gameObject);
 					// Lower the reach target to be withing grabbing distance to the target
 					curReachTarget = setDownPos + Vector3.up * bounds.size.y - holdOffset;
 
@@ -244,13 +252,17 @@ public class GrabPlaceModule : ModuleBase
 				if (rightArmMotion == "reached")
 				{
 					// Do not respond to forces/collisions
-					targetBlock.GetComponent<Rigidbody>().isKinematic = true;
+					Rigging rigging = targetBlock.GetComponent<Rigging>();
+					if (rigging != null) {
+						rigging.ActivatePhysics(false);
+					}
+					//targetBlock.GetComponent<Rigidbody>().isKinematic = true;
 
 					// Store a reference to the grabbed object
 					heldObject = targetBlock;
 
 					// Raise the reach target to be high above the target
-					var bounds = targetBlock.GetComponent<Collider>().bounds;
+					var bounds = GlobalHelper.GetObjectWorldSize(targetBlock.gameObject);
 					curReachTarget = setDownPos + Vector3.up * (bounds.size.y + liftHeight) - holdOffset;
 
 					// We go to the next state
@@ -330,14 +342,14 @@ public class GrabPlaceModule : ModuleBase
 
 				if (rightArmMotion == "reached")
 				{
-					heldObject.SetParent(grabbableBlocks);
+					heldObject.transform.SetParent(grabbableBlocks);
 					var bounds = heldObject.GetComponent<Collider>().bounds;
-					heldObject.position = setDownPos + Vector3.up * bounds.extents.y;
-					heldObject.eulerAngles = Vector3.zero;
+					heldObject.transform.position = setDownPos + Vector3.up * bounds.extents.y;
+					heldObject.transform.eulerAngles = Vector3.zero;
 
 					heldObject.GetComponent<Rigidbody>().isKinematic = false;
 
-					curReachTarget = heldObject.position + Vector3.up * reachHeight - holdOffset;
+					curReachTarget = heldObject.transform.position + Vector3.up * reachHeight - holdOffset;
 					
 					DataStore.SetValue("me:holding", new DataStore.StringValue(""), null, "BipedIKGrab released " + targetBlock.name);
 					heldObject = null;

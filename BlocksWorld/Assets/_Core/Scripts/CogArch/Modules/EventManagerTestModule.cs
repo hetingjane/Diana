@@ -28,6 +28,19 @@ public class EventManagerTestModule : ModuleBase
     public void GRASP(object[] args)
     {
         Debug.Log("Diana's World: I'm grasping!");
+
+        if (args[args.Length - 1] is bool)
+        {
+            if ((bool) args[args.Length - 1] == true)
+            {
+                if (args[0] is GameObject)
+                {
+                    GameObject obj = (args[0] as GameObject);
+                    SetValue("me:intent:action", "pickUp", string.Empty);
+                    SetValue("me:intent:targetName", obj.name, comment);
+                }
+            }                    
+        }
     }
 
     public void UNGRASP(object[] args)

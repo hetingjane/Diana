@@ -15,6 +15,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using Semantics;
 
+using VoxSimPlatform.Vox;
+
 public class CommandsModule : ModuleBase
 {
 	[Tooltip("Container for objects the agent can see and manipulate")]
@@ -193,6 +195,8 @@ public class CommandsModule : ModuleBase
 		}
 	}
 	
+	// 10/1/19 - NK - too many dependecies to change return type from Transform
+	//	to Voxeme right now, but we should work toward this
 	Transform FindObjectFromSpec(Semantics.ObjSpec objSpec) {
 		if (objSpec == null) return null;
 		Debug.Log("Looking for object fitting: " + objSpec);
@@ -202,7 +206,7 @@ public class CommandsModule : ModuleBase
 		if (objSpec.referredToAs == "it") {
 			// If user says "it" while the agent is holding a block,
 			// then let's assume they mean the held block.
-			foundObject = GrabPlaceModule.heldObject;	// unfortunate coupling... ToDo: improve this.
+			foundObject = GrabPlaceModule.heldObject.transform;	// unfortunate coupling... ToDo: improve this.
 			if (foundObject != null) return foundObject;
 			Debug.Log("Noted \"it\", but heldObject is null");
 		}
@@ -237,7 +241,7 @@ public class CommandsModule : ModuleBase
 			}
 		}
 		Debug.Log("Found: " + foundObject);
-		return foundObject;
+		return foundObject.transform;
 	}
 	
 	void SayICant(string comment) {
