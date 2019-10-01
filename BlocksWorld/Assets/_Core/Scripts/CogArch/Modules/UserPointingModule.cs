@@ -143,6 +143,8 @@ public class UserPointingModule : ModuleBase
             }
             SetValue("user:isPointing:right", this.rightPoint, comment);
             SetValue("user:isPointing:left", this.leftPoint, comment);
+            SetValue("user:pointPos:right", this.pointPosRight, comment);
+            SetValue("user:pointPos:left", this.pointPosLeft, comment);
             SetValue("user:pointValid:right", this.isPointPosRightValid && !hit.collider.name.EndsWith("Backstop"), comment);
             SetValue("user:pointValid:left", this.isPointPosLeftValid && !hit.collider.name.EndsWith("Backstop"), comment);
         }
