@@ -17,10 +17,10 @@ public class NegackIntentModule : ModuleBase
 			switch (negackStateMachine.CurrentState)
 			{
 				case NegackState.NegackStart:
-					DataStore.SetStringValue("user:intent:negack", new DataStore.StringValue("negack start"), this, "thumbs down with either hand");
+					DataStore.SetValue("user:intent:isNegack", DataStore.BoolValue.True, this, "thumbs down with either hand");
 					break;
 				case NegackState.NegackStop:
-					DataStore.SetStringValue("user:intent:negack", new DataStore.StringValue("negack stop"), this, "");
+					DataStore.SetValue("user:intent:isNegack", DataStore.BoolValue.False, this, "");
 					break;
 			}
 		}
