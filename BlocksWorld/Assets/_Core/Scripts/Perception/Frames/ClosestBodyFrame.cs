@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using Windows.Kinect;
 using System.IO;
 using System.Diagnostics;
+using Windows.Kinect;
 
 namespace Perception.Frames
 {

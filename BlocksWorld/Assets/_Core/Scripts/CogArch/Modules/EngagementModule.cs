@@ -38,7 +38,7 @@ public class EngagmentModule : ModuleBase
         Vector3 spineBasePoint;
         if (spineBaseExists)
         {
-            Debug.Log(DataStore.GetVector3Value(spineBaseKey).ToString());
+            //Debug.Log(DataStore.GetVector3Value(spineBaseKey).ToString());
             spineBasePoint = DataStore.GetVector3Value(spineBaseKey);
             if (isValidPosition(spineBasePoint))
             {

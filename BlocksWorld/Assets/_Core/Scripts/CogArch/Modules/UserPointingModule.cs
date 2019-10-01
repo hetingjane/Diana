@@ -109,7 +109,8 @@ public class UserPointingModule : ModuleBase
             this.mousePreviouslyMoved = true; // to allow mouse movement to cease and remain in this mode
             screenPos = mousePos;
         }
-        else
+        else //in the case of no kinect pointing input (missing joints/hand pose not 'point front'
+            // then either 1) not moving and last movement was BodyMode (kinect pointing) or 2) mouse out of screen
         {
             this.mousePreviouslyMoved = true;
             SetValue("user:isPointing", false, "no mouse/kinect input");
@@ -127,6 +128,8 @@ public class UserPointingModule : ModuleBase
                 // When the ray hits this, we want to show a "no bueno" indicator
                 // and report the point as invalid.
                 var comment = "hit pointer backstop";
+
+
                 SetValue("user:isPointing", true, comment);
                 SetValue("user:pointPos", hit.point, comment);
                 SetValue("user:pointValid", false, comment);
@@ -138,6 +141,10 @@ public class UserPointingModule : ModuleBase
                 SetValue("user:pointPos", hit.point, comment);
                 SetValue("user:pointValid", true, comment);
             }
+            SetValue("user:isPointing:right", this.rightPoint, comment);
+            SetValue("user:isPointing:left", this.leftPoint, comment);
+            SetValue("user:pointValid:right", this.isPointPosRightValid && !hit.collider.name.EndsWith("Backstop"), comment);
+            SetValue("user:pointValid:left", this.isPointPosLeftValid && !hit.collider.name.EndsWith("Backstop"), comment);
         }
         else
         {

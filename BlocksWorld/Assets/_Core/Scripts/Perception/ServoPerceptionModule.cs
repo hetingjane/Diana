@@ -50,9 +50,9 @@ public class ServoPerceptionModule : ModuleBase
         
 
         bool rightArmExists = DataStore.HasValue(handRightOrientationKey) && DataStore.HasValue(wristRightOrientationKey);
-        Debug.Log(rightArmExists.ToString());
+        //Debug.Log(rightArmExists.ToString());
         bool leftArmExists = DataStore.HasValue(handLeftOrientationKey) && DataStore.HasValue(wristLeftOrientationKey);
-        Debug.Log(leftArmExists.ToString());
+        //Debug.Log(leftArmExists.ToString());
         if (rightArmExists)
         {
             Vector3 axis;

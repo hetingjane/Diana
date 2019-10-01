@@ -10,7 +10,8 @@ using UnityEngine;
 /// - If <c>me:intent:handPosR</c> is set while "reaching" or having "reached", it starts manipulating the
 ///   ongoing animation so that it ends up at new set value. During this operation, <c>me:rightArm:motion</c>
 ///   is set to "moving"
-/// - If <c>me:intent:handPosR</c> is set to default value of <see cref="Vector3"/>, the ungrab animation starts.
+/// - If <c>me:intent:handPosR</c> is set to default value of <see cref="Vector3"/>, the ungrab animation starts
+///   and <c>me:rightArm:motion</c> is set to "unreaching"
 /// Reads:		me:intent:handPosR		The intended position of the hand
 /// Writes:		me:rightArm:motion		The motion that Diana is doing with right arm
 ///				me:actual:handPosR		The actual position of the hand updated every frame
