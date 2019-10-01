@@ -17,6 +17,8 @@ public abstract class RuleStateMachine<T> where T: Enum
 
 		private set
 		{
+			T prevState = currentState;
+
 			currentState = value;
 
 			if (transitions.TryGetValue(currentState, out var stateToRule))
@@ -24,19 +26,43 @@ public abstract class RuleStateMachine<T> where T: Enum
 				foreach (var rule in stateToRule.Values)
 					rule.Reset();
 			}
+
+			OnStateChanged?.Invoke(this, new StateChangedArgs<T>(prevState, currentState));
 		}
 	}
-	
 
-	public RuleStateMachine()
+	public class StateChangedArgs<T>: EventArgs
 	{
-		transitions = new Dictionary<T, Dictionary<T, Rule>>();
-		Initialize();
+		public T FromState
+		{
+			get;
+		}
+
+		public T ToState
+		{
+			get;
+		}
+
+		public StateChangedArgs(T fromState, T toState)
+		{
+			FromState = fromState;
+			ToState = toState;
+		}
 	}
 
-	public RuleStateMachine(T initialState): this()
+	public event EventHandler<StateChangedArgs<T>> OnStateChanged;
+	
+
+	public RuleStateMachine(): this(default)
 	{
+	}
+
+	public RuleStateMachine(T initialState)
+	{
+		transitions = new Dictionary<T, Dictionary<T, Rule>>();
+		// Need to set this before Initialize() to avoid OnStateChanged event being invoked
 		CurrentState = initialState;
+		Initialize();
 	}
 
 	private bool IsSameState(T first, T second)
