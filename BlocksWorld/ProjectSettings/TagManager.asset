@@ -9,6 +9,7 @@ TagManager:
   - robot
   - UnPhysic
   - Ground
+  - Agent
   layers:
   - Default
   - TransparentFX

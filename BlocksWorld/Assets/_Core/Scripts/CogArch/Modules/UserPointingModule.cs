@@ -128,6 +128,8 @@ public class UserPointingModule : ModuleBase
                 // When the ray hits this, we want to show a "no bueno" indicator
                 // and report the point as invalid.
                 var comment = "hit pointer backstop";
+
+
                 SetValue("user:isPointing", true, comment);
                 SetValue("user:pointPos", hit.point, comment);
                 SetValue("user:pointValid", false, comment);
@@ -139,6 +141,12 @@ public class UserPointingModule : ModuleBase
                 SetValue("user:pointPos", hit.point, comment);
                 SetValue("user:pointValid", true, comment);
             }
+            SetValue("user:isPointing:right", this.rightPoint, comment);
+            SetValue("user:isPointing:left", this.leftPoint, comment);
+            SetValue("user:pointPos:right", this.pointPosRight, comment);
+            SetValue("user:pointPos:left", this.pointPosLeft, comment);
+            SetValue("user:pointValid:right", this.isPointPosRightValid && !hit.collider.name.EndsWith("Backstop"), comment);
+            SetValue("user:pointValid:left", this.isPointPosLeftValid && !hit.collider.name.EndsWith("Backstop"), comment);
         }
         else
         {
