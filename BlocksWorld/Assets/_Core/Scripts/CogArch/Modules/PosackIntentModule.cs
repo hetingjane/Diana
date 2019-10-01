@@ -16,10 +16,10 @@
 			switch (posackStateMachine.CurrentState)
 			{
 				case PosackState.PosackStart:
-					DataStore.SetStringValue("user:intent:posack", new DataStore.StringValue("posack start"), this, "thumbs up with either hand");
+					DataStore.SetValue("user:intent:isPosack", DataStore.BoolValue.True, this, "thumbs up with either hand");
 					break;
 				case PosackState.PosackStop:
-					DataStore.SetStringValue("user:intent:posack", new DataStore.StringValue("posack stop"), this, "");
+					DataStore.SetValue("user:intent:isPosack", DataStore.BoolValue.False, this, "");
 					break;
 			}
 		}
