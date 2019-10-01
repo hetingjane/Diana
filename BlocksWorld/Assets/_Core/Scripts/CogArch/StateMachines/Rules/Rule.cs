@@ -22,4 +22,7 @@ public class Rule
 	{
 		lastFuncEvaluation = false;
 	}
+
+	public static readonly Rule True = new Rule(() => true);
+	public static readonly Rule False = new Rule(() => false);
 }
