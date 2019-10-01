@@ -26,23 +26,11 @@ git submodule init
 git submodule update
 ```
 
-2a. If in File Explorer you don't see an icon like [this](https://cs.colostate.edu/~dwhite54/symlink.png), then something wend wrong. Proceed to the manual symlink creation in the troubleshooting section below.
-
-3. Then open the BlocksWorld project in Unity, and choose Assets->Import Package->Custom Package, and select "VoxSimPaidAssets.unitypackage" from the BlocksWorld repo root.
-
+3. If in File Explorer you don't see an icon like [this](https://cs.colostate.edu/~dwhite54/symlink.png), then something wend wrong. In repo root, right click on WinMakeSymlink.cmd->Run as administrator
+4. Then open the BlocksWorld project in Unity, and choose Assets->Import Package->Custom Package, and select "VoxSimPaidAssets.unitypackage" from the BlocksWorld repo root.
 Finally, you should be able to open BlocksWorld in Unity and click play after importing.
 
-### VoxSim Submodule troubleshooting
-- **Missing Newtonsoft and other assembly references** The symlink wasn't created for some reason. 
-
-First remove the file BlocksWorld/BlocksWorld/Assets/Plugins/VoxSimPlatform. 
-Then, from an admin cmd prompt (not tested in git bash/wsl/powershell/mingw):
-```
-cd BlocksWorld\BlocksWorld\Assets\Plugins
-mklink /D VoxSimPlatform ..\..\..\VoxSim\Assets\VoxSimPlatform
-```
-# KSIM
-## Requirements
+# Kinect Requirements
 * [MS Kinect SDK (v2)](https://www.microsoft.com/en-us/download/details.aspx?id=44561)
 * [MS Speech Platform runtime (v11)](https://www.microsoft.com/en-us/download/details.aspx?id=27225)
 * MSP acoustic model(s) for English 
