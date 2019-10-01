@@ -16,10 +16,10 @@
 			switch (waveStateMachine.CurrentState)
 			{
 				case WaveState.WaveStart:
-					DataStore.SetValue("user:intent:isWaving", DataStore.BoolValue.True, this, "waving with either hand");
+					DataStore.SetValue("user:intent:isWave", DataStore.BoolValue.True, this, "waving with either hand");
 					break;
 				case WaveState.WaveStop:
-					DataStore.SetValue("user:intent:isWaving", DataStore.BoolValue.False, this, "");
+					DataStore.SetValue("user:intent:isWave", DataStore.BoolValue.False, this, "");
 					break;
 			}
 		}
