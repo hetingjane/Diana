@@ -16,10 +16,10 @@
 			switch (nevermindStateMachine.CurrentState)
 			{
 				case NevermindState.NevermindStart:
-					DataStore.SetStringValue("user:intent:nevermind", new DataStore.StringValue("nevermind start"), this, "thumbs up with either hand");
+					DataStore.SetValue("user:intent:isNevermind", DataStore.BoolValue.True, this, "stop gesture with either hand");
 					break;
 				case NevermindState.NevermindStop:
-					DataStore.SetStringValue("user:intent:nevermind", new DataStore.StringValue("nevermind stop"), this, "");
+					DataStore.SetValue("user:intent:isNevermind", DataStore.BoolValue.False, this, "");
 					break;
 			}
 		}
