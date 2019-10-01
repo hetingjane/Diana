@@ -20,19 +20,26 @@ public class MiniOptions : MonoBehaviour
 		cameraDropdown.options.Clear();
 		string curCamName = PlayerPrefs.GetString("FaceCam");
 		int curCamIdx = 0;
+        bool cameraSet = false;
 		foreach (var cam in WebCamTexture.devices) {
 			var opt = new TMP_Dropdown.OptionData();
 			opt.text = cam.name;
 			cameraDropdown.options.Add(opt);
-			if (cam.name == curCamName) curCamIdx = cameraDropdown.options.Count;
+            if (cam.name.Contains("4310")) //look for our preferred camera
+            {
+                curCamIdx  = cameraDropdown.options.Count - 1;
+                cameraSet = true; //prevent camera from being changed to current
+            }
+            else if (cam.name == curCamName && !cameraSet)
+            {
+                curCamIdx = cameraDropdown.options.Count - 1;
+            }
 		}
-		cameraDropdown.value = -1;
 		cameraDropdown.value = curCamIdx;
-		//NoteCameraOptionChanged(curCamIdx);
-	}
+        NoteCameraOptionChanged(curCamIdx);
+    }
 	
 	public void NoteCameraOptionChanged(int value) {
-		if (value < 0) return;
 		string choice = cameraDropdown.options[value].text;
 		PlayerPrefs.SetString("FaceCam", choice);
 		onCameraChosen.Invoke(choice);
