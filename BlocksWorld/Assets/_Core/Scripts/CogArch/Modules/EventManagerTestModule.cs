@@ -1,13 +1,15 @@
 ﻿/*
 This script interfaces with the VoxSim event manager
 
-Reads:      ...
-Writes:     ...
-
+Reads:      I don't know yet
+Writes:     me:intent:action (StringValue)
+            me:intent:targetName (StringValue, name of object that is theme of action)
 */
 using UnityEngine;
+using System.Collections;
 
 using VoxSimPlatform.Core;
+using VoxSimPlatform.Global;
 
 public class EventManagerTestModule : ModuleBase
 {
@@ -46,5 +48,32 @@ public class EventManagerTestModule : ModuleBase
     public void UNGRASP(object[] args)
     {
         Debug.Log("Diana's World: I'm ungrasping!");
+    }
+
+    public bool IsSatisfied(string test) {
+        bool satisfied = false;
+
+        Hashtable predArgs = GlobalHelper.ParsePredicate(test);
+        string predString = "";
+        string[] argsStrings = null;
+
+        foreach (DictionaryEntry entry in predArgs) {
+            predString = (string) entry.Key;
+            argsStrings = ((string) entry.Value).Split(',');
+        }
+
+        if (predString == "grasp") {
+            GameObject theme = GameObject.Find(argsStrings[0] as string);
+
+            if (theme != null) {
+                if (DataStore.GetStringValue("me:holding") == theme.name) {
+                    satisfied = true;
+                }
+            }
+        }
+        else if (predString == "ungrasp") {
+        }
+
+        return satisfied;
     }
 }
