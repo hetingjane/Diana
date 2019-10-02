@@ -70,7 +70,7 @@ As a general rule, each part of a key should be named like a variable or propert
 |`user:joint:tracked:<joint>` |Boolean      |T or F  |Whether joint <joint> is tracked |
 |`user:joint:WristLeft`       |Vector3      |Position|Location of left wrist point of closest body frame in "camera space"      |
 |`user:joint:WristRight`      |Vector3      |Position|Location of right wrist point of closest body frame in "camera space"     |
-|`user:jointOrientation:<joint>`|Quaternion |Orientation|Joint local orientation (relative to parent joint) |
+|`user:jointOrientation:<joint>`|Quaternion |Orientation|Joint orientation (world coordinates) |
 |`user:parse`                 |WordValue    |        |Shallow parse of the user's input (probably not used with VoxSim) |
 |`user:pointPos`              |Vector3      |        |Position the user is pointing at in the scene                             |
 |`user:pointPos:left`         |Vector3      |Position|Location of left hand pointing position in camera space, calibration only. (z==0)            |
