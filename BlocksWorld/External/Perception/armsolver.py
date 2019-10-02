@@ -47,8 +47,9 @@ class Solver(object):
 
     def printable_result(self):
         # Debugging mode
-        LA_motion_label = left_arm_motions[self.result[0]]
-        RA_motion_label = right_arm_motions[self.result[1]]
+        #Remove the hand prefixes: 'ra move left' -> 'move left'
+        LA_motion_label = left_arm_motions[self.result[0]][3:]
+        RA_motion_label = right_arm_motions[self.result[1]][3:]
 
         to_print_result = [LA_motion_label,RA_motion_label]
         return to_print_result
