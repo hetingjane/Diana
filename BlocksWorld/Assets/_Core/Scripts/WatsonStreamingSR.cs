@@ -54,26 +54,35 @@ public class WatsonStreamingSR : ModuleBase
 	IEnumerator Start() {
         LogSystem.InstallDefaultReactors();
 
-        //  Create credential and instantiate service
-		TokenOptions tokenOptions = new TokenOptions() { IamApiKey = _apiKey };
-		var credentials = new Credentials(tokenOptions, _url);
+		Runnable.Run(CreateService());
+		yield return null;
+	}
+    
+	private IEnumerator CreateService()
+	{
+		//  Create credential and instantiate service
+		Credentials credentials = null;
 
+		//  Authenticate using iamApikey
+		TokenOptions tokenOptions = new TokenOptions() { IamApiKey = _apiKey };
+		credentials = new Credentials(tokenOptions, _url);
+	
 		//  Wait for tokendata
-		Debug.Log("Watson: waiting for token data");
 		while (!credentials.HasIamTokenData())
 			yield return null;
-		Debug.Log("Watson: got token data; starting service");
 
 		_speechToText = new SpeechToTextService(credentials);
-	    alternatives = new List<string>();
+		_speechToText.StreamMultipart = true;
 
-	    if (!pushToTalk) {
-		    Active = true;
-	    	StartRecording();
-	    } else {
-	    	onNotListening.Invoke();
-	    }
-    }
+		Active = true;
+		if (!pushToTalk) {
+			Active = true;
+			StartRecording();
+		} else {
+			onNotListening.Invoke();
+		}
+	}
+
     
 	protected void Update() {
 		if (pushToTalk) {

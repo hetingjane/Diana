@@ -241,7 +241,7 @@ public class CommandsModule : ModuleBase
 			}
 		}
 		Debug.Log("Found: " + foundObject);
-		return foundObject.transform;
+		return foundObject == null ? null : foundObject.transform;
 	}
 	
 	void SayICant(string comment) {
