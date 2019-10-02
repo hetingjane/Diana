@@ -63,3 +63,10 @@ As a general rule, each part of a key should be named like a variable or propert
 |`user:pointPos:right`        |Vector3      |Reals   |Location of right hand pointing position in pixel space, calibration only. (z==0)           |
 |`user:pointValid`            |Boolean      |T or F  |True if the user is pointing at a valid location (Table) false otherwise  |
 |`user:speech`                |String       |        |Text of utterance user has just spoken (or typed)                         |
+|`user:intent:isPosack`       |Boolean      |T or F  |Whether the user is doing a thumbs up gesture with either hand            |
+|`user:intent:isNegack`       |Boolean      |T or F  |Whether the user is doing a thumbs down gesture with either hand          |
+|`user:intent:isPushLeft`     |Boolean      |T or F  |Whether the user is doing a push left gesture with the right hand         |
+|`user:intent:isPushRight`    |Boolean      |T or F  |Whether the user is doing a push right gesture with the left hand         |
+|`user:intent:isNevermind`    |Boolean      |T or F  |Whether the user is doing a stop gesture (nevermind) with either hand     |
+|`user:intent:isWave`         |Boolean      |T or F  |Whether the user is doing the wave gesture with either hand               |
+
