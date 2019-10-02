@@ -195,8 +195,8 @@ public class CommandsModule : ModuleBase
 		}
 	}
 	
-	// 10/1/19 - NK - too many dependecies to change return type from Transform
-	//	to Voxeme right now, but we should work toward this
+	// Todo: This should return a Voxeme
+    //  Voxemes allow robust filtering of objects by property
 	Transform FindObjectFromSpec(Semantics.ObjSpec objSpec) {
 		if (objSpec == null) return null;
 		Debug.Log("Looking for object fitting: " + objSpec);

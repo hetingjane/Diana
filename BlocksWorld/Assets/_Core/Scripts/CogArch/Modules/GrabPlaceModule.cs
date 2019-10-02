@@ -198,6 +198,8 @@ public class GrabPlaceModule : ModuleBase
 				{
 					// Try to resolve the target by name
 					string name = DataStore.GetStringValue("me:intent:targetName");
+
+                    // If the target is a named object get its Voxeme component
 					targetBlock = string.IsNullOrEmpty(name) ? null : grabbableBlocks.Find(name).GetComponent<Voxeme>();
 
 					if (targetBlock == null)
@@ -206,6 +208,7 @@ public class GrabPlaceModule : ModuleBase
 						var targetLocation = DataStore.GetVector3Value("me:intent:target");
 						if (targetLocation != default)
 						{
+                            // Get the Voxeme component of object resolved by target location
 							targetBlock = FindTargetByLocation(targetLocation, radius).GetComponent<Voxeme>();
 						}
 					}
@@ -214,9 +217,7 @@ public class GrabPlaceModule : ModuleBase
 					if (targetBlock != null)
 					{
 						// Either by name or location, we successfully resolved the target object
-						//var bounds = targetBlock.GetComponent<Collider>().bounds;
-						
-						//10/1/19 - NK - trying this the VoxSim way
+                        // Get bounds of the Voxeme geometry
 						var bounds = GlobalHelper.GetObjectWorldSize(targetBlock.gameObject);
 						
 						// The default set down position is the same as the initial position of the block
@@ -256,7 +257,6 @@ public class GrabPlaceModule : ModuleBase
 					if (rigging != null) {
 						rigging.ActivatePhysics(false);
 					}
-					//targetBlock.GetComponent<Rigidbody>().isKinematic = true;
 
 					// Store a reference to the grabbed object
 					heldObject = targetBlock;
