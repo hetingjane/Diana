@@ -1,7 +1,7 @@
 import time
 from kinect import Kinect
 from socket_api import SocketAPI
-from armsolver import ArmMotionRecogntion
+import armsolver
 
 # kinect frame processing settings
 ENGAGE_MIN = 0
@@ -27,7 +27,8 @@ class SkeletonClient:
                 print("Socket didn't start, waiting 3 seconds...")
                 time.sleep(3)
         print("Connected!")
-        self.model = ArmMotionRecogntion()
+        #self.model = armsolver.ArmMotionRecogntion()
+        self.model = armsolver.PrimalRecognition()
 
     def run(self):
         while True:
