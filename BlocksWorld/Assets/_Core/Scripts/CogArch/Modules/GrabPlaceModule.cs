@@ -318,7 +318,7 @@ public class GrabPlaceModule : ModuleBase
 					}
 					else
 					{
-						var bounds = heldObject.GetComponent<Collider>().bounds;
+						var bounds = GlobalHelper.GetObjectWorldSize(heldObject.gameObject);
 						// Set the reach target to be just above the set down position accounting for hold offset
 						curReachTarget = setDownPos + Vector3.up * bounds.size.y - holdOffset;
 						currentState = State.Lowering;
@@ -331,7 +331,7 @@ public class GrabPlaceModule : ModuleBase
 			
 				if (rightArmMotion == "reached")
 				{
-					var bounds = heldObject.GetComponent<Collider>().bounds;
+					var bounds = GlobalHelper.GetObjectWorldSize(heldObject.gameObject);
 					// Set the reach target to be just above the set down position accounting for hold offset
 					curReachTarget = setDownPos + Vector3.up * bounds.size.y - holdOffset;
 					currentState = State.Lowering;
@@ -343,11 +343,15 @@ public class GrabPlaceModule : ModuleBase
 				if (rightArmMotion == "reached")
 				{
 					heldObject.transform.SetParent(grabbableBlocks);
-					var bounds = heldObject.GetComponent<Collider>().bounds;
+					var bounds = GlobalHelper.GetObjectWorldSize(heldObject.gameObject);
 					heldObject.transform.position = setDownPos + Vector3.up * bounds.extents.y;
 					heldObject.transform.eulerAngles = Vector3.zero;
 
-					heldObject.GetComponent<Rigidbody>().isKinematic = false;
+					// reactivate physics on this object
+					Rigging rigging = heldObject.GetComponent<Rigging>();
+					if (rigging != null) {
+						rigging.ActivatePhysics(true);
+					}
 
 					curReachTarget = heldObject.transform.position + Vector3.up * reachHeight - holdOffset;
 					
@@ -360,8 +364,12 @@ public class GrabPlaceModule : ModuleBase
 			case State.Releasing:
 				if (rightArmMotion == "reached")
 				{
-					if (setDownTarget != null)
-						setDownTarget.GetComponent<Rigidbody>().isKinematic = false;
+					if (setDownTarget != null) {
+						Rigging rigging = setDownTarget.GetComponent<Rigging>();
+						if (rigging != null) {
+							rigging.ActivatePhysics(true);
+						}
+					}
 					curReachTarget = default;
 					currentState = State.Unreaching;
 				}

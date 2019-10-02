@@ -39,7 +39,7 @@ public class EventManagerTestModule : ModuleBase
                 {
                     GameObject obj = (args[0] as GameObject);
                     SetValue("me:intent:action", "pickUp", string.Empty);
-                    SetValue("me:intent:targetName", obj.name, comment);
+                    SetValue("me:intent:targetName", obj.name, string.Format("Grasping {0}",obj.name));
                 }
             }                    
         }
@@ -48,6 +48,20 @@ public class EventManagerTestModule : ModuleBase
     public void UNGRASP(object[] args)
     {
         Debug.Log("Diana's World: I'm ungrasping!");
+
+        if (args[args.Length - 1] is bool)
+        {
+            if ((bool) args[args.Length - 1] == true)
+            {
+                if (args[0] is GameObject)
+                {
+                    GameObject obj = (args[0] as GameObject);
+                    SetValue("me:intent:action", "setDown", string.Empty);
+                    SetValue("me:intent:target", obj.transform.position, 
+                        string.Format("Ungrasping {0} at {1}", obj.name, GlobalHelper.VectorToParsable(obj.transform.position)));
+                }
+            }                    
+        }
     }
 
     public bool IsSatisfied(string test) {
@@ -72,6 +86,16 @@ public class EventManagerTestModule : ModuleBase
             }
         }
         else if (predString == "ungrasp") {
+            GameObject theme = GameObject.Find(argsStrings[0] as string);
+            Debug.Log("me:holding = " + DataStore.GetStringValue("me:holding"));
+            Debug.Log(theme.name);
+            Debug.Log(DataStore.GetStringValue("me:holding") != theme.name);
+
+            if (theme != null) {
+                if (DataStore.GetStringValue("me:holding") != theme.name) {
+                    satisfied = true;
+                }
+            }
         }
 
         return satisfied;
