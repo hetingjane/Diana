@@ -3,7 +3,7 @@ import numpy as np
 from realtime_hand_recognition import RealTimeHandRecognition, RealTimeHandRecognitionOneShot
 from kinect import Kinect
 from socket_api import SocketAPI
-from postures import left_hand_postures, right_hand_postures, hand_postures
+from postures import left_hand_postures, right_hand_postures
 
 # kinect frame processing settings
 SEGMENT_SIZE = 224  # the resulting size of the segmented depth frame (square)
@@ -41,9 +41,9 @@ class DepthClient:
             time.sleep(1/60)
             (LH_probs, LH_out), (RH_probs, RH_out) = self.HandModel.classifyLR(frames[0], frames[1])
             LH_idx = np.argmax(LH_out)
-            LH_label = hand_postures[LH_idx]
+            LH_label = left_hand_postures[LH_idx][3:]
             RH_idx = np.argmax(RH_out)
-            RH_label = hand_postures[RH_idx]
+            RH_label = right_hand_postures[RH_idx][3:]
             #self.socket_api.send_to_server("user:hands:left:probs", LH_out)
             #self.socket_api.set("user:hands:left:argmax", int(LH_idx))
             self.socket_api.set("user:hands:left", LH_label)
