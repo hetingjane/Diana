@@ -16,7 +16,7 @@ public class PushLeftStateMachine : RuleStateMachine<PushLeftState>
 			{
 				string rightHandGesture = DataStore.GetStringValue("user:hands:right");
 				string rightArmMotion = DataStore.GetStringValue("user:arms:right");
-				return (rightHandGesture == "rh open left" || rightHandGesture == "rh closed left") && rightArmMotion == "ra move left";
+				return (rightHandGesture == "open left" || rightHandGesture == "closed left") && rightArmMotion == "ra move left";
 			}
 			return false;
 		}, 300));
@@ -31,7 +31,7 @@ public class PushLeftStateMachine : RuleStateMachine<PushLeftState>
 			{
 				string rightHandGesture = DataStore.GetStringValue("user:hands:right");
 				string rightArmMotion = DataStore.GetStringValue("user:arms:right");
-				return (rightHandGesture != "rh open left" && rightHandGesture != "rh closed left") || rightArmMotion != "ra move left";
+				return (rightHandGesture != "open left" && rightHandGesture != "closed left") || rightArmMotion != "ra move left";
 			}
 		}, 100));
 	}
