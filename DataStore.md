@@ -33,9 +33,9 @@ As a general rule, each part of a key should be named like a variable or propert
 |`user:armMotion:left`        |String       |        |servo behavior of left arm: "servo" or "still" |
 |`user:armMotion:right`       |String       |        |servo behavior of right arm: "servo" or "still" |
 |`user:communication`         |Communication|        |Semantic representation of the user's last utterance                      |
-|`user:dominantEmotion:`      |String       |        |Current user dominant emotion, e.g. "Happy", "Angry"                      |
-|`user:dominantEmotion:Angry` |Integer      |0 to 100|Measure of how angry the user looks                                       |
-|`user:dominantEmotion:Happy` |Integer      |0 to 100|Measure of how happy the user looks                                       |
+|`user:dominantEmotion`      |String       |        |Current user dominant emotion, e.g. "Happy", "Angry"                      |
+|`user:EmotionAngry` |Integer      |0 to 100|Measure of how angry the user looks                                       |
+|`user:EmotionHappy` |Integer      |0 to 100|Measure of how happy the user looks                                       |
 |`user:isEngaged`             |Boolean      |T or F  |True if closest body frame is engaged and false otherwise                 |
 |`user:isPointing`            |Boolean      |T or F  |Whether the user appears to be pointing (anywhere at all)                 |
 |`user:isPointing:left`       |Boolean      |T or F  |Whether the user appears to be pointing with left hand (anywhere at all)  |
