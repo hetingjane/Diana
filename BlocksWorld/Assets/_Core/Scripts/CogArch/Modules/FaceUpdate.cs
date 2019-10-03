@@ -61,16 +61,16 @@ public class FaceUpdate : MonoBehaviour
                 frownRightIndex.Add(frightIdx);
             }
         }
-        iteration = 1;
+        iteration = 0;
     }
 
     void Update()
     {
-        if (DataStore.GetValue("me:attending").ToString()== "user" && iteration < 5)
+        if (DataStore.GetBoolValue("user:isEngaged") && iteration < 10)
         {
             // User has just approached the table.  Smile to greet.
-            recoveryRate = 20;
-            maxStrength = 100;
+            recoveryRate = 30;
+            maxStrength = 80;
             currSmileStrength = Mathf.MoveTowards(currSmileStrength, maxStrength, recoveryRate);
             for (int i = 0; i < renderers.Count; i++)
             {
@@ -102,7 +102,7 @@ public class FaceUpdate : MonoBehaviour
                 }
                 break;
             case "Happy":
-                recoveryRate = score / 5;
+                recoveryRate = score / 3;
                 maxStrength = 100;
                 currSmileStrength = Mathf.MoveTowards(currSmileStrength, maxStrength, recoveryRate * Time.deltaTime);
                 currFrownStrength = Mathf.MoveTowards(currFrownStrength, 0, recoveryRate * Time.deltaTime);
@@ -115,7 +115,7 @@ public class FaceUpdate : MonoBehaviour
                 }
                 break;
             case "Angry":
-                recoveryRate = score / 5;
+                recoveryRate = score / 3;
                 maxStrength = 100;
                 currFrownStrength = Mathf.MoveTowards(currFrownStrength, maxStrength, recoveryRate * Time.deltaTime);
                 currSmileStrength = Mathf.MoveTowards(currSmileStrength, 0, recoveryRate * Time.deltaTime);
