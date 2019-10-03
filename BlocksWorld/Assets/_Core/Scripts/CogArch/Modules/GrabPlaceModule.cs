@@ -271,7 +271,7 @@ public class GrabPlaceModule : ModuleBase
 				break;
 			case State.Lifting:
 				// Move the held object along with the hand maintaining the same offset
-				heldObject.transform.position = hand.transform.position + holdOffset;
+				heldObject.targetPosition = hand.transform.position + holdOffset;
 				if (rightArmMotion == "reached")
 				{
 					currentState = State.Holding;
@@ -327,7 +327,7 @@ public class GrabPlaceModule : ModuleBase
 				break;
 			case State.Traversing:
 				// Move the held object along with the hand maintaining the same offset
-				heldObject.transform.position = hand.transform.position + holdOffset;
+				heldObject.targetPosition = hand.transform.position + holdOffset;
 			
 				if (rightArmMotion == "reached")
 				{
@@ -338,14 +338,14 @@ public class GrabPlaceModule : ModuleBase
 				}
 				break;		
 			case State.Lowering:
-				heldObject.transform.position = hand.transform.position + holdOffset;
+				heldObject.targetPosition = hand.transform.position + holdOffset;
 
 				if (rightArmMotion == "reached")
 				{
 					heldObject.transform.SetParent(grabbableBlocks);
 					var bounds = GlobalHelper.GetObjectWorldSize(heldObject.gameObject);
-					heldObject.transform.position = setDownPos + Vector3.up * bounds.extents.y;
-					heldObject.transform.eulerAngles = Vector3.zero;
+					heldObject.targetPosition = setDownPos + Vector3.up * bounds.extents.y;
+					heldObject.targetRotation = Vector3.zero;
 
 					// reactivate physics on this object
 					Rigging rigging = heldObject.GetComponent<Rigging>();
@@ -353,7 +353,7 @@ public class GrabPlaceModule : ModuleBase
 						rigging.ActivatePhysics(true);
 					}
 
-					curReachTarget = heldObject.transform.position + Vector3.up * reachHeight - holdOffset;
+					curReachTarget = heldObject.targetPosition + Vector3.up * reachHeight - holdOffset;
 					
 					DataStore.SetValue("me:holding", new DataStore.StringValue(""), null, "BipedIKGrab released " + targetBlock.name);
 					heldObject = null;
