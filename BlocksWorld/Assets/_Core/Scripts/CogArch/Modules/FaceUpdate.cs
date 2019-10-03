@@ -21,12 +21,14 @@ public class FaceUpdate : MonoBehaviour
     List<int> smileRightIndex;
     List<int> frownLeftIndex;
     List<int> frownRightIndex;
+
     float currSmileStrength;
     float currFrownStrength;
 
     float maxStrength;
     float recoveryRate;
-    int iteration;
+
+    BlendShapeMixer bsm;
     void Start()
     {
         renderers = new List<SkinnedMeshRenderer>();
@@ -59,28 +61,61 @@ public class FaceUpdate : MonoBehaviour
                 smileRightIndex.Add(srightIdx);
                 frownLeftIndex.Add(fleftIdx);
                 frownRightIndex.Add(frightIdx);
+
             }
         }
-        iteration = 0;
-    }
 
+        bsm = avatar.GetComponentInChildren<BlendShapeMixer>();
+        if (bsm == null)
+        {
+            Debug.LogError("bsm is null!");
+        }
+        DataStore.Subscribe("user:isEngaged", NoteUserIsEngaged);
+        //DataStore.Subscribe("user:intent:isPosack", NoteUserIsGesturing);
+        //DataStore.Subscribe("user:intent:isNegack", NoteUserIsGesturing);
+        //DataStore.Subscribe("user:intent:isPushLeft", NoteUserIsGesturing);
+        //DataStore.Subscribe("user:intent:isPushRight", NoteUserIsGesturing);
+        //DataStore.Subscribe("user:intent:isNevermind", NoteUserIsGesturing);
+        //DataStore.Subscribe("user:intent:isPosack", NoteUserIsGesturing);
+        //DataStore.Subscribe("user:intent:isWave", NoteUserIsGesturing);
+
+
+    }
+    void NoteUserIsGesturing(string key, DataStore.IValue value)
+    {
+        if ((value as DataStore.BoolValue).val)
+        {
+            // User's gesturing, better pay attention.
+
+            bsm.Apply();
+        }
+        else { bsm.ResetToNeutral(); }
+    }
+    void NoteUserIsEngaged(string key, DataStore.IValue value)
+    {
+        if ((value as DataStore.BoolValue).val)
+        {
+            for (int j = 0; j < 10; j++)
+            {
+                // User has just approached the table.  Smile to greet.
+                recoveryRate = 30;
+                maxStrength = 80;
+                currSmileStrength = Mathf.MoveTowards(currSmileStrength, maxStrength, recoveryRate);
+                for (int i = 0; i < renderers.Count; i++)
+                {
+                    renderers[i].SetBlendShapeWeight(smileLeftIndex[i], currSmileStrength);
+                    renderers[i].SetBlendShapeWeight(smileRightIndex[i], currSmileStrength);
+
+                }
+            }
+
+
+        }
+    }
     void Update()
     {
-        if (DataStore.GetBoolValue("user:isEngaged") && iteration < 10)
-        {
-            // User has just approached the table.  Smile to greet.
-            recoveryRate = 30;
-            maxStrength = 80;
-            currSmileStrength = Mathf.MoveTowards(currSmileStrength, maxStrength, recoveryRate);
-            for (int i = 0; i < renderers.Count; i++)
-            {
-                renderers[i].SetBlendShapeWeight(smileLeftIndex[i], currSmileStrength);
-                renderers[i].SetBlendShapeWeight(smileRightIndex[i], currSmileStrength);
+        DataStore.Subscribe("user:isPointing", NoteUserIsGesturing);
 
-            }
-            iteration += 1;
-
-        }
         //Get current dominantEmotion and its measurement score
 
         string dominantEmotion = DataStore.GetStringValue("user:dominantEmotion");
@@ -88,7 +123,7 @@ public class FaceUpdate : MonoBehaviour
         switch (dominantEmotion)
         {
             case "Neutral":
-                recoveryRate = 10;
+                recoveryRate = 30;
                 maxStrength = 0;
                 currSmileStrength = Mathf.MoveTowards(currSmileStrength, maxStrength, recoveryRate * Time.deltaTime);
                 currFrownStrength = Mathf.MoveTowards(currFrownStrength, maxStrength, recoveryRate * Time.deltaTime);

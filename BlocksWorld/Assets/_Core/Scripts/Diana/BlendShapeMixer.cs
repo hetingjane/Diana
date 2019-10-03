@@ -53,22 +53,20 @@ public class BlendShapeMixer : MonoBehaviour
 
 	
 	[ContextMenu("Reset to neutral")]
-	void ResetToNeutral() {
-		foreach (var exp in expressions) {
-			exp.weight = 0;
-		}
-		Apply();
-	}
+    public void ResetToNeutral() {
+        float idx = 0;
+        Apply(idx);
+    }
 	
 	[ContextMenu("Apply Expressions")]
-	void Apply() {
+	public void Apply(float idx = 1) { // This index works as a parameter to control if we want to set the blendshape weights to some value or reset to 0
 		// There are opportunities for improvement here; creating and throwing out
 		// a dictionary every time is pretty expensive, as is GetBlendShapeIndex.
 		// But this works well enough for now.  (--JJS)
 		Dictionary<string, float> totalWeight = new Dictionary<string, float>();
 		foreach (var exp in expressions) {
 			foreach (var tv in exp.targets) {
-				float newWeight = tv.weight * exp.weight * 0.01f;
+				float newWeight = tv.weight * exp.weight * 0.01f * idx;
 				if (totalWeight.ContainsKey(tv.blendShape)) totalWeight[tv.blendShape] += newWeight;
 				else totalWeight[tv.blendShape] = newWeight;
 			}
