@@ -2,8 +2,8 @@
 This is the module to change Diana's facial expressions based on emotion scores we get from BlackBoard.
 It sets different weights to blend shapes when the score of a certain emotion below/above a certain threshold.
 
-Reads:  user:dominantEmotion: (StringValue)
-user:dominantEmotion:(enum)Emotion: (IntValue, ranges from 0 to 100)
+Reads:  user:dominantEmotion (StringValue)
+        user:dominantEmotion:(enum)Emotion: (IntValue, ranges from 0 to 100)
 
 TODO: add more emotions and a dynamic mechanism to let Diana express supportive empathy in appropraite context.
 */
@@ -83,8 +83,8 @@ public class FaceUpdate : MonoBehaviour
         }
         //Get current dominantEmotion and its measurement score
 
-        string dominantEmotion = DataStore.GetStringValue("user:dominantEmotion:");
-        int score = DataStore.GetIntValue("user:dominantEmotion:" + dominantEmotion);
+        string dominantEmotion = DataStore.GetStringValue("user:dominantEmotion");
+        int score = DataStore.GetIntValue("user:Emotion" + dominantEmotion);
         switch (dominantEmotion)
         {
             case "Neutral":

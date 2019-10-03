@@ -62,23 +62,23 @@ public class PlayerEmotions : ImageResultsListener
 
 
                 var emotionValue = new DataStore.IntValue((int)currentJoy);
-                DataStore.SetValue("user:dominantEmotion:" + dominantEmotion.ToString(), emotionValue, this, emotionValue.ToString());
-                DataStore.SetStringValue("user:dominantEmotion:", new DataStore.StringValue(dominantEmotion.ToString()), this, dominantEmotion.ToString());
+                DataStore.SetValue("user:Emotion" + dominantEmotion.ToString(), emotionValue, this, emotionValue.ToString());
+                DataStore.SetStringValue("user:dominantEmotion", new DataStore.StringValue(dominantEmotion.ToString()), this, dominantEmotion.ToString());
             }
             else if (currentAnger > angryThreshold)
             {
                 dominantEmotion = Emotion.Angry;
                 var emotionValue = new DataStore.IntValue((int)currentAnger);
-                DataStore.SetValue("user:dominantEmotion:" + dominantEmotion.ToString(), emotionValue, this, emotionValue.ToString());
-                DataStore.SetStringValue("user:dominantEmotion:", new DataStore.StringValue(dominantEmotion.ToString()), this, dominantEmotion.ToString());
+                DataStore.SetValue("user:Emotion" + dominantEmotion.ToString(), emotionValue, this, emotionValue.ToString());
+                DataStore.SetStringValue("user:dominantEmotion", new DataStore.StringValue(dominantEmotion.ToString()), this, dominantEmotion.ToString());
 
             }
             else
             {
                 dominantEmotion = Emotion.Neutral;
-                DataStore.SetValue("user:dominantEmotion:Happy" , new DataStore.IntValue(0), this, "0");
-                DataStore.SetValue("user:dominantEmotion:Angry", new DataStore.IntValue(0), this, "0");
-                DataStore.SetStringValue("user:dominantEmotion:", new DataStore.StringValue(dominantEmotion.ToString()), this, dominantEmotion.ToString());
+                DataStore.SetValue("user:EmotionHappy" , new DataStore.IntValue(0), this, "0");
+                DataStore.SetValue("user:EmotionAngry", new DataStore.IntValue(0), this, "0");
+                DataStore.SetStringValue("user:dominantEmotion", new DataStore.StringValue(dominantEmotion.ToString()), this, dominantEmotion.ToString());
 
             }
 
