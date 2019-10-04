@@ -39,9 +39,9 @@ public class EventManagerTestModule : ModuleBase
 
         if (objectMovePath != null)
         {
-	        if ((actualHandPosR - (objectMovePath.ElementAt(0) - holdOffset)).sqrMagnitude < Constants.EPSILON)
+	        if (rightArmMotion == "reached")
             {
-                Debug.Log(string.Format("Dist btw = {0}", (actualHandPosR - (objectMovePath.ElementAt(0) - holdOffset)).sqrMagnitude));
+                //Debug.Log(string.Format("Dist btw = {0}", (actualHandPosR - (objectMovePath.ElementAt(0) - holdOffset)).sqrMagnitude));
                 objectMovePath.RemoveAt(0);
 
                 if (objectMovePath.Count > 0)

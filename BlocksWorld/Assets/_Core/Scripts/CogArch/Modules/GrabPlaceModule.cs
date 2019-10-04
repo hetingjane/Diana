@@ -226,6 +226,7 @@ public class GrabPlaceModule : ModuleBase
 
 						// Set the reach target to be high above the set down position accounting for hold offset
 						curReachTarget = setDownPos + Vector3.up * (bounds.size.y + reachHeight) - holdOffset;
+                        SetValue("me:intent:handPosR", curReachTarget, currentState.ToString());
 
 						// We go to the next state
 						currentState = State.Reaching;
@@ -243,6 +244,7 @@ public class GrabPlaceModule : ModuleBase
 					var bounds = GlobalHelper.GetObjectWorldSize(targetBlock.gameObject);
 					// Lower the reach target to be withing grabbing distance to the target
 					curReachTarget = setDownPos + Vector3.up * bounds.size.y - holdOffset;
+                    SetValue("me:intent:handPosR", curReachTarget, currentState.ToString());
 
 					// We go to the next state
 					currentState = State.Grabbing;
@@ -264,6 +266,7 @@ public class GrabPlaceModule : ModuleBase
 					// Raise the reach target to be high above the target
 					var bounds = GlobalHelper.GetObjectWorldSize(targetBlock.gameObject);
 					curReachTarget = setDownPos + Vector3.up * (bounds.size.y + liftHeight) - holdOffset;
+                    SetValue("me:intent:handPosR", curReachTarget, currentState.ToString());
 
 					// We go to the next state
 					currentState = State.Lifting;
@@ -308,6 +311,7 @@ public class GrabPlaceModule : ModuleBase
 
 						// Set the reach target to be high above the set down position accounting for hold offset
 						curReachTarget = setDownPos + Vector3.up * reachHeight - holdOffset;
+                        SetValue("me:intent:handPosR", curReachTarget, currentState.ToString());
 						currentState = State.Traversing;
 					}
 					else if (targetPos != default)
@@ -317,6 +321,7 @@ public class GrabPlaceModule : ModuleBase
 
 						// Set the reach target to be high above the set down position accounting for hold offset
 						curReachTarget = setDownPos + Vector3.up * reachHeight - holdOffset;
+                        SetValue("me:intent:handPosR", curReachTarget, currentState.ToString());
 						currentState = State.Traversing;
 					}
 					else
@@ -324,6 +329,7 @@ public class GrabPlaceModule : ModuleBase
 						var bounds = GlobalHelper.GetObjectWorldSize(heldObject.gameObject);
 						// Set the reach target to be just above the set down position accounting for hold offset
 						curReachTarget = setDownPos + Vector3.up * bounds.size.y - holdOffset;
+                        SetValue("me:intent:handPosR", curReachTarget, currentState.ToString());
 						currentState = State.Lowering;
 					}
 				}
@@ -337,6 +343,7 @@ public class GrabPlaceModule : ModuleBase
 					var bounds = GlobalHelper.GetObjectWorldSize(heldObject.gameObject);
 					// Set the reach target to be just above the set down position accounting for hold offset
 					curReachTarget = setDownPos + Vector3.up * bounds.size.y - holdOffset;
+                    SetValue("me:intent:handPosR", curReachTarget, currentState.ToString());
 					currentState = State.Lowering;
 				}
 				break;		
@@ -357,7 +364,8 @@ public class GrabPlaceModule : ModuleBase
 					}
 
 					curReachTarget = heldObject.targetPosition + Vector3.up * reachHeight - holdOffset;
-					
+                    SetValue("me:intent:handPosR", curReachTarget, currentState.ToString());
+
 					DataStore.SetValue("me:holding", new DataStore.StringValue(""), null, "BipedIKGrab released " + targetBlock.name);
 					heldObject = null;
 
@@ -374,6 +382,8 @@ public class GrabPlaceModule : ModuleBase
 						}
 					}
 					curReachTarget = default;
+                    SetValue("me:intent:handPosR", curReachTarget, currentState.ToString());
+
 					currentState = State.Unreaching;
 				}
 				break;	
@@ -385,7 +395,5 @@ public class GrabPlaceModule : ModuleBase
 				}
 				break;
 		}
-
-		SetValue("me:intent:handPosR", curReachTarget, currentState.ToString());
 	}
 }
