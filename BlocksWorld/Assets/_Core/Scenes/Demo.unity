@@ -2096,7 +2096,6 @@ MonoBehaviour:
   defaultMoveSpeed: 0
   defaultTurnSpeed: 0
   minYBound: 0
-  supportingSurface: {fileID: 0}
   isGrasped: 0
   graspTracker: {fileID: 0}
   grasperCoord: {fileID: 0}
@@ -4422,7 +4421,6 @@ MonoBehaviour:
   defaultMoveSpeed: 0
   defaultTurnSpeed: 0
   minYBound: 0
-  supportingSurface: {fileID: 0}
   isGrasped: 0
   graspTracker: {fileID: 0}
   grasperCoord: {fileID: 0}
@@ -4732,7 +4730,6 @@ MonoBehaviour:
   defaultMoveSpeed: 0
   defaultTurnSpeed: 0
   minYBound: 0
-  supportingSurface: {fileID: 0}
   isGrasped: 0
   graspTracker: {fileID: 0}
   grasperCoord: {fileID: 0}
@@ -5839,7 +5836,6 @@ MonoBehaviour:
   defaultMoveSpeed: 0
   defaultTurnSpeed: 0
   minYBound: 0
-  supportingSurface: {fileID: 0}
   isGrasped: 0
   graspTracker: {fileID: 0}
   grasperCoord: {fileID: 0}
@@ -5959,7 +5955,6 @@ MonoBehaviour:
   defaultMoveSpeed: 0
   defaultTurnSpeed: 0
   minYBound: 0
-  supportingSurface: {fileID: 0}
   isGrasped: 0
   graspTracker: {fileID: 0}
   grasperCoord: {fileID: 0}
@@ -6520,7 +6515,6 @@ MonoBehaviour:
   defaultMoveSpeed: 0
   defaultTurnSpeed: 0
   minYBound: 0
-  supportingSurface: {fileID: 0}
   isGrasped: 0
   graspTracker: {fileID: 0}
   grasperCoord: {fileID: 0}
@@ -7591,7 +7585,6 @@ MonoBehaviour:
   defaultMoveSpeed: 0
   defaultTurnSpeed: 0
   minYBound: 0
-  supportingSurface: {fileID: 0}
   isGrasped: 0
   graspTracker: {fileID: 0}
   grasperCoord: {fileID: 0}
@@ -9286,7 +9279,6 @@ MonoBehaviour:
   defaultMoveSpeed: 0
   defaultTurnSpeed: 0
   minYBound: 0
-  supportingSurface: {fileID: 0}
   isGrasped: 0
   graspTracker: {fileID: 0}
   grasperCoord: {fileID: 0}
@@ -9737,7 +9729,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70566ee1084d7624ba75a1bfa1c6dc02, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  movementSpeed: 0.5
+  movementSpeed: 1
 --- !u!114 &1463965741
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13490,17 +13482,17 @@ PrefabInstance:
     - target: {fileID: 8370107686997645971, guid: 1d104b2c6fd8e45d9a2953c2779e4ad0,
         type: 3}
       propertyPath: defaultIncrement.x
-      value: 0.2
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 8370107686997645971, guid: 1d104b2c6fd8e45d9a2953c2779e4ad0,
         type: 3}
       propertyPath: defaultIncrement.y
-      value: 0.2
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 8370107686997645971, guid: 1d104b2c6fd8e45d9a2953c2779e4ad0,
         type: 3}
       propertyPath: defaultIncrement.z
-      value: 0.2
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 8370107687644816505, guid: 1d104b2c6fd8e45d9a2953c2779e4ad0,
         type: 3}

@@ -95,7 +95,7 @@ public class GrabPlaceModule : ModuleBase
 	/// <summary>
 	/// Object to place the held object on top of
 	/// </summary>
-	private Transform setDownTarget; 
+	private Voxeme setDownTarget; 
 
 	/// <summary>
 	/// Location to place the held object at
@@ -288,7 +288,7 @@ public class GrabPlaceModule : ModuleBase
 				{					
 					// Try to resolve set down target block by name
 					string name = DataStore.GetStringValue("me:intent:targetName");
-					setDownTarget = string.IsNullOrEmpty(name) ? null : grabbableBlocks.Find(name);
+					setDownTarget = string.IsNullOrEmpty(name) ? null : grabbableBlocks.Find(name).GetComponent<Voxeme>();
 					// In case we need to resolve by target location
 					Vector3 targetPos = DataStore.GetVector3Value("me:intent:target");
 
@@ -297,10 +297,13 @@ public class GrabPlaceModule : ModuleBase
 						// We have the set down target block by name
 
 						// Turn off physical interaction with the set down target block
-						setDownTarget.GetComponent<Rigidbody>().isKinematic = true;
+						Rigging rigging = setDownTarget.GetComponent<Rigging>();
+						if (rigging != null) {
+							rigging.ActivatePhysics(false);
+						}
 
 						// Set down position is on the top surface of the set down target block
-						var bounds = setDownTarget.GetComponent<Collider>().bounds;
+						var bounds = GlobalHelper.GetObjectWorldSize(setDownTarget.gameObject);
 						setDownPos = bounds.center + bounds.extents.y * Vector3.up;
 
 						// Set the reach target to be high above the set down position accounting for hold offset
