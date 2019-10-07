@@ -20,6 +20,12 @@ using System;
 ///		{
 ///			SetTransitionRule(MyStates.Start, MyStates.Stop, Rule.True);
 ///			SetTransitionRule(MyStates.Stop, MyStates.Start, Rule.False);
+///			StateChanged += StateChangedEventHandler;
+///		}
+///		
+///		private void StateChangedEventHandler()
+///		{
+///			// Do something
 ///		}
 /// }
 /// </code>
@@ -42,7 +48,7 @@ public abstract class RuleStateMachine<T> where T: Enum
 	/// The current state.
 	/// <para>
 	/// Setting the property resets all the rules transitioning out from the new state.
-	/// Setting also invokes <see cref="OnStateChanged"/> event.
+	/// Setting also invokes <see cref="StateChanged"/> event.
 	/// </para>
 	/// </summary>
 	public T CurrentState
@@ -64,15 +70,15 @@ public abstract class RuleStateMachine<T> where T: Enum
 					rule.Reset();
 			}
 
-			OnStateChanged?.Invoke(this, new StateChangedArgs<T>(prevState, currentState));
+			StateChanged?.Invoke(this, new StateChangedEventArgs<T>(prevState, currentState));
 		}
 	}
 
 	/// <summary>
-	/// Event arguments that accompany a <see cref="OnStateChanged"/> event
+	/// Event arguments that accompany a <see cref="StateChanged"/> event
 	/// </summary>
 	/// <typeparam name="T">an enumeration of the states</typeparam>
-	public class StateChangedArgs<T>: EventArgs
+	public class StateChangedEventArgs<T>: EventArgs
 	{
 		/// <summary>
 		/// State from which the transition was made (previous state)
@@ -91,11 +97,11 @@ public abstract class RuleStateMachine<T> where T: Enum
 		}
 
 		/// <summary>
-		/// Create a StateChangedArgs instance
+		/// Create an instance using from state and to state
 		/// </summary>
 		/// <param name="fromState">State from which the transition was made (previous state)</param>
 		/// <param name="toState">State to which the transition was made (current state)</param>
-		public StateChangedArgs(T fromState, T toState)
+		public StateChangedEventArgs(T fromState, T toState)
 		{
 			FromState = fromState;
 			ToState = toState;
@@ -105,7 +111,7 @@ public abstract class RuleStateMachine<T> where T: Enum
 	/// <summary>
 	/// Event that is triggered whenever the state is changed
 	/// </summary>
-	public event EventHandler<StateChangedArgs<T>> OnStateChanged;
+	public event EventHandler<StateChangedEventArgs<T>> StateChanged;
 	
 	/// <summary>
 	/// Create a rule state machine with initial state set to the first value of the <see cref="T"/> enumeration
@@ -184,7 +190,7 @@ public abstract class RuleStateMachine<T> where T: Enum
 
 	/// <summary>
 	/// Override this in child classes to set up transitions using <see cref="SetTransitionRule(T, T, Rule)"/>
-	/// and to attach event handlers to <see cref="OnStateChanged"/> event. This method is called right after 
+	/// and to attach event handlers to <see cref="StateChanged"/> event. This method is called right after 
 	/// the constructor is called.
 	/// </summary>
 	protected abstract void Initialize();
