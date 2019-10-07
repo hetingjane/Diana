@@ -77,13 +77,13 @@ public abstract class RuleStateMachine<T> where T: Enum
 	/// <summary>
 	/// Event arguments that accompany a <see cref="StateChanged"/> event
 	/// </summary>
-	/// <typeparam name="T">an enumeration of the states</typeparam>
-	public class StateChangedEventArgs<T>: EventArgs
+	/// <typeparam name="T1">an enumeration of the states</typeparam>
+	public class StateChangedEventArgs<T1>: EventArgs
 	{
 		/// <summary>
 		/// State from which the transition was made (previous state)
 		/// </summary>
-		public T FromState
+		public T1 FromState
 		{
 			get;
 		}
@@ -91,7 +91,7 @@ public abstract class RuleStateMachine<T> where T: Enum
 		/// <summary>
 		/// State to which the transition was made (current state)
 		/// </summary>
-		public T ToState
+		public T1 ToState
 		{
 			get;
 		}
@@ -101,7 +101,7 @@ public abstract class RuleStateMachine<T> where T: Enum
 		/// </summary>
 		/// <param name="fromState">State from which the transition was made (previous state)</param>
 		/// <param name="toState">State to which the transition was made (current state)</param>
-		public StateChangedEventArgs(T fromState, T toState)
+		public StateChangedEventArgs(T1 fromState, T1 toState)
 		{
 			FromState = fromState;
 			ToState = toState;
