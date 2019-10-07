@@ -200,7 +200,7 @@ public class GrabPlaceModule : ModuleBase
                     string name = DataStore.GetStringValue("me:intent:targetName");
 
                     // If the target is a named object get its Voxeme component
-                    targetBlock = string.IsNullOrEmpty(name) ? null : grabbableBlocks.Find(name).GetComponent<Voxeme>();
+	                targetBlock = string.IsNullOrEmpty(name) ? null : GameObject.Find(name).GetComponent<Voxeme>();
 
                     if (targetBlock == null)
                     {
@@ -212,7 +212,6 @@ public class GrabPlaceModule : ModuleBase
                             targetBlock = FindTargetByLocation(targetLocation, radius).GetComponent<Voxeme>();
                         }
                     }
-                    
 
                     if (targetBlock != null)
                     {
@@ -261,7 +260,7 @@ public class GrabPlaceModule : ModuleBase
                     }
 
                     // Store a reference to the grabbed object
-                    heldObject = targetBlock;
+	                heldObject = targetBlock;
 
                     // Raise the reach target to be high above the target
                     var bounds = GlobalHelper.GetObjectWorldSize(targetBlock.gameObject);
