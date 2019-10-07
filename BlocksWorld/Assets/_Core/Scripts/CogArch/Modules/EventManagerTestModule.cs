@@ -39,9 +39,8 @@ public class EventManagerTestModule : ModuleBase
 
         if (objectMovePath != null)
         {
-	        if (rightArmMotion == "reached")
+            if (rightArmMotion == "reached")
             {
-                //Debug.Log(string.Format("Dist btw = {0}", (actualHandPosR - (objectMovePath.ElementAt(0) - holdOffset)).sqrMagnitude));
                 objectMovePath.RemoveAt(0);
 
                 if (objectMovePath.Count > 0)
@@ -93,9 +92,9 @@ public class EventManagerTestModule : ModuleBase
                                         Debug.Log(string.Format("{0} : {1}",
                                             GlobalHelper.VectorToParsable(curTargetHandPos),
                                             GlobalHelper.VectorToParsable(newTargetHandPos)));
-    	                                Debug.Log(string.Format("Setting me:intent:handPosR to {0}; me:actual:handPosR is {1}",
-    		                                GlobalHelper.VectorToParsable(newTargetHandPos),
-    		                                GlobalHelper.VectorToParsable(curHandPos)));
+                                        Debug.Log(string.Format("Setting me:intent:handPosR to {0}; me:actual:handPosR is {1}",
+                                            GlobalHelper.VectorToParsable(newTargetHandPos),
+                                            GlobalHelper.VectorToParsable(curHandPos)));
                                         SetValue("me:intent:handPosR", newTargetHandPos, string.Empty);
                                     }
                                 }
@@ -107,9 +106,9 @@ public class EventManagerTestModule : ModuleBase
                                     Vector3 newTargetHandPos = heldVoxeme.targetPosition - holdOffset;
                                     if (!GlobalHelper.CloseEnough(curTargetHandPos, newTargetHandPos))
                                     {
-    	                                Debug.Log(string.Format("Setting me:intent:handPosR to {0}; me:actual:handPosR is {1}",
-    		                                GlobalHelper.VectorToParsable(newTargetHandPos),
-    		                                GlobalHelper.VectorToParsable(curHandPos)));
+                                        Debug.Log(string.Format("Setting me:intent:handPosR to {0}; me:actual:handPosR is {1}",
+                                            GlobalHelper.VectorToParsable(newTargetHandPos),
+                                            GlobalHelper.VectorToParsable(curHandPos)));
                                         SetValue("me:intent:handPosR", newTargetHandPos, string.Empty);
                                     }
                                 }
@@ -123,7 +122,12 @@ public class EventManagerTestModule : ModuleBase
 
     public void GotPath(object sender, EventArgs e) {
         objectMovePath = ((ComputedPathEventArgs)e).path;
-        SetValue("me:intent:handPosR", objectMovePath.ElementAt(0), string.Empty);
+        SetValue("me:intent:handPosR", objectMovePath.ElementAt(0) - holdOffset, string.Empty);
+        //[<0.2200003; 1.356002; 0.0009997636>, <0.3200003; 1.256002; 0.1009998>, <0.4200003; 1.256002; 0.2009998>, <0.4010004; 1.206002; 0.164>]
+        //Setting me:intent:handPosR to <0.3200003; 1.336002; 0.06099977>; me:actual:handPosR is <0.2200003; 1.536003; -0.1390002>
+        //Setting me:intent:handPosR to <0.4200003; 1.336002; 0.1609998>; me:actual:handPosR is <0.3200004; 1.336002; 0.06099981>
+        //Setting me:intent:handPosR to <0.4010004; 1.286002; 0.124>; me:actual:handPosR is <0.4070366; 1.344791; 0.06851584>
+
     }
 
     public void GRASP(object[] args)
