@@ -12,9 +12,9 @@ using System.Collections.Generic;
 using System.Linq;
 
 using VoxSimPlatform.Core;
+using VoxSimPlatform.CogPhysics;
 using VoxSimPlatform.Global;
 using VoxSimPlatform.Pathfinding;
-using VoxSimPlatform.Vox;
 
 public class EventManagerTestModule : ModuleBase
 {
@@ -56,78 +56,11 @@ public class EventManagerTestModule : ModuleBase
                 }
             }
         }
-
-        /*if (DataStore.GetStringValue("me:holding") != string.Empty)
-        {
-            GameObject heldObj = GameObject.Find(DataStore.GetStringValue("me:holding"));
-            if (heldObj != null)
-            {
-                Voxeme heldVoxeme = heldObj.GetComponent<Voxeme>();
-                if (heldVoxeme != null)
-                {
-                    string rightArmMotion = DataStore.GetStringValue("me:rightArm:motion");
-
-                    // keep target intents up to date with voxeme target position
-                    Vector3 curHandPos = DataStore.GetVector3Value("me:actual:handPosR");
-
-                    // curHandPos is the actual current hand position
-                    // (curHandPos+holdOffset) is where Diana expects the voxeme object to be based on the
-                    //  known offset from her hand to an object (TODO: does this offset depend on the size of the object,
-                    //  and therefore is hard-coding it a domain restriction?)
-                    // ((curHandPos+holdOffset)-heldVoxeme.transform.position).sqrMagnitude is the square of the distance from
-                    //  where Diana expects the voxeme object to be to where the voxeme actually is
-                    if (rightArmMotion == "reached")
-                    {
-                        if (((curHandPos+holdOffset)-heldVoxeme.transform.position).sqrMagnitude > Constants.EPSILON)
-                        {
-                            Vector3 curTargetHandPos = DataStore.GetVector3Value("me:intent:handPosR");
-
-                            if (heldVoxeme.interTargetPositions.Count > 0) // a queued path
-                            {
-                                if (!GlobalHelper.VectorIsNaN(heldVoxeme.interTargetPositions.ElementAt(0)))   // has valid destination
-                                {
-                                    Vector3 newTargetHandPos = heldVoxeme.interTargetPositions.ElementAt(0) - holdOffset;
-                                    if (!GlobalHelper.CloseEnough(curTargetHandPos, newTargetHandPos))
-                                    {
-                                        Debug.Log(string.Format("{0} : {1}",
-                                            GlobalHelper.VectorToParsable(curTargetHandPos),
-                                            GlobalHelper.VectorToParsable(newTargetHandPos)));
-                                        Debug.Log(string.Format("Setting me:intent:handPosR to {0}; me:actual:handPosR is {1}",
-                                            GlobalHelper.VectorToParsable(newTargetHandPos),
-                                            GlobalHelper.VectorToParsable(curHandPos)));
-                                        SetValue("me:intent:handPosR", newTargetHandPos, string.Empty);
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                if (!GlobalHelper.VectorIsNaN(heldVoxeme.targetPosition))   // has valid destination
-                                {
-                                    Vector3 newTargetHandPos = heldVoxeme.targetPosition - holdOffset;
-                                    if (!GlobalHelper.CloseEnough(curTargetHandPos, newTargetHandPos))
-                                    {
-                                        Debug.Log(string.Format("Setting me:intent:handPosR to {0}; me:actual:handPosR is {1}",
-                                            GlobalHelper.VectorToParsable(newTargetHandPos),
-                                            GlobalHelper.VectorToParsable(curHandPos)));
-                                        SetValue("me:intent:handPosR", newTargetHandPos, string.Empty);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }*/
     }
 
     public void GotPath(object sender, EventArgs e) {
         objectMovePath = ((ComputedPathEventArgs)e).path;
         SetValue("me:intent:handPosR", objectMovePath.ElementAt(0) - holdOffset, string.Empty);
-        //[<0.2200003; 1.356002; 0.0009997636>, <0.3200003; 1.256002; 0.1009998>, <0.4200003; 1.256002; 0.2009998>, <0.4010004; 1.206002; 0.164>]
-        //Setting me:intent:handPosR to <0.3200003; 1.336002; 0.06099977>; me:actual:handPosR is <0.2200003; 1.536003; -0.1390002>
-        //Setting me:intent:handPosR to <0.4200003; 1.336002; 0.1609998>; me:actual:handPosR is <0.3200004; 1.336002; 0.06099981>
-        //Setting me:intent:handPosR to <0.4010004; 1.286002; 0.124>; me:actual:handPosR is <0.4070366; 1.344791; 0.06851584>
-
     }
 
     public void GRASP(object[] args)
@@ -139,6 +72,7 @@ public class EventManagerTestModule : ModuleBase
                 if (args[0] is GameObject)
                 {
                     GameObject obj = (args[0] as GameObject);
+                    RiggingHelper.UnRig(obj, obj.transform.parent.gameObject);
                     SetValue("me:intent:action", "pickUp", string.Empty);
                     SetValue("me:intent:targetName", obj.name, string.Format("Grasping {0}",obj.name));
                 }
