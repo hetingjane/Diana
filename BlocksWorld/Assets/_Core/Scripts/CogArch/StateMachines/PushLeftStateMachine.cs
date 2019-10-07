@@ -10,7 +10,7 @@ public class PushLeftStateMachine : RuleStateMachine<PushLeftState>
 	{
 		SetTransitionRule(PushLeftState.PushLeftStop, PushLeftState.PushLeftStart, new TimedRule(() =>
 		{
-			bool userIsEngaged = DataStore.GetBoolValue("user:engaged");
+			bool userIsEngaged = DataStore.GetBoolValue("user:isEngaged");
 
 			if (userIsEngaged)
 			{
@@ -23,7 +23,7 @@ public class PushLeftStateMachine : RuleStateMachine<PushLeftState>
 
 		SetTransitionRule(PushLeftState.PushLeftStart, PushLeftState.PushLeftStop, new TimedRule(() =>
 		{
-			bool userIsEngaged = DataStore.GetBoolValue("user:engaged");
+			bool userIsEngaged = DataStore.GetBoolValue("user:isEngaged");
 
 			if (!userIsEngaged)
 				return true;
