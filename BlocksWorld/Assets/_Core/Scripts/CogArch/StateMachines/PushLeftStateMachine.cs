@@ -6,24 +6,24 @@
 
 public class PushLeftStateMachine : RuleStateMachine<PushLeftState>
 {
-	protected override void Initialize()
+	public PushLeftStateMachine()
 	{
 		SetTransitionRule(PushLeftState.PushLeftStop, PushLeftState.PushLeftStart, new TimedRule(() =>
 		{
-			bool userIsEngaged = DataStore.GetBoolValue("user:engaged");
+			bool userIsEngaged = DataStore.GetBoolValue("user:isEngaged");
 
 			if (userIsEngaged)
 			{
 				string rightHandGesture = DataStore.GetStringValue("user:hands:right");
 				string rightArmMotion = DataStore.GetStringValue("user:arms:right");
-				return (rightHandGesture == "open left" || rightHandGesture == "closed left") && rightArmMotion == "ra move left";
+				return (rightHandGesture == "open left" || rightHandGesture == "closed left") && rightArmMotion == "move left";
 			}
 			return false;
 		}, 300));
 
 		SetTransitionRule(PushLeftState.PushLeftStart, PushLeftState.PushLeftStop, new TimedRule(() =>
 		{
-			bool userIsEngaged = DataStore.GetBoolValue("user:engaged");
+			bool userIsEngaged = DataStore.GetBoolValue("user:isEngaged");
 
 			if (!userIsEngaged)
 				return true;
@@ -31,7 +31,7 @@ public class PushLeftStateMachine : RuleStateMachine<PushLeftState>
 			{
 				string rightHandGesture = DataStore.GetStringValue("user:hands:right");
 				string rightArmMotion = DataStore.GetStringValue("user:arms:right");
-				return (rightHandGesture != "open left" && rightHandGesture != "closed left") || rightArmMotion != "ra move left";
+				return (rightHandGesture != "open left" && rightHandGesture != "closed left") || rightArmMotion != "move left";
 			}
 		}, 100));
 	}

@@ -1,36 +1,117 @@
 ﻿/*
 This script interfaces with the VoxSim event manager
 
-Reads:      I don't know yet
+Reads:      user:intent:event (StringValue)
 Writes:     me:intent:action (StringValue)
             me:intent:targetName (StringValue, name of object that is theme of action)
 */
-using UnityEngine;
-using System.Collections;
 
+using UnityEngine;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
+
+using VoxSimPlatform.CogPhysics;
 using VoxSimPlatform.Core;
 using VoxSimPlatform.Global;
+using VoxSimPlatform.Pathfinding;
+using VoxSimPlatform.Vox;
 
 public class EventManagerTestModule : ModuleBase
 {
     public EventManager eventManager;
 
+    // need to keep the same as GrabPlaceModule's value but don't want to couple them
+    private readonly Vector3 holdOffset = new Vector3(0f, -.08f, .04f);
+
+    List<Vector3> objectMovePath = null;
+
     // Start is called before the first frame update
     void Start()
     {
-        
+        base.Start();
+        DataStore.Subscribe("user:intent:event", PromptEvent);
+
+        AStarSearch.ComputedPath += GotPath;
+
+        eventManager.NonexistentEntityError += NonexistentReferent;
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        string rightArmMotion = DataStore.GetStringValue("me:rightArm:motion");
+
+        if (objectMovePath != null)
+        {
+            if (rightArmMotion == "reached")
+            {
+                objectMovePath.RemoveAt(0);
+
+                if (objectMovePath.Count > 0)
+                {
+                    Debug.Log(string.Format("Setting me:intent:handPosR to {0}; me:actual:handPosR is {1}",
+                        GlobalHelper.VectorToParsable(objectMovePath.ElementAt(0) - holdOffset),
+                        GlobalHelper.VectorToParsable(DataStore.GetVector3Value("me:actual:handPosR"))));
+                    SetValue("me:intent:handPosR", objectMovePath.ElementAt(0) - holdOffset, string.Empty);
+                }
+                else
+                {
+                    objectMovePath = null;
+                }
+            }
+        }
+    }
+
+    void PromptEvent(string key, DataStore.IValue value)
+    {
+        string eventStr = value.ToString().Trim();
+        if (string.IsNullOrEmpty(eventStr)) return;
+
+        eventManager.InsertEvent("", 0);
+        eventManager.InsertEvent(eventStr, 1);
+    }
+
+    public void GotPath(object sender, EventArgs e)
+    {
+        objectMovePath = ((ComputedPathEventArgs)e).path;
+        SetValue("me:intent:handPosR", objectMovePath.ElementAt(0) - holdOffset, string.Empty);
+    }
+
+    public void NonexistentReferent(object sender, EventArgs e) {
+        Debug.Log(((EventReferentArgs) e).Referent is Pair<string, List<object>>);
+        if (((EventReferentArgs) e).Referent is Pair<string, List<object>>) {
+            // pair of predicate and object list 
+            // (present type - common type of object list, of absent attribute - predicate)
+            string pred = ((Pair<string, List<object>>) ((EventReferentArgs) e).Referent).Item1;
+            List<object> objs = ((Pair<string, List<object>>) ((EventReferentArgs) e).Referent).Item2;
+            Debug.Log(objs.Count);
+            if (objs.Count > 0) {
+                if (!objs.Any(o => (o == null) || (o.GetType() != typeof(GameObject)))) {
+                    // if all objects are game objects
+                    Debug.Log(string.Format("{0} {1} does not exist!", pred,
+                        (objs[0] as GameObject).GetComponent<Voxeme>().voxml.Lex.Pred));
+                    string responseStr = string.Format("There is no {0} {1} here.", pred,
+	                    (objs[0] as GameObject).GetComponent<Voxeme>().voxml.Lex.Pred);
+                    SetValue("me:speech:intent", responseStr, string.Empty);
+                }
+            }
+        }
+        else if (((EventReferentArgs) e).Referent is string) {
+            // absent object type - string
+            if (Regex.IsMatch(((EventReferentArgs) e).Referent as string, @"\{.\}")) {
+                return;
+            }
+
+            string responseStr = string.Format("There is no {0} here.", ((EventReferentArgs)e).Referent as string);
+            SetValue("me:speech:intent", responseStr, string.Empty);
+        }
     }
 
     public void GRASP(object[] args)
     {
-        Debug.Log("Diana's World: I'm grasping!");
-
         if (args[args.Length - 1] is bool)
         {
             if ((bool) args[args.Length - 1] == true)
@@ -38,6 +119,7 @@ public class EventManagerTestModule : ModuleBase
                 if (args[0] is GameObject)
                 {
                     GameObject obj = (args[0] as GameObject);
+                    RiggingHelper.UnRig(obj, obj.transform.parent.gameObject);
                     SetValue("me:intent:action", "pickUp", string.Empty);
                     SetValue("me:intent:targetName", obj.name, string.Format("Grasping {0}",obj.name));
                 }
@@ -47,8 +129,6 @@ public class EventManagerTestModule : ModuleBase
 
     public void UNGRASP(object[] args)
     {
-        Debug.Log("Diana's World: I'm ungrasping!");
-
         if (args[args.Length - 1] is bool)
         {
             if ((bool) args[args.Length - 1] == true)
@@ -87,9 +167,6 @@ public class EventManagerTestModule : ModuleBase
         }
         else if (predString == "ungrasp") {
             GameObject theme = GameObject.Find(argsStrings[0] as string);
-            Debug.Log("me:holding = " + DataStore.GetStringValue("me:holding"));
-            Debug.Log(theme.name);
-            Debug.Log(DataStore.GetStringValue("me:holding") != theme.name);
 
             if (theme != null) {
                 if (DataStore.GetStringValue("me:holding") != theme.name) {

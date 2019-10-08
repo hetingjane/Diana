@@ -2,8 +2,8 @@
 This is the module to change Diana's facial expressions based on emotion scores we get from BlackBoard.
 It sets different weights to blend shapes when the score of a certain emotion below/above a certain threshold.
 
-Reads:  user:dominantEmotion: (StringValue)
-user:dominantEmotion:(enum)Emotion: (IntValue, ranges from 0 to 100)
+Reads:  user:dominantEmotion (StringValue)
+        user:dominantEmotion:(enum)Emotion: (IntValue, ranges from 0 to 100)
 
 TODO: add more emotions and a dynamic mechanism to let Diana express supportive empathy in appropraite context.
 */
@@ -21,12 +21,14 @@ public class FaceUpdate : MonoBehaviour
     List<int> smileRightIndex;
     List<int> frownLeftIndex;
     List<int> frownRightIndex;
+
     float currSmileStrength;
     float currFrownStrength;
 
     float maxStrength;
     float recoveryRate;
-    int iteration;
+
+    BlendShapeMixer bsm;
     void Start()
     {
         renderers = new List<SkinnedMeshRenderer>();
@@ -59,36 +61,69 @@ public class FaceUpdate : MonoBehaviour
                 smileRightIndex.Add(srightIdx);
                 frownLeftIndex.Add(fleftIdx);
                 frownRightIndex.Add(frightIdx);
+
             }
         }
-        iteration = 1;
-    }
 
+        bsm = avatar.GetComponentInChildren<BlendShapeMixer>();
+        if (bsm == null)
+        {
+            Debug.LogError("bsm is null!");
+        }
+        DataStore.Subscribe("user:isEngaged", NoteUserIsEngaged);
+        //DataStore.Subscribe("user:intent:isPosack", NoteUserIsGesturing);
+        //DataStore.Subscribe("user:intent:isNegack", NoteUserIsGesturing);
+        //DataStore.Subscribe("user:intent:isPushLeft", NoteUserIsGesturing);
+        //DataStore.Subscribe("user:intent:isPushRight", NoteUserIsGesturing);
+        //DataStore.Subscribe("user:intent:isNevermind", NoteUserIsGesturing);
+        //DataStore.Subscribe("user:intent:isPosack", NoteUserIsGesturing);
+        //DataStore.Subscribe("user:intent:isWave", NoteUserIsGesturing);
+
+
+    }
+    void NoteUserIsGesturing(string key, DataStore.IValue value)
+    {
+        if ((value as DataStore.BoolValue).val)
+        {
+            // User's gesturing, better pay attention.
+
+            bsm.Apply();
+        }
+        else { bsm.ResetToNeutral(); }
+    }
+    void NoteUserIsEngaged(string key, DataStore.IValue value)
+    {
+        if ((value as DataStore.BoolValue).val)
+        {
+            for (int j = 0; j < 10; j++)
+            {
+                // User has just approached the table.  Smile to greet.
+                recoveryRate = 30;
+                maxStrength = 80;
+                currSmileStrength = Mathf.MoveTowards(currSmileStrength, maxStrength, recoveryRate);
+                for (int i = 0; i < renderers.Count; i++)
+                {
+                    renderers[i].SetBlendShapeWeight(smileLeftIndex[i], currSmileStrength);
+                    renderers[i].SetBlendShapeWeight(smileRightIndex[i], currSmileStrength);
+
+                }
+            }
+
+
+        }
+    }
     void Update()
     {
-        if (DataStore.GetValue("me:attending").ToString()== "user" && iteration < 5)
-        {
-            // User has just approached the table.  Smile to greet.
-            recoveryRate = 20;
-            maxStrength = 100;
-            currSmileStrength = Mathf.MoveTowards(currSmileStrength, maxStrength, recoveryRate);
-            for (int i = 0; i < renderers.Count; i++)
-            {
-                renderers[i].SetBlendShapeWeight(smileLeftIndex[i], currSmileStrength);
-                renderers[i].SetBlendShapeWeight(smileRightIndex[i], currSmileStrength);
+        DataStore.Subscribe("user:isPointing", NoteUserIsGesturing);
 
-            }
-            iteration += 1;
-
-        }
         //Get current dominantEmotion and its measurement score
 
-        string dominantEmotion = DataStore.GetStringValue("user:dominantEmotion:");
-        int score = DataStore.GetIntValue("user:dominantEmotion:" + dominantEmotion);
+        string dominantEmotion = DataStore.GetStringValue("user:dominantEmotion");
+        int score = DataStore.GetIntValue("user:Emotion" + dominantEmotion);
         switch (dominantEmotion)
         {
             case "Neutral":
-                recoveryRate = 10;
+                recoveryRate = 30;
                 maxStrength = 0;
                 currSmileStrength = Mathf.MoveTowards(currSmileStrength, maxStrength, recoveryRate * Time.deltaTime);
                 currFrownStrength = Mathf.MoveTowards(currFrownStrength, maxStrength, recoveryRate * Time.deltaTime);
@@ -102,7 +137,7 @@ public class FaceUpdate : MonoBehaviour
                 }
                 break;
             case "Happy":
-                recoveryRate = score / 5;
+                recoveryRate = score / 3;
                 maxStrength = 100;
                 currSmileStrength = Mathf.MoveTowards(currSmileStrength, maxStrength, recoveryRate * Time.deltaTime);
                 currFrownStrength = Mathf.MoveTowards(currFrownStrength, 0, recoveryRate * Time.deltaTime);
@@ -115,7 +150,7 @@ public class FaceUpdate : MonoBehaviour
                 }
                 break;
             case "Angry":
-                recoveryRate = score / 5;
+                recoveryRate = score / 3;
                 maxStrength = 100;
                 currFrownStrength = Mathf.MoveTowards(currFrownStrength, maxStrength, recoveryRate * Time.deltaTime);
                 currSmileStrength = Mathf.MoveTowards(currSmileStrength, 0, recoveryRate * Time.deltaTime);

@@ -18,7 +18,7 @@ public class WaveStateMachine : RuleStateMachine<WaveState>
         return userIsEngaged && (leftArmHelper.IsArmWaving() || rightArmHelper.IsArmWaving());
     }
 
-    protected override void Initialize()
+    public WaveStateMachine()
     {
         SetTransitionRule(WaveState.WaveStop, WaveState.WaveStart, new Rule(() => isWaving()));
         SetTransitionRule(WaveState.WaveStart, WaveState.WaveStop, new Rule(() => !isWaving()));
