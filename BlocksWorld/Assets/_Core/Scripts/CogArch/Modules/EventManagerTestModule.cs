@@ -1,18 +1,19 @@
 ﻿/*
 This script interfaces with the VoxSim event manager
 
-Reads:      I don't know yet
+Reads:      user:speech (StringValue)
 Writes:     me:intent:action (StringValue)
             me:intent:targetName (StringValue, name of object that is theme of action)
 */
+
 using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-using VoxSimPlatform.Core;
 using VoxSimPlatform.CogPhysics;
+using VoxSimPlatform.Core;
 using VoxSimPlatform.Global;
 using VoxSimPlatform.Pathfinding;
 
@@ -35,7 +36,6 @@ public class EventManagerTestModule : ModuleBase
     void Update()
     {
         string rightArmMotion = DataStore.GetStringValue("me:rightArm:motion");
-        Vector3 actualHandPosR = DataStore.GetVector3Value("me:actual:handPosR");
 
         if (objectMovePath != null)
         {
@@ -58,7 +58,8 @@ public class EventManagerTestModule : ModuleBase
         }
     }
 
-    public void GotPath(object sender, EventArgs e) {
+    public void GotPath(object sender, EventArgs e)
+    {
         objectMovePath = ((ComputedPathEventArgs)e).path;
         SetValue("me:intent:handPosR", objectMovePath.ElementAt(0) - holdOffset, string.Empty);
     }
