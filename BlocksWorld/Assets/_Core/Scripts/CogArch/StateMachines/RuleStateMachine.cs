@@ -116,7 +116,7 @@ public abstract class RuleStateMachine<T> where T: Enum
 	/// <summary>
 	/// Create a rule state machine with initial state set to the first value of the <see cref="T"/> enumeration
 	/// </summary>
-	public RuleStateMachine(): this(default)
+	protected RuleStateMachine(): this(default)
 	{
 	}
 
@@ -124,7 +124,7 @@ public abstract class RuleStateMachine<T> where T: Enum
 	/// Create a rule state machine with initial state set to the given value of the<see cref="T"/> enumeration 
 	/// </summary>
 	/// <param name="initialState">The state in which the state machine is initially in</param>
-	public RuleStateMachine(T initialState)
+	protected RuleStateMachine(T initialState)
 	{
 		transitions = new Dictionary<T, Dictionary<T, Rule>>();
 		// This won't invoke StateChanged event, since no event handlers are attached to the event
