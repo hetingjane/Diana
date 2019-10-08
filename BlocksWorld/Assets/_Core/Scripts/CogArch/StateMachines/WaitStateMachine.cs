@@ -6,7 +6,7 @@
 
 public class WaitStateMachine : RuleStateMachine<WaitState>
 {
-	protected override void Initialize()
+	public WaitStateMachine()
 	{
 		SetTransitionRule(WaitState.WaitStop, WaitState.WaitStart, new TimedRule(() =>
 		{

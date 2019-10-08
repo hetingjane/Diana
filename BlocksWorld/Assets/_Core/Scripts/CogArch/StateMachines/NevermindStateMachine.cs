@@ -6,7 +6,7 @@
 
 public class NevermindStateMachine : RuleStateMachine<NevermindState>
 {
-	protected override void Initialize()
+	public NevermindStateMachine()
 	{
 		SetTransitionRule(NevermindState.NevermindStop, NevermindState.NevermindStart, new TimedRule(() =>
 		{

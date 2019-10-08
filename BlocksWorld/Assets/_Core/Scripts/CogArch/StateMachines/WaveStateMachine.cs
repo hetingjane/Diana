@@ -13,7 +13,7 @@ public class WaveStateMachine : RuleStateMachine<WaveState>
 		return rightArmMotion == "ra wave" || leftArmMotion == "la wave";
 	}
 
-	protected override void Initialize()
+	public WaveStateMachine()
 	{
 		SetTransitionRule(WaveState.WaveStop, WaveState.WaveStart, new TimedRule(() =>
 		{

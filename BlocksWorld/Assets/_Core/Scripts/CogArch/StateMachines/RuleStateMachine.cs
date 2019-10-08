@@ -16,7 +16,7 @@ using System;
 /// 
 /// public class MyOwnStateMachine: RuleStateMachine{MyStates}
 /// {
-///		protected override void Initialize()
+///		public MyOwnStateMachine(): base()
 ///		{
 ///			SetTransitionRule(MyStates.Start, MyStates.Stop, Rule.True);
 ///			SetTransitionRule(MyStates.Stop, MyStates.Start, Rule.False);
@@ -127,9 +127,8 @@ public abstract class RuleStateMachine<T> where T: Enum
 	public RuleStateMachine(T initialState)
 	{
 		transitions = new Dictionary<T, Dictionary<T, Rule>>();
-		// Need to set this before Initialize() to avoid OnStateChanged event being invoked
+		// This won't invoke StateChanged event, since no event handlers are attached to the event
 		CurrentState = initialState;
-		Initialize();
 	}
 
 	/// <summary>
@@ -187,11 +186,4 @@ public abstract class RuleStateMachine<T> where T: Enum
 		}
 		return false;
 	}
-
-	/// <summary>
-	/// Override this in child classes to set up transitions using <see cref="SetTransitionRule(T, T, Rule)"/>
-	/// and to attach event handlers to <see cref="StateChanged"/> event. This method is called right after 
-	/// the constructor is called.
-	/// </summary>
-	protected abstract void Initialize();
 }

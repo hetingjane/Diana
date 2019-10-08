@@ -6,7 +6,7 @@
 
 public class NegackStateMachine : RuleStateMachine<NegackState>
 {
-	protected override void Initialize()
+	public NegackStateMachine()
 	{
 		SetTransitionRule(NegackState.NegackStop, NegackState.NegackStart, new TimedRule(() =>
 		{

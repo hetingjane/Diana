@@ -6,7 +6,7 @@
 
 public class PosackStateMachine : RuleStateMachine<PosackState>
 {
-	protected override void Initialize()
+	public PosackStateMachine()
 	{
 		SetTransitionRule(PosackState.PosackStop, PosackState.PosackStart, new TimedRule(() =>
 		{

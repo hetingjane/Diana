@@ -6,7 +6,7 @@
 
 public class ClawStateMachine : RuleStateMachine<ClawState>
 {
-	protected override void Initialize()
+	public ClawStateMachine()
 	{
 		SetTransitionRule(ClawState.ClawStop, ClawState.ClawStart, new TimedRule(() =>
 		{

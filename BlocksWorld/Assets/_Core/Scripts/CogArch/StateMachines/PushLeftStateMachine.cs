@@ -6,7 +6,7 @@
 
 public class PushLeftStateMachine : RuleStateMachine<PushLeftState>
 {
-	protected override void Initialize()
+	public PushLeftStateMachine()
 	{
 		SetTransitionRule(PushLeftState.PushLeftStop, PushLeftState.PushLeftStart, new TimedRule(() =>
 		{
