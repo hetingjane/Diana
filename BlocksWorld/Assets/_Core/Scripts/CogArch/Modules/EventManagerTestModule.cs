@@ -29,6 +29,9 @@ public class EventManagerTestModule : ModuleBase
     // Start is called before the first frame update
     void Start()
     {
+        base.Start();
+        DataStore.Subscribe("user:intent:event", PromptEvent);
+
         AStarSearch.ComputedPath += GotPath;
     }
 
@@ -56,6 +59,15 @@ public class EventManagerTestModule : ModuleBase
                 }
             }
         }
+    }
+
+    void PromptEvent(string key, DataStore.IValue value)
+    {
+        string eventStr = value.ToString().Trim();
+        if (string.IsNullOrEmpty(eventStr)) return;
+
+        eventManager.InsertEvent("", 0);
+        eventManager.InsertEvent(eventStr, 1);
     }
 
     public void GotPath(object sender, EventArgs e)

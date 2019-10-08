@@ -28,5 +28,7 @@ public class NLUModule : ModuleBase
 
         string parsed = communicationsBridge.NLParse(input);
         Debug.Log(string.Format("Diana's World: Heard you was talkin' \"{0}\".",parsed));
+
+        SetValue("user:intent:event", parsed, string.Empty);
     }
 }
