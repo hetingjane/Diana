@@ -11,11 +11,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 using VoxSimPlatform.CogPhysics;
 using VoxSimPlatform.Core;
 using VoxSimPlatform.Global;
 using VoxSimPlatform.Pathfinding;
+using VoxSimPlatform.Vox;
 
 public class EventManagerTestModule : ModuleBase
 {
@@ -33,6 +35,8 @@ public class EventManagerTestModule : ModuleBase
         DataStore.Subscribe("user:intent:event", PromptEvent);
 
         AStarSearch.ComputedPath += GotPath;
+
+        eventManager.NonexistentEntityError += NonexistentReferent;
     }
 
     // Update is called once per frame
@@ -74,6 +78,36 @@ public class EventManagerTestModule : ModuleBase
     {
         objectMovePath = ((ComputedPathEventArgs)e).path;
         SetValue("me:intent:handPosR", objectMovePath.ElementAt(0) - holdOffset, string.Empty);
+    }
+
+    public void NonexistentReferent(object sender, EventArgs e) {
+        Debug.Log(((EventReferentArgs) e).Referent is Pair<string, List<object>>);
+        if (((EventReferentArgs) e).Referent is Pair<string, List<object>>) {
+            // pair of predicate and object list 
+            // (present type - common type of object list, of absent attribute - predicate)
+            string pred = ((Pair<string, List<object>>) ((EventReferentArgs) e).Referent).Item1;
+            List<object> objs = ((Pair<string, List<object>>) ((EventReferentArgs) e).Referent).Item2;
+            Debug.Log(objs.Count);
+            if (objs.Count > 0) {
+                if (!objs.Any(o => (o == null) || (o.GetType() != typeof(GameObject)))) {
+                    // if all objects are game objects
+                    Debug.Log(string.Format("{0} {1} does not exist!", pred,
+                        (objs[0] as GameObject).GetComponent<Voxeme>().voxml.Lex.Pred));
+                    string responseStr = string.Format("There is no {0} {1} here.", pred,
+	                    (objs[0] as GameObject).GetComponent<Voxeme>().voxml.Lex.Pred);
+                    SetValue("me:speech:intent", responseStr, string.Empty);
+                }
+            }
+        }
+        else if (((EventReferentArgs) e).Referent is string) {
+            // absent object type - string
+            if (Regex.IsMatch(((EventReferentArgs) e).Referent as string, @"\{.\}")) {
+                return;
+            }
+
+            string responseStr = string.Format("There is no {0} here.", ((EventReferentArgs)e).Referent as string);
+            SetValue("me:speech:intent", responseStr, string.Empty);
+        }
     }
 
     public void GRASP(object[] args)
