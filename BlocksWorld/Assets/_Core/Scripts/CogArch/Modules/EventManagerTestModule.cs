@@ -1,7 +1,7 @@
 ﻿/*
 This script interfaces with the VoxSim event manager
 
-Reads:      user:speech (StringValue)
+Reads:      user:intent:event (StringValue)
 Writes:     me:intent:action (StringValue)
             me:intent:targetName (StringValue, name of object that is theme of action)
 */

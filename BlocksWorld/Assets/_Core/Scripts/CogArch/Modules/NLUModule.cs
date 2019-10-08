@@ -1,4 +1,12 @@
-﻿using UnityEngine;
+﻿/*
+This script parses natural language input into forms VoxSim can work with
+
+Reads:      user:speech (StringValue, transcribed speech)
+Writes:     user:intent:event (StringValue, predicate logic form used by VoxSim event manager)
+
+*/
+
+using UnityEngine;
 
 using VoxSimPlatform.Network;
 
