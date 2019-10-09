@@ -6,13 +6,13 @@ namespace Affdex
     /// <summary>
     /// Class that contains callback methods for asset results
     /// </summary>
-    public abstract class ImageResultsListener : ModuleBase
+    public interface ImageResultsListener
     { 
         /// <summary>
         /// Indicates image results are available.
         /// </summary>
         /// <param name="faces">The faces.</param>
-        public abstract void onImageResults(Dictionary<int, Face> faces);
+        void onImageResults(Dictionary<int, Face> faces);
 
         /// <summary>
         /// Indicates that the face detector has started tracking a new face.
@@ -23,7 +23,7 @@ namespace Affdex
         /// </summary>
         /// <param name="timestamp">Frame timestamp when new face was first observed.</param>
         /// <param name="faceId">Face identified.</param>
-        public abstract void onFaceFound(float timestamp, int faceId);
+        void onFaceFound(float timestamp, int faceId);
 
         /// <summary>
         /// Indicates that the face detector has stopped tracking a face.
@@ -34,6 +34,6 @@ namespace Affdex
         /// </summary>
         /// <param name="timestamp">Frame timestamp when previously observed face is no longer present.</param>
         /// <param name="faceId">Face identified.</param>
-        public abstract void onFaceLost(float timestamp, int faceId);
+        void onFaceLost(float timestamp, int faceId);
     }
 }

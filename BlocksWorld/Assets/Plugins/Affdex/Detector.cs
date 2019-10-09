@@ -41,7 +41,7 @@ namespace Affdex
             {
                 if (listener == null)
                 {
-                    listener = (ImageResultsListener)GameObject.FindObjectOfType(typeof(ImageResultsListener));
+                    listener = GetComponent<ImageResultsListener>();
 
                 }
 
@@ -115,7 +115,7 @@ namespace Affdex
             }
             lib = NativeMethods.LoadLibrary (filename);
             if (lib == IntPtr.Zero) {
-	            Debug.LogWarning("Failed to load native library!");
+                Debug.LogError ("Failed to load native library!");
                 return false;
             }
             return true;
@@ -308,14 +308,7 @@ namespace Affdex
             if (initialized)
                 yield break;
 
-            // Libraries are expected in Assets/Affdex/Plugins
-            String rootPath;
-            if (RuntimePlatform.OSXPlayer == Application.platform || RuntimePlatform.WindowsPlayer == Application.platform)
-                rootPath = Application.dataPath;
-            else
-                rootPath = Path.Combine(Application.dataPath, "_Core/Scripts/Perception/Affdex");
-
-            rootPath = Path.Combine(rootPath, "Plugins");
+            string rootPath = Path.Combine(Application.dataPath, "Plugins/Affdex");
 
             Debug.Log("Detector.Initialize: Starting affdex SDK using (" + Application.platform + ") Platform");
 
@@ -501,7 +494,7 @@ namespace Affdex
             IntPtr retVal = dlopen (fileName, RTLD_NOW);
             var errPtr = dlerror ();
             if (errPtr != IntPtr.Zero) {
-	            Debug.LogWarning(Marshal.PtrToStringAnsi (errPtr));
+                Debug.LogError (Marshal.PtrToStringAnsi (errPtr));
             }
             return retVal;
         }
