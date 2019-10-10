@@ -14389,7 +14389,7 @@ GameObject:
   - component: {fileID: 2045593223}
   - component: {fileID: 2045593224}
   m_Layer: 0
-  m_Name: EventManagerTestModule
+  m_Name: EventManagementModule
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -14418,7 +14418,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2045593222}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f65fce806bb39473db3e41509944381b, type: 3}
+  m_Script: {fileID: 11500000, guid: 504923e5be85f4cd581b2c2c6006886b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   comment: 

@@ -19,7 +19,7 @@ using VoxSimPlatform.Global;
 using VoxSimPlatform.Pathfinding;
 using VoxSimPlatform.Vox;
 
-public class EventManagerTestModule : ModuleBase
+public class EventManagementModule : ModuleBase
 {
     public EventManager eventManager;
 
