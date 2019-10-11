@@ -300,7 +300,7 @@ public class DialogueStateMachine : CharacterLogicAutomaton
             new PDAStackOperation(PDAStackOperation.PDAStackOperationType.None, null)));
 
         TransitionRelation.Add(new PDAInstruction(
-            States,
+            States.Except(new List<PDAState>(new PDAState[] {GetState("CleanUp"),GetState("EndState") })).ToList(),
             null,
             GenerateStackSymbolFromConditions(
                 (b) => b.IGetBoolValue("user:isEngaged", false) == false
