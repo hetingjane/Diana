@@ -5423,7 +5423,7 @@ MonoBehaviour:
   - keyboardKey: 53
     blackboardKey: user:intent:nevermind
   - keyboardKey: 54
-    blackboardKey: user:intent:wave
+    blackboardKey: user:intent:isWave
 --- !u!114 &799983260
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10233,6 +10233,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3cbf237ce12994861bf541b17a1ac2bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1463965744
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1463965736}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89cd9f69a293643b9890b7fb4bc3f16b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scenarioController: {fileID: 0}
 --- !u!1 &1475041667
 GameObject:
   m_ObjectHideFlags: 0
@@ -12833,6 +12846,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1831328033}
   - component: {fileID: 1831328034}
+  - component: {fileID: 1831328035}
   m_Layer: 0
   m_Name: DialogueInteractionModule
   m_TagString: Untagged
@@ -12868,6 +12882,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   comment: 
   display: {fileID: 0}
+  stateMachine: {fileID: 1463965744}
+--- !u!114 &1831328035
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1831328032}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ab6887d5598b48098363537d785af28, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1837520094
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,9 +1,11 @@
 ﻿using UnityEditor;
 using UnityEngine;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 
 using Object = System.Object;
 using VoxSimPlatform.Agent.CharacterLogic;
@@ -11,41 +13,14 @@ using VoxSimPlatform.Global;
 using VoxSimPlatform.Interaction;
 
 public class StackSymbolContent : IEquatable<Object> {
-    public object IndicatedObj { get; set; }
+    public object BlackboardState { get; set; }
 
-    public object GraspedObj { get; set; }
-
-    public object IndicatedRegion { get; set; }
-
-    public object ObjectOptions { get; set; }
-
-    public object ActionOptions { get; set; }
-
-    public object ActionSuggestions { get; set; }
-
-    public StackSymbolContent(object indicatedObj, object graspedObj, object indicatedRegion,
-        object objectOptions, object actionOptions, object actionSuggestions) {
-        this.IndicatedObj = indicatedObj;
-        this.GraspedObj = graspedObj;
-        this.IndicatedRegion = indicatedRegion;
-        this.ObjectOptions = objectOptions;
-        this.ActionOptions = actionOptions;
-        this.ActionSuggestions = actionSuggestions;
+    public StackSymbolContent(object blackboardState) {
+        this.BlackboardState = blackboardState;
     }
 
     public StackSymbolContent(StackSymbolContent clone) {
-        this.IndicatedObj = (GameObject) clone.IndicatedObj;
-        this.GraspedObj = (GameObject) clone.GraspedObj;
-        this.IndicatedRegion = (clone.IndicatedRegion != null) ? new Region((Region) clone.IndicatedRegion) : null;
-        this.ObjectOptions = (clone.ObjectOptions != null)
-            ? new List<GameObject>((List<GameObject>) clone.ObjectOptions)
-            : null;
-        this.ActionOptions = (clone.ActionOptions != null)
-            ? new List<string>((List<string>) clone.ActionOptions)
-            : null;
-        this.ActionSuggestions = (clone.ActionSuggestions != null)
-            ? new List<string>((List<string>) clone.ActionSuggestions)
-            : null;
+        this.BlackboardState = (DataStore) clone.BlackboardState;
     }
 
     public override bool Equals(object obj) {
@@ -54,19 +29,12 @@ public class StackSymbolContent : IEquatable<Object> {
         else {
             StackSymbolContent tuple = (StackSymbolContent) obj;
 
-            return (GameObject) IndicatedObj == (GameObject) tuple.IndicatedObj &&
-                   (GameObject) GraspedObj == (GameObject) tuple.GraspedObj &&
-                   GlobalHelper.RegionsEqual((Region) IndicatedRegion, (Region) tuple.IndicatedRegion) &&
-                   ((List<GameObject>) ObjectOptions).SequenceEqual((List<GameObject>) tuple.ObjectOptions) &&
-                   ((List<string>) ActionOptions).SequenceEqual((List<string>) tuple.ActionOptions) &&
-                   ((List<string>) ActionSuggestions).SequenceEqual((List<string>) tuple.ActionSuggestions);
+            return (DataStore) BlackboardState == (DataStore) tuple.BlackboardState;
         }
     }
 
     public override int GetHashCode() {
-        return IndicatedObj.GetHashCode() ^ GraspedObj.GetHashCode() ^
-               IndicatedRegion.GetHashCode() ^ ObjectOptions.GetHashCode() ^
-               ActionOptions.GetHashCode() ^ ActionSuggestions.GetHashCode();
+        return BlackboardState.GetHashCode();
     }
 
     public static bool operator == (StackSymbolContent tuple1, StackSymbolContent tuple2) {
@@ -79,30 +47,10 @@ public class StackSymbolContent : IEquatable<Object> {
 }
 
 public class StackSymbolConditions : IEquatable<Object> {
-    public Expression<Predicate<GameObject>> IndicatedObjCondition { get; set; }
+    public Expression<Predicate<DataStore>> BlackboardStateCondition { get; set; }
 
-    public Expression<Predicate<GameObject>> GraspedObjCondition { get; set; }
-
-    public Expression<Predicate<Region>> IndicatedRegionCondition { get; set; }
-
-    public Expression<Predicate<List<GameObject>>> ObjectOptionsCondition { get; set; }
-
-    public Expression<Predicate<List<string>>> ActionOptionsCondition { get; set; }
-
-    public Expression<Predicate<List<string>>> ActionSuggestionsCondition { get; set; }
-
-    public StackSymbolConditions(Expression<Predicate<GameObject>> indicatedObjCondition,
-        Expression<Predicate<GameObject>> graspedObjCondition,
-        Expression<Predicate<Region>> indicatedRegionCondition,
-        Expression<Predicate<List<GameObject>>> objectOptionsCondition,
-        Expression<Predicate<List<string>>> actionOptionsCondition,
-        Expression<Predicate<List<string>>> actionSuggestionsCondition) {
-        this.IndicatedObjCondition = indicatedObjCondition;
-        this.GraspedObjCondition = graspedObjCondition;
-        this.IndicatedRegionCondition = indicatedRegionCondition;
-        this.ObjectOptionsCondition = objectOptionsCondition;
-        this.ActionOptionsCondition = actionOptionsCondition;
-        this.ActionSuggestionsCondition = actionSuggestionsCondition;
+    public StackSymbolConditions(Expression<Predicate<DataStore>> blackboardStateCondition) {
+        this.BlackboardStateCondition = blackboardStateCondition;
     }
 
     public bool SatisfiedBy(object obj) {
@@ -111,18 +59,8 @@ public class StackSymbolConditions : IEquatable<Object> {
         else {
             StackSymbolContent tuple = (StackSymbolContent) obj;
 
-            return ((IndicatedObjCondition == null) ||
-                    (IndicatedObjCondition.Compile().Invoke((GameObject) tuple.IndicatedObj))) &&
-                   ((GraspedObjCondition == null) ||
-                    (GraspedObjCondition.Compile().Invoke((GameObject) tuple.GraspedObj))) &&
-                   ((IndicatedRegionCondition == null) ||
-                    (IndicatedRegionCondition.Compile().Invoke((Region) tuple.IndicatedRegion))) &&
-                   ((ObjectOptionsCondition == null) || (ObjectOptionsCondition.Compile()
-                        .Invoke((List<GameObject>) tuple.ObjectOptions))) &&
-                   ((ActionOptionsCondition == null) ||
-                    (ActionOptionsCondition.Compile().Invoke((List<string>) tuple.ActionOptions))) &&
-                   ((ActionSuggestionsCondition == null) || (ActionSuggestionsCondition.Compile()
-                        .Invoke((List<string>) tuple.ActionSuggestions)));
+            return ((BlackboardStateCondition == null) ||
+                    (BlackboardStateCondition.Compile().Invoke((DataStore) tuple.BlackboardState)));
         }
     }
 
@@ -134,95 +72,20 @@ public class StackSymbolConditions : IEquatable<Object> {
 
             bool equal = true;
 
-            if ((IndicatedObjCondition == null) && (tuple.IndicatedObjCondition == null)) {
+            if ((BlackboardStateCondition == null) && (tuple.BlackboardStateCondition == null)) {
                 equal &= true;
             }
-            else if ((IndicatedObjCondition == null) && (tuple.IndicatedObjCondition != null)) {
+            else if ((BlackboardStateCondition == null) && (tuple.BlackboardStateCondition != null)) {
                 equal &= false;
             }
-            else if ((IndicatedObjCondition != null) && (tuple.IndicatedObjCondition == null)) {
+            else if ((BlackboardStateCondition != null) && (tuple.BlackboardStateCondition == null)) {
                 equal &= false;
             }
             else {
                 // loath to do this but it should work for now
-                equal &= Convert.ToString(IndicatedObjCondition) ==
-                         Convert.ToString(tuple.IndicatedObjCondition);
+                equal &= Convert.ToString(BlackboardStateCondition) ==
+                         Convert.ToString(tuple.BlackboardStateCondition);
                 //equal &= Expression.Lambda<Func<bool>>(Expression.Equal(IndicatedObjCondition, tuple.IndicatedObjCondition)).Compile()();
-            }
-
-            if ((GraspedObjCondition == null) && (tuple.GraspedObjCondition == null)) {
-                equal &= true;
-            }
-            else if ((GraspedObjCondition == null) && (tuple.GraspedObjCondition != null)) {
-                equal &= false;
-            }
-            else if ((GraspedObjCondition != null) && (tuple.GraspedObjCondition == null)) {
-                equal &= false;
-            }
-            else {
-                equal &= Convert.ToString(GraspedObjCondition) ==
-                         Convert.ToString(tuple.GraspedObjCondition);
-                //equal &= Expression.Lambda<Func<bool>>(Expression.Equal(GraspedObjCondition, tuple.GraspedObjCondition)).Compile()();
-            }
-
-            if ((IndicatedRegionCondition == null) && (tuple.IndicatedRegionCondition == null)) {
-                equal &= true;
-            }
-            else if ((IndicatedRegionCondition == null) && (tuple.IndicatedRegionCondition != null)) {
-                equal &= false;
-            }
-            else if ((IndicatedRegionCondition != null) && (tuple.IndicatedRegionCondition == null)) {
-                equal &= false;
-            }
-            else {
-                equal &= Convert.ToString(IndicatedRegionCondition) ==
-                         Convert.ToString(tuple.IndicatedRegionCondition);
-                //                  equal &= Expression.Lambda<Func<bool>>(Expression.Equal(IndicatedRegionCondition, tuple.IndicatedRegionCondition)).Compile()();
-            }
-
-            if ((ObjectOptionsCondition == null) && (tuple.ObjectOptionsCondition == null)) {
-                equal &= true;
-            }
-            else if ((ObjectOptionsCondition == null) && (tuple.ObjectOptionsCondition != null)) {
-                equal &= false;
-            }
-            else if ((ObjectOptionsCondition != null) && (tuple.ObjectOptionsCondition == null)) {
-                equal &= false;
-            }
-            else {
-                equal &= Convert.ToString(ObjectOptionsCondition) ==
-                         Convert.ToString(tuple.ObjectOptionsCondition);
-                //                  equal &= Expression.Lambda<Func<bool>>(Expression.Equal(ObjectOptionsCondition, tuple.ObjectOptionsCondition)).Compile()();
-            }
-
-            if ((ActionOptionsCondition == null) && (tuple.ActionOptionsCondition == null)) {
-                equal &= true;
-            }
-            else if ((ActionOptionsCondition == null) && (tuple.ActionOptionsCondition != null)) {
-                equal &= false;
-            }
-            else if ((ActionOptionsCondition != null) && (tuple.ActionOptionsCondition == null)) {
-                equal &= false;
-            }
-            else {
-                equal &= Convert.ToString(ActionOptionsCondition) ==
-                         Convert.ToString(tuple.ActionOptionsCondition);
-                //                  equal &= Expression.Lambda<Func<bool>>(Expression.Equal(ActionOptionsCondition, tuple.ActionOptionsCondition)).Compile()();
-            }
-
-            if ((ActionSuggestionsCondition == null) && (tuple.ActionSuggestionsCondition == null)) {
-                equal &= true;
-            }
-            else if ((ActionSuggestionsCondition == null) && (tuple.ActionSuggestionsCondition != null)) {
-                equal &= false;
-            }
-            else if ((ActionSuggestionsCondition != null) && (tuple.ActionSuggestionsCondition == null)) {
-                equal &= false;
-            }
-            else {
-                equal &= Convert.ToString(ActionSuggestionsCondition) ==
-                         Convert.ToString(tuple.ActionSuggestionsCondition);
-                //                  equal &= Expression.Lambda<Func<bool>>(Expression.Equal(ActionSuggestionsCondition, tuple.ActionSuggestionsCondition)).Compile()();
             }
 
             Debug.Log(equal);
@@ -231,9 +94,7 @@ public class StackSymbolConditions : IEquatable<Object> {
     }
 
     public override int GetHashCode() {
-        return IndicatedObjCondition.GetHashCode() ^ GraspedObjCondition.GetHashCode() ^
-               IndicatedRegionCondition.GetHashCode() ^ ObjectOptionsCondition.GetHashCode() ^
-               ActionOptionsCondition.GetHashCode() ^ ActionSuggestionsCondition.GetHashCode();
+        return BlackboardStateCondition.GetHashCode();
     }
 
     public static bool operator ==(StackSymbolConditions tuple1, StackSymbolConditions tuple2) {
@@ -245,14 +106,46 @@ public class StackSymbolConditions : IEquatable<Object> {
     }
 }
 
+public class StateChangeEventArgs : EventArgs {
+    public PDAState State { get; set; }
+
+    public StateChangeEventArgs(PDAState state) {
+        this.State = state;
+    }
+}
+
 public class DialogueStateMachine : CharacterLogicAutomaton
 {
+    public DataStore BlackboardState {
+        get {
+            return GetCurrentStackSymbol() == null
+                ? null
+                : (DataStore) ((StackSymbolContent) GetCurrentStackSymbol().Content).BlackboardState;
+        }
+    }
+
     bool useOrderingHeuristics;
     bool humanRelativeDirections;
     bool waveToStart;
     bool useEpistemicModel;
 
-    public SingleAgentInteraction scenario;
+    public SingleAgentInteraction scenarioController;
+
+    public event EventHandler ChangeState;
+
+    public void OnChangeState(object sender, EventArgs e) {
+        if (ChangeState != null) {
+            ChangeState(this, e);
+        }
+    }
+
+    public object NullObject(object arg) {
+        return null;
+    }
+
+    public object GetBlackboardState(object arg) {
+        return BlackboardState;
+    }
 
 #if UNITY_EDITOR
     [CustomEditor(typeof(DialogueStateMachine))]
@@ -372,13 +265,160 @@ public class DialogueStateMachine : CharacterLogicAutomaton
     // Use this for initialization
     void Start()
     {
-        scenario = new SingleAgentInteraction();
+        base.Start();
+        
+        States.Add(new PDAState("StartState", null));
+        States.Add(new PDAState("BeginInteraction", null));
+        States.Add(new PDAState("Ready", null));
+        States.Add(new PDAState("ModularInteractionLoop", null));
+        States.Add(new PDAState("CleanUp", null));
+        States.Add(new PDAState("EndState", null));
+
+        TransitionRelation.Add(new PDAInstruction(
+            GetStates("StartState"),
+            null,
+            GenerateStackSymbolFromConditions(
+                (b) => b.IGetBoolValue("user:isEngaged", false) == true
+            ),
+            GetState("BeginInteraction"),
+            new PDAStackOperation(PDAStackOperation.PDAStackOperationType.None, null)));
+
+        TransitionRelation.Add(new PDAInstruction(
+            GetStates("BeginInteraction"),
+            null,
+            GenerateStackSymbolFromConditions(
+                (b) => b.IGetBoolValue("user:intent:isWave", false) == true
+            ),
+            GetState("Ready"),
+            new PDAStackOperation(PDAStackOperation.PDAStackOperationType.None, null)));
+
+        TransitionRelation.Add(new PDAInstruction(
+            GetStates("Ready"),
+            null,
+            GenerateStackSymbolFromConditions(null),
+            GetState("ModularInteractionLoop"),
+            new PDAStackOperation(PDAStackOperation.PDAStackOperationType.None, null)));
+
+        TransitionRelation.Add(new PDAInstruction(
+            States,
+            null,
+            GenerateStackSymbolFromConditions(
+                (b) => b.IGetBoolValue("user:isEngaged", false) == false
+            ),
+            GetState("CleanUp"),
+            new PDAStackOperation(PDAStackOperation.PDAStackOperationType.None, null)));
+
+        TransitionRelation.Add(new PDAInstruction(
+            GetStates("CleanUp"),
+            null,
+            GenerateStackSymbolFromConditions(null),
+            GetState("EndState"),
+            new PDAStackOperation(PDAStackOperation.PDAStackOperationType.Flush, GetState("EndState"))));
+
+        TransitionRelation.Add(new PDAInstruction(
+            GetStates("EndState"),
+            null,
+            GenerateStackSymbolFromConditions(
+                (b) => b.IGetBoolValue("user:isEngaged", true) == true
+            ),
+            GetState("StartState"),
+            new PDAStackOperation(PDAStackOperation.PDAStackOperationType.None, null)));
+
+        PerformStackOperation(new PDAStackOperation(PDAStackOperation.PDAStackOperationType.Push,
+            GenerateStackSymbol(DataStore.instance)));
+        MoveToState(GetState("StartState"));
     }
 
     // Update is called once per frame
     void Update()
     {
 
+    }
+
+    void MoveToState(PDAState state) {
+        Triple<PDASymbol, PDAState, PDASymbol> symbolStateTriple =
+            new Triple<PDASymbol, PDAState, PDASymbol>(GetLastInputSymbol(), state, GetCurrentStackSymbol());
+
+        if (CurrentState != null) {
+            if (TransitionRelation.Where(i => (i.FromStates.Contains(CurrentState)) && (i.ToState == state))
+                    .ToList().Count == 0) {
+                Debug.Log(string.Format("No transition arc between state {0} and state {1}.  Aborting.",
+                    CurrentState.Name, state.Name));
+                return;
+            }
+
+            if (state.Name == "BeginInteraction") {
+                //epistemicModel.state.InitiateEpisim();
+                StateTransitionHistory.Push(symbolStateTriple);
+                ContextualMemory.Push(symbolStateTriple);
+            }
+            else {
+                StateTransitionHistory.Push(symbolStateTriple);
+                ContextualMemory.Push(symbolStateTriple);
+            }
+        }
+        else {
+            StateTransitionHistory.Push(symbolStateTriple);
+            ContextualMemory.Push(symbolStateTriple);
+        }
+
+        CurrentState = state;
+        OnChangeState(this, new StateChangeEventArgs(CurrentState));
+
+        //if ((repeatAfterWait) && (repeatTimerTime > 0)) {
+        //    repeatTimer.Interval = repeatTimerTime;
+        //    repeatTimer.Enabled = true;
+        //}
+
+        Debug.Log(string.Format("Entering state: {0}.  Stack symbol: {1}", CurrentState.Name,
+            StackSymbolToString(GetCurrentStackSymbol())));
+    }
+
+    public PDASymbol GenerateStackSymbol(object blackboardState,
+        bool overwriteCurrentSymbol = false, string name = "New Stack Symbol") {
+
+        StackSymbolContent symbolContent =
+            new StackSymbolContent(
+                blackboardState == null
+                    ? (DataStore) GetBlackboardState(null)
+                    : blackboardState.GetType() == typeof(DelegateFactory)
+                        ? ((DelegateFactory) blackboardState).Function
+                        : blackboardState.GetType() == typeof(FunctionDelegate)
+                            ? (DataStore) ((FunctionDelegate) blackboardState).Invoke(null)
+                            : (DataStore) blackboardState);
+
+        PDASymbol symbol = new PDASymbol(symbolContent);
+
+        return symbol;
+    }
+
+    public PDASymbol GenerateStackSymbol(StackSymbolContent content, string name = "New Stack Symbol") {
+        StackSymbolContent symbolContent =
+            new StackSymbolContent(
+                content.BlackboardState == null
+                    ? (DataStore) GetBlackboardState(null)
+                    : content.BlackboardState.GetType() == typeof(DelegateFactory)
+                        ? ((DelegateFactory) content.BlackboardState).Function
+                        : content.BlackboardState.GetType() == typeof(FunctionDelegate)
+                            ? (DataStore) ((FunctionDelegate) content.BlackboardState).Invoke(null)
+                            : (DataStore) content.BlackboardState);
+
+        PDASymbol symbol = new PDASymbol(symbolContent);
+
+        return symbol;
+    }
+        
+    public PDASymbol GenerateStackSymbolFromConditions(
+        Expression<Predicate<DataStore>> blackboardStateCondition,
+        string name = "New Stack Symbol") {
+        StackSymbolConditions symbolConditions =
+            new StackSymbolConditions(null);
+
+        symbolConditions.BlackboardStateCondition = blackboardStateCondition;
+
+        PDASymbol symbol = new PDASymbol(symbolConditions);
+
+        return symbol;
     }
 
     public string StackSymbolToString(object stackSymbol) {
@@ -394,64 +434,20 @@ public class DialogueStateMachine : CharacterLogicAutomaton
             else if (symbol.Content.GetType() == typeof(StackSymbolContent)) {
                 StackSymbolContent content = (StackSymbolContent) symbol.Content;
 
-                return string.Format("[{0},{1},{2},{3},{4},{5}]",
-                    content.IndicatedObj == null
+                return string.Format("[{0}]",
+                    content.BlackboardState == null
                         ? "Null"
-                        : content.IndicatedObj.GetType() == typeof(FunctionDelegate)
-                            ? ((FunctionDelegate) content.IndicatedObj).ToString()
-                            : Convert.ToString(((GameObject) content.IndicatedObj).name),
-                    content.GraspedObj == null
-                        ? "Null"
-                        : content.GraspedObj.GetType() == typeof(FunctionDelegate)
-                            ? ((FunctionDelegate) content.GraspedObj).ToString()
-                            : Convert.ToString(((GameObject) content.GraspedObj).name),
-                    content.IndicatedRegion == null
-                        ? "Null"
-                        : content.IndicatedRegion.GetType() == typeof(FunctionDelegate)
-                            ? ((FunctionDelegate) content.IndicatedRegion).ToString()
-                            : GlobalHelper.RegionToString((Region) content.IndicatedRegion),
-                    content.ObjectOptions == null
-                        ? "Null"
-                        : content.ObjectOptions.GetType() == typeof(FunctionDelegate)
-                            ? ((FunctionDelegate) content.ObjectOptions).ToString()
-                            : string.Format("[{0}]",
-                                String.Join(", ",
-                                    ((List<GameObject>) content.ObjectOptions).Select(o => o.name).ToArray())),
-                    content.ActionOptions == null
-                        ? "Null"
-                        : content.ActionOptions.GetType() == typeof(FunctionDelegate)
-                            ? ((FunctionDelegate) content.ActionOptions).ToString()
-                            : string.Format("[{0}]",
-                                String.Join(", ", ((List<string>) content.ActionOptions).ToArray())),
-                    content.ActionSuggestions == null
-                        ? "Null"
-                        : content.ActionSuggestions.GetType() == typeof(FunctionDelegate)
-                            ? ((FunctionDelegate) content.ActionSuggestions).ToString()
-                            : string.Format("[{0}]",
-                                String.Join(", ", ((List<string>) content.ActionSuggestions).ToArray())));
+                        : content.BlackboardState.ToString()
+                    );
             }
             else if (symbol.Content.GetType() == typeof(StackSymbolConditions)) {
                 StackSymbolConditions content = (StackSymbolConditions) symbol.Content;
 
-                return string.Format("[{0},{1},{2},{3},{4},{5}]",
-                    content.IndicatedObjCondition == null
+                return string.Format("[{0}]",
+                    content.BlackboardStateCondition == null
                         ? "Null"
-                        : Convert.ToString(content.IndicatedObjCondition),
-                    content.GraspedObjCondition == null
-                        ? "Null"
-                        : Convert.ToString(content.GraspedObjCondition),
-                    content.IndicatedRegionCondition == null
-                        ? "Null"
-                        : Convert.ToString(content.IndicatedRegionCondition),
-                    content.ObjectOptionsCondition == null
-                        ? "Null"
-                        : Convert.ToString(content.ObjectOptionsCondition),
-                    content.ActionOptionsCondition == null
-                        ? "Null"
-                        : Convert.ToString(content.ActionOptionsCondition),
-                    content.ActionSuggestionsCondition == null
-                        ? "Null"
-                        : Convert.ToString(content.ActionSuggestionsCondition));
+                        : content.BlackboardStateCondition.ToString()
+                    );
             }
             else if (symbol.Content.GetType() == typeof(PDAState)) {
                 return ((PDAState) symbol.Content).Name;
@@ -460,45 +456,346 @@ public class DialogueStateMachine : CharacterLogicAutomaton
         else if (stackSymbol.GetType() == typeof(StackSymbolContent)) {
             StackSymbolContent content = (StackSymbolContent) stackSymbol;
 
-            return string.Format("[{0},{1},{2},{3},{4},{5}]",
-                content.IndicatedObj == null
-                    ? "Null"
-                    : content.IndicatedObj.GetType() == typeof(FunctionDelegate)
-                        ? ((FunctionDelegate) content.IndicatedObj).ToString()
-                        : Convert.ToString(((GameObject) content.IndicatedObj).name),
-                content.GraspedObj == null
-                    ? "Null"
-                    : content.GraspedObj.GetType() == typeof(FunctionDelegate)
-                        ? ((FunctionDelegate) content.GraspedObj).ToString()
-                        : Convert.ToString(((GameObject) content.GraspedObj).name),
-                content.IndicatedRegion == null
-                    ? "Null"
-                    : content.IndicatedRegion.GetType() == typeof(FunctionDelegate)
-                        ? ((FunctionDelegate) content.IndicatedRegion).ToString()
-                        : GlobalHelper.RegionToString((Region) content.IndicatedRegion),
-                content.ObjectOptions == null
-                    ? "Null"
-                    : content.ObjectOptions.GetType() == typeof(FunctionDelegate)
-                        ? ((FunctionDelegate) content.ObjectOptions).ToString()
-                        : string.Format("[{0}]",
-                            String.Join(", ",
-                                ((List<GameObject>) content.ObjectOptions).Select(o => o.name).ToArray())),
-                content.ActionOptions == null
-                    ? "Null"
-                    : content.ActionOptions.GetType() == typeof(FunctionDelegate)
-                        ? ((FunctionDelegate) content.ActionOptions).ToString()
-                        : string.Format("[{0}]", String.Join(", ", ((List<string>) content.ActionOptions).ToArray())),
-                content.ActionSuggestions == null
-                    ? "Null"
-                    : content.ActionSuggestions.GetType() == typeof(FunctionDelegate)
-                        ? ((FunctionDelegate) content.ActionSuggestions).ToString()
-                        : string.Format("[{0}]",
-                            String.Join(", ", ((List<string>) content.ActionSuggestions).ToArray())));
+            return string.Format("[{0}]",
+                    content.BlackboardState == null
+                        ? "Null"
+                        : content.BlackboardState.ToString()
+                    );
         }
         else if (stackSymbol.GetType() == typeof(FunctionDelegate)) {
             return string.Format(":{0}", ((FunctionDelegate) stackSymbol).Method.Name);
         }
 
         return string.Empty;
+    }
+
+    void PerformStackOperation(PDAStackOperation operation) {
+        switch (operation.Type) {
+            case PDAStackOperation.PDAStackOperationType.None:
+                break;
+
+            case PDAStackOperation.PDAStackOperationType.Pop:
+                if ((operation.Content == null) || (operation.Content.GetType() != typeof(PDAState))) {
+                    Stack.Pop();
+                    ContextualMemory.Pop();
+                }
+                else {
+                    PDASymbol popUntilSymbol = ContextualMemory.First().Item3;
+                    foreach (Triple<PDASymbol, PDAState, PDASymbol> symbolStateTriple in ContextualMemory.ToList()
+                        .GetRange(1, ContextualMemory.Count - 2)) {
+                        Debug.Log(string.Format("{0} {1}", symbolStateTriple.Item3.Name,
+                            StackSymbolToString(symbolStateTriple.Item3)));
+                        if ((symbolStateTriple.Item2 == (PDAState) operation.Content) &&
+                            (symbolStateTriple.Item3 != GetCurrentStackSymbol())) {
+                            // if state == operation content && stack symbol != current stack symbol
+                            popUntilSymbol = symbolStateTriple.Item3;
+                            break;
+                        }
+                    }
+
+                    Debug.Log(string.Format(StackSymbolToString(popUntilSymbol)));
+                    while (Stack.Count > 1 &&
+                           !((StackSymbolContent) GetCurrentStackSymbol().Content).Equals(
+                               (StackSymbolContent) popUntilSymbol.Content)) {
+                        Debug.Log(string.Format("Popping {0} until {1}",
+                            StackSymbolToString(GetCurrentStackSymbol()), StackSymbolToString(popUntilSymbol)));
+                        Stack.Pop();
+                        ContextualMemory.Pop();
+                    }
+                }
+
+                break;
+
+            case PDAStackOperation.PDAStackOperationType.Push:
+                if (operation.Content.GetType() == typeof(FunctionDelegate)) {
+                    object content = ((FunctionDelegate) operation.Content).Invoke(null);
+                    Debug.Log(content.GetType());
+                    foreach (PDASymbol symbol in (List<PDASymbol>) content) {
+                        Debug.Log(StackSymbolToString((PDASymbol) symbol));
+                    }
+
+                    if (content.GetType() == typeof(PDASymbol)) {
+                        // When we push a new Stack symbol we should clone the CurrentStackSymbol and check the conditions below to adjust the values
+                        //PDASymbol pushSymbol = (PDASymbol)content;
+
+                        Stack.Push(GenerateStackSymbol((StackSymbolContent) ((PDASymbol) content).Content));
+                    }
+                    else if ((content is IList) && (content.GetType().IsGenericType) &&
+                             (content.GetType().IsAssignableFrom(typeof(List<PDASymbol>)))) {
+                        foreach (PDASymbol symbol in (List<PDASymbol>) content) {
+                            //Debug.Log (((StackSymbolContent)symbol.Content).IndicatedObj);
+                            Stack.Push(GenerateStackSymbol((StackSymbolContent) ((PDASymbol) symbol).Content));
+                        }
+                    }
+                }
+                else if (operation.Content.GetType() == typeof(PDASymbol)) {
+                    Stack.Push(GenerateStackSymbol((StackSymbolContent) ((PDASymbol) operation.Content).Content));
+                }
+                else if ((operation.Content is IList) && (operation.Content.GetType().IsGenericType) &&
+                         (operation.Content.GetType().IsAssignableFrom(typeof(List<PDASymbol>)))) {
+                    foreach (PDASymbol symbol in (List<PDASymbol>) operation.Content) {
+                        Stack.Push(GenerateStackSymbol((StackSymbolContent) ((PDASymbol) symbol).Content));
+                    }
+                }
+                else if (operation.Content.GetType() == typeof(StackSymbolContent)) {
+                    Stack.Push(GenerateStackSymbol((StackSymbolContent) operation.Content));
+                }
+                else if ((operation.Content is IList) && (operation.Content.GetType().IsGenericType) &&
+                         (operation.Content.GetType().IsAssignableFrom(typeof(List<StackSymbolContent>)))) {
+                    foreach (StackSymbolContent symbol in (List<StackSymbolContent>) operation.Content) {
+                        Stack.Push(GenerateStackSymbol((StackSymbolContent) symbol));
+                    }
+                }
+
+                break;
+
+            case PDAStackOperation.PDAStackOperationType.Rewrite:
+                RewriteStack(new PDAStackOperation(PDAStackOperation.PDAStackOperationType.Rewrite, null));
+                break;
+
+            case PDAStackOperation.PDAStackOperationType.Flush:
+                if (operation.Content != null) {
+                    if (operation.Content.GetType() == typeof(StackSymbolContent)) {
+                        Stack.Clear();
+                        Stack.Push(GenerateStackSymbol((StackSymbolContent) operation.Content));
+                        //ContextualMemory.Clear ();
+                        //ContextualMemory.Push(
+                        //new Triple<PDASymbol,PDAState,PDASymbol>(GetLastInputSymbol(),CurrentState,
+                        //GenerateStackSymbol((StackSymbolContent)operation.Content)));
+                    }
+                    else if (operation.Content.GetType() == typeof(PDAState)) {
+                        if (((PDAState) operation.Content) == GetState("EndState")) {
+                            Stack.Clear();
+                            Stack.Push(GenerateStackSymbol(null));
+                            ContextualMemory.Clear();
+                            ContextualMemory.Push(new Triple<PDASymbol, PDAState, PDASymbol>(null,
+                                GetState("StartState"),
+                                GenerateStackSymbol(null)));
+                            //GenerateStackSymbol((StackSymbolContent)operation.Content)));
+                        }
+                    }
+                }
+
+                break;
+
+            default:
+                break;
+        }
+
+	    //Debug.Log(string.Format("PerformStackOperation: {0} result {1}", operation.Type,
+	    //    StackSymbolToString(GetCurrentStackSymbol())));
+    }
+
+    List<PDAInstruction> GetApplicableInstructions(PDAState fromState, PDASymbol inputSymbol, object stackSymbol) {
+	    //Debug.Log(fromState.Name);
+	    //Debug.Log(inputSymbol == null ? "Null" : inputSymbol.Name);
+	    //Debug.Log(string.Format("Stack symbol: {0}", StackSymbolToString(stackSymbol)));
+        //foreach (PDASymbol element in Stack) {
+        //    Debug.Log(StackSymbolToString(element));
+        //}
+
+        List<PDAInstruction> instructions = TransitionRelation.Where(i =>
+            (i.FromStates == null && fromState == null) ||
+            (i.FromStates != null && i.FromStates.Contains(fromState))).ToList();
+        instructions = instructions.Where(i =>
+            (i.InputSymbols == null && inputSymbol == null) ||
+            (i.InputSymbols != null && i.InputSymbols.Contains(inputSymbol))).ToList();
+
+	    //Debug.Log(string.Format("{0} instructions from {1} with {2}", instructions.Count, fromState.Name,
+	    //    inputSymbol == null ? "Null" : inputSymbol.Name));
+
+        //foreach (PDAInstruction inst in instructions) {
+        //    Debug.Log(string.Format("{0},{1},{2},{3},{4}",
+        //        (inst.FromStates == null)
+        //            ? "Null"
+        //            : string.Format("[{0}]",
+        //                String.Join(", ", ((List<PDAState>) inst.FromStates).Select(s => s.Name).ToArray())),
+        //        (inst.InputSymbols == null)
+        //            ? "Null"
+        //            : string.Format("[{0}]",
+        //                String.Join(", ",
+        //                    ((List<PDASymbol>) inst.InputSymbols).Select(s => s.Content.ToString()).ToArray())),
+        //        StackSymbolToString(inst.StackSymbol),
+        //        inst.ToState.Name,
+        //        string.Format("[{0},{1}]",
+        //            inst.StackOperation.Type.ToString(),
+        //            (inst.StackOperation.Content == null)
+        //                ? "Null"
+        //                : (inst.StackOperation.Content.GetType() == typeof(StackSymbolContent))
+        //                    ? StackSymbolToString(inst.StackOperation.Content)
+        //                    : (inst.StackOperation.Content.GetType() == typeof(PDAState))
+        //                        ? ((PDAState) inst.StackOperation.Content).Name
+        //                        : string.Empty)));
+        //}
+
+        //Debug.Log(string.Format("{0} instructions before symbol + gate filtering", instructions.Count));
+        //Debug.Log(stackSymbol.GetType());
+
+        if (stackSymbol.GetType() == typeof(StackSymbolContent)) {
+            //instructions = instructions.Where (i => (i.StackSymbol.Content.GetType() == typeof(StackSymbolContent))).ToList();
+            //Debug.Log (instructions.Count);
+            instructions = instructions.Where(i =>
+                    ((i.StackSymbol.Content.GetType() == typeof(StackSymbolContent)) &&
+                     (i.StackSymbol.Content as StackSymbolContent) == (stackSymbol as StackSymbolContent)) ||
+                    ((i.StackSymbol.Content.GetType() == typeof(StackSymbolConditions)) &&
+                     (i.StackSymbol.Content as StackSymbolConditions).SatisfiedBy(stackSymbol as StackSymbolContent)
+                    ))
+                .ToList();
+        }
+
+        instructions = instructions.Where(i => !(instructions.Where(j => ((j.ToState.Content != null) &&
+                                                                          (j.ToState.Content.GetType() ==
+                                                                           typeof(TransitionGate)))).Select(j =>
+            ((TransitionGate) j.ToState.Content).RejectState).ToList()).Contains(i.ToState)).ToList();
+        //          else if (stackSymbol.GetType () == typeof(StackSymbolConditions)) {
+        //              instructions = instructions.Where (i => (i.StackSymbol.Content.GetType() == typeof(StackSymbolConditions))).ToList();
+        //              instructions = instructions.Where (i => ((i.StackSymbol.Content as StackSymbolConditions) == (stackSymbol as StackSymbolConditions))).ToList();
+        //          }
+
+        //          Debug.Log (instructions.Count);
+
+        //Debug.Log(string.Format("{0} instructions after symbol + gate filtering", instructions.Count));
+
+        return instructions;
+    }
+
+    public void RewriteStack(PDAStackOperation operation) {
+        if (operation.Type != PDAStackOperation.PDAStackOperationType.Rewrite) {
+            return;
+        }
+        else {
+            if (operation.Content != null) {
+	            PDASymbol symbol = Stack.Pop();
+	            //Debug.Log(string.Format("Popped symbol {0}", StackSymbolToString(symbol)));
+                //Stack.Push ((PDASymbol)operation.Content);
+
+                // if the symbol you just popped has a null parameter
+                //  and the operation content has the same null parameter
+                //  but the new stack symbol (before the rewrite -> push) does not have a null parameter there
+                if (GetCurrentStackSymbol() != null) {
+                    if (operation.Content.GetType() == typeof(PDASymbol)) {
+                        if ((((StackSymbolContent) symbol.Content).BlackboardState == null) &&
+                            (((StackSymbolContent) ((PDASymbol) operation.Content).Content).BlackboardState == null) &&
+                            (((StackSymbolContent) GetCurrentStackSymbol().Content).BlackboardState != null)) {
+                            ((StackSymbolContent) ((PDASymbol) operation.Content).Content).BlackboardState =
+                                new FunctionDelegate(NullObject);
+                        }
+                    }
+                    else if ((operation.Content is IList) && (operation.Content.GetType().IsGenericType) &&
+                             (operation.Content.GetType().IsAssignableFrom(typeof(List<StackSymbolContent>)))) {
+                        if ((((StackSymbolContent) symbol.Content).BlackboardState == null) &&
+                            (((List<StackSymbolContent>) operation.Content)[0].BlackboardState == null) &&
+                            (((StackSymbolContent) GetCurrentStackSymbol().Content).BlackboardState != null)) {
+                            ((List<StackSymbolContent>) operation.Content)[0].BlackboardState =
+                                new FunctionDelegate(NullObject);
+                        }
+                    }
+                }
+
+                PerformStackOperation(new PDAStackOperation(PDAStackOperation.PDAStackOperationType.Push,
+                    operation.Content));
+            }
+
+	        //Debug.Log(string.Format("RewriteStack: {0} result {1}", operation.Type,
+	        //    StackSymbolToString(GetCurrentStackSymbol())));
+
+            // handle state transitions on stack rewrite
+
+            List<PDAInstruction> instructions = GetApplicableInstructions(CurrentState, null,
+                GetCurrentStackSymbol().Content);
+
+            PDAInstruction instruction = null;
+
+            if (instructions.Count > 1) {
+                Debug.Log(string.Format("Multiple instruction condition ({0}).  Aborting.", instructions.Count));
+                foreach (PDAInstruction inst in instructions) {
+                    Debug.Log(string.Format("{0},{1},{2},{3},{4}",
+                        (inst.FromStates == null)
+                            ? "Null"
+                            : string.Format("[{0}]",
+                                String.Join(", ",
+                                    ((List<PDAState>) inst.FromStates).Select(s => s.Name).ToArray())),
+                        (inst.InputSymbols == null)
+                            ? "Null"
+                            : string.Format("[{0}]",
+                                String.Join(", ",
+                                    ((List<PDASymbol>) inst.InputSymbols).Select(s => s.Content.ToString())
+                                    .ToArray())),
+                        StackSymbolToString(inst.StackSymbol),
+                        inst.ToState.Name,
+                        string.Format("[{0},{1}]",
+                            inst.StackOperation.Type.ToString(),
+                            (inst.StackOperation.Content == null)
+                                ? "Null"
+                                : (inst.StackOperation.Content.GetType() == typeof(StackSymbolContent))
+                                    ? StackSymbolToString(inst.StackOperation.Content)
+                                    : (inst.StackOperation.Content.GetType() == typeof(PDAState))
+                                        ? ((PDAState) inst.StackOperation.Content).Name
+                                        : (inst.StackOperation.Content.GetType() == typeof(FunctionDelegate))
+                                            ? ((FunctionDelegate) inst.StackOperation.Content).Method.Name
+                                            : string.Empty)));
+                }
+
+                return;
+            }
+            else if (instructions.Count == 1) {
+                instruction = instructions[0];
+                Debug.Log(string.Format("{0},{1},{2},{3},{4}",
+                    (instruction.FromStates == null)
+                        ? "Null"
+                        : string.Format("[{0}]",
+                            String.Join(", ",
+                                ((List<PDAState>) instruction.FromStates).Select(s => s.Name).ToArray())),
+                    (instruction.InputSymbols == null)
+                        ? "Null"
+                        : string.Format("[{0}]",
+                            String.Join(", ",
+                                ((List<PDASymbol>) instruction.InputSymbols).Select(s => s.Content.ToString())
+                                .ToArray())),
+                    StackSymbolToString(instruction.StackSymbol),
+                    instruction.ToState.Name,
+                    string.Format("[{0},{1}]",
+                        instruction.StackOperation.Type.ToString(),
+                        (instruction.StackOperation.Content == null)
+                            ? "Null"
+                            : (instruction.StackOperation.Content.GetType() == typeof(StackSymbolContent))
+                                ? StackSymbolToString(instruction.StackOperation.Content)
+                                : (instruction.StackOperation.Content.GetType() == typeof(PDAState))
+                                    ? ((PDAState) instruction.StackOperation.Content).Name
+                                    : (instruction.StackOperation.Content.GetType() == typeof(FunctionDelegate))
+                                        ? ((FunctionDelegate) instruction.StackOperation.Content).Method.Name
+                                        : string.Empty)));
+            }
+            //else if (instructions.Count < 1) {
+            //    Debug.Log("Zero instruction condition.  Aborting.");
+            //    return;
+            //}
+
+            if (instruction != null) {
+                MoveToState(instruction.ToState);
+                PerformStackOperation(instruction.StackOperation);
+                ExecuteStateContent();
+            }
+        }
+    }
+
+    void ExecuteStateContent(object tempMessage = null) {
+	    //Debug.Log(scenarioController);
+	    //Debug.Log(scenarioController.GetType());
+	    //Debug.Log(CurrentState.Name);
+	    //Debug.Log(scenarioController.GetType().GetMethod(CurrentState.Name));
+	    DialogueInteractionModule dialogueModule = scenarioController.gameObject.GetComponent<DialogueInteractionModule>();
+	    MethodInfo methodToCall = dialogueModule.GetType().GetMethod(CurrentState.Name);
+        List<object> contentMessages = new List<object>();
+
+        contentMessages.Add(tempMessage);
+
+        if (methodToCall != null) {
+            Debug.Log("MoveToState: invoke " + methodToCall.Name);
+	        object obj = methodToCall.Invoke(dialogueModule, new object[] {contentMessages.ToArray()});
+        }
+        else {
+            Debug.Log(string.Format("No method of name {0} on object {1}", CurrentState.Name, scenarioController));
+        }
     }
 }
