@@ -67,11 +67,14 @@ public class EventManagementModule : ModuleBase
 
     void PromptEvent(string key, DataStore.IValue value)
     {
-        string eventStr = value.ToString().Trim();
-        if (string.IsNullOrEmpty(eventStr)) return;
+        if (DataStore.GetBoolValue("user:isInteracting"))
+        {
+            string eventStr = value.ToString().Trim();
+            if (string.IsNullOrEmpty(eventStr)) return;
 
-        eventManager.InsertEvent("", 0);
-        eventManager.InsertEvent(eventStr, 1);
+            eventManager.InsertEvent("", 0);
+            eventManager.InsertEvent(eventStr, 1);
+        }
     }
 
     public void GotPath(object sender, EventArgs e)
