@@ -98,8 +98,8 @@ public class FaceUpdate : MonoBehaviour
             for (int j = 0; j < 10; j++)
             {
                 // User has just approached the table.  Smile to greet.
-                recoveryRate = 20;
-                maxStrength = 80;
+                recoveryRate = 25;
+                maxStrength = 130;
                 currSmileStrength = Mathf.MoveTowards(currSmileStrength, maxStrength, recoveryRate);
                 for (int i = 0; i < renderers.Count; i++)
                 {
