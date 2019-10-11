@@ -98,7 +98,7 @@ public class FaceUpdate : MonoBehaviour
             for (int j = 0; j < 10; j++)
             {
                 // User has just approached the table.  Smile to greet.
-                recoveryRate = 30;
+                recoveryRate = 20;
                 maxStrength = 80;
                 currSmileStrength = Mathf.MoveTowards(currSmileStrength, maxStrength, recoveryRate);
                 for (int i = 0; i < renderers.Count; i++)
@@ -114,7 +114,7 @@ public class FaceUpdate : MonoBehaviour
     }
     void Update()
     {
-        DataStore.Subscribe("user:isPointing", NoteUserIsGesturing);
+        DataStore.Subscribe("user:pointValid", NoteUserIsGesturing);
 
         //Get current dominantEmotion and its measurement score
 
@@ -123,9 +123,9 @@ public class FaceUpdate : MonoBehaviour
         switch (dominantEmotion)
         {
             case "Neutral":
-                recoveryRate = 30;
+                recoveryRate = 20;
                 maxStrength = 0;
-                currSmileStrength = Mathf.MoveTowards(currSmileStrength, maxStrength, recoveryRate * Time.deltaTime);
+                currSmileStrength = Mathf.MoveTowards(currSmileStrength, maxStrength+30, recoveryRate * Time.deltaTime);
                 currFrownStrength = Mathf.MoveTowards(currFrownStrength, maxStrength, recoveryRate * Time.deltaTime);
                 for (int i = 0; i < renderers.Count; i++)
                 {
