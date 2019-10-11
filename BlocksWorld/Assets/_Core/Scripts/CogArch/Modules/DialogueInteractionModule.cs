@@ -46,4 +46,8 @@ public class DialogueInteractionModule : ModuleBase
     public void Ready(object content) {
         SetValue("me:speech:intent", "I'm ready to go.", string.Empty);
     }
+
+    public void CleanUp(object content) {
+        SetValue("me:speech:intent", "Bye!", string.Empty);
+    }
 }

@@ -300,7 +300,8 @@ public class DialogueStateMachine : CharacterLogicAutomaton
             new PDAStackOperation(PDAStackOperation.PDAStackOperationType.None, null)));
 
         TransitionRelation.Add(new PDAInstruction(
-            States.Except(new List<PDAState>(new PDAState[] {GetState("CleanUp"),GetState("EndState") })).ToList(),
+            States.Except(new List<PDAState>(new PDAState[] { 
+                GetState("StartState"), GetState("CleanUp"), GetState("EndState") })).ToList(),
             null,
             GenerateStackSymbolFromConditions(
                 (b) => b.IGetBoolValue("user:isEngaged", false) == false
@@ -362,6 +363,11 @@ public class DialogueStateMachine : CharacterLogicAutomaton
             ContextualMemory.Push(symbolStateTriple);
         }
 
+	    Debug.Log(string.Format("Entering state {0} from state {1}.  Stack symbol: {2}",
+		    state == null ? "Null" : state.Name,
+		    CurrentState == null ? "Null" : CurrentState.Name,
+		    StackSymbolToString(GetCurrentStackSymbol())));
+		    
         CurrentState = state;
         OnChangeState(this, new StateChangeEventArgs(CurrentState));
 
@@ -369,9 +375,6 @@ public class DialogueStateMachine : CharacterLogicAutomaton
         //    repeatTimer.Interval = repeatTimerTime;
         //    repeatTimer.Enabled = true;
         //}
-
-        Debug.Log(string.Format("Entering state: {0}.  Stack symbol: {1}", CurrentState.Name,
-            StackSymbolToString(GetCurrentStackSymbol())));
     }
 
     public PDASymbol GenerateStackSymbol(object blackboardState,
@@ -566,11 +569,11 @@ public class DialogueStateMachine : CharacterLogicAutomaton
                     else if (operation.Content.GetType() == typeof(PDAState)) {
                         if (((PDAState) operation.Content) == GetState("EndState")) {
                             Stack.Clear();
-                            Stack.Push(GenerateStackSymbol(null));
+	                        Stack.Push(GenerateStackSymbol(new StackSymbolContent(null as object)));
                             ContextualMemory.Clear();
                             ContextualMemory.Push(new Triple<PDASymbol, PDAState, PDASymbol>(null,
                                 GetState("StartState"),
-                                GenerateStackSymbol(null)));
+	                            GenerateStackSymbol(new StackSymbolContent(null as object))));
                             //GenerateStackSymbol((StackSymbolContent)operation.Content)));
                         }
                     }
