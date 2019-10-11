@@ -49,10 +49,6 @@ public class EngagmentModule : ModuleBase
                 DataStore.SetValue("user:isEngaged", new DataStore.BoolValue(false), this, "The user is not in the engagment zone");
             }
         }
-        else
-        {
-            DataStore.SetValue("user:isEngaged", new DataStore.BoolValue(true), this, "No kinect data so isEngaged automatically true");
-        }
     }
 
     private bool isValidPosition(Vector3 spineBasePoint)
