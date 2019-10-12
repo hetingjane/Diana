@@ -77,8 +77,15 @@ public class EventManagementModule : ModuleBase
             string eventStr = value.ToString().Trim();
             if (string.IsNullOrEmpty(eventStr)) return;
 
-            eventManager.InsertEvent("", 0);
-            eventManager.InsertEvent(eventStr, 1);
+            string pred = GlobalHelper.GetTopPredicate(eventStr);
+            if (eventManager.voxmlLibrary.VoxMLEntityTypeDict.ContainsKey(pred) &&
+                eventManager.voxmlLibrary.VoxMLEntityTypeDict[pred] == "programs") {
+
+                SetValue("user:intent:action", pred, string.Empty);
+
+                eventManager.InsertEvent("", 0);
+                eventManager.InsertEvent(eventStr, 1);
+            }
         }
     }
 

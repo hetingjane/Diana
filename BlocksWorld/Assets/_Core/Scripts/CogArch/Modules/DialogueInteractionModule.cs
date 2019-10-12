@@ -37,6 +37,17 @@ public class DialogueInteractionModule : ModuleBase
         //Debug.Log(string.Format("Diana's World: {0} changed",key));
         stateMachine.RewriteStack(new PDAStackOperation(PDAStackOperation.PDAStackOperationType.Rewrite,
             stateMachine.GenerateStackSymbol(DataStore.instance)));
+
+        if (key == "user:intent:isPushLeft") {
+            if (DataStore.GetBoolValue(key)) {
+                SetValue("user:intent:action", "slide({0},left)", string.Empty);
+            }
+        }
+        else if (key == "user:intent:isPushRight") {
+            if (DataStore.GetBoolValue(key)) {
+                SetValue("user:intent:action", "slide({0},right)", string.Empty);
+            }
+        }
     }
 
     public void BeginInteraction(object content) {
