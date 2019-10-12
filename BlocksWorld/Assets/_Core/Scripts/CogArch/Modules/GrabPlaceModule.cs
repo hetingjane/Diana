@@ -189,7 +189,7 @@ public class GrabPlaceModule : ModuleBase
     
     protected void Update()
     {
-        string rightArmMotion = DataStore.GetStringValue("me:rightArm:motion");
+        string rightArmMotion = DataStore.GetStringValue("me:actual:motion:rightArm");
 
         switch (currentState)
         {
@@ -226,6 +226,7 @@ public class GrabPlaceModule : ModuleBase
                         // Set the reach target to be high above the set down position accounting for hold offset
                         curReachTarget = setDownPos + Vector3.up * (bounds.size.y + reachHeight) - holdOffset;
                         SetValue("me:intent:handPosR", curReachTarget, currentState.ToString());
+                        SetValue("me:intent:motion:rightArm", new DataStore.StringValue("reach"), "");
 
                         // We go to the next state
                         currentState = State.Reaching;
@@ -388,6 +389,7 @@ public class GrabPlaceModule : ModuleBase
                     }
                     curReachTarget = default;
                     SetValue("me:intent:handPosR", curReachTarget, currentState.ToString());
+                    SetValue("me:intent:motion:rightArm", new DataStore.StringValue("unreach"), "");
 
                     currentState = State.Unreaching;
                 }
