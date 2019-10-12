@@ -30,17 +30,19 @@ public class CommandsModule : ModuleBase
 	}
 
 	void NoteUserCommunication(string key, DataStore.IValue value) {
-		var comVal = value as CommunicationValue;
-		if (comVal == null) return;
-		
-		// if we're standing by, then ignore anything that's not a direct address.
-		if (DataStore.GetBoolValue("me:standingBy")) {
-			if (!comVal.val.directAddress) return;
-			DataStore.SetValue("me:standingBy", new DataStore.BoolValue(false), this, "noted direct address");
-		}
-				
-		ComCommand cmd = comVal.val as ComCommand;
-		if (cmd != null) HandleCommand(cmd);
+        if (DataStore.GetBoolValue("user:isInteracting")) {
+    		var comVal = value as CommunicationValue;
+    		if (comVal == null) return;
+    		
+    		// if we're standing by, then ignore anything that's not a direct address.
+    		if (DataStore.GetBoolValue("me:standingBy")) {
+    			if (!comVal.val.directAddress) return;
+    			DataStore.SetValue("me:standingBy", new DataStore.BoolValue(false), this, "noted direct address");
+    		}
+    				
+    		ComCommand cmd = comVal.val as ComCommand;
+    		if (cmd != null) HandleCommand(cmd);
+        }
 	}
 
 	void HandleCommand(ComCommand cmd) {
