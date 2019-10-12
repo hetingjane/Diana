@@ -1,9 +1,13 @@
 ﻿/*
 This script interfaces with the VoxSim event manager
 
-Reads:      user:intent:event (StringValue)
+Reads:      user:intent:event (StringValue, full logical string representation of event)
+            user:intent:object (StringValue)
+            user:intent:action (StringValue)
+            user:intent:location (Vector3Value)
 Writes:     me:intent:action (StringValue)
             me:intent:targetName (StringValue, name of object that is theme of action)
+            me:intent:handPosR
 */
 
 using UnityEngine;
@@ -36,6 +40,7 @@ public class EventManagementModule : ModuleBase
 
         AStarSearch.ComputedPath += GotPath;
 
+        eventManager.EntityReferenced += EntityReferenced;
         eventManager.NonexistentEntityError += NonexistentReferent;
     }
 
@@ -83,6 +88,15 @@ public class EventManagementModule : ModuleBase
         SetValue("me:intent:handPosR", objectMovePath.ElementAt(0) - holdOffset, string.Empty);
     }
 
+    public void EntityReferenced(object sender, EventArgs e) {
+        // if there's an event to go with this, proceed with the event
+        //  otherwise, Diana should indicate the entity and prompt for more information
+
+        if (((EventReferentArgs)e).Referent is string) {
+            SetValue("user:intent:object", ((EventReferentArgs)e).Referent as string, string.Empty);
+        }
+    }
+        
     public void NonexistentReferent(object sender, EventArgs e) {
         Debug.Log(((EventReferentArgs) e).Referent is Pair<string, List<object>>);
         if (((EventReferentArgs) e).Referent is Pair<string, List<object>>) {
