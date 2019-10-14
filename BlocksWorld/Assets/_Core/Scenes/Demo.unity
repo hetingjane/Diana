@@ -287,6 +287,7 @@ MonoBehaviour:
   display: {fileID: 0}
   grabbableBlocks: {fileID: 184680267}
   animator: {fileID: 1102099335}
+  radius: 0.1
 --- !u!1 &26311430
 GameObject:
   m_ObjectHideFlags: 0
@@ -7130,6 +7131,7 @@ MonoBehaviour:
   display: {fileID: 0}
   grabbableBlocks: {fileID: 184680267}
   animator: {fileID: 0}
+  radius: 0.1
 --- !u!1 &1000591898
 GameObject:
   m_ObjectHideFlags: 0
@@ -7806,12 +7808,12 @@ PrefabInstance:
     - target: {fileID: 54498395900354984, guid: fb9fefddb78e7bc4da8e32aad5c490f0,
         type: 3}
       propertyPath: m_UseGravity
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 54498395900354984, guid: fb9fefddb78e7bc4da8e32aad5c490f0,
         type: 3}
       propertyPath: m_IsKinematic
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4936627015769846, guid: fb9fefddb78e7bc4da8e32aad5c490f0, type: 3}
       propertyPath: m_LocalPosition.y
@@ -7820,7 +7822,7 @@ PrefabInstance:
     - target: {fileID: 65930720188244366, guid: fb9fefddb78e7bc4da8e32aad5c490f0,
         type: 3}
       propertyPath: m_IsTrigger
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fb9fefddb78e7bc4da8e32aad5c490f0, type: 3}
@@ -15103,12 +15105,12 @@ PrefabInstance:
     - target: {fileID: 54498395900354984, guid: fb9fefddb78e7bc4da8e32aad5c490f0,
         type: 3}
       propertyPath: m_IsKinematic
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 54498395900354984, guid: fb9fefddb78e7bc4da8e32aad5c490f0,
         type: 3}
       propertyPath: m_UseGravity
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4936627015769846, guid: fb9fefddb78e7bc4da8e32aad5c490f0, type: 3}
       propertyPath: m_LocalPosition.y
@@ -15117,7 +15119,7 @@ PrefabInstance:
     - target: {fileID: 65930720188244366, guid: fb9fefddb78e7bc4da8e32aad5c490f0,
         type: 3}
       propertyPath: m_IsTrigger
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fb9fefddb78e7bc4da8e32aad5c490f0, type: 3}
