@@ -22,11 +22,16 @@ public class CommandsModule : ModuleBase
 	[Tooltip("Container for objects the agent can see and manipulate")]
 	public Transform manipulableObjects;
 	
+	ComCommand pendingCommand;
+	string pendingGrabTarget;
+	
 	protected override void Start() {
 		Debug.Assert(manipulableObjects != null);	// we need this asigned
 		
 		base.Start();
 		DataStore.Subscribe("user:communication", NoteUserCommunication);
+		
+		DataStore.Subscribe("me:holding", NoteHolding);
 	}
 
 	void NoteUserCommunication(string key, DataStore.IValue value) {
@@ -44,6 +49,17 @@ public class CommandsModule : ModuleBase
     		if (cmd != null) HandleCommand(cmd);
         //}
 	}
+
+	void NoteHolding(string key, DataStore.IValue value) {
+		if (value.ToString() == pendingGrabTarget && pendingCommand != null) {
+			Debug.Log("OK, we got it!  Time to continue with " + pendingCommand);
+			HandleCommand(pendingCommand);
+			pendingCommand = null;
+		}
+	}
+
+	// me:holding = same as me:intent:targetName (i.e. GreenBlock),
+	// and me:actual:motion:rightArm = reached
 
 	void HandleCommand(ComCommand cmd) {
 		ActionSpec act = cmd.action;
@@ -176,6 +192,21 @@ public class CommandsModule : ModuleBase
                             }
                         }
                     }
+	                if (string.IsNullOrEmpty(DataStore.GetStringValue("me:holding"))) {
+	                	// We're told to put something somewhere, but haven't been told
+	                	// what.  Pick something.
+	                	var spec = new ObjSpec();
+	                	spec.referredToAs = "it";
+	                	obj = FindObjectFromSpec(spec);
+	                	Debug.Log("Got obj: " + obj);
+		                SetValue("me:speech:intent", "OK.", comment);
+		                SetValue("me:intent:action", "pickUp", comment);
+		                SetValue("me:intent:targetName", obj.name, comment);
+		                SetValue("me:intent:target", obj.position, comment);
+		                pendingCommand = cmd;
+		                pendingGrabTarget = obj.name;
+		                return;
+	                }
                     if (allGood)
                     {
                         SetValue("me:speech:intent", "OK.", comment);
@@ -226,9 +257,11 @@ public class CommandsModule : ModuleBase
 		if (objSpec.referredToAs == "it") {
 			// If user says "it" while the agent is holding a block,
 			// then let's assume they mean the held block.
-			foundObject = GrabPlaceModule.heldObject.transform;	// unfortunate coupling... ToDo: improve this.
+			foundObject = null;
+			if (GrabPlaceModule.heldObject != null) foundObject = GrabPlaceModule.heldObject.transform;	// unfortunate coupling... ToDo: improve this.
 			if (foundObject != null) return foundObject;
 			Debug.Log("Noted \"it\", but heldObject is null");
+			// In this case, just guess at a block.
 		}
 		
 		bool userIsPointing = DataStore.GetBoolValue("user:isPointing");
@@ -259,6 +292,11 @@ public class CommandsModule : ModuleBase
 			} else {
 				Debug.Log("Not looking for points because plurality=" + objSpec.plurality + " and color=" + objSpec.color);
 			}
+		}
+		if (foundObject == null) {
+			// Still no idea wtf the user's talking about?  Pick a default block.
+			foundObject	= manipulableObjects.GetChild(0);
+			Debug.Log("Picking " + foundObject + " pretty much at random");
 		}
 		Debug.Log("Found: " + foundObject);
 		return foundObject == null ? null : foundObject.transform;

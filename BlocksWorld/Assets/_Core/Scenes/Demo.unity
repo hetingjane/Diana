@@ -5148,6 +5148,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: PurpleBlock
       objectReference: {fileID: 0}
+    - target: {fileID: 1128249006367636, guid: fb9fefddb78e7bc4da8e32aad5c490f0, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4836846081410544, guid: fb9fefddb78e7bc4da8e32aad5c490f0, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.003
@@ -6382,7 +6386,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4836846081410544, guid: fb9fefddb78e7bc4da8e32aad5c490f0, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.164
+      value: -0.302
       objectReference: {fileID: 0}
     - target: {fileID: 4836846081410544, guid: fb9fefddb78e7bc4da8e32aad5c490f0, type: 3}
       propertyPath: m_LocalRotation.x

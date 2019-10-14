@@ -157,6 +157,7 @@ namespace CWCNLP
 				case "put":
 				case "set":
 				case "place":
+				case "but":
 					act.action = Action.Put;
 					break;
 				case "close":

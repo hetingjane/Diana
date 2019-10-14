@@ -115,7 +115,7 @@ namespace Affdex
             }
             lib = NativeMethods.LoadLibrary (filename);
             if (lib == IntPtr.Zero) {
-                Debug.LogError ("Failed to load native library!");
+                Debug.Log ("Failed to load native library!");
                 return false;
             }
             return true;
@@ -494,7 +494,7 @@ namespace Affdex
             IntPtr retVal = dlopen (fileName, RTLD_NOW);
             var errPtr = dlerror ();
             if (errPtr != IntPtr.Zero) {
-                Debug.LogError (Marshal.PtrToStringAnsi (errPtr));
+                Debug.Log(Marshal.PtrToStringAnsi (errPtr));
             }
             return retVal;
         }
