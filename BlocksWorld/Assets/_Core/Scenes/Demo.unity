@@ -1221,9 +1221,9 @@ MonoBehaviour:
   blackboardKey: user:dominantEmotion
   defaultValue: 
   keyMappings:
-  - keyboardKey: 57
+  - keyboardKey: 61
     valueToSet: Happy
-  - keyboardKey: 48
+  - keyboardKey: 45
     valueToSet: Angry
 --- !u!114 &143427718
 MonoBehaviour:
@@ -2596,7 +2596,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "<color=blue>1</color> \u2014 posack\n<color=blue>2</color> \u2014 negack\n<color=blue>3</color>
     \u2014 pushLeft\n<color=blue>4</color> \u2014 pushRight\n<color=blue>5</color>
-    \u2014 claw\n<color=blue>6</color> \u2014 nevermind\n<color=blue>7</color> \u2014
+    \u2014 servoLeft\n<color=blue>6</color> \u2014 servoRight\n<color=blue>7</color>
+    \u2014 claw\n<color=blue>8</color> \u2014 nevermind\n<color=blue>9</color> \u2014
     wave"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2642,7 +2643,7 @@ MonoBehaviour:
   m_enableWordWrapping: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
-  m_firstOverflowCharacterIndex: -1
+  m_firstOverflowCharacterIndex: 101
   m_linkedTextComponent: {fileID: 0}
   m_isLinkedTextComponent: 0
   m_isTextTruncated: 0
@@ -2666,12 +2667,12 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_textInfo:
     textComponent: {fileID: 298995688}
-    characterCount: 80
+    characterCount: 109
     spriteCount: 0
-    spaceCount: 20
-    wordCount: 14
+    spaceCount: 26
+    wordCount: 18
     linkCount: 0
-    lineCount: 7
+    lineCount: 9
     pageCount: 1
     materialCount: 1
   m_isUsingLegacyAnimationComponent: 0
@@ -5410,7 +5411,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 20, y: 110}
-  m_SizeDelta: {x: 185.53, y: 190.73}
+  m_SizeDelta: {x: 185.53, y: 225.73}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &799983259
 MonoBehaviour:
@@ -5436,10 +5437,14 @@ MonoBehaviour:
   - keyboardKey: 52
     blackboardKey: user:intent:isPushRight
   - keyboardKey: 53
-    blackboardKey: user:intent:isClaw
+    blackboardKey: user:intent:isServoLeft
   - keyboardKey: 54
-    blackboardKey: user:intent:nevermind
+    blackboardKey: user:intent:isServoRight
   - keyboardKey: 55
+    blackboardKey: user:intent:isClaw
+  - keyboardKey: 56
+    blackboardKey: user:intent:nevermind
+  - keyboardKey: 57
     blackboardKey: user:intent:isWave
 --- !u!114 &799983260
 MonoBehaviour:
@@ -8879,7 +8884,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "<color=blue>9</color> \u2014 happy\n<color=blue>0</color> \u2014 angry"
+  m_text: "<color=blue>=</color> \u2014 happy\n<color=blue>-</color> \u2014 angry"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
