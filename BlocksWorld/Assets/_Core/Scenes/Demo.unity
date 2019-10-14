@@ -2597,7 +2597,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "<color=blue>1</color> \u2014 posack\n<color=blue>2</color> \u2014 negack\n<color=blue>3</color>
     \u2014 pushLeft\n<color=blue>4</color> \u2014 pushRight\n<color=blue>5</color>
-    \u2014 nevermind\n<color=blue>6</color> \u2014 wave"
+    \u2014 claw\n<color=blue>6</color> \u2014 nevermind\n<color=blue>7</color> \u2014
+    wave"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2642,7 +2643,7 @@ MonoBehaviour:
   m_enableWordWrapping: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
-  m_firstOverflowCharacterIndex: 63
+  m_firstOverflowCharacterIndex: -1
   m_linkedTextComponent: {fileID: 0}
   m_isLinkedTextComponent: 0
   m_isTextTruncated: 0
@@ -2666,12 +2667,12 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_textInfo:
     textComponent: {fileID: 298995688}
-    characterCount: 71
+    characterCount: 80
     spriteCount: 0
-    spaceCount: 17
-    wordCount: 12
+    spaceCount: 20
+    wordCount: 14
     linkCount: 0
-    lineCount: 6
+    lineCount: 7
     pageCount: 1
     materialCount: 1
   m_isUsingLegacyAnimationComponent: 0
@@ -3075,7 +3076,7 @@ CapsuleCollider:
   m_GameObject: {fileID: 428766460}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   m_Radius: 0.035
   m_Height: 0.2
   m_Direction: 1
@@ -3765,6 +3766,8 @@ Transform:
   - {fileID: 1731563924}
   - {fileID: 26311431}
   - {fileID: 1831328033}
+  - {fileID: 1615904251}
+  - {fileID: 1757900844}
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -5408,7 +5411,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 20, y: 110}
-  m_SizeDelta: {x: 185.53, y: 164.73}
+  m_SizeDelta: {x: 185.53, y: 190.73}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &799983259
 MonoBehaviour:
@@ -5434,8 +5437,10 @@ MonoBehaviour:
   - keyboardKey: 52
     blackboardKey: user:intent:isPushRight
   - keyboardKey: 53
-    blackboardKey: user:intent:nevermind
+    blackboardKey: user:intent:claw
   - keyboardKey: 54
+    blackboardKey: user:intent:nevermind
+  - keyboardKey: 55
     blackboardKey: user:intent:isWave
 --- !u!114 &799983260
 MonoBehaviour:
@@ -9070,7 +9075,7 @@ BoxCollider:
   m_GameObject: {fileID: 1170713087}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Size: {x: 0.07471759, y: 0.0728644, z: 0.028176043}
   m_Center: {x: -0.0097622555, y: 0.052027576, z: 0.0070823976}
@@ -11497,6 +11502,51 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1614117612}
   m_CullTransparentMesh: 0
+--- !u!1 &1615904250
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1615904251}
+  - component: {fileID: 1615904252}
+  m_Layer: 0
+  m_Name: WaitIntentModule
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1615904251
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1615904250}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 461181410}
+  m_RootOrder: 24
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1615904252
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1615904250}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1017d9312b1f1654a976c10625fa1da6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  comment: 
+  display: {fileID: 0}
 --- !u!1 &1619516727
 GameObject:
   m_ObjectHideFlags: 0
@@ -12514,6 +12564,51 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1747337171}
   m_CullTransparentMesh: 0
+--- !u!1 &1757900843
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1757900844}
+  - component: {fileID: 1757900845}
+  m_Layer: 0
+  m_Name: ClawIntentModule
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1757900844
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1757900843}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 461181410}
+  m_RootOrder: 25
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1757900845
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1757900843}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d13c715b7848a143a271ab25a139750, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  comment: 
+  display: {fileID: 0}
 --- !u!1 &1782418785
 GameObject:
   m_ObjectHideFlags: 0
@@ -12844,7 +12939,7 @@ CapsuleCollider:
   m_GameObject: {fileID: 1813331036}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   m_Radius: 0.05
   m_Height: 0.25
   m_Direction: 1
