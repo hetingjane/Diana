@@ -143,19 +143,6 @@ public class GrabPlaceModule : ModuleBase
         Debug.Assert(hand != null);
         currentState = State.Idle;
     }
-
-    /// <summary>
-    /// Tries to find an object transform nearest to a location within a given radius
-    /// </summary>
-    /// <param name="location">The location around which to search</param>
-    /// <param name="radius">The radius of the sphere which checks for nearby overlapping objects</param>
-    /// <param name="target">The transform of the nearest object if found, <c>null</c> otherwise</param>
-    /// <returns><c>true</c> if the search was successful, <c>false</c> otherwise</returns>
-    private bool TryFindTargetByLocation(Vector3 location, float radius, out GameObject target)
-    {
-        target = GlobalHelper.FindTargetByLocation(location, radius);
-        return target != null;
-    }
     
     protected void Update()
     {
