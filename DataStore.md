@@ -85,4 +85,5 @@ As a general rule, each part of a key should be named like a variable or propert
 |`user:intent:isPushRight`    |Boolean      |T or F  |Whether the user is doing a push right gesture with the left hand         |
 |`user:intent:isNevermind`    |Boolean      |T or F  |Whether the user is doing a stop gesture (nevermind) with either hand     |
 |`user:intent:isWave`         |Boolean      |T or F  |Whether the user is doing the wave gesture with either hand               |
-
+|`user:intent:isClaw`         |Boolean      |T or F  |Whether the user is doing a claw down gesture with either hand            |
+|`user:intent:isWait`         |Boolean      |T or F  |Whether the user is doing a count one gesture with either hand            |
