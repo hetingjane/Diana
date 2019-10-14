@@ -31,6 +31,8 @@ public class GrabPlaceModule : ModuleBase
     [Tooltip("Drag drop the character model here")]
     public Animator animator;
 
+	public static bool paused = false;		// Hacky hack hack
+
     /// <summary>
     /// The state of the hand
     /// </summary>
@@ -139,9 +141,17 @@ public class GrabPlaceModule : ModuleBase
         Debug.Assert(animator != null);
         hand = animator.GetBoneTransform(HumanBodyBones.RightHand);
         Debug.Assert(hand != null);
-        currentState = State.Idle;
+	    currentState = State.Idle;
+	    DataStore.Subscribe("user:isSpeaking", NoteSpeech);
     }
 
+	void NoteSpeech(string key, DataStore.IValue value) {
+		if (value.Equals(DataStore.BoolValue.True)) {
+			Debug.Log("Pausing to listen to the user");
+			paused = true;
+		}
+	}
+  
     /// <summary>
     /// Find an object transform nearest to a location within a given radius
     /// </summary>
@@ -186,7 +196,9 @@ public class GrabPlaceModule : ModuleBase
     }
 
     protected void Update()
-    {
+	{
+		if (paused) return;
+    	
         string rightArmMotion = DataStore.GetStringValue("me:actual:motion:rightArm");
 
         switch (currentState)

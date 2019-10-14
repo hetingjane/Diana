@@ -124,97 +124,102 @@ public class CommandsModule : ModuleBase
 			SetValue("me:intent:pointAt", "", comment);
 			SetValue("me:intent:action", "", comment);
 			break;
-            case Action.PickUp:
-            case Action.Raise:
-                // See if we can determine what object to pick up, based on spec.
-                if (act.directObject == null) return;   // (user is probably not done speaking)
-                obj = FindObjectFromSpec(act.directObject);
-                if (obj == null)
+		case Action.Continue:
+			SetValue("me:speech:intent", "OK.", comment);
+			GrabPlaceModule.paused = false;
+			break;
+        case Action.PickUp:
+        case Action.Raise:
+            // See if we can determine what object to pick up, based on spec.
+            if (act.directObject == null) return;   // (user is probably not done speaking)
+            obj = FindObjectFromSpec(act.directObject);
+            if (obj == null)
+            {
+                SetValue("me:speech:intent", "I don't know what block you mean.", comment);
+            }
+            else
+            {
+                SetValue("me:speech:intent", "OK.", comment);
+                SetValue("me:intent:action", "pickUp", comment);
+                SetValue("me:intent:targetName", obj.name, comment);
+                SetValue("me:intent:target", obj.position, comment);
+            }
+            break;
+        case Action.SetDown:
+        case Action.Put:
+            // For now we'll assume we're being told to set down whatever we're holding.
+            // But let's verify anyway.
+            GrabPlaceModule.paused = false;
+            obj = FindObjectFromSpec(act.directObject);
+            if (obj != null && obj.name != DataStore.GetStringValue("me:holding"))
+            {
+                SetValue("me:speech:intent", "I'm not holding that.", comment);
+            }
+            else
+            {
+                bool allGood = true;
+                if (act.location == null)
                 {
-                    SetValue("me:speech:intent", "I don't know what block you mean.", comment);
+                    // No location specified.
+                    SetValue("me:intent:targetName", "", comment);
+                    SetValue("me:intent:target", "", comment);
                 }
                 else
                 {
-                    SetValue("me:speech:intent", "OK.", comment);
-                    SetValue("me:intent:action", "pickUp", comment);
-                    SetValue("me:intent:targetName", obj.name, comment);
-                    SetValue("me:intent:target", obj.position, comment);
-                }
-                break;
-            case Action.SetDown:
-            case Action.Put:
-                // For now we'll assume we're being told to set down whatever we're holding.
-                // But let's verify anyway.
-                obj = FindObjectFromSpec(act.directObject);
-                if (obj != null && obj.name != DataStore.GetStringValue("me:holding"))
-                {
-                    SetValue("me:speech:intent", "I'm not holding that.", comment);
-                }
-                else
-                {
-                    bool allGood = true;
-                    if (act.location == null)
+                    // Location specified.
+                    if (act.location.relation == LocationSpec.Relation.Indicated)
                     {
-                        // No location specified.
-                        SetValue("me:intent:targetName", "", comment);
-                        SetValue("me:intent:target", "", comment);
-                    }
-                    else
-                    {
-                        // Location specified.
-                        if (act.location.relation == LocationSpec.Relation.Indicated)
+                        // User is saying "here" or "there" and should be pointing.
+                        if (!DataStore.GetBoolValue("user:isPointing"))
                         {
-                            // User is saying "here" or "there" and should be pointing.
-                            if (!DataStore.GetBoolValue("user:isPointing"))
-                            {
-                                SetValue("me:speech:intent", "I don't know where you mean.", comment);
-                                allGood = false;
-                            }
-                            else
-                            {
-                                SetValue("me:intent:targetName", "", comment);
-                                SetValue("me:intent:target", DataStore.GetVector3Value("user:pointPos"), comment);
-                            }
+                            SetValue("me:speech:intent", "I don't know where you mean.", comment);
+                            allGood = false;
                         }
                         else
                         {
-                            // User specified an object to set it on.
-                            Transform relObj = FindObjectFromSpec(act.location.obj);
-                            if (relObj == null && act.location.obj != null)
-                            {
-                                SetValue("me:speech:intent", "I don't know where you mean.", comment);
-                                allGood = false;
-                            }
-                            if (relObj != null)
-                            {
-                                SetValue("me:intent:target", relObj.position, comment);
-                                SetValue("me:intent:targetName", relObj.name, comment);
-                            }
+                            SetValue("me:intent:targetName", "", comment);
+                            SetValue("me:intent:target", DataStore.GetVector3Value("user:pointPos"), comment);
                         }
                     }
-	                if (string.IsNullOrEmpty(DataStore.GetStringValue("me:holding"))) {
-	                	// We're told to put something somewhere, but haven't been told
-	                	// what.  Pick something.
-	                	var spec = new ObjSpec();
-	                	spec.referredToAs = "it";
-	                	obj = FindObjectFromSpec(spec);
-	                	Debug.Log("Got obj: " + obj);
-		                SetValue("me:speech:intent", "OK.", comment);
-		                SetValue("me:intent:action", "pickUp", comment);
-		                SetValue("me:intent:targetName", obj.name, comment);
-		                SetValue("me:intent:target", obj.position, comment);
-		                pendingCommand = cmd;
-		                pendingGrabTarget = obj.name;
-		                return;
-	                }
-                    if (allGood)
+                    else
                     {
-                        SetValue("me:speech:intent", "OK.", comment);
-                        SetValue("me:intent:action", "setDown", comment);
+                        // User specified an object to set it on.
+                        Transform relObj = FindObjectFromSpec(act.location.obj);
+                        if (relObj == null && act.location.obj != null)
+                        {
+                            SetValue("me:speech:intent", "I don't know where you mean.", comment);
+                            allGood = false;
+                        }
+                        if (relObj != null)
+                        {
+                            SetValue("me:intent:target", relObj.position, comment);
+                            SetValue("me:intent:targetName", relObj.name, comment);
+                        }
                     }
                 }
-                break;
-            case Action.StandBy:
+                if (string.IsNullOrEmpty(DataStore.GetStringValue("me:holding"))) {
+                	// We're told to put something somewhere, but haven't been told
+                	// what.  Pick something.
+                	var spec = new ObjSpec();
+                	spec.referredToAs = "it";
+                	obj = FindObjectFromSpec(spec);
+                	Debug.Log("Got obj: " + obj);
+	                SetValue("me:speech:intent", "OK.", comment);
+	                SetValue("me:intent:action", "pickUp", comment);
+	                SetValue("me:intent:targetName", obj.name, comment);
+	                SetValue("me:intent:target", obj.position, comment);
+	                pendingCommand = cmd;
+	                pendingGrabTarget = obj.name;
+	                return;
+                }
+                if (allGood)
+                {
+                    SetValue("me:speech:intent", "OK.", comment);
+                    SetValue("me:intent:action", "setDown", comment);
+                }
+            }
+            break;
+        case Action.StandBy:
 			SetValue("me:standingBy", true, comment);
 			break;
 		case Action.Identify:

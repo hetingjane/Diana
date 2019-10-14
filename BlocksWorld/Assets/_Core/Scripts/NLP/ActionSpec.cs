@@ -14,6 +14,7 @@ namespace Semantics
 		Point,
 		Look,
 		Stop,
+		Continue,
 		StandBy,
 		Resume,
 		Identify,

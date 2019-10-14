@@ -181,7 +181,13 @@ namespace CWCNLP
 					act.action = Action.Point;
 					break;
 				case "stop":
+				case "wait":
+				case "no":
 					act.action = Action.Stop;
+					break;
+				case "continue":
+				case "go_on":
+					act.action = Action.Continue;
 					break;
 				case "thank":
 				case "thank_you":
