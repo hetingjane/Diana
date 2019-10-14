@@ -150,7 +150,7 @@ public class GrabPlaceModule : ModuleBase
     /// <param name="location">The location around which to search</param>
     /// <param name="radius">The radius of the sphere which checks for nearby overlapping objects</param>
     /// <returns>The transform of the closest object to <paramref name="location"/>"/> or <c>null</c> if it can't find any.</returns>
-    private GameObject FindTargetByLocation(Vector3 location, float radius)
+    public static GameObject FindTargetByLocation(Vector3 location, float radius)
     {
         GameObject target = null;
 
