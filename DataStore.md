@@ -34,6 +34,8 @@ As a general rule, each part of a key should be named like a variable or propert
 |`user:EmotionHappy`              |Integer      |0 to 100    |Measure of how happy the user looks                                                                 |
 |`user:armMotion:left`            |String       |            |servo behavior of left arm: "servo" or "still"                                                      |
 |`user:armMotion:right`           |String       |            |servo behavior of right arm: "servo" or "still"                                                     |
+|`user:arms:left`                 |String       |            |Motion of left arm: "move <direction>", "servo", "still", etc.                                      |
+|`user:arms:right`                |String       |            |Motion of right arm: "move <direction>", "servo", "still", etc.                                     |
 |`user:communication`             |Communication|            |Semantic representation of the user's last utterance                                                |
 |`user:dominantEmotion`           |String       |            |Current user dominant emotion, e.g. "Happy", "Angry"                                                |
 |`user:hands:[right,left]`        |String       |            |Current hand pose for either left or right hand                                                     |
