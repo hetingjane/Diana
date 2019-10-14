@@ -113,6 +113,12 @@ public class GrabPlaceModule : ModuleBase
     private Transform hand;
 
     /// <summary>
+    /// Radius of the sphere to test for objects near to a location
+    /// </summary>
+    [Tooltip("Radius of the sphere to test for objects near to a location")]
+    public float radius = .1f;
+
+    /// <summary>
     /// Height at which to raise the object while holding and traversing
     /// relative to object's top surface
     /// </summary>
@@ -137,6 +143,49 @@ public class GrabPlaceModule : ModuleBase
         Debug.Assert(hand != null);
         currentState = State.Idle;
     }
+
+    /// <summary>
+    /// Find an object transform nearest to a location within a given radius
+    /// </summary>
+    /// <param name="location">The location around which to search</param>
+    /// <param name="radius">The radius of the sphere which checks for nearby overlapping objects</param>
+    /// <returns>The transform of the closest object to <paramref name="location"/>"/> or <c>null</c> if it can't find any.</returns>
+    public static GameObject FindTargetByLocation(Vector3 location, float radius)
+    {
+        GameObject target = null;
+
+        // Find a block that we can grab
+        Collider[] colliders = Physics.OverlapSphere(location, radius, LayerMask.GetMask("Blocks"));
+
+        if (colliders != null && colliders.Length > 0)
+        {
+            float minDistance = float.MaxValue;
+            foreach (Collider c in colliders)
+            {
+                float distance = Vector3.Distance(c.transform.position, location);
+                if (distance < minDistance)
+                {
+                    minDistance = distance;
+                    target = GlobalHelper.GetMostImmediateParentVoxeme(c.gameObject);
+                }
+            }
+        }
+
+        return target;
+    }
+
+    /// <summary>
+    /// Tries to find an object transform nearest to a location within a given radius
+    /// </summary>
+    /// <param name="location">The location around which to search</param>
+    /// <param name="radius">The radius of the sphere which checks for nearby overlapping objects</param>
+    /// <param name="target">The transform of the nearest object if found, <c>null</c> otherwise</param>
+    /// <returns><c>true</c> if the search was successful, <c>false</c> otherwise</returns>
+    private bool TryFindTargetByLocation(Vector3 location, float radius, out GameObject target)
+    {
+        target = FindTargetByLocation(location, radius);
+        return target != null;
+    }
     
     protected void Update()
     {
@@ -160,7 +209,7 @@ public class GrabPlaceModule : ModuleBase
                         if (targetLocation != default)
                         {
                             // Get the Voxeme component of object resolved by target location
-	                        targetBlock = GlobalHelper.FindTargetByLocation(targetLocation, .1f, LayerMask.GetMask("Blocks")).GetComponent<Voxeme>();
+                            targetBlock = FindTargetByLocation(targetLocation, radius).GetComponent<Voxeme>();
                         }
                     }
 
