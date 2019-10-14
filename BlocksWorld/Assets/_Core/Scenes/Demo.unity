@@ -287,7 +287,6 @@ MonoBehaviour:
   display: {fileID: 0}
   grabbableBlocks: {fileID: 184680267}
   animator: {fileID: 1102099335}
-  radius: 0.1
 --- !u!1 &26311430
 GameObject:
   m_ObjectHideFlags: 0
@@ -5437,7 +5436,7 @@ MonoBehaviour:
   - keyboardKey: 52
     blackboardKey: user:intent:isPushRight
   - keyboardKey: 53
-    blackboardKey: user:intent:claw
+    blackboardKey: user:intent:isClaw
   - keyboardKey: 54
     blackboardKey: user:intent:nevermind
   - keyboardKey: 55
@@ -7131,7 +7130,6 @@ MonoBehaviour:
   display: {fileID: 0}
   grabbableBlocks: {fileID: 184680267}
   animator: {fileID: 0}
-  radius: 0.1
 --- !u!1 &1000591898
 GameObject:
   m_ObjectHideFlags: 0
