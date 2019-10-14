@@ -30,7 +30,7 @@ public class CommandsModule : ModuleBase
 	}
 
 	void NoteUserCommunication(string key, DataStore.IValue value) {
-        if (DataStore.GetBoolValue("user:isInteracting")) {
+        //if (DataStore.GetBoolValue("user:isInteracting")) {
     		var comVal = value as CommunicationValue;
     		if (comVal == null) return;
     		
@@ -42,7 +42,7 @@ public class CommandsModule : ModuleBase
     				
     		ComCommand cmd = comVal.val as ComCommand;
     		if (cmd != null) HandleCommand(cmd);
-        }
+        //}
 	}
 
 	void HandleCommand(ComCommand cmd) {
@@ -108,64 +108,82 @@ public class CommandsModule : ModuleBase
 			SetValue("me:intent:pointAt", "", comment);
 			SetValue("me:intent:action", "", comment);
 			break;
-		//case Action.PickUp:
-		//case Action.Raise:
-		//	// See if we can determine what object to pick up, based on spec.
-		//	if (act.directObject == null) return;	// (user is probably not done speaking)
-		//	obj = FindObjectFromSpec(act.directObject);
-		//	if (obj == null) {
-		//		SetValue("me:speech:intent", "I don't know what block you mean.", comment);
-		//	} else {
-		//		SetValue("me:speech:intent", "OK.", comment);		
-		//		SetValue("me:intent:action", "pickUp", comment);
-		//		SetValue("me:intent:targetName", obj.name, comment);					
-		//		SetValue("me:intent:target", obj.position, comment);
-		//	}
-		//	break;
-		//case Action.SetDown:
-		//case Action.Put:
-			//// For now we'll assume we're being told to set down whatever we're holding.
-			//// But let's verify anyway.
-			//obj = FindObjectFromSpec(act.directObject);
-			//if (obj != null && obj.name != DataStore.GetStringValue("me:holding")) {
-			//	SetValue("me:speech:intent", "I'm not holding that.", comment);
-			//} else {
-			//	bool allGood = true;
-			//	if (act.location == null) {
-			//		// No location specified.
-			//		SetValue("me:intent:targetName", "", comment);
-			//		SetValue("me:intent:target", "", comment);
-			//	} else {
-			//		// Location specified.
-			//		if (act.location.relation == LocationSpec.Relation.Indicated) {
-			//			// User is saying "here" or "there" and should be pointing.
-			//			if (!DataStore.GetBoolValue("user:isPointing")) {
-			//				SetValue("me:speech:intent", "I don't know where you mean.", comment);
-			//				allGood = false;
-			//			} else {
-			//				SetValue("me:intent:targetName", "", comment);
-			//				SetValue("me:intent:target", DataStore.GetVector3Value("user:pointPos"), comment);
-			//			}
-			//		} else {
-			//			// User specified an object to set it on.
-			//			Transform relObj = FindObjectFromSpec(act.location.obj);
-			//			if (relObj == null && act.location.obj != null) {
-			//				SetValue("me:speech:intent", "I don't know where you mean.", comment);
-			//				allGood = false;
-			//			}
-			//			if (relObj != null) {
-			//				SetValue("me:intent:target", relObj.position, comment);
-			//				SetValue("me:intent:targetName", relObj.name, comment);
-			//			}
-			//		}
-			//	}
-			//	if (allGood) {
-			//		SetValue("me:speech:intent", "OK.", comment);		
-			//		SetValue("me:intent:action", "setDown", comment);
-			//	}
-			//}
-			//break;
-		case Action.StandBy:
+            case Action.PickUp:
+            case Action.Raise:
+                // See if we can determine what object to pick up, based on spec.
+                if (act.directObject == null) return;   // (user is probably not done speaking)
+                obj = FindObjectFromSpec(act.directObject);
+                if (obj == null)
+                {
+                    SetValue("me:speech:intent", "I don't know what block you mean.", comment);
+                }
+                else
+                {
+                    SetValue("me:speech:intent", "OK.", comment);
+                    SetValue("me:intent:action", "pickUp", comment);
+                    SetValue("me:intent:targetName", obj.name, comment);
+                    SetValue("me:intent:target", obj.position, comment);
+                }
+                break;
+            case Action.SetDown:
+            case Action.Put:
+                // For now we'll assume we're being told to set down whatever we're holding.
+                // But let's verify anyway.
+                obj = FindObjectFromSpec(act.directObject);
+                if (obj != null && obj.name != DataStore.GetStringValue("me:holding"))
+                {
+                    SetValue("me:speech:intent", "I'm not holding that.", comment);
+                }
+                else
+                {
+                    bool allGood = true;
+                    if (act.location == null)
+                    {
+                        // No location specified.
+                        SetValue("me:intent:targetName", "", comment);
+                        SetValue("me:intent:target", "", comment);
+                    }
+                    else
+                    {
+                        // Location specified.
+                        if (act.location.relation == LocationSpec.Relation.Indicated)
+                        {
+                            // User is saying "here" or "there" and should be pointing.
+                            if (!DataStore.GetBoolValue("user:isPointing"))
+                            {
+                                SetValue("me:speech:intent", "I don't know where you mean.", comment);
+                                allGood = false;
+                            }
+                            else
+                            {
+                                SetValue("me:intent:targetName", "", comment);
+                                SetValue("me:intent:target", DataStore.GetVector3Value("user:pointPos"), comment);
+                            }
+                        }
+                        else
+                        {
+                            // User specified an object to set it on.
+                            Transform relObj = FindObjectFromSpec(act.location.obj);
+                            if (relObj == null && act.location.obj != null)
+                            {
+                                SetValue("me:speech:intent", "I don't know where you mean.", comment);
+                                allGood = false;
+                            }
+                            if (relObj != null)
+                            {
+                                SetValue("me:intent:target", relObj.position, comment);
+                                SetValue("me:intent:targetName", relObj.name, comment);
+                            }
+                        }
+                    }
+                    if (allGood)
+                    {
+                        SetValue("me:speech:intent", "OK.", comment);
+                        SetValue("me:intent:action", "setDown", comment);
+                    }
+                }
+                break;
+            case Action.StandBy:
 			SetValue("me:standingBy", true, comment);
 			break;
 		case Action.Identify:
