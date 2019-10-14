@@ -39,6 +39,7 @@ public class EventManagementModule : ModuleBase
         DataStore.Subscribe("user:intent:event", PromptEvent);
         DataStore.Subscribe("user:intent:object", TryEventComposition);
         DataStore.Subscribe("user:intent:action", TryEventComposition);
+        DataStore.Subscribe("user:intent:location", TryEventComposition);
 
         AStarSearch.ComputedPath += GotPath;
 
@@ -114,7 +115,7 @@ public class EventManagementModule : ModuleBase
         }
     }
 
-    void TryEventResolution(string key, DataStore.IValue value)
+    void TryEventComposition(string key, DataStore.IValue value)
     {
     }
 
