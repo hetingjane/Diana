@@ -113,12 +113,6 @@ public class GrabPlaceModule : ModuleBase
     private Transform hand;
 
     /// <summary>
-    /// Radius of the sphere to test for objects near to a location
-    /// </summary>
-    [Tooltip("Radius of the sphere to test for objects near to a location")]
-    public float radius = .1f;
-
-    /// <summary>
     /// Height at which to raise the object while holding and traversing
     /// relative to object's top surface
     /// </summary>
@@ -166,7 +160,7 @@ public class GrabPlaceModule : ModuleBase
                         if (targetLocation != default)
                         {
                             // Get the Voxeme component of object resolved by target location
-	                        targetBlock = GlobalHelper.FindTargetByLocation(targetLocation, radius).GetComponent<Voxeme>();
+	                        targetBlock = GlobalHelper.FindTargetByLocation(targetLocation, .1f, LayerMask.GetMask("Blocks")).GetComponent<Voxeme>();
                         }
                     }
 
