@@ -37,6 +37,8 @@ public class EventManagementModule : ModuleBase
     {
         base.Start();
         DataStore.Subscribe("user:intent:event", PromptEvent);
+        DataStore.Subscribe("user:intent:object", TryEventComposition);
+        DataStore.Subscribe("user:intent:action", TryEventComposition);
 
         AStarSearch.ComputedPath += GotPath;
 
@@ -81,13 +83,41 @@ public class EventManagementModule : ModuleBase
             if (eventManager.voxmlLibrary.VoxMLEntityTypeDict.ContainsKey(pred) &&
                 eventManager.voxmlLibrary.VoxMLEntityTypeDict[pred] == "programs") {
 
-                SetValue("user:intent:action", pred, string.Empty);
+                switch (pred) {
+                    case "grasp":
+                        SetValue("user:intent:action", "grasp{{0})", string.Empty);
+                        break;
+
+                    case "ungrasp":
+                        SetValue("user:intent:action", "ungrasp{{0})", string.Empty);
+                        break;
+
+                    case "put":
+                        SetValue("user:intent:action", "put{{0},{1})", string.Empty);
+                        break;
+
+                    case "slide":
+                        SetValue("user:intent:action", "slide{{0},{1})", string.Empty);
+                        break;
+
+                    case "lift":
+                        SetValue("user:intent:action", "lift{{0},{1})", string.Empty);
+                        break;
+
+                    default:
+                        break;
+                }
 
                 eventManager.InsertEvent("", 0);
                 eventManager.InsertEvent(eventStr, 1);
             }
         }
     }
+
+    void TryEventResolution(string key, DataStore.IValue value)
+    {
+    }
+
 
     public void GotPath(object sender, EventArgs e)
     {
