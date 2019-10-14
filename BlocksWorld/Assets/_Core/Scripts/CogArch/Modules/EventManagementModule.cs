@@ -80,43 +80,46 @@ public class EventManagementModule : ModuleBase
             string eventStr = value.ToString().Trim();
             if (string.IsNullOrEmpty(eventStr)) return;
 
-            string pred = GlobalHelper.GetTopPredicate(eventStr);
-            if (eventManager.voxmlLibrary.VoxMLEntityTypeDict.ContainsKey(pred) &&
-                eventManager.voxmlLibrary.VoxMLEntityTypeDict[pred] == "programs") {
-
-                switch (pred) {
-                    case "grasp":
-                        SetValue("user:intent:action", "grasp{{0})", string.Empty);
-                        break;
-
-                    case "ungrasp":
-                        SetValue("user:intent:action", "ungrasp{{0})", string.Empty);
-                        break;
-
-                    case "put":
-                        SetValue("user:intent:action", "put{{0},{1})", string.Empty);
-                        break;
-
-                    case "slide":
-                        SetValue("user:intent:action", "slide{{0},{1})", string.Empty);
-                        break;
-
-                    case "lift":
-                        SetValue("user:intent:action", "lift{{0},{1})", string.Empty);
-                        break;
-
-                    default:
-                        break;
-                }
-
+            try
+            {
                 eventManager.InsertEvent("", 0);
                 eventManager.InsertEvent(eventStr, 1);
+            }
+            catch (Exception ex)
+            {
+                if (ex is NullReferenceException)
+                {
+                    Debug.LogWarning(string.Format("VoxSim event manager couldn't handle \"{0}\"", eventStr));
+                }
             }
         }
     }
 
     void TryEventComposition(string key, DataStore.IValue value)
     {
+        if (DataStore.GetBoolValue("user:isInteracting"))
+        {
+            string eventStr = string.Empty;
+            string actionStr = DataStore.GetStringValue("user:intent:action");
+            string objectStr = DataStore.GetStringValue("user:intent:object");
+            string locationStr = DataStore.GetStringValue("user:intent:location");
+
+            if (actionStr != null)
+            {
+                if (objectStr != null)
+                {
+                    eventStr = actionStr.Replace("{0}", objectStr);
+                    SetValue("user:intent:partialEvent", eventStr, string.Empty);
+                }
+            }
+
+
+            // if no variables left in the compose event string
+	        if (!Regex.IsMatch(@"\{[0-9]+\}", eventStr))
+            {
+                SetValue("user:intent:event", eventStr, string.Empty);
+            }
+        }
     }
 
 
