@@ -147,7 +147,7 @@ public class GrabPlaceModule : ModuleBase
 
 	void NoteSpeech(string key, DataStore.IValue value) {
 		if (value.Equals(DataStore.BoolValue.True)) {
-			Debug.Log("Pausing to listen to the user");
+			//Debug.Log("Pausing to listen to the user");
 			paused = true;
 		}
 	}

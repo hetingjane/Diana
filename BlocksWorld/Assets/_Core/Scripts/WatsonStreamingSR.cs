@@ -264,7 +264,12 @@ public class WatsonStreamingSR : ModuleBase
 			Log.Debug("WatsonStreamingSR.OnRecognize [final=" + result.results[0].final + "]", debugTxt);
 			SetValue("user:isSpeaking", true, alternatives[0]);
 			if (result.results[0].final) {
-				SetValue("user:speech", alternatives[0], "final speech");
+				string s = alternatives[0];
+				// Here we hack in some fixes for common errors:
+				if (s.StartsWith("but ")) s = "put " + s.Substring(4);
+				if (s.StartsWith("now ")) s = "no " + s.Substring(4);
+				
+				SetValue("user:speech", s, "final speech");
 			} else {
 				onInterim.Invoke(alternatives[0]);
 			}

@@ -14,6 +14,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Semantics;
+using CWCNLP;
 
 using VoxSimPlatform.Vox;
 
@@ -22,8 +23,9 @@ public class CommandsModule : ModuleBase
 	[Tooltip("Container for objects the agent can see and manipulate")]
 	public Transform manipulableObjects;
 	
-	ComCommand pendingCommand;
+	List<ComCommand> pendingCommand = new List<ComCommand>();
 	string pendingGrabTarget;
+	float pendingTime;	// if nonzero, time at which to do the next command
 	
 	protected override void Start() {
 		Debug.Assert(manipulableObjects != null);	// we need this asigned
@@ -32,6 +34,18 @@ public class CommandsModule : ModuleBase
 		DataStore.Subscribe("user:communication", NoteUserCommunication);
 		
 		DataStore.Subscribe("me:holding", NoteHolding);
+	}
+
+	protected void Update() {
+		if (pendingCommand.Count > 0 && pendingTime > 0 && Time.time > pendingTime) {
+			Debug.Log("It's about time to continue with " + pendingCommand[0]);
+			HandleCommand(pendingCommand[0]);
+			pendingCommand.RemoveAt(0);
+			if (pendingCommand.Count > 0) {
+				Debug.Log("Still pending: " + pendingCommand[0]);
+				pendingTime = Time.time + 2;
+			}
+		}
 	}
 
 	void NoteUserCommunication(string key, DataStore.IValue value) {
@@ -46,16 +60,18 @@ public class CommandsModule : ModuleBase
     		}
     				
     		ComCommand cmd = comVal.val as ComCommand;
-    		if (cmd != null) HandleCommand(cmd);
+			if (cmd != null) HandleCommand(cmd);
+			ComEmote emote = comVal.val as ComEmote;
+		if (emote != null) HandleEmote(emote);
         //}
 	}
 
 	void NoteHolding(string key, DataStore.IValue value) {
-		if (value.ToString() == pendingGrabTarget && pendingCommand != null) {
-			Debug.Log("OK, we got it!  Time to continue with " + pendingCommand);
-			HandleCommand(pendingCommand);
-			pendingCommand = null;
-		}
+		//if (value.ToString() == pendingGrabTarget && pendingCommand.Count > 0 != null) {
+		//	Debug.Log("OK, we got it!  Time to continue with " + pendingCommand[0]);
+		//	HandleCommand(pendingCommand[pendingCommand.Count-1]);
+		//	pendingCommand.RemoveAt(pendingCommand.Count-1);
+		//}
 	}
 
 	// me:holding = same as me:intent:targetName (i.e. GreenBlock),
@@ -151,8 +167,7 @@ public class CommandsModule : ModuleBase
             // But let's verify anyway.
             GrabPlaceModule.paused = false;
             obj = FindObjectFromSpec(act.directObject);
-            if (obj != null && obj.name != DataStore.GetStringValue("me:holding"))
-            {
+	        if (false && obj != null && obj.name != DataStore.GetStringValue("me:holding")) {
                 SetValue("me:speech:intent", "I'm not holding that.", comment);
             }
             else
@@ -197,7 +212,7 @@ public class CommandsModule : ModuleBase
                         }
                     }
                 }
-                if (string.IsNullOrEmpty(DataStore.GetStringValue("me:holding"))) {
+	            if (obj == null && string.IsNullOrEmpty(DataStore.GetStringValue("me:holding"))) {
                 	// We're told to put something somewhere, but haven't been told
                 	// what.  Pick something.
                 	var spec = new ObjSpec();
@@ -208,8 +223,10 @@ public class CommandsModule : ModuleBase
 	                SetValue("me:intent:action", "pickUp", comment);
 	                SetValue("me:intent:targetName", obj.name, comment);
 	                SetValue("me:intent:target", obj.position, comment);
-	                pendingCommand = cmd;
+	                pendingCommand.Add(cmd);
 	                pendingGrabTarget = obj.name;
+		            pendingTime = Time.time + 4;
+		            Debug.Log("Added pending: " + cmd);
 	                return;
                 }
                 if (allGood)
@@ -248,6 +265,36 @@ public class CommandsModule : ModuleBase
 			// At least not yet ... it gets pretty annoying.
 			//SayICant(comment);
 			break;
+		}
+	}
+	
+	void HandleEmote(ComEmote emote) {
+		Debug.Log("Handling an emote: " + emote);
+		foreach (int i in emote.parse.ChildrenOf(-1)) {
+			if (emote.parse.partOfSpeech[i] == PartOfSpeech.NN) {
+				ObjSpec obj = Grok.GrokObject(emote.parse, i);
+				Debug.Log("Found object: " + obj);
+				if (obj == null) return;
+				SetValue("me:intent:targetName", "", comment);
+				SetValue("me:intent:target", "", comment);
+				SetValue("me:speech:intent", "OK.", comment);
+				SetValue("me:intent:action", "setDown", comment);
+ 				
+				foreach (var com in pendingCommand) {
+					Debug.Log("Updating " + com + " to refer to " +obj);
+					com.action.directObject = obj;
+				}
+ 				
+				var act = new ActionSpec();
+				act.action = Action.PickUp;
+				act.directObject = obj;
+				var cmd = new ComCommand(emote.originalText, emote.parse, act);
+				pendingCommand.Insert(0, cmd);
+				pendingTime = Time.time + 1;
+				Debug.Log("Inserting pending command: " + cmd);
+				pendingGrabTarget = "";
+				GrabPlaceModule.paused = false;
+			}
 		}
 	}
 	
