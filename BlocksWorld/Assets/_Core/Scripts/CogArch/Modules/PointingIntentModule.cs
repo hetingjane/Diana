@@ -15,6 +15,7 @@
 			switch (pointingStateMachine.CurrentState)
 			{
 				case PointingState.Pointed:
+				case PointingState.PointingStop:
 					DataStore.SetStringValue("user:lastPointedAt:name", new DataStore.StringValue(pointingStateMachine.LastPointedAtObject?.name ?? string.Empty), this, string.Empty);
 					DataStore.SetValue("user:lastPointedAt:position", new DataStore.Vector3Value(pointingStateMachine.LastPointedAtLocation), this, string.Empty);
 					break;

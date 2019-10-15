@@ -37,7 +37,7 @@ public class PointingStateMachine : RuleStateMachine<PointingState>
 		if (checkValidity)
 		{
 			bool pointPositionIsValid = DataStore.GetBoolValue("user:pointValid");
-			return pointPositionIsValid;
+			return userIsPointing && pointPositionIsValid;
 		}
 		return userIsPointing;
 	}
@@ -143,6 +143,16 @@ public class PointingStateMachine : RuleStateMachine<PointingState>
 			lastNPositions.Enqueue(pos);
 			if (lastNPositions.Count > N)
 				lastNPositions.Dequeue();
+		};
+
+		StateChanged += (object sender, StateChangedEventArgs<PointingState> e) =>
+		{
+			//Debug.LogWarning($"{e.FromState} -> {e.ToState}");
+			if (e.ToState == PointingState.PointingStop)
+			{
+				LastPointedAtObject = null;
+				LastPointedAtLocation = default;
+			}
 		};
 	}
 }
