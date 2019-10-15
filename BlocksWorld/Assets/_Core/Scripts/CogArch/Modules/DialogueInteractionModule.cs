@@ -48,6 +48,11 @@ public class DialogueInteractionModule : ModuleBase
                 SetValue("user:intent:action", "slide({0},right)", string.Empty);
             }
         }
+        else if (key == "user:intent:isClaw") {
+            if (DataStore.GetBoolValue(key)) {
+                SetValue("user:intent:action", "grasp({0})", string.Empty);
+            }
+        }
     }
 
     public void BeginInteraction(object content) {

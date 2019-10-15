@@ -10,6 +10,7 @@ TODO: add more emotions and a dynamic mechanism to let Diana express supportive 
 using UnityEngine;
 using System;
 using System.Collections.Generic;
+using System.Collections;
 
 public class FaceUpdate : MonoBehaviour
 {
@@ -95,26 +96,31 @@ public class FaceUpdate : MonoBehaviour
     {
         if ((value as DataStore.BoolValue).val)
         {
-            for (int j = 0; j < 10; j++)
-            {
-                // User has just approached the table.  Smile to greet.
-                recoveryRate = 25;
-                maxStrength = 130;
-                currSmileStrength = Mathf.MoveTowards(currSmileStrength, maxStrength, recoveryRate);
-                for (int i = 0; i < renderers.Count; i++)
-                {
-                    renderers[i].SetBlendShapeWeight(smileLeftIndex[i], currSmileStrength);
-                    renderers[i].SetBlendShapeWeight(smileRightIndex[i], currSmileStrength);
-
-                }
-            }
-
+            StartCoroutine(WaitAndSmile(value, 0.55f));
 
         }
     }
+    private IEnumerator WaitAndSmile(DataStore.IValue value, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        for (int j = 0; j < 10; j++)
+        {
+            // User has just approached the table.  Smile to greet.
+            recoveryRate = 30;
+            maxStrength = 130;
+            currSmileStrength = Mathf.MoveTowards(currSmileStrength, maxStrength, recoveryRate);
+            for (int i = 0; i < renderers.Count; i++)
+            {
+                renderers[i].SetBlendShapeWeight(smileLeftIndex[i], currSmileStrength);
+                renderers[i].SetBlendShapeWeight(smileRightIndex[i], currSmileStrength);
+
+            }
+        }
+
+    }
     void Update()
     {
-        DataStore.Subscribe("user:pointValid", NoteUserIsGesturing);
+        DataStore.Subscribe("user:isPointing", NoteUserIsGesturing);
 
         //Get current dominantEmotion and its measurement score
 
@@ -123,9 +129,9 @@ public class FaceUpdate : MonoBehaviour
         switch (dominantEmotion)
         {
             case "Neutral":
-                recoveryRate = 20;
+                recoveryRate = 30;
                 maxStrength = 0;
-                currSmileStrength = Mathf.MoveTowards(currSmileStrength, maxStrength+30, recoveryRate * Time.deltaTime);
+                currSmileStrength = Mathf.MoveTowards(currSmileStrength, maxStrength + 30, recoveryRate * Time.deltaTime);
                 currFrownStrength = Mathf.MoveTowards(currFrownStrength, maxStrength, recoveryRate * Time.deltaTime);
                 for (int i = 0; i < renderers.Count; i++)
                 {
@@ -137,7 +143,7 @@ public class FaceUpdate : MonoBehaviour
                 }
                 break;
             case "Happy":
-                recoveryRate = score / 3;
+                recoveryRate = 40;
                 maxStrength = 100;
                 currSmileStrength = Mathf.MoveTowards(currSmileStrength, maxStrength, recoveryRate * Time.deltaTime);
                 currFrownStrength = Mathf.MoveTowards(currFrownStrength, 0, recoveryRate * Time.deltaTime);
@@ -150,7 +156,7 @@ public class FaceUpdate : MonoBehaviour
                 }
                 break;
             case "Angry":
-                recoveryRate = score / 3;
+                recoveryRate = 40;
                 maxStrength = 100;
                 currFrownStrength = Mathf.MoveTowards(currFrownStrength, maxStrength, recoveryRate * Time.deltaTime);
                 currSmileStrength = Mathf.MoveTowards(currSmileStrength, 0, recoveryRate * Time.deltaTime);
