@@ -23,12 +23,18 @@ public class ServoPerceptionModule : ModuleBase
     string wristRightOrientationKey = "user:jointOrientation:WristRight";
     string handLeftOrientationKey = "user:jointOrientation:HandLeft";
     string wristLeftOrientationKey = "user:jointOrientation:WristLeft";
+    string leftLabel = "user:armMotion:left";
+    string rightLabel = "user:armMotion:right";
     Quaternion wristRight, handRight, wristLeft, handLeft;
     int windowSize = 10;
     List<float> handRightAngles = new List<float>();
     List<float> wristRightAngles = new List<float>();
     List<float> handLeftAngles = new List<float>();
     List<float> wristLeftAngles = new List<float>();
+    System.Numerics.Vector2 leftLabelProb, rightLabelProb;
+
+    List<string> LabelList = new List<string>() { "still", "servo" };
+
 
     protected override void Start()
     {
@@ -38,6 +44,9 @@ public class ServoPerceptionModule : ModuleBase
         DataStore.Subscribe(wristRightOrientationKey, Handler);
         DataStore.Subscribe(handLeftOrientationKey, Handler);
         DataStore.Subscribe(wristLeftOrientationKey, Handler);
+
+        leftLabelProb = new System.Numerics.Vector2(0.0f, 0.0f);
+        rightLabelProb = new System.Numerics.Vector2(0.0f, 0.0f);
     }
 
     void Handler(string key, DataStore.IValue value)
@@ -53,6 +62,8 @@ public class ServoPerceptionModule : ModuleBase
         //Debug.Log(rightArmExists.ToString());
         bool leftArmExists = DataStore.HasValue(handLeftOrientationKey) && DataStore.HasValue(wristLeftOrientationKey);
         //Debug.Log(leftArmExists.ToString());
+
+        System.Numerics.Vector2 tempRight, tempLeft;
         if (rightArmExists)
         {
             Vector3 axis;
@@ -68,14 +79,20 @@ public class ServoPerceptionModule : ModuleBase
             if (wristRightAngles.Count > windowSize) wristRightAngles.RemoveAt(windowSize);
 
             string s = handRightAngles.Max() + " " + handRightAngles.Min() + " " + wristRightAngles.Max() + " " + wristRightAngles.Min();
-            if (handRightAngles.Max() - handRightAngles.Min() > 100 || wristRightAngles.Max() - wristRightAngles.Min() > 100)
+            if (handRightAngles.Max() - handRightAngles.Min() > 80 || wristRightAngles.Max() - wristRightAngles.Min() > 50)
             {
-                SetValue("user:armMotion:right", "servo ", "based on handRight angle");
+                //SetValue("user:armMotion:right", "servo ", "based on handRight angle");
+                tempRight = new System.Numerics.Vector2(0.0f, 1.0f);
             }
             else
             {
-                SetValue("user:armMotion:right", "still", "based on handRight angle");
+                //SetValue("user:armMotion:right", "still", "based on handRight angle");
+                tempRight = new System.Numerics.Vector2(1.0f, 0.0f);
             }
+
+            rightLabelProb = (rightLabelProb + tempRight) / 2;
+            string rightPred = LabelList.ElementAt(rightLabelProb.X > rightLabelProb.Y ? 0 : 1);
+            SetValue("user:armMotion:right", rightPred, "based on right arm joint angles");
         }
         if (leftArmExists)
         {
@@ -92,14 +109,20 @@ public class ServoPerceptionModule : ModuleBase
             if (wristLeftAngles.Count > windowSize) wristLeftAngles.RemoveAt(windowSize);
 
             string s = handLeftAngles.Max() + " " + handLeftAngles.Min() + " " + wristLeftAngles.Max() + " " + wristLeftAngles.Min();
-            if (handLeftAngles.Max() - handLeftAngles.Min() > 100 || wristLeftAngles.Max() - wristLeftAngles.Min() > 100)
+            if (handLeftAngles.Max() - handLeftAngles.Min() > 80 || wristLeftAngles.Max() - wristLeftAngles.Min() > 80)
             {
-                SetValue("user:armMotion:left", "servo", "based on handLeft angle");
+                //SetValue("user:armMotion:left", "servo", "based on handLeft angle");
+                tempLeft = new System.Numerics.Vector2(0.0f, 1.0f);
             }
             else
             {
-                SetValue("user:armMotion:left", "still", "based on handLeft angle");
+                //SetValue("user:armMotion:left", "still", "based on handLeft angle");
+                tempLeft = new System.Numerics.Vector2(1.0f, 0.0f);
             }
+
+            leftLabelProb = (leftLabelProb + tempLeft) / 2;
+            string leftPred = LabelList.ElementAt(leftLabelProb.X > leftLabelProb.Y ? 0 : 1);
+            SetValue("user:armMotion:left", leftPred, "based on left arm joint angles");
         }
     }
 

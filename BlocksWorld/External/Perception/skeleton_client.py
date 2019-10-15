@@ -27,8 +27,8 @@ class SkeletonClient:
                 print("Socket didn't start, waiting 3 seconds...")
                 time.sleep(3)
         print("Connected!")
-        #self.model = armsolver.ArmMotionRecogntion()
-        self.model = armsolver.PrimalRecognition()
+        self.model = armsolver.ArmMotionRecogntion()
+        #self.model = armsolver.PrimalRecognition()
 
     def run(self):
         while True:
@@ -46,6 +46,12 @@ class SkeletonClient:
 
             result = self.model.printable_result()
             LA_label, RA_label = result[0], result[1]
+
+            if(LA_label == "servo"): 
+                LA_label = "still"
+
+            if(RA_label == "servo"):
+                RA_label = "still"
 
             self.socket_api.set("user:arms:left", LA_label)
             self.socket_api.set("user:arms:right", RA_label)
