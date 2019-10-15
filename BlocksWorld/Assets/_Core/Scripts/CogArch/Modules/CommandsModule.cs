@@ -27,6 +27,8 @@ public class CommandsModule : ModuleBase
 	string pendingGrabTarget;
 	float pendingTime;	// if nonzero, time at which to do the next command
 	
+	public static bool hasPending { get; private set; }
+	
 	protected override void Start() {
 		Debug.Assert(manipulableObjects != null);	// we need this asigned
 		
@@ -43,7 +45,9 @@ public class CommandsModule : ModuleBase
 			pendingCommand.RemoveAt(0);
 			if (pendingCommand.Count > 0) {
 				Debug.Log("Still pending: " + pendingCommand[0]);
-				pendingTime = Time.time + 2;
+				pendingTime = Time.time + 1;
+			} else {
+				hasPending = false;
 			}
 		}
 	}
@@ -226,6 +230,7 @@ public class CommandsModule : ModuleBase
 	                pendingCommand.Add(cmd);
 	                pendingGrabTarget = obj.name;
 		            pendingTime = Time.time + 4;
+		            hasPending = true;
 		            Debug.Log("Added pending: " + cmd);
 	                return;
                 }
@@ -291,6 +296,7 @@ public class CommandsModule : ModuleBase
 				var cmd = new ComCommand(emote.originalText, emote.parse, act);
 				pendingCommand.Insert(0, cmd);
 				pendingTime = Time.time + 1;
+				hasPending = true;
 				Debug.Log("Inserting pending command: " + cmd);
 				pendingGrabTarget = "";
 				GrabPlaceModule.paused = false;

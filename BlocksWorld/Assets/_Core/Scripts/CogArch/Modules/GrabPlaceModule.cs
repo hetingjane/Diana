@@ -378,11 +378,16 @@ public class GrabPlaceModule : ModuleBase
                 {
                     if (setDownTarget != null)
                         setDownTarget.GetComponent<Rigidbody>().isKinematic = false;
-                    curReachTarget = default;
-                    SetValue("me:intent:handPosR", curReachTarget, currentState.ToString());
-                    SetValue("me:intent:motion:rightArm", new DataStore.StringValue("unreach"), "");
+	                curReachTarget = default;
+	                if (CommandsModule.hasPending) {
+	                	currentState = State.Idle;
+	                	DataStore.ClearValue("me:intent:handPosR");
+	                } else {
+		                SetValue("me:intent:handPosR", curReachTarget, currentState.ToString());
+		                SetValue("me:intent:motion:rightArm", new DataStore.StringValue("unreach"), "");
 
-                    currentState = State.Unreaching;
+		                currentState = State.Unreaching;	                	
+	                }
                 }
                 break;
             case State.Unreaching:
