@@ -40,11 +40,13 @@ public class EventManagementModule : ModuleBase
         DataStore.Subscribe("user:intent:object", TryEventComposition);
         DataStore.Subscribe("user:intent:action", TryEventComposition);
         DataStore.Subscribe("user:intent:location", TryEventComposition);
+        DataStore.Subscribe("user:intent:partialEvent", TryEventComposition);
 
         AStarSearch.ComputedPath += GotPath;
 
         eventManager.EntityReferenced += EntityReferenced;
         eventManager.NonexistentEntityError += NonexistentReferent;
+        eventManager.QueueEmpty += EventDoneExecuting;
     }
 
     // Update is called once per frame
@@ -99,26 +101,58 @@ public class EventManagementModule : ModuleBase
     {
         if (DataStore.GetBoolValue("user:isInteracting"))
         {
-            string eventStr = string.Empty;
+            string eventStr = DataStore.GetStringValue("user:intent:partialEvent");
             string actionStr = DataStore.GetStringValue("user:intent:action");
             string objectStr = DataStore.GetStringValue("user:intent:object");
-            string locationStr = DataStore.GetStringValue("user:intent:location");
+            Vector3 locationPos = DataStore.GetVector3Value("user:intent:location");
 
-            if (actionStr != null)
+	        if (!string.IsNullOrEmpty(actionStr))
             {
-                if (objectStr != null)
+		        if (!string.IsNullOrEmpty(objectStr))
                 {
-                    eventStr = actionStr.Replace("{0}", objectStr);
-                    SetValue("user:intent:partialEvent", eventStr, string.Empty);
+                    if (actionStr.Contains("{0}"))
+                    {
+                        eventStr = actionStr.Replace("{0}", objectStr);
+                        SetValue("user:intent:partialEvent", eventStr, string.Empty);
+                    }
+                }
+
+                if (locationPos != default)
+                {
+                    if (actionStr.Contains("{1}"))
+                    {
+                        eventStr = actionStr.Replace("{1}", GlobalHelper.VectorToParsable(locationPos));
+                        SetValue("user:intent:partialEvent", eventStr, string.Empty);
+                    }
+                }
+            }
+            else
+            {
+	            if ((!string.IsNullOrEmpty(objectStr)) && (locationPos != default))
+                {
+                    GameObject theme = GameObject.Find(objectStr);
+                    if (!GlobalHelper.ContainingObjects(locationPos).Contains(theme))
+                    {
+                        Vector3 targetLoc = new Vector3(locationPos.x, locationPos.y + GlobalHelper.GetObjectWorldSize(theme).extents.y, locationPos.z);
+                        eventStr = "put({0},{1})".Replace("{0}", objectStr).Replace("{1}", GlobalHelper.VectorToParsable(targetLoc));
+                        SetValue("user:intent:partialEvent", eventStr, string.Empty);
+                    }
+                }
+                else
+                {
+
                 }
             }
 
 
             // if no variables left in the compose event string
-	        if (!Regex.IsMatch(@"\{[0-9]+\}", eventStr))
-            {
-                SetValue("user:intent:event", eventStr, string.Empty);
-            }
+	        if (!string.IsNullOrEmpty(eventStr))
+	        {
+		        if (!Regex.IsMatch(eventStr, @"\{[0-9]+\}"))
+		        {
+			        SetValue("user:intent:event", eventStr, string.Empty);
+		        }
+	        }
         }
     }
 
@@ -133,9 +167,9 @@ public class EventManagementModule : ModuleBase
         // if there's an event to go with this, proceed with the event
         //  otherwise, Diana should indicate the entity and prompt for more information
 
-        if (((EventReferentArgs)e).Referent is string) {
-            SetValue("user:intent:object", ((EventReferentArgs)e).Referent as string, string.Empty);
-        }
+	    //if (((EventReferentArgs)e).Referent is string) {
+        //    SetValue("user:intent:object", ((EventReferentArgs)e).Referent as string, string.Empty);
+        //}
     }
         
     public void NonexistentReferent(object sender, EventArgs e) {
@@ -166,6 +200,18 @@ public class EventManagementModule : ModuleBase
             string responseStr = string.Format("There is no {0} here.", ((EventReferentArgs)e).Referent as string);
             SetValue("me:speech:intent", responseStr, string.Empty);
         }
+    }
+
+    public void EventDoneExecuting(object sender, EventArgs e) {
+	    SetValue("user:intent:event",DataStore.StringValue.Empty,string.Empty);
+	    SetValue("user:intent:partialEvent",DataStore.StringValue.Empty,string.Empty);
+
+        if (string.IsNullOrEmpty(DataStore.GetStringValue("me:holding"))) {
+	        SetValue("user:intent:object",DataStore.StringValue.Empty,string.Empty);
+        }
+
+	    SetValue("user:intent:action",DataStore.StringValue.Empty,string.Empty);
+	    SetValue("user:intent:location",DataStore.Vector3Value.Zero,string.Empty);
     }
 
     public void GRASP(object[] args)
@@ -200,6 +246,45 @@ public class EventManagementModule : ModuleBase
                 }
             }                    
         }
+    }
+
+    // IN: Objects
+    // OUT: String
+    public String THAT(object[] args) {
+        List<String> objNames = new List<String>();
+        //System.Random random = new System.Random ();
+
+        if (args[0] is GameObject) {
+            // assume all inputs are of same type
+            //int index = random.Next(args.Length);
+            for (int index = 0; index < args.Length; index++) {
+                if (args[index] is GameObject) {
+                    objNames.Add((args[index] as GameObject).name);
+                }
+            }
+        }
+
+        return string.Join(",", objNames.ToArray());
+    }
+
+    // IN: Objects
+    // OUT: String
+    public String THIS(object[] args) {
+        Debug.Log("Diana's World: THIS");
+        List<String> objNames = new List<String>();
+        //System.Random random = new System.Random ();
+
+        if (args[0] is GameObject) {
+            // assume all inputs are of same type
+            //int index = random.Next(args.Length);
+            for (int index = 0; index < args.Length; index++) {
+                if (args[index] is GameObject) {
+                    objNames.Add((args[index] as GameObject).name);
+                }
+            }
+        }
+
+        return string.Join(",", objNames.ToArray());
     }
 
     public bool IsSatisfied(string test) {

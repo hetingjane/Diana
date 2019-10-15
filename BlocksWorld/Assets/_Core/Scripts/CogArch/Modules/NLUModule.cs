@@ -38,11 +38,12 @@ public class NLUModule : ModuleBase
         Debug.Log(string.Format("Diana's World: Heard you was talkin' \"{0}\".",input));
 
         string mapped = MapTerms(input);
+	    Debug.Log(string.Format("Diana's World: Heard you was talkin' \"{0}\".",mapped));
 
         string parsed = communicationsBridge.NLParse(mapped);
         Debug.Log(string.Format("Diana's World: Heard you was talkin' \"{0}\".",parsed));
 
-        SetValue("user:intent:event", parsed, string.Empty);
+        SetValue("user:intent:partialEvent", parsed, string.Empty);
     }
 
     string MapTerms(string input) {
@@ -112,6 +113,26 @@ public class NLUModule : ModuleBase
             mapped = mapped.Replace("on the top of", "on");
         }
 
+        // insert "one" after "this"/"that" if not already followed by noun
+        if (mapped.Split().Contains("this")) {
+	        string nextWord = mapped.Split().Length == 1 ? 
+		        string.Empty : 
+		        mapped.Split().ToList()[mapped.Split().ToList().IndexOf("this") + 1];
+            string[] knownNominals = new string[] { "block", "cup", "knife", "plate", "one" };
+            if (!knownNominals.Contains(nextWord)) {
+                mapped = mapped.Replace("this", "this one");
+            }
+        }
+        else if (mapped.Split().Contains("this")) {
+	        string nextWord = mapped.Split().Length == 1 ? 
+		        string.Empty : 
+		        mapped.Split().ToList()[mapped.Split().ToList().IndexOf("this") + 1];
+	        string[] knownNominals = new string[] { "block", "cup", "knife", "plate", "one" };
+            if (!knownNominals.Contains(nextWord)) {
+                mapped = mapped.Replace("this", "this one");
+            }
+        }
+
         // add anaphor placeholder
         if (mapped.Split().Contains("one")) {
             mapped = mapped.Replace("one", "{2}");
@@ -127,11 +148,11 @@ public class NLUModule : ModuleBase
             mapped = mapped.Replace("them", "{0}");
         }
 
-        if (mapped.Contains("here")) {
-            mapped = mapped.Replace("here", "{1}");
-        }
-        else if (mapped.Contains("there")) {
+        if (mapped.Contains("there")) {
             mapped = mapped.Replace("there", "{1}");
+        }
+        else if (mapped.Contains("here")) {
+	        mapped = mapped.Replace("here", "{1}");
         }
 
         return mapped;

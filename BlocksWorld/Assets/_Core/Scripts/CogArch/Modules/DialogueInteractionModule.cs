@@ -40,17 +40,47 @@ public class DialogueInteractionModule : ModuleBase
 
         if (key == "user:intent:isPushLeft") {
             if (DataStore.GetBoolValue(key)) {
-                SetValue("user:intent:action", "slide({0},left)", string.Empty);
+                SetValue("user:intent:action", "slide({0},{1}(left))", string.Empty);
             }
         }
         else if (key == "user:intent:isPushRight") {
             if (DataStore.GetBoolValue(key)) {
-                SetValue("user:intent:action", "slide({0},right)", string.Empty);
+                SetValue("user:intent:action", "slide({0},{1}(right))", string.Empty);
+            }
+        }
+        if (key == "user:intent:isServoLeft") {
+            if (DataStore.GetBoolValue(key)) {
+                SetValue("user:intent:action", "slidep({0},{1}(left))", string.Empty);
+            }
+        }
+        else if (key == "user:intent:isServoRight") {
+            if (DataStore.GetBoolValue(key)) {
+                SetValue("user:intent:action", "slidep({0},{1}(right))", string.Empty);
             }
         }
         else if (key == "user:intent:isClaw") {
             if (DataStore.GetBoolValue(key)) {
                 SetValue("user:intent:action", "grasp({0})", string.Empty);
+            }
+        }
+        else if (key == "user:lastPointedAt:name") {
+            if (DataStore.GetStringValue(key) != string.Empty) {
+                if (string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:object"))) {
+                    SetValue("user:intent:object", DataStore.GetStringValue(key), string.Empty);
+                }
+                else {
+                    SetValue("user:intent:partialEvent",
+                        string.Format("put({0},on({1}))",
+                        DataStore.GetStringValue("user:intent:object"),
+                        DataStore.GetStringValue(key)), string.Empty);
+                }
+            }
+        }
+        else if (key == "user:lastPointedAt:position") {
+            if (string.IsNullOrEmpty(DataStore.GetStringValue("user:lastPointedAt:name"))) {
+                if (DataStore.GetVector3Value(key) != default) {
+                    SetValue("user:intent:location", DataStore.GetVector3Value(key), string.Empty);
+                }
             }
         }
     }
@@ -62,6 +92,11 @@ public class DialogueInteractionModule : ModuleBase
     public void Ready(object content) {
         SetValue("me:speech:intent", "I'm ready to go.", string.Empty);
         SetValue("user:isInteracting", true, string.Empty);
+    }
+
+    public void ModularInteractionLoop(object content) {
+        // do anything that needs to happen when we first enter the main
+        //  interaction loop here
     }
 
     public void CleanUp(object content) {
