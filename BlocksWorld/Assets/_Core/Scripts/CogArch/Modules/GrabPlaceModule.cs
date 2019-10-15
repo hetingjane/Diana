@@ -48,10 +48,6 @@ public class GrabPlaceModule : ModuleBase
 		/// </summary>
 		Reaching,
 		/// <summary>
-		/// Hand begins to descend towards the object
-		/// </summary>
-		Grabbing,
-		/// <summary>
 		/// Hand begins to be raised with the object held
 		/// </summary>
 		Lifting,
@@ -173,9 +169,9 @@ public class GrabPlaceModule : ModuleBase
 						// The default set down position is the same as the initial position of the block
 						// in case the user backs out of the action
 						setDownPos = bounds.center + Vector3.down * bounds.extents.y;
-						
-						// Set the reach target to be high above the set down position accounting for hold offset
-						curReachTarget = setDownPos + Vector3.up * (bounds.size.y + reachHeight) - holdOffset;
+
+						// Set the reach target to be within grabbing distance to the target
+						curReachTarget = setDownPos + Vector3.up * bounds.size.y - holdOffset;
 						SetValue("me:intent:handPosR", curReachTarget, currentState.ToString());
 						SetValue("me:intent:motion:rightArm", new DataStore.StringValue("reach"), "");
 
@@ -192,41 +188,31 @@ public class GrabPlaceModule : ModuleBase
 				// If the grab animation is completed
 				if (rightArmMotion == "reached")
 				{
-					var bounds = GlobalHelper.GetObjectWorldSize(targetBlock.gameObject);
-					// Lower the reach target to be withing grabbing distance to the target
-					curReachTarget = setDownPos + Vector3.up * bounds.size.y - holdOffset;
-					SetValue("me:intent:handPosR", curReachTarget, currentState.ToString());
-
-					// We go to the next state
-					currentState = State.Grabbing;
-				}
-				// ToDo: check for interrupt.
-				break;
-			case State.Grabbing:
-				if (rightArmMotion == "reached")
-				{
 					// Do not respond to forces/collisions
 					Rigging rigging = targetBlock.GetComponent<Rigging>();
-					if (rigging != null) {
+					if (rigging != null)
+					{
 						rigging.ActivatePhysics(false);
 					}
 
 					// Store a reference to the grabbed object
 					heldObject = targetBlock;
 
-					// Raise the reach target to be high above the target
 					var bounds = GlobalHelper.GetObjectWorldSize(targetBlock.gameObject);
+					// Raise the reach target to be high above the target
 					curReachTarget = setDownPos + Vector3.up * (bounds.size.y + liftHeight) - holdOffset;
 
 					// Set the target position of the held object to maintain the hold offset
 					// NOTE: DianaMotorControl move speed and the voxeme move speed must be the same after this point
 					//  or this isn't going to look right
 					heldObject.targetPosition = curReachTarget + holdOffset;
+
 					SetValue("me:intent:handPosR", curReachTarget, currentState.ToString());
 
 					// We go to the next state
 					currentState = State.Lifting;
 				}
+				// ToDo: check for interrupt.
 				break;
 			case State.Lifting:
 				if (rightArmMotion == "reached")
