@@ -115,7 +115,7 @@ public class NLUModule : ModuleBase
 
         // insert "one" after "this"/"that" if not already followed by noun
         if (mapped.Split().Contains("this")) {
-	        string nextWord = mapped.Split().Length == 1 ? 
+	        string nextWord = mapped.Split().ToList().IndexOf("this") == mapped.Split().Length - 1 ? 
 		        string.Empty : 
 		        mapped.Split().ToList()[mapped.Split().ToList().IndexOf("this") + 1];
             string[] knownNominals = new string[] { "block", "cup", "knife", "plate", "one" };

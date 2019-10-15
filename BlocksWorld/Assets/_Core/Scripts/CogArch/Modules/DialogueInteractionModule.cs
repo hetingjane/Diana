@@ -68,7 +68,7 @@ public class DialogueInteractionModule : ModuleBase
                 if (string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:object"))) {
                     SetValue("user:intent:object", DataStore.GetStringValue(key), string.Empty);
                 }
-                else {
+                else if (DataStore.GetStringValue("user:intent:object") != DataStore.GetStringValue(key)) {
                     SetValue("user:intent:partialEvent",
                         string.Format("put({0},on({1}))",
                         DataStore.GetStringValue("user:intent:object"),
