@@ -112,6 +112,8 @@ public abstract class RuleStateMachine<T> where T: Enum
 	/// Event that is triggered whenever the state is changed
 	/// </summary>
 	public event EventHandler<StateChangedEventArgs<T>> StateChanged;
+
+	public event EventHandler Evaluated;
 	
 	/// <summary>
 	/// Create a rule state machine with initial state set to the first value of the <see cref="T"/> enumeration
@@ -175,15 +177,20 @@ public abstract class RuleStateMachine<T> where T: Enum
 	/// <returns><c>true</c> if the transition was made, <c>false</c> otherwise</returns>
 	public bool Evaluate()
 	{
+		bool stateChanged = false;
 		foreach(var pair in transitions[CurrentState])
 		{
 			var (toState, rule) = (pair.Key, pair.Value);
 			if (rule.Evaluate())
 			{
 				CurrentState = toState;
-				return true;
+				stateChanged = true;
+				break;
 			}
 		}
-		return false;
+
+		Evaluated?.Invoke(this, EventArgs.Empty);
+
+		return stateChanged;
 	}
 }
