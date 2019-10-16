@@ -63,6 +63,12 @@ public class DialogueInteractionModule : ModuleBase
                 SetValue("user:intent:action", "grasp({0})", string.Empty);
             }
         }
+        else if (key == "user:isPointing") {
+            if (!DataStore.GetBoolValue(key)) {
+                SetValue("user:lastPointedAt:name", DataStore.StringValue.Empty, string.Empty);
+                SetValue("user:lastPointedAt:position", DataStore.Vector3Value.Zero, string.Empty);
+            }
+        }
         else if (key == "user:lastPointedAt:name") {
             if (DataStore.GetStringValue(key) != string.Empty) {
                 if (string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:object"))) {
@@ -79,9 +85,14 @@ public class DialogueInteractionModule : ModuleBase
         else if (key == "user:lastPointedAt:position") {
             if (string.IsNullOrEmpty(DataStore.GetStringValue("user:lastPointedAt:name"))) {
                 if (DataStore.GetVector3Value(key) != default) {
+                    Debug.Log(string.Format("Setting user:intent:location to {0} ({1})", DataStore.GetVector3Value(key), key));
                     SetValue("user:intent:location", DataStore.GetVector3Value(key), string.Empty);
                 }
             }
+        }
+        else if (key == "user:communication") {
+            CommunicationValue comm = DataStore.GetValue("user:communication") as CommunicationValue;
+	        Debug.Log(string.Format("User communication: {0} {1} {2} {3}", comm.val, comm.val.directAddress, comm.val.parse, comm.val.originalText));
         }
     }
 

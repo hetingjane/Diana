@@ -27,6 +27,12 @@ public class EventManagementModule : ModuleBase
 {
     public EventManager eventManager;
 
+    /// <summary>
+    /// Reference to the manipulable objects in the scene.
+    /// Only these will be searched when an object is referred by name.
+    /// </summary>
+    public Transform grabbableBlocks;
+
     // need to keep the same as GrabPlaceModule's value but don't want to couple them
     private readonly Vector3 holdOffset = new Vector3(0f, -.08f, .04f);
 
@@ -47,7 +53,10 @@ public class EventManagementModule : ModuleBase
         eventManager.EntityReferenced += EntityReferenced;
         eventManager.NonexistentEntityError += NonexistentReferent;
         eventManager.QueueEmpty += EventDoneExecuting;
+
+        eventManager.OnUnhandledArgument += TryAnaphorHandling;
     }
+
 
     // Update is called once per frame
     void Update()
@@ -101,6 +110,7 @@ public class EventManagementModule : ModuleBase
     {
         if (DataStore.GetBoolValue("user:isInteracting"))
         {
+            Debug.Log("Trying event composition");
             string eventStr = DataStore.GetStringValue("user:intent:partialEvent");
             string actionStr = DataStore.GetStringValue("user:intent:action");
             string objectStr = DataStore.GetStringValue("user:intent:object");
@@ -144,11 +154,18 @@ public class EventManagementModule : ModuleBase
                 }
             }
 
-
-            // if no variables left in the compose event string
 	        if (!string.IsNullOrEmpty(eventStr))
 	        {
-		        if (!Regex.IsMatch(eventStr, @"\{[0-9]+\}"))
+	            if (eventStr.Contains("{2}"))
+	            {
+	                
+	            }
+	        }
+
+            // if no variables left in the composed event string
+	        if (!string.IsNullOrEmpty(eventStr))
+	        {
+		        if (!Regex.IsMatch(eventStr, @"\{[0-1]+\}"))
 		        {
 			        SetValue("user:intent:event", eventStr, string.Empty);
 		        }
@@ -167,9 +184,23 @@ public class EventManagementModule : ModuleBase
         // if there's an event to go with this, proceed with the event
         //  otherwise, Diana should indicate the entity and prompt for more information
 
-	    //if (((EventReferentArgs)e).Referent is string) {
-        //    SetValue("user:intent:object", ((EventReferentArgs)e).Referent as string, string.Empty);
-        //}
+	    if (((EventReferentArgs)e).Referent is string) {
+            SetValue("user:intent:object", ((EventReferentArgs)e).Referent as string, string.Empty);
+        }
+    }
+
+    public string TryAnaphorHandling(string predStr) {
+	    Debug.Log(string.Format("VoxSim event manager hit an UnhandledArgument error with {0}!", predStr));
+
+        string anaphorList = string.Empty;
+
+        // it might contain an anaphor
+        if (predStr.Contains("{2}")) {
+            anaphorList = string.Join(",", grabbableBlocks.GetComponentsInChildren<Voxeme>().Where(v => v.isActiveAndEnabled).Select(
+                o => GlobalHelper.GetMostImmediateParentVoxeme(o.gameObject).name));
+        }
+
+        return anaphorList;
     }
         
     public void NonexistentReferent(object sender, EventArgs e) {
@@ -193,7 +224,7 @@ public class EventManagementModule : ModuleBase
         }
         else if (((EventReferentArgs) e).Referent is string) {
             // absent object type - string
-            if (Regex.IsMatch(((EventReferentArgs) e).Referent as string, @"\{.\}")) {
+	        if (Regex.IsMatch(((EventReferentArgs) e).Referent as string, @"\{.\}")) {
                 return;
             }
 
