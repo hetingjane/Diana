@@ -14654,6 +14654,7 @@ MonoBehaviour:
   comment: 
   display: {fileID: 0}
   eventManager: {fileID: 1725009506}
+  grabbableBlocks: {fileID: 184680267}
 --- !u!1 &2054860432
 GameObject:
   m_ObjectHideFlags: 0
