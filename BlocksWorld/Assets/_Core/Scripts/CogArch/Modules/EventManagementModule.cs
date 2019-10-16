@@ -52,8 +52,9 @@ public class EventManagementModule : ModuleBase
 
         eventManager.EntityReferenced += EntityReferenced;
         eventManager.NonexistentEntityError += NonexistentReferent;
-        eventManager.QueueEmpty += EventDoneExecuting;
+        //eventManager.QueueEmpty += EventDoneExecuting;
 
+        SatisfactionTest.OnUnhandledArgument += TryPropWordHandling;
         eventManager.OnUnhandledArgument += TryPropWordHandling;
     }
 
@@ -283,40 +284,53 @@ public class EventManagementModule : ModuleBase
     // IN: Objects
     // OUT: String
     public String THAT(object[] args) {
-        List<String> objNames = new List<String>();
-        //System.Random random = new System.Random ();
+	    String objName = string.Empty;
+	    //System.Random random = new System.Random ();
 
-        if (args[0] is GameObject) {
-            // assume all inputs are of same type
-            //int index = random.Next(args.Length);
-            for (int index = 0; index < args.Length; index++) {
-                if (args[index] is GameObject) {
-                    objNames.Add((args[index] as GameObject).name);
-                }
-            }
-        }
+	    if (args[0] is GameObject) {
+		    // assume all inputs are of same type
+		    GameObject target = GlobalHelper.FindTargetByLocation(DataStore.GetVector3Value("user:pointPos"),
+			    .1f, args.Select(a => a as GameObject).ToList(), LayerMask.GetMask("Blocks"));
+		    if (target != null) {
+			    objName = target.name;
+		    }
+	    }
+	    else if (args[0] is String) {
+		    // assume all inputs are of same type
+		    GameObject target = GlobalHelper.FindTargetByLocation(DataStore.GetVector3Value("user:pointPos"),
+			    .1f, args.Select(a => GameObject.Find(a as String)).ToList(), LayerMask.GetMask("Blocks"));
+		    if (target != null) {
+			    objName = target.name;
+		    }
+	    }
 
-        return string.Join(",", objNames.ToArray());
+	    return objName;
     }
 
     // IN: Objects
     // OUT: String
     public String THIS(object[] args) {
-        Debug.Log("Diana's World: THIS");
-        List<String> objNames = new List<String>();
+	    String objName = string.Empty;
         //System.Random random = new System.Random ();
 
         if (args[0] is GameObject) {
-            // assume all inputs are of same type
-            //int index = random.Next(args.Length);
-            for (int index = 0; index < args.Length; index++) {
-                if (args[index] is GameObject) {
-                    objNames.Add((args[index] as GameObject).name);
-                }
-            }
+	        // assume all inputs are of same type
+	        GameObject target = GlobalHelper.FindTargetByLocation(DataStore.GetVector3Value("user:pointPos"),
+	        	.1f, args.Select(a => a as GameObject).ToList(), LayerMask.GetMask("Blocks"));
+	        if (target != null) {
+	        	objName = target.name;
+	        }
+        }
+        else if (args[0] is String) {
+        	// assume all inputs are of same type
+        	GameObject target = GlobalHelper.FindTargetByLocation(DataStore.GetVector3Value("user:pointPos"),
+	        	.1f, args.Select(a => GameObject.Find(a as String)).ToList(), LayerMask.GetMask("Blocks"));
+	        if (target != null) {
+	        	objName = target.name;
+	        }
         }
 
-        return string.Join(",", objNames.ToArray());
+        return objName;
     }
 
     public bool IsSatisfied(string test) {
