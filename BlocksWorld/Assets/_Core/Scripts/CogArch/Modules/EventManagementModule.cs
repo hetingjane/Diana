@@ -54,7 +54,7 @@ public class EventManagementModule : ModuleBase
         eventManager.NonexistentEntityError += NonexistentReferent;
         eventManager.QueueEmpty += EventDoneExecuting;
 
-        eventManager.OnUnhandledArgument += TryAnaphorHandling;
+        eventManager.OnUnhandledArgument += TryPropWordHandling;
     }
 
 
@@ -111,14 +111,15 @@ public class EventManagementModule : ModuleBase
         if (DataStore.GetBoolValue("user:isInteracting"))
         {
             Debug.Log("Trying event composition");
+
             string eventStr = DataStore.GetStringValue("user:intent:partialEvent");
             string actionStr = DataStore.GetStringValue("user:intent:action");
             string objectStr = DataStore.GetStringValue("user:intent:object");
             Vector3 locationPos = DataStore.GetVector3Value("user:intent:location");
 
-	        if (!string.IsNullOrEmpty(actionStr))
+            if (!string.IsNullOrEmpty(actionStr))
             {
-		        if (!string.IsNullOrEmpty(objectStr))
+                if (!string.IsNullOrEmpty(objectStr))
                 {
                     if (actionStr.Contains("{0}"))
                     {
@@ -138,11 +139,11 @@ public class EventManagementModule : ModuleBase
             }
             else
             {
-	            if ((!string.IsNullOrEmpty(objectStr)) && (locationPos != default))
+                if ((!string.IsNullOrEmpty(objectStr)) && (locationPos != default))
                 {
                     GameObject theme = GameObject.Find(objectStr);
-		            Vector3 targetLoc = new Vector3(locationPos.x, locationPos.y + GlobalHelper.GetObjectWorldSize(theme).extents.y, locationPos.z);
-		            if (!GlobalHelper.ContainingObjects(targetLoc).Contains(theme))
+                    Vector3 targetLoc = new Vector3(locationPos.x, locationPos.y + GlobalHelper.GetObjectWorldSize(theme).extents.y, locationPos.z);
+                    if (!GlobalHelper.ContainingObjects(targetLoc).Contains(theme))
                     {
                         eventStr = "put({0},{1})".Replace("{0}", objectStr).Replace("{1}", GlobalHelper.VectorToParsable(targetLoc));
                         SetValue("user:intent:partialEvent", eventStr, string.Empty);
@@ -154,22 +155,22 @@ public class EventManagementModule : ModuleBase
                 }
             }
 
-	        if (!string.IsNullOrEmpty(eventStr))
-	        {
-	            if (eventStr.Contains("{2}"))
-	            {
-	                
-	            }
-	        }
+            if (!string.IsNullOrEmpty(eventStr))
+            {
+                if (eventStr.Contains("{2}"))
+                {
+                    
+                }
+            }
 
             // if no variables left in the composed event string
-	        if (!string.IsNullOrEmpty(eventStr))
-	        {
-		        if (!Regex.IsMatch(eventStr, @"\{[0-1]+\}"))
-		        {
-			        SetValue("user:intent:event", eventStr, string.Empty);
-		        }
-	        }
+            if (!string.IsNullOrEmpty(eventStr))
+            {
+                if (!Regex.IsMatch(eventStr, @"\{[0-1]+\}"))
+                {
+                    SetValue("user:intent:event", eventStr, string.Empty);
+                }
+            }
         }
     }
 
@@ -184,23 +185,23 @@ public class EventManagementModule : ModuleBase
         // if there's an event to go with this, proceed with the event
         //  otherwise, Diana should indicate the entity and prompt for more information
 
-	    if (((EventReferentArgs)e).Referent is string) {
+        if (((EventReferentArgs)e).Referent is string) {
             SetValue("user:intent:object", ((EventReferentArgs)e).Referent as string, string.Empty);
         }
     }
 
-    public string TryAnaphorHandling(string predStr) {
-	    Debug.Log(string.Format("VoxSim event manager hit an UnhandledArgument error with {0}!", predStr));
+    public string TryPropWordHandling(string predStr) {
+        Debug.Log(string.Format("VoxSim event manager hit an UnhandledArgument error with {0}!", predStr));
 
-        string anaphorList = string.Empty;
+        string fillerList = string.Empty;
 
-        // it might contain an anaphor
+        // it might contain a prop-word
         if (predStr.Contains("{2}")) {
-            anaphorList = string.Join(",", grabbableBlocks.GetComponentsInChildren<Voxeme>().Where(v => v.isActiveAndEnabled).Select(
+            fillerList = string.Join(",", grabbableBlocks.GetComponentsInChildren<Voxeme>().Where(v => v.isActiveAndEnabled).Select(
                 o => GlobalHelper.GetMostImmediateParentVoxeme(o.gameObject).name));
         }
 
-        return anaphorList;
+        return fillerList;
     }
         
     public void NonexistentReferent(object sender, EventArgs e) {
@@ -217,14 +218,14 @@ public class EventManagementModule : ModuleBase
                     Debug.Log(string.Format("{0} {1} does not exist!", pred,
                         (objs[0] as GameObject).GetComponent<Voxeme>().voxml.Lex.Pred));
                     string responseStr = string.Format("There is no {0} {1} here.", pred,
-	                    (objs[0] as GameObject).GetComponent<Voxeme>().voxml.Lex.Pred);
+                        (objs[0] as GameObject).GetComponent<Voxeme>().voxml.Lex.Pred);
                     SetValue("me:speech:intent", responseStr, string.Empty);
                 }
             }
         }
         else if (((EventReferentArgs) e).Referent is string) {
             // absent object type - string
-	        if (Regex.IsMatch(((EventReferentArgs) e).Referent as string, @"\{.\}")) {
+            if (Regex.IsMatch(((EventReferentArgs) e).Referent as string, @"\{.\}")) {
                 return;
             }
 
@@ -234,15 +235,15 @@ public class EventManagementModule : ModuleBase
     }
 
     public void EventDoneExecuting(object sender, EventArgs e) {
-	    SetValue("user:intent:event",DataStore.StringValue.Empty,string.Empty);
-	    SetValue("user:intent:partialEvent",DataStore.StringValue.Empty,string.Empty);
+        SetValue("user:intent:event",DataStore.StringValue.Empty,string.Empty);
+        SetValue("user:intent:partialEvent",DataStore.StringValue.Empty,string.Empty);
 
         if (string.IsNullOrEmpty(DataStore.GetStringValue("me:holding"))) {
-	        SetValue("user:intent:object",DataStore.StringValue.Empty,string.Empty);
+            SetValue("user:intent:object",DataStore.StringValue.Empty,string.Empty);
         }
 
-	    SetValue("user:intent:action",DataStore.StringValue.Empty,string.Empty);
-	    SetValue("user:intent:location",DataStore.Vector3Value.Zero,string.Empty);
+        SetValue("user:intent:action",DataStore.StringValue.Empty,string.Empty);
+        SetValue("user:intent:location",DataStore.Vector3Value.Zero,string.Empty);
     }
 
     public void GRASP(object[] args)
