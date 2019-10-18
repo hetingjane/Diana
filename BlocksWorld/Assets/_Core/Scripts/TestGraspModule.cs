@@ -56,7 +56,11 @@ public class TestGraspModule : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (doGraspRandomObject)
+		doGraspRandomObject = doGraspRandomObject || Input.GetKeyDown(KeyCode.J);
+		doMoveRandomLocation = doMoveRandomLocation || Input.GetKeyDown(KeyCode.K);
+		doUngrasp = doUngrasp || Input.GetKeyDown(KeyCode.L);
+
+		if (doGraspRandomObject)
 		{
 			targetBlock = GetRandomObject();
 			DataStore.SetValue("me:intent:action", new DataStore.StringValue("grasp"), null, "");
