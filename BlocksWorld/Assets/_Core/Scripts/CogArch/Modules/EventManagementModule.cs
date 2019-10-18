@@ -180,19 +180,16 @@ public class EventManagementModule : ModuleBase
 
     public void EventDoneExecuting(string key, DataStore.IValue value) {
         if ((value as DataStore.BoolValue).val == true) {
-            if (DataStore.GetStringValue("me:actual:motion:rightArm") == "idle") {
-                // if "me:intent:action:isComplete" is true AND "me:rightArm:motion" is "idle",
-                //  then Diana has returned to rest after ungrasping
-                SetValue("user:intent:event",DataStore.StringValue.Empty,string.Empty);
-                SetValue("user:intent:partialEvent",DataStore.StringValue.Empty,string.Empty);
+            // if "me:intent:action:isComplete" is true
+            SetValue("user:intent:event",DataStore.StringValue.Empty,string.Empty);
+            SetValue("user:intent:partialEvent",DataStore.StringValue.Empty,string.Empty);
 
-                if (string.IsNullOrEmpty(DataStore.GetStringValue("me:holding"))) {
-                    SetValue("user:intent:object",DataStore.StringValue.Empty,string.Empty);
-                }
-
-                SetValue("user:intent:action",DataStore.StringValue.Empty,string.Empty);
-                SetValue("user:intent:location",DataStore.Vector3Value.Zero,string.Empty);
+            if (string.IsNullOrEmpty(DataStore.GetStringValue("me:holding"))) {
+                SetValue("user:intent:object",DataStore.StringValue.Empty,string.Empty);
             }
+
+            SetValue("user:intent:action",DataStore.StringValue.Empty,string.Empty);
+            SetValue("user:intent:location",DataStore.Vector3Value.Zero,string.Empty);
         }
     }
 
