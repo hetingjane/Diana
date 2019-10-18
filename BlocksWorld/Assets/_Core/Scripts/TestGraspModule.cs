@@ -50,7 +50,7 @@ public class TestGraspModule : MonoBehaviour
 
 	private GameObject GetRandomObject()
 	{
-		return manipulableObjects[Random.Range(0, manipulableObjects.Length - 1)];
+		return manipulableObjects[Random.Range(0, manipulableObjects.Length)];
 	}
 
     // Update is called once per frame
