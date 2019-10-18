@@ -65,7 +65,7 @@ public class EventManagementModule : ModuleBase
     // Update is called once per frame
     void Update()
     {
-        string rightArmMotion = DataStore.GetStringValue("me:rightArm:motion");
+        string rightArmMotion = DataStore.GetStringValue("me:actual:motion:rightArm");
 
         if (objectMovePath != null)
         {
@@ -180,7 +180,7 @@ public class EventManagementModule : ModuleBase
 
     public void EventDoneExecuting(string key, DataStore.IValue value) {
         if ((value as DataStore.BoolValue).val == true) {
-            if (DataStore.GetStringValue("me:rightArm:motion") == "idle") {
+            if (DataStore.GetStringValue("me:actual:motion:rightArm") == "idle") {
                 // if "me:intent:action:isComplete" is true AND "me:rightArm:motion" is "idle",
                 //  then Diana has returned to rest after ungrasping
                 SetValue("user:intent:event",DataStore.StringValue.Empty,string.Empty);
