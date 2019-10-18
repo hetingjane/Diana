@@ -47,6 +47,7 @@ public class EventManagementModule : ModuleBase
         DataStore.Subscribe("user:intent:action", TryEventComposition);
         DataStore.Subscribe("user:intent:location", TryEventComposition);
         DataStore.Subscribe("user:intent:partialEvent", TryEventComposition);
+        DataStore.Subscribe("user:intent:action:isComplete", EventDoneExecuting);
 
         AStarSearch.ComputedPath += GotPath;
 
@@ -175,6 +176,19 @@ public class EventManagementModule : ModuleBase
         }
     }
 
+    public void EventDoneExecuting(string key, DataStore.IValue value) {
+        if ((value as DataStore.BoolValue).val == true) {
+            SetValue("user:intent:event",DataStore.StringValue.Empty,string.Empty);
+            SetValue("user:intent:partialEvent",DataStore.StringValue.Empty,string.Empty);
+
+            if (string.IsNullOrEmpty(DataStore.GetStringValue("me:holding"))) {
+                SetValue("user:intent:object",DataStore.StringValue.Empty,string.Empty);
+            }
+
+            SetValue("user:intent:action",DataStore.StringValue.Empty,string.Empty);
+            SetValue("user:intent:location",DataStore.Vector3Value.Zero,string.Empty);
+        }
+    }
 
     public void GotPath(object sender, EventArgs e)
     {
@@ -233,18 +247,6 @@ public class EventManagementModule : ModuleBase
             string responseStr = string.Format("There is no {0} here.", ((EventReferentArgs)e).Referent as string);
             SetValue("me:speech:intent", responseStr, string.Empty);
         }
-    }
-
-    public void EventDoneExecuting(object sender, EventArgs e) {
-        SetValue("user:intent:event",DataStore.StringValue.Empty,string.Empty);
-        SetValue("user:intent:partialEvent",DataStore.StringValue.Empty,string.Empty);
-
-        if (string.IsNullOrEmpty(DataStore.GetStringValue("me:holding"))) {
-            SetValue("user:intent:object",DataStore.StringValue.Empty,string.Empty);
-        }
-
-        SetValue("user:intent:action",DataStore.StringValue.Empty,string.Empty);
-        SetValue("user:intent:location",DataStore.Vector3Value.Zero,string.Empty);
     }
 
     public void GRASP(object[] args)
