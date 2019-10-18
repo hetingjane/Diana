@@ -1,5 +1,7 @@
-﻿using VoxSimPlatform.Vox;
-using UnityEngine;
+﻿using UnityEngine;
+
+using VoxSimPlatform.CogPhysics;
+using VoxSimPlatform.Vox;
 
 public enum GraspState
 {
@@ -105,6 +107,13 @@ public class GraspModule : ModuleBase
 				{
 					held = target;
 					SetValue("me:holding", held.name, $"Holding {held.name}");
+
+                    // Do not respond to forces/collisions
+                    Rigging rigging = held.GetComponent<Rigging>();
+                    if (rigging != null)
+                    {
+                        rigging.ActivatePhysics(false);
+                    }
 
 					SetValue("me:intent:action:isComplete", true, "");
 					currentState = GraspState.Holding;

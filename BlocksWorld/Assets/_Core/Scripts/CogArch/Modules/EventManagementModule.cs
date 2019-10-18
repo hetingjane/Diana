@@ -5,9 +5,11 @@ Reads:      user:intent:event (StringValue, full logical string representation o
             user:intent:object (StringValue)
             user:intent:action (StringValue)
             user:intent:location (Vector3Value)
+            user:intent:partialEvent (StringValue, currently composed event from available info)
+            me:intent:action:isComplete (BoolValue)
 Writes:     me:intent:action (StringValue)
             me:intent:targetName (StringValue, name of object that is theme of action)
-            me:intent:handPosR
+            me:intent:target (Vector3Value)
 */
 
 using UnityEngine;
@@ -47,6 +49,7 @@ public class EventManagementModule : ModuleBase
         DataStore.Subscribe("user:intent:action", TryEventComposition);
         DataStore.Subscribe("user:intent:location", TryEventComposition);
         DataStore.Subscribe("user:intent:partialEvent", TryEventComposition);
+        DataStore.Subscribe("me:intent:action:isComplete", EventDoneExecuting);
 
         AStarSearch.ComputedPath += GotPath;
 
@@ -62,7 +65,7 @@ public class EventManagementModule : ModuleBase
     // Update is called once per frame
     void Update()
     {
-        string rightArmMotion = DataStore.GetStringValue("me:rightArm:motion");
+        string rightArmMotion = DataStore.GetStringValue("me:actual:motion:rightArm");
 
         if (objectMovePath != null)
         {
@@ -72,10 +75,10 @@ public class EventManagementModule : ModuleBase
 
                 if (objectMovePath.Count > 0)
                 {
-                    Debug.Log(string.Format("Setting me:intent:handPosR to {0}; me:actual:handPosR is {1}",
+                    Debug.Log(string.Format("Setting me:intent:target to {0}; me:actual:handPosR is {1}",
                         GlobalHelper.VectorToParsable(objectMovePath.ElementAt(0) - holdOffset),
                         GlobalHelper.VectorToParsable(DataStore.GetVector3Value("me:actual:handPosR"))));
-                    SetValue("me:intent:handPosR", objectMovePath.ElementAt(0) - holdOffset, string.Empty);
+                    SetValue("me:intent:target", objectMovePath.ElementAt(0) - holdOffset, string.Empty);
                 }
                 else
                 {
@@ -175,11 +178,26 @@ public class EventManagementModule : ModuleBase
         }
     }
 
+    public void EventDoneExecuting(string key, DataStore.IValue value) {
+        if ((value as DataStore.BoolValue).val == true) {
+            // if "me:intent:action:isComplete" is true
+            SetValue("user:intent:event",DataStore.StringValue.Empty,string.Empty);
+            SetValue("user:intent:partialEvent",DataStore.StringValue.Empty,string.Empty);
+
+            if (string.IsNullOrEmpty(DataStore.GetStringValue("me:holding"))) {
+                SetValue("user:intent:object",DataStore.StringValue.Empty,string.Empty);
+            }
+
+            SetValue("user:intent:action",DataStore.StringValue.Empty,string.Empty);
+            SetValue("user:intent:location",DataStore.Vector3Value.Zero,string.Empty);
+        }
+    }
 
     public void GotPath(object sender, EventArgs e)
     {
         objectMovePath = ((ComputedPathEventArgs)e).path;
-        SetValue("me:intent:handPosR", objectMovePath.ElementAt(0) - holdOffset, string.Empty);
+        SetValue("me:intent:action", "move", string.Empty);
+        SetValue("me:intent:target", objectMovePath.ElementAt(0) - holdOffset, string.Empty);
     }
 
     public void EntityReferenced(object sender, EventArgs e) {
@@ -235,18 +253,6 @@ public class EventManagementModule : ModuleBase
         }
     }
 
-    public void EventDoneExecuting(object sender, EventArgs e) {
-        SetValue("user:intent:event",DataStore.StringValue.Empty,string.Empty);
-        SetValue("user:intent:partialEvent",DataStore.StringValue.Empty,string.Empty);
-
-        if (string.IsNullOrEmpty(DataStore.GetStringValue("me:holding"))) {
-            SetValue("user:intent:object",DataStore.StringValue.Empty,string.Empty);
-        }
-
-        SetValue("user:intent:action",DataStore.StringValue.Empty,string.Empty);
-        SetValue("user:intent:location",DataStore.Vector3Value.Zero,string.Empty);
-    }
-
     public void GRASP(object[] args)
     {
         if (args[args.Length - 1] is bool)
@@ -257,8 +263,9 @@ public class EventManagementModule : ModuleBase
                 {
                     GameObject obj = (args[0] as GameObject);
                     RiggingHelper.UnRig(obj, obj.transform.parent.gameObject);
-                    SetValue("me:intent:action", "pickUp", string.Empty);
+                    SetValue("me:intent:action", "grasp", string.Empty);
                     SetValue("me:intent:targetName", obj.name, string.Format("Grasping {0}",obj.name));
+                    SetValue("me:intent:target", obj.transform.position - holdOffset, string.Empty);
                 }
             }                    
         }
@@ -273,7 +280,7 @@ public class EventManagementModule : ModuleBase
                 if (args[0] is GameObject)
                 {
                     GameObject obj = (args[0] as GameObject);
-                    SetValue("me:intent:action", "setDown", string.Empty);
+                    SetValue("me:intent:action", "ungrasp", string.Empty);
                     SetValue("me:intent:target", obj.transform.position, 
                         string.Format("Ungrasping {0} at {1}", obj.name, GlobalHelper.VectorToParsable(obj.transform.position)));
                 }
