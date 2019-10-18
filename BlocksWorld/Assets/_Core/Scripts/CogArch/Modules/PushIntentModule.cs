@@ -16,6 +16,8 @@ public class PushIntentModule : ModuleBase
 {
 	private PushLeftStateMachine pushLeftStateMachine;
 	private PushRightStateMachine pushRightStateMachine;
+	private PushFrontStateMachine pushFrontStateMachine;
+	private PushBackStateMachine pushBackStateMachine;
 	
 	protected override void Start()
     {
@@ -23,6 +25,8 @@ public class PushIntentModule : ModuleBase
 
 		pushLeftStateMachine = new PushLeftStateMachine();
 		pushRightStateMachine = new PushRightStateMachine();
+		pushFrontStateMachine = new PushFrontStateMachine();
+		pushBackStateMachine = new PushBackStateMachine();
 	}
 
 	private void Update()
@@ -49,6 +53,32 @@ public class PushIntentModule : ModuleBase
 					break;
 				case PushLeftState.PushLeftStop:
 					DataStore.SetValue("user:intent:isPushLeft", DataStore.BoolValue.False, this, "stopped pushing left with right hand");
+					break;
+			}
+		}
+
+		if (pushFrontStateMachine.Evaluate())
+		{
+			switch (pushFrontStateMachine.CurrentState)
+			{
+				case PushFrontState.PushFrontStart:
+					DataStore.SetValue("user:intent:isPushFront", DataStore.BoolValue.True, this, "pushing front with either hand");
+					break;
+				case PushFrontState.PushFrontStop:
+					DataStore.SetValue("user:intent:isPushFront", DataStore.BoolValue.False, this, "stopped pushing front");
+					break;
+			}
+		}
+
+		if (pushBackStateMachine.Evaluate())
+		{
+			switch (pushBackStateMachine.CurrentState)
+			{
+				case PushBackState.PushBackStart:
+					DataStore.SetValue("user:intent:isPushBack", DataStore.BoolValue.True, this, "pushing back with right hand");
+					break;
+				case PushBackState.PushBackStop:
+					DataStore.SetValue("user:intent:isPushBack", DataStore.BoolValue.False, this, "stopped pushing back");
 					break;
 			}
 		}
