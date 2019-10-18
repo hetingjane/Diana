@@ -6,6 +6,6 @@ public class IdleBehaviour : StateMachineBehaviour
 {
 	public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        animator.SetBool("grab", false);
+        animator.SetFloat("grab", 0.0f);
 	}
 }

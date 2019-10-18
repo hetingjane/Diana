@@ -132,6 +132,13 @@ public class DianaMotorControl : MonoBehaviour
 		DataStore.Subscribe("me:intent:motion:rightArm", OnIntentMotionRightArmChanged);
 	}
 
+	private bool AnimatorGrab
+	{
+		get => animator.GetFloat("grab") > 0.0f;
+
+		set => animator.SetFloat("grab", value ? 1f : -1f);
+	}
+
 	/// <summary>
 	/// The handler for whenever the <c>"me:intent:handPosR"</c> key changes.
 	/// </summary>
@@ -146,7 +153,7 @@ public class DianaMotorControl : MonoBehaviour
 		if (target != default)
 		{
 			// If already grabbing/grabbed
-			if (animator.GetBool("grab"))
+			if (AnimatorGrab)
 			{
 				// Changes should be over time
 				if (animatorLerpCoroutine != null)
@@ -172,7 +179,7 @@ public class DianaMotorControl : MonoBehaviour
 
 		if (motion == "reach")
 		{
-			if (!animator.GetBool("grab"))
+			if (!AnimatorGrab)
 			{
 				Vector3 target = DataStore.GetVector3Value("me:intent:handPosR");
 				// Prepare animator to start the grab motion towards the target
@@ -181,12 +188,12 @@ public class DianaMotorControl : MonoBehaviour
 				if (target != default)
 				{
 					SetAnimatorXYZ(x: target.x, y: target.y, z: target.z);
-					animator.SetBool("grab", true);
+					AnimatorGrab = true;
 				}
 			}
 		}
 		else if (motion == "unreach")
-			animator.SetBool("grab", false);
+			AnimatorGrab = false;
 		else if (motion == "wave")
 			animator.SetBool("wave", true);
 	}
