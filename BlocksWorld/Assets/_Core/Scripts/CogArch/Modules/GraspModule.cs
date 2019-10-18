@@ -1,6 +1,4 @@
-﻿using VoxSimPlatform.CogPhysics;
-using VoxSimPlatform.Global;
-using VoxSimPlatform.Vox;
+﻿using VoxSimPlatform.Vox;
 using UnityEngine;
 
 public enum GraspState
@@ -17,6 +15,7 @@ public enum GraspState
 	/// Hand is stationary with the object held
 	/// </summary>
 	Holding,
+	Moving,
 	/// <summary>
 	/// Hand begins to retreat towards relaxed position
 	/// </summary>
@@ -171,9 +170,32 @@ public class GraspModule : ModuleBase
 				else if (action == moveAction)
 				{
 					Vector3 curMovePosition = DataStore.GetVector3Value("me:intent:target");
-					movePosition = curMovePosition;
-					SetValue("me:intent:handPosR", movePosition, currentState.ToString());
-					SetValue("me:intent:action:isComplete", false, "");
+
+					if (curMovePosition != default && curMovePosition != movePosition)
+					{
+						movePosition = curMovePosition;
+						SetValue("me:intent:handPosR", movePosition, currentState.ToString());
+						SetValue("me:intent:action:isComplete", false, "");
+
+						currentState = GraspState.Moving;
+					}
+				}
+				break;
+			case GraspState.Moving:
+				if (rightArmMotion == "reached")
+				{
+					SetValue("me:intent:action:isComplete", true, "");
+					currentState = GraspState.Holding;
+				}
+				else if (rightArmMotion == "moving")
+				{
+					Vector3 curMovePosition = DataStore.GetVector3Value("me:intent:target");
+
+					if (curMovePosition != default && curMovePosition != movePosition)
+					{
+						movePosition = curMovePosition;
+						SetValue("me:intent:handPosR", movePosition, currentState.ToString());
+					}
 				}
 				break;
 			case GraspState.Ungrasping:
@@ -181,27 +203,6 @@ public class GraspModule : ModuleBase
 				{
 					SetValue("me:intent:action:isComplete", true, "");
 					currentState = GraspState.Idle;
-				}
-				else if (action == "grasp")
-				{
-					// Try to resolve the target by name
-					string targetName = DataStore.GetStringValue("me:intent:targetName");
-					// If the target is a named object get its Voxeme component
-					var curTarget = string.IsNullOrEmpty(targetName) ? null : GameObject.Find(targetName).GetComponent<Voxeme>();
-
-					Vector3 curMovePosition = DataStore.GetVector3Value("me:intent:target");
-
-					if (curTarget != null && curMovePosition != default)
-					{
-						target = curTarget;
-						movePosition = curMovePosition;
-
-						SetValue("me:intent:handPosR", movePosition, currentState.ToString());
-						SetValue("me:intent:motion:rightArm", new DataStore.StringValue("reach"), "");
-						SetValue("me:intent:action:isComplete", false, "");
-						// We begin grasping
-						currentState = GraspState.Grasping;
-					}
 				}
 				break;
 		}
