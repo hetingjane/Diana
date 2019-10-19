@@ -50,12 +50,12 @@ public class DialogueInteractionModule : ModuleBase
         }
         if (key == "user:intent:isServoLeft") {
             if (DataStore.GetBoolValue(key)) {
-                SetValue("user:intent:action", "slidep({0},{1}(left))", string.Empty);
+                SetValue("user:intent:action", "servo({0},{1}(left))", string.Empty);
             }
         }
         else if (key == "user:intent:isServoRight") {
             if (DataStore.GetBoolValue(key)) {
-                SetValue("user:intent:action", "slidep({0},{1}(right))", string.Empty);
+                SetValue("user:intent:action", "servo({0},{1}(right))", string.Empty);
             }
         }
         else if (key == "user:intent:isClaw") {

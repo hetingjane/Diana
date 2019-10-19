@@ -35,7 +35,6 @@ public class EventManagementModule : ModuleBase
     /// </summary>
     public Transform grabbableBlocks;
 
-    // need to keep the same as GrabPlaceModule's value but don't want to couple them
     private readonly Vector3 holdOffset = new Vector3(0f, -.08f, .04f);
 
     List<Vector3> objectMovePath = null;
@@ -64,27 +63,31 @@ public class EventManagementModule : ModuleBase
 
     // Update is called once per frame
     void Update()
-    {
+	{
+		string graspStatus = DataStore.GetStringValue("me:intent:action");
         string rightArmMotion = DataStore.GetStringValue("me:actual:motion:rightArm");
 
         if (objectMovePath != null)
         {
-            if (rightArmMotion == "reached")
-            {
-                objectMovePath.RemoveAt(0);
-
-                if (objectMovePath.Count > 0)
-                {
-                    Debug.Log(string.Format("Setting me:intent:target to {0}; me:actual:handPosR is {1}",
-                        GlobalHelper.VectorToParsable(objectMovePath.ElementAt(0) - holdOffset),
-                        GlobalHelper.VectorToParsable(DataStore.GetVector3Value("me:actual:handPosR"))));
-                    SetValue("me:intent:target", objectMovePath.ElementAt(0) - holdOffset, string.Empty);
-                }
-                else
-                {
-                    objectMovePath = null;
-                }
-            }
+        	if (graspStatus == "move")
+        	{
+	            if (rightArmMotion == "reached")
+	            {
+		            if (objectMovePath.Count > 1)
+	                {
+		                objectMovePath.RemoveAt(0);
+		                
+		                Debug.Log(string.Format("Setting me:intent:target to {0}; me:actual:handPosR is {1}",
+	                        GlobalHelper.VectorToParsable(objectMovePath.ElementAt(0) - holdOffset),
+	                        GlobalHelper.VectorToParsable(DataStore.GetVector3Value("me:actual:handPosR"))));
+	                    SetValue("me:intent:target", objectMovePath.ElementAt(0) - holdOffset, string.Empty);
+	                }
+	                else
+	                {
+	                    objectMovePath = null;
+	                }
+	            }
+	        }
         }
     }
 
@@ -114,7 +117,11 @@ public class EventManagementModule : ModuleBase
     {
         if (DataStore.GetBoolValue("user:isInteracting"))
         {
-            Debug.Log("Trying event composition");
+            Debug.Log(string.Format("Trying event composition with new info: {0} ({1})",
+                key, key == "user:intent:partialEvent" ? DataStore.GetStringValue("user:intent:partialEvent") :
+                    key == "user:intent:action" ? DataStore.GetStringValue("user:intent:action") :
+                    key == "user:intent:object" ? DataStore.GetStringValue("user:intent:object") :
+                    key == "user:intent:location" ? GlobalHelper.VectorToParsable(DataStore.GetVector3Value("user:intent:location")) : "Null"));
 
             string eventStr = DataStore.GetStringValue("user:intent:partialEvent");
             string actionStr = DataStore.GetStringValue("user:intent:action");
@@ -141,6 +148,26 @@ public class EventManagementModule : ModuleBase
                     }
                 }
             }
+            else if (!string.IsNullOrEmpty(eventStr))
+            {
+                if (!string.IsNullOrEmpty(objectStr))
+                {
+                    if (eventStr.Contains("{0}"))
+                    {
+                        eventStr = eventStr.Replace("{0}", objectStr);
+                        SetValue("user:intent:partialEvent", eventStr, string.Empty);
+                    }
+                }
+
+                if (locationPos != default)
+                {
+                    if (eventStr.Contains("{1}"))
+                    {
+                        eventStr = eventStr.Replace("{1}", GlobalHelper.VectorToParsable(locationPos));
+                        SetValue("user:intent:partialEvent", eventStr, string.Empty);
+                    }
+                }
+            }
             else
             {
                 if ((!string.IsNullOrEmpty(objectStr)) && (locationPos != default))
@@ -159,28 +186,108 @@ public class EventManagementModule : ModuleBase
                 }
             }
 
-            if (!string.IsNullOrEmpty(eventStr))
-            {
-                if (eventStr.Contains("{2}"))
-                {
-                    
-                }
-            }
-
             // if no variables left in the composed event string
             if (!string.IsNullOrEmpty(eventStr))
             {
                 if (!Regex.IsMatch(eventStr, @"\{[0-1]+\}"))
                 {
+                	Debug.Log(string.Format("Composed object {0}, action {1}, and location {2} into event {3}",
+                		objectStr, actionStr, GlobalHelper.VectorToParsable(locationPos), eventStr));
                     SetValue("user:intent:event", eventStr, string.Empty);
+                }
+                else
+                {
+                	if (key != "user:intent:partialEvent")
+                	{
+		                Debug.Log(string.Format("Partial event is now {0}", eventStr));
+
+                        if (!Regex.IsMatch(eventStr, @"\{1\}\(.+\)"))
+                        {
+                            string dir = Regex.Match(eventStr, @"\{1\}\(.+\)").Value.Replace("{1}(", "").Replace(")", "");
+                            InferTargetLocation(GlobalHelper.GetTopPredicate(eventStr), GameObject.Find(objectStr), dir);
+                        }
+	                }
                 }
             }
         }
     }
 
+    Vector3 InferTargetLocation(string pred, GameObject theme, string dir)
+    {
+        Vector3 loc = theme.transform.position;
+        switch (pred)
+        {
+            case "slide":
+                loc = CalcSlideTarget(theme, dir);
+                break;
+
+            case "servo":
+                loc = CalcServoTarget(theme, dir);
+                break;
+
+            default:
+                break;
+        }
+
+        return loc;
+    }
+
+    Vector3 CalcSlideTarget(GameObject theme, string dir)
+    {
+        Vector3 loc = theme.transform.position;
+
+        switch (dir)
+        {
+            case "left":
+                break;
+
+            case "right":
+                break;
+
+            case "front":
+                break;
+
+            case "back":
+                break;
+
+            default:
+                break;
+        }
+
+        return loc;
+    }
+
+    Vector3 CalcServoTarget(GameObject theme, string dir)
+    {
+        Vector3 loc = theme.transform.position;
+
+        switch (dir)
+        {
+            case "left":
+                break;
+
+            case "right":
+                break;
+
+            case "front":
+                break;
+
+            case "back":
+                break;
+
+            default:
+                break;
+        }
+
+        return loc;
+    }
+
     public void EventDoneExecuting(string key, DataStore.IValue value) {
         if ((value as DataStore.BoolValue).val == true) {
             // if "me:intent:action:isComplete" is true
+            SetValue("user:intent:lastEvent", DataStore.GetStringValue("user:intent:event"),
+	            string.Format("Store user:intent:event ({0}) in user:intent:lastEvent in case Diana did something wrong",
+	            	DataStore.GetStringValue("user:intent:event")));
             SetValue("user:intent:event",DataStore.StringValue.Empty,string.Empty);
             SetValue("user:intent:partialEvent",DataStore.StringValue.Empty,string.Empty);
 
