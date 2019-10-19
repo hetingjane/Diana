@@ -18,7 +18,7 @@
     </Args>
     <Body>
       <Subevent Value="grasp(x,y)" />
-      <Subevent Value="while(hold(x,y)^!at(y,plus(loc(y),<0;.3;0>))):move(x,y,z,'')" />
+      <Subevent Value="while(hold(x,y)^!at(y,plus(loc(y),&lt;0;.3;0&gt;))):move(x,y,z,'')" />
     </Body>
     <Scale />
     <Arity />
