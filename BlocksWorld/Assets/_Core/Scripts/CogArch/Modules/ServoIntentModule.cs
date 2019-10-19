@@ -2,6 +2,7 @@
 {
 	private ServoLeftStateMachine servoLeftStateMachine;
 	private ServoRightStateMachine servoRightStateMachine;
+	private ServoBackStateMachine servoBackStateMachine;
 
 	protected override void Start()
     {
@@ -9,6 +10,7 @@
 
 		servoLeftStateMachine = new ServoLeftStateMachine();
 		servoRightStateMachine = new ServoRightStateMachine();
+		servoBackStateMachine = new ServoBackStateMachine();
 	}
 
 	private void Update()
@@ -35,6 +37,19 @@
 					break;
 				case ServoLeftState.ServoLeftStop:
 					DataStore.SetValue("user:intent:isServoLeft", DataStore.BoolValue.False, this, "stopped servo left with right hand");
+					break;
+			}
+		}
+
+		if (servoBackStateMachine.Evaluate())
+		{
+			switch (servoBackStateMachine.CurrentState)
+			{
+				case ServoBackState.ServoBackStart:
+					DataStore.SetValue("user:intent:isServoBack", DataStore.BoolValue.True, this, "servo back with either hand");
+					break;
+				case ServoBackState.ServoBackStop:
+					DataStore.SetValue("user:intent:isServoBack", DataStore.BoolValue.False, this, "stopped servo back");
 					break;
 			}
 		}
