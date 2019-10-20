@@ -6,10 +6,18 @@ Reads:      user:intent:event (StringValue, full logical string representation o
             user:intent:action (StringValue)
             user:intent:location (Vector3Value)
             user:intent:partialEvent (StringValue, currently composed event from available info)
+            user:intent:append:event (StringValue, same as user:intent:event,
+                but intended to be appended to the end of the event queue)
+            user:intent:append:action (StringValue, same as user:intent:action,
+                but intended for the composed event to be appended to the end of the event queue)
+            user:intent:append:partialEvent (StringValue, same as user:intent:partialEvent,
+                but intended for the composed event to be appended to the end of the event queue)          
             me:intent:action:isComplete (BoolValue)
+            me:checkServo (BoolValue)
 Writes:     me:intent:action (StringValue)
             me:intent:targetName (StringValue, name of object that is theme of action)
             me:intent:target (Vector3Value)
+            me:checkServo (BoolValue)
 */
 
 using UnityEngine;
@@ -35,9 +43,61 @@ public class EventManagementModule : ModuleBase
     /// </summary>
     public Transform grabbableBlocks;
 
+    public float servoSpeed = 0.05f;
+
     private readonly Vector3 holdOffset = new Vector3(0f, -.08f, .04f);
 
     List<Vector3> objectMovePath = null;
+
+    // corresponding predicate to each intent direction name
+    Dictionary<string, string> directionPreds = new Dictionary<string, string>()
+    {
+        { "left", "left" },
+        { "right", "right" },
+        { "front", "in_front" },
+        { "back", "behind" }
+    };
+
+    // how each intent direction name is referred to in speech
+    Dictionary<string, string> directionLabels = new Dictionary<string, string>()
+    {
+        { "left", "left of" },
+        { "right", "right of" },
+        { "front", "in front of" },
+        { "back", "behind" }
+    };
+
+    // corresponding world-space vector to each intent direction name
+    Dictionary<string, Vector3> directionVectors = new Dictionary<string, Vector3>()
+    {
+        { "left", Vector3.left },
+        { "right", Vector3.right },
+        { "front", Vector3.forward },
+        { "back", Vector3.back },
+        { "up", Vector3.up },
+        { "down", Vector3.down }
+    };
+
+    // the opposite of each direction
+    Dictionary<string, string> oppositeDir = new Dictionary<string, string>()
+    {
+        { "left", "right" },
+        { "right", "left" },
+        { "front", "back" },
+        { "back", "front" },
+        { "up", "down" },
+        { "down", "up" }
+    };
+
+    Dictionary<string, string> relativeDir = new Dictionary<string, string>()
+    {
+        { "left", "left" },
+        { "right", "right" },
+        { "front", "back" },
+        { "back", "front" },
+        { "up", "up" },
+        { "down", "down" }
+    };
 
     // Start is called before the first frame update
     void Start()
@@ -48,7 +108,11 @@ public class EventManagementModule : ModuleBase
         DataStore.Subscribe("user:intent:action", TryEventComposition);
         DataStore.Subscribe("user:intent:location", TryEventComposition);
         DataStore.Subscribe("user:intent:partialEvent", TryEventComposition);
+        DataStore.Subscribe("user:intent:append:event", AppendEvent);
+        DataStore.Subscribe("user:intent:append:action", TryEventComposition);
+        DataStore.Subscribe("user:intent:append:partialEvent", TryEventComposition);
         DataStore.Subscribe("me:intent:action:isComplete", EventDoneExecuting);
+        DataStore.Subscribe("me:isCheckingServo", CheckServoStatus);
 
         AStarSearch.ComputedPath += GotPath;
 
@@ -113,6 +177,28 @@ public class EventManagementModule : ModuleBase
         }
     }
 
+    void AppendEvent(string key, DataStore.IValue value)
+    {
+        if (DataStore.GetBoolValue("user:isInteracting"))
+        {
+            string eventStr = value.ToString().Trim();
+            if (string.IsNullOrEmpty(eventStr)) return;
+
+            try
+            {
+                eventManager.InsertEvent("", eventManager.events.Count);
+                eventManager.InsertEvent(eventStr, eventManager.events.Count);
+            }
+            catch (Exception ex)
+            {
+                if (ex is NullReferenceException)
+                {
+                    Debug.LogWarning(string.Format("VoxSim event manager couldn't handle \"{0}\"", eventStr));
+                }
+            }
+        }
+    }
+
     void TryEventComposition(string key, DataStore.IValue value)
     {
         if (DataStore.GetBoolValue("user:isInteracting"))
@@ -121,95 +207,245 @@ public class EventManagementModule : ModuleBase
                 key, key == "user:intent:partialEvent" ? DataStore.GetStringValue("user:intent:partialEvent") :
                     key == "user:intent:action" ? DataStore.GetStringValue("user:intent:action") :
                     key == "user:intent:object" ? DataStore.GetStringValue("user:intent:object") :
-                    key == "user:intent:location" ? GlobalHelper.VectorToParsable(DataStore.GetVector3Value("user:intent:location")) : "Null"));
+                    key == "user:intent:location" ? GlobalHelper.VectorToParsable(DataStore.GetVector3Value("user:intent:location")) : 
+                    key == "user:intent:append:partialEvent" ? DataStore.GetStringValue("user:intent:append:partialEvent") : 
+                    key == "user:intent:append:action" ? DataStore.GetStringValue("user:intent:append:action") : "Null"));
 
             string eventStr = DataStore.GetStringValue("user:intent:partialEvent");
             string actionStr = DataStore.GetStringValue("user:intent:action");
+
+            string appendEventStr = DataStore.GetStringValue("user:intent:append:partialEvent");
+            string appendActionStr = DataStore.GetStringValue("user:intent:append:action");
+
             string objectStr = DataStore.GetStringValue("user:intent:object");
             Vector3 locationPos = DataStore.GetVector3Value("user:intent:location");
 
-            if (!string.IsNullOrEmpty(actionStr))
+            if (key == "user:intent:object")
             {
                 if (!string.IsNullOrEmpty(objectStr))
                 {
-                    if (actionStr.Contains("{0}"))
+                    if (!string.IsNullOrEmpty(eventStr))
                     {
-                        eventStr = actionStr.Replace("{0}", objectStr);
-                        SetValue("user:intent:partialEvent", eventStr, string.Empty);
-                    }
-                }
-
-                if (locationPos != default)
-                {
-                    if (actionStr.Contains("{1}"))
-                    {
-                        eventStr = actionStr.Replace("{1}", GlobalHelper.VectorToParsable(locationPos));
-                        SetValue("user:intent:partialEvent", eventStr, string.Empty);
-                    }
-                }
-            }
-            else if (!string.IsNullOrEmpty(eventStr))
-            {
-                if (!string.IsNullOrEmpty(objectStr))
-                {
-                    if (eventStr.Contains("{0}"))
-                    {
-                        eventStr = eventStr.Replace("{0}", objectStr);
-                        SetValue("user:intent:partialEvent", eventStr, string.Empty);
-                    }
-                }
-
-                if (locationPos != default)
-                {
-                    if (eventStr.Contains("{1}"))
-                    {
-                        eventStr = eventStr.Replace("{1}", GlobalHelper.VectorToParsable(locationPos));
-                        SetValue("user:intent:partialEvent", eventStr, string.Empty);
-                    }
-                }
-            }
-            else
-            {
-                if ((!string.IsNullOrEmpty(objectStr)) && (locationPos != default))
-                {
-                    GameObject theme = GameObject.Find(objectStr);
-                    Vector3 targetLoc = new Vector3(locationPos.x, locationPos.y + GlobalHelper.GetObjectWorldSize(theme).extents.y, locationPos.z);
-                    if (!GlobalHelper.ContainingObjects(targetLoc).Contains(theme))
-                    {
-                        eventStr = "put({0},{1})".Replace("{0}", objectStr).Replace("{1}", GlobalHelper.VectorToParsable(targetLoc));
-                        SetValue("user:intent:partialEvent", eventStr, string.Empty);
-                    }
-                }
-                else
-                {
-
-                }
-            }
-
-            // if no variables left in the composed event string
-            if (!string.IsNullOrEmpty(eventStr))
-            {
-                if (!Regex.IsMatch(eventStr, @"\{[0-1]+\}"))
-                {
-                	Debug.Log(string.Format("Composed object {0}, action {1}, and location {2} into event {3}",
-                		objectStr, actionStr, GlobalHelper.VectorToParsable(locationPos), eventStr));
-                    SetValue("user:intent:event", eventStr, string.Empty);
-                }
-                else
-                {
-                	if (key != "user:intent:partialEvent")
-                	{
-		                Debug.Log(string.Format("Partial event is now {0}", eventStr));
-
-                        if (!Regex.IsMatch(eventStr, @"\{1\}\(.+\)"))
+                        if (eventStr.Contains("{0}"))
                         {
-                            string dir = Regex.Match(eventStr, @"\{1\}\(.+\)").Value.Replace("{1}(", "").Replace(")", "");
-                            InferTargetLocation(GlobalHelper.GetTopPredicate(eventStr), GameObject.Find(objectStr), dir);
+                            eventStr = eventStr.Replace("{0}", objectStr);
+                            SetValue("user:intent:partialEvent", eventStr, string.Empty);
                         }
-	                }
+                    }
+                    else if (!string.IsNullOrEmpty(appendEventStr))
+                    {
+                        if (appendEventStr.Contains("{0}"))
+                        {
+                            appendEventStr = appendEventStr.Replace("{0}", objectStr);
+                            SetValue("user:intent:append:partialEvent", appendEventStr, string.Empty);
+                        }
+                    }
+                    else if (!string.IsNullOrEmpty(actionStr))
+                    {
+                        if (actionStr.Contains("{0}"))
+                        {
+                            eventStr = actionStr.Replace("{0}", objectStr);
+                            SetValue("user:intent:partialEvent", eventStr, string.Empty);
+                        }
+                    }
+                    else if (!string.IsNullOrEmpty(appendActionStr))
+                    {
+                        if (appendActionStr.Contains("{0}"))
+                        {
+                            appendEventStr = appendActionStr.Replace("{0}", objectStr);
+                            SetValue("user:intent:append:partialEvent", appendEventStr, string.Empty);
+                        }
+                    }
+                    else if (locationPos != default)
+                    {
+                        GameObject theme = GameObject.Find(objectStr);
+                        Vector3 targetLoc = new Vector3(locationPos.x, locationPos.y + GlobalHelper.GetObjectWorldSize(theme).extents.y, locationPos.z);
+                        if (!GlobalHelper.ContainingObjects(targetLoc).Contains(theme))
+                        {
+                            eventStr = "put({0},{1})".Replace("{0}", objectStr).Replace("{1}", GlobalHelper.VectorToParsable(targetLoc));
+                            SetValue("user:intent:partialEvent", eventStr, string.Empty);
+                        }
+                    }
+                }
+            } 
+            else if (key == "user:intent:action")
+            {
+                if (!string.IsNullOrEmpty(actionStr))
+                {
+                    if (!string.IsNullOrEmpty(objectStr))
+                    {
+                        if (actionStr.Contains("{0}"))
+                        {
+                            eventStr = actionStr.Replace("{0}", objectStr);
+                        }
+                    }
+
+                    if (locationPos != default)
+                    {
+                        if (actionStr.Contains("{1}"))
+                        {
+                            eventStr = actionStr.Replace("{1}", GlobalHelper.VectorToParsable(locationPos));
+                        }
+                    }
+
+	                SetValue("user:intent:partialEvent", eventStr, string.Empty);
+                }
+            }
+            else if (key == "user:intent:location")
+            {
+                if (locationPos != default)
+                {
+                    if (!string.IsNullOrEmpty(eventStr))
+                    {
+                        if (eventStr.Contains("{1}"))
+                        {
+                            eventStr = eventStr.Replace("{1}", GlobalHelper.VectorToParsable(locationPos));
+                            SetValue("user:intent:partialEvent", eventStr, string.Empty);
+                        }
+                    }
+                    else if (!string.IsNullOrEmpty(appendEventStr))
+                    {
+                        if (appendEventStr.Contains("{1}"))
+                        {
+                            appendEventStr = appendEventStr.Replace("{1}", GlobalHelper.VectorToParsable(locationPos));
+                            SetValue("user:intent:append:partialEvent", appendEventStr, string.Empty);
+                        }
+                    }
+                    else if (!string.IsNullOrEmpty(actionStr))
+                    {
+                        if (actionStr.Contains("{1}"))
+                        {
+                            eventStr = actionStr.Replace("{1}", GlobalHelper.VectorToParsable(locationPos));
+                            SetValue("user:intent:partialEvent", eventStr, string.Empty);
+                        }
+                    }
+                    else if (!string.IsNullOrEmpty(appendActionStr))
+                    {
+                        if (appendActionStr.Contains("{1}"))
+                        {
+                            appendEventStr = appendActionStr.Replace("{1}", GlobalHelper.VectorToParsable(locationPos));
+                            SetValue("user:intent:append:partialEvent", appendEventStr, string.Empty);
+                        }
+                    }
+                    else if (!string.IsNullOrEmpty(objectStr))
+                    {
+                        GameObject theme = GameObject.Find(objectStr);
+                        Vector3 targetLoc = new Vector3(locationPos.x, locationPos.y + GlobalHelper.GetObjectWorldSize(theme).extents.y, locationPos.z);
+                        if (!GlobalHelper.ContainingObjects(targetLoc).Contains(theme))
+                        {
+                            eventStr = "put({0},{1})".Replace("{0}", objectStr).Replace("{1}", GlobalHelper.VectorToParsable(targetLoc));
+                            SetValue("user:intent:partialEvent", eventStr, string.Empty);
+                        }
+                    }
+                }
+            } 
+            else if (key == "user:intent:partialEvent")
+            {
+                // if no variables left in the composed event string
+                if (!string.IsNullOrEmpty(eventStr))
+                {
+                    if (!Regex.IsMatch(eventStr, @"\{[0-1]+\}"))
+                    {
+                        Debug.Log(string.Format("Composed object {0}, action {1}, and location {2} into event {3}",
+                            objectStr, actionStr, GlobalHelper.VectorToParsable(locationPos), eventStr));
+                        SetValue("user:intent:event", eventStr, string.Empty);
+                    }
+                    else
+                    {
+                        Debug.Log(string.Format("Partial event is now {0}", eventStr));
+
+                        if (Regex.IsMatch(eventStr, @"\{1\}\(.+\)(?=\))"))
+                        {
+                            string match = Regex.Match(eventStr, @"\{1\}\(.+\)(?=\))").Value;
+                            string dir = match.Replace("{1}(", "").Replace(")", "");
+                            Vector3 targetPos = InferTargetLocation(GlobalHelper.GetTopPredicate(eventStr), GameObject.Find(objectStr), dir);
+                            Debug.Log(GlobalHelper.VectorToParsable(targetPos));
+                            Debug.Log(match);
+
+                            SetValue("user:intent:partialEvent", 
+                                eventStr.Replace(match, GlobalHelper.VectorToParsable(targetPos)), string.Empty);
+                        }
+                    }
+                }
+            }
+            else if (key == "user:intent:append:action")
+            { 
+                if (!string.IsNullOrEmpty(appendActionStr))
+                {
+                    if (!string.IsNullOrEmpty(objectStr))
+                    {
+                        if (appendActionStr.Contains("{0}"))
+                        {
+                            appendEventStr = appendActionStr.Replace("{0}", objectStr);
+                        }
+                    }
+
+                    if (locationPos != default)
+                    {
+                        if (appendActionStr.Contains("{1}"))
+                        {
+                            appendEventStr = appendActionStr.Replace("{1}", GlobalHelper.VectorToParsable(locationPos));
+                        }
+                    }
+
+	                SetValue("user:intent:append:partialEvent", appendEventStr, string.Empty);
+                }
+            }
+            else if (key == "user:intent:append:partialEvent")
+            {
+                // if no variables left in the composed event string
+                if (!string.IsNullOrEmpty(appendEventStr))
+                {
+                    if (!Regex.IsMatch(appendEventStr, @"\{[0-1]+\}"))
+                    {
+                        Debug.Log(string.Format("Composed object {0}, action {1}, and location {2} into event {3}",
+                            objectStr, appendActionStr, GlobalHelper.VectorToParsable(locationPos), appendEventStr));
+                        SetValue("user:intent:append:event", appendEventStr, string.Empty);
+                    }
+                    else
+                    {
+                        Debug.Log(string.Format("Partial event is now {0}", appendEventStr));
+
+                        if (Regex.IsMatch(appendEventStr, @"\{1\}\(.+\)(?=\))"))
+                        {
+                            string match = Regex.Match(appendEventStr, @"\{1\}\(.+\)(?=\))").Value;
+                            string dir = match.Replace("{1}(", "").Replace(")", "");
+                            Vector3 targetPos = InferTargetLocation(GlobalHelper.GetTopPredicate(appendEventStr), GameObject.Find(objectStr), dir);
+                            Debug.Log(GlobalHelper.VectorToParsable(targetPos));
+                            Debug.Log(match);
+
+                            SetValue("user:intent:append:partialEvent", 
+                                appendEventStr.Replace(match, GlobalHelper.VectorToParsable(targetPos)), string.Empty);
+                        }
+                    }
                 }
             }
         }
+    }
+
+    void CheckServoStatus(string key, DataStore.IValue value)
+    {
+        bool val = (value as DataStore.BoolValue).val;
+
+        // if me:checkServo is true, and me:actual:motion:rightArm is "reached"
+        if ((val) && (DataStore.GetStringValue("me:actual:motion:rightArm") == "reached"))
+        {
+            if (eventManager.events.Count == 0) {
+                Debug.Log("Add new servo");
+                SetValue("user:intent:append:partialEvent", string.Empty, string.Empty);
+
+                if (DataStore.GetBoolValue("user:intent:isServoLeft")) {
+                    SetValue("user:intent:append:action", string.Empty, string.Empty);
+                    SetValue("user:intent:append:action", "servo({0},{1}(left))", string.Empty);
+                }
+                else if (DataStore.GetBoolValue("user:intent:isServoRight")) {
+                    SetValue("user:intent:append:action", string.Empty, string.Empty);
+                    SetValue("user:intent:append:action", "servo({0},{1}(right))", string.Empty);
+                }
+            }
+        }
+
+        SetValue("me:isCheckingServo", false, string.Empty);
     }
 
     Vector3 InferTargetLocation(string pred, GameObject theme, string dir)
@@ -228,7 +464,7 @@ public class EventManagementModule : ModuleBase
             default:
                 break;
         }
-
+                
         return loc;
     }
 
@@ -259,30 +495,12 @@ public class EventManagementModule : ModuleBase
 
     Vector3 CalcServoTarget(GameObject theme, string dir)
     {
-        Vector3 loc = theme.transform.position;
-
-        switch (dir)
-        {
-            case "left":
-                break;
-
-            case "right":
-                break;
-
-            case "front":
-                break;
-
-            case "back":
-                break;
-
-            default:
-                break;
-        }
+        Vector3 loc = theme.transform.position + (directionVectors[oppositeDir[dir]] * servoSpeed);
 
         return loc;
     }
 
-    public void EventDoneExecuting(string key, DataStore.IValue value) {
+    void EventDoneExecuting(string key, DataStore.IValue value) {
         if ((value as DataStore.BoolValue).val == true) {
             // if "me:intent:action:isComplete" is true
             SetValue("user:intent:lastEvent", DataStore.GetStringValue("user:intent:event"),
@@ -297,8 +515,12 @@ public class EventManagementModule : ModuleBase
 
             SetValue("user:intent:action",DataStore.StringValue.Empty,string.Empty);
             SetValue("user:intent:location",DataStore.Vector3Value.Zero,string.Empty);
+
+            SetValue("user:intent:append:partialEvent",DataStore.StringValue.Empty,string.Empty);
+            SetValue("user:intent:append:action",DataStore.StringValue.Empty,string.Empty);
         }
     }
+   
 
     public void GotPath(object sender, EventArgs e)
     {

@@ -13150,6 +13150,7 @@ MonoBehaviour:
   comment: 
   display: {fileID: 0}
   stateMachine: {fileID: 1463965744}
+  servoLoopTimerTime: 500
 --- !u!114 &1831328035
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14719,6 +14720,7 @@ MonoBehaviour:
   display: {fileID: 0}
   eventManager: {fileID: 1725009506}
   grabbableBlocks: {fileID: 184680267}
+  servoSpeed: 0.05
 --- !u!1 &2054860432
 GameObject:
   m_ObjectHideFlags: 0
