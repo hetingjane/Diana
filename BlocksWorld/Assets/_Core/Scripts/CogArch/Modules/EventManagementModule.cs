@@ -544,9 +544,56 @@ public class EventManagementModule : ModuleBase
                 break;
 
             case "front":
+                options = options.Where(o =>
+                    Vector3.Dot((o.transform.position - theme.transform.position), directionVectors[dir]) > 0.0f).ToList();
+                choice = options.OrderByDescending(o =>
+                    Vector3.Dot((o.transform.position - theme.transform.position), directionVectors[dir])).
+                    ThenBy(o => (o.transform.position - theme.transform.position).magnitude).FirstOrDefault();
+
+                if (choice != null)
+                {
+                    // slide against the side of chosen block
+                    loc = choice.transform.position + Vector3.Scale(GlobalHelper.GetObjectWorldSize(choice).extents,
+                        directionVectors[oppositeDir[dir]]) + Vector3.Scale(GlobalHelper.GetObjectWorldSize(theme).extents,
+                        directionVectors[oppositeDir[dir]]);
+                }
+                else
+                {
+                    // choose location in that direction on table
+                    Bounds themeBounds = GlobalHelper.GetObjectWorldSize(theme);
+                    Bounds surfaceBounds = GlobalHelper.GetObjectWorldSize(demoSurface);
+                    loc = new Vector3(theme.transform.position.x,
+                        theme.transform.position.y,
+                        RandomHelper.RandomFloat(
+                            (theme.transform.position + Vector3.Scale(themeBounds.extents, directionVectors[dir])).z,
+                            surfaceBounds.max.z, 0));
+                }
                 break;
 
             case "back":
+                options = options.Where(o =>
+                    Vector3.Dot((o.transform.position - theme.transform.position), directionVectors[dir]) > 0.0f).ToList();
+                choice = options.OrderByDescending(o =>
+                    Vector3.Dot((o.transform.position - theme.transform.position), directionVectors[dir])).
+                    ThenBy(o => (o.transform.position - theme.transform.position).magnitude).FirstOrDefault();
+
+                if (choice != null)
+                {
+                    // slide against the side of chosen block
+                    loc = choice.transform.position + Vector3.Scale(GlobalHelper.GetObjectWorldSize(choice).extents,
+                        directionVectors[oppositeDir[dir]]) + Vector3.Scale(GlobalHelper.GetObjectWorldSize(theme).extents,
+                        directionVectors[oppositeDir[dir]]);
+                }
+                else
+                {
+                    // choose location in that direction on table
+                    Bounds themeBounds = GlobalHelper.GetObjectWorldSize(theme);
+                    Bounds surfaceBounds = GlobalHelper.GetObjectWorldSize(demoSurface);
+                    loc = new Vector3(theme.transform.position.x,
+                        theme.transform.position.y,
+                        RandomHelper.RandomFloat(surfaceBounds.min.z,
+                            (theme.transform.position + Vector3.Scale(themeBounds.extents, directionVectors[dir])).z, 0));
+                }
                 break;
 
             default:
