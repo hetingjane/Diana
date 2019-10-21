@@ -16,7 +16,7 @@ public class ServoRightStateMachine : RuleStateMachine<ServoRightState>
 			{
 				string leftHandGesture = DataStore.GetStringValue("user:hands:left");
 				string leftArmServo = DataStore.GetStringValue("user:armMotion:left");
-				return (leftHandGesture == "open left" || leftHandGesture == "closed left") && leftArmServo == "servo";
+				return (leftHandGesture == "open right" || leftHandGesture == "closed right") && leftArmServo == "servo";
 			}
 			return false;
 		}, 300));
@@ -31,7 +31,7 @@ public class ServoRightStateMachine : RuleStateMachine<ServoRightState>
 			{
 				string leftHandGesture = DataStore.GetStringValue("user:hands:left");
 				string leftArmServo = DataStore.GetStringValue("user:armMotion:left");
-				return (leftHandGesture != "open left" && leftHandGesture != "closed left") || leftArmServo != "servo";
+				return (leftHandGesture != "open right" && leftHandGesture != "closed right") || leftArmServo != "servo";
 			}
 		}, 100));
 	}
