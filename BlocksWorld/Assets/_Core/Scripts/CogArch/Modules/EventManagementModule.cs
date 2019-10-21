@@ -43,6 +43,12 @@ public class EventManagementModule : ModuleBase
     /// </summary>
     public Transform grabbableBlocks;
 
+    /// <summary>
+    /// Reference to the default surface in the scene.
+    /// (i.e., the table)
+    /// </summary>
+    public GameObject demoSurface;
+
     public float servoSpeed = 0.05f;
 
     private readonly Vector3 holdOffset = new Vector3(0f, -.08f, .04f);
@@ -472,12 +478,69 @@ public class EventManagementModule : ModuleBase
     {
         Vector3 loc = theme.transform.position;
 
+        List<GameObject> options = new List<GameObject>();
+        GameObject choice = null;
+
+        foreach (Transform child in grabbableBlocks)
+        {
+            options.Add(child.gameObject);
+        }
+
         switch (dir)
         {
             case "left":
+                options = options.Where(o =>
+                    Vector3.Dot((o.transform.position - theme.transform.position), directionVectors[oppositeDir[dir]]) > 0.0f).ToList();
+                choice = options.OrderByDescending(o =>
+                    Vector3.Dot((o.transform.position - theme.transform.position), directionVectors[oppositeDir[dir]])).
+                    ThenBy(o => (o.transform.position - theme.transform.position).magnitude).FirstOrDefault();
+
+                if (choice != null)
+                {
+                    // slide against the side of chosen block
+                    loc = choice.transform.position + Vector3.Scale(GlobalHelper.GetObjectWorldSize(choice).extents,
+                        directionVectors[dir]) + Vector3.Scale(GlobalHelper.GetObjectWorldSize(theme).extents,
+                        directionVectors[dir]);
+                }
+                else
+                {
+                    // choose location in that direction on table
+                    Bounds themeBounds = GlobalHelper.GetObjectWorldSize(theme);
+                    Bounds surfaceBounds = GlobalHelper.GetObjectWorldSize(demoSurface);
+                    loc = new Vector3(
+                        RandomHelper.RandomFloat(
+                            (theme.transform.position + Vector3.Scale(themeBounds.extents, directionVectors[oppositeDir[dir]])).x,
+                            surfaceBounds.max.x, 0),
+                        theme.transform.position.y,
+                        theme.transform.position.z);
+                }
                 break;
 
             case "right":
+                options = options.Where(o =>
+                    Vector3.Dot((o.transform.position - theme.transform.position), directionVectors[oppositeDir[dir]]) > 0.0f).ToList();
+                choice = options.OrderByDescending(o =>
+                    Vector3.Dot((o.transform.position - theme.transform.position), directionVectors[oppositeDir[dir]])).
+                    ThenBy(o => (o.transform.position - theme.transform.position).magnitude).FirstOrDefault();
+
+                if (choice != null)
+                {
+                    // slide against the side of chosen block
+                    loc = choice.transform.position + Vector3.Scale(GlobalHelper.GetObjectWorldSize(choice).extents,
+                        directionVectors[dir]) + Vector3.Scale(GlobalHelper.GetObjectWorldSize(theme).extents,
+                        directionVectors[dir]);
+                }
+                else
+                {
+                    // choose location in that direction on table
+                    Bounds themeBounds = GlobalHelper.GetObjectWorldSize(theme);
+                    Bounds surfaceBounds = GlobalHelper.GetObjectWorldSize(demoSurface);
+                    loc = new Vector3(
+                        RandomHelper.RandomFloat(surfaceBounds.min.x,
+                            (theme.transform.position + Vector3.Scale(themeBounds.extents, directionVectors[oppositeDir[dir]])).x, 0),
+                        theme.transform.position.y,
+                        theme.transform.position.z);
+                }
                 break;
 
             case "front":
@@ -579,6 +642,10 @@ public class EventManagementModule : ModuleBase
 
             string responseStr = string.Format("There is no {0} here.", ((EventReferentArgs)e).Referent as string);
             SetValue("me:speech:intent", responseStr, string.Empty);
+        }
+
+        if (string.IsNullOrEmpty(DataStore.GetStringValue("me:holding"))) {
+            SetValue("user:intent:object",DataStore.StringValue.Empty,string.Empty);
         }
     }
 

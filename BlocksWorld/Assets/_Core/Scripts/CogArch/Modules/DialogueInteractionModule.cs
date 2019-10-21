@@ -11,6 +11,9 @@ public class DialogueInteractionModule : ModuleBase
 
     public double servoLoopTimerTime = 10;
 
+    public Transform grabbableBlocks;
+    public GameObject demoSurface;
+
     Timer servoLoopTimer;
 
     bool checkServoStatus = false;
