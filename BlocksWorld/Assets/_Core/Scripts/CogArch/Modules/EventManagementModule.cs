@@ -371,6 +371,14 @@ public class EventManagementModule : ModuleBase
                             SetValue("user:intent:partialEvent", 
                                 eventStr.Replace(match, GlobalHelper.VectorToParsable(targetPos)), string.Empty);
                         }
+                        else if (eventStr.Contains("{0}"))
+                        {
+                        	if (!string.IsNullOrEmpty(objectStr))
+                        	{
+	                        	eventStr = eventStr.Replace("{0}", objectStr);
+	                        	SetValue("user:intent:partialEvent", eventStr, string.Empty);
+	                        }
+                        }
                     }
                 }
             }
