@@ -14,11 +14,10 @@
     <Args>
       <Arg Value="x:agent" />
       <Arg Value="y:physobj" />
-      <Arg Value="z:location" />
     </Args>
     <Body>
       <Subevent Value="grasp(x,y)" />
-      <Subevent Value="while(hold(x,y)^!at(y,plus(loc(y),&lt;0;.3;0&gt;))):move(x,y,z,'')" />
+      <Subevent Value="while(hold(x,y)^!at(y,loc(y)+&lt;0;.3;0&gt;)):move(x,y,loc(y)+&lt;0;.3;0&gt;,'')" />
     </Body>
     <Scale />
     <Arity />
