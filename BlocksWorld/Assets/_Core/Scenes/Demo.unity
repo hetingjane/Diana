@@ -14733,7 +14733,7 @@ MonoBehaviour:
   eventManager: {fileID: 1725009506}
   grabbableBlocks: {fileID: 184680267}
   demoSurface: {fileID: 672448213}
-  servoSpeed: 0.05
+  servoSpeed: 0.1
 --- !u!1 &2054860432
 GameObject:
   m_ObjectHideFlags: 0

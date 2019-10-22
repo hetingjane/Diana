@@ -113,6 +113,7 @@ public class GraspModule : ModuleBase
                     if (rigging != null)
                     {
                         rigging.ActivatePhysics(false);
+                        //RiggingHelper.RigTo(held.gameObject, hand.gameObject);
                     }
 
 					SetValue("me:intent:action:isComplete", true, "");
