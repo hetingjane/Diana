@@ -12,16 +12,16 @@ public enum GraspState
 	/// <summary>
 	/// Hand begins to be stretched out to reach the object
 	/// </summary>
-	Grasping,
+	Reaching,
 	/// <summary>
 	/// Hand is stationary with the object held
 	/// </summary>
-	Holding,
+	Reached,
 	Moving,
 	/// <summary>
 	/// Hand begins to retreat towards relaxed position
 	/// </summary>
-	Ungrasping
+	Unreaching
 }
 
 public class GraspModule : ModuleBase
@@ -67,9 +67,11 @@ public class GraspModule : ModuleBase
 		currentState = GraspState.Idle;
 	}
 
-	private const string graspAction = "grasp";
+	private const string reachAction = "reach";
+	private const string holdAction = "hold";
 	private const string moveAction = "move";
-	private const string ungraspAction = "ungrasp";
+	private const string releaseAction = "release";
+	private const string unreachAction = "unreach";
 
 	// Update is called once per frame
 	void Update()
@@ -80,7 +82,7 @@ public class GraspModule : ModuleBase
 		switch (currentState)
 		{
 			case GraspState.Idle:
-				if (action == graspAction)
+				if (action == reachAction)
 				{
 					// Try to resolve the target by name
 					string targetName = DataStore.GetStringValue("me:intent:targetName");
@@ -98,34 +100,23 @@ public class GraspModule : ModuleBase
 						SetValue("me:intent:motion:rightArm", new DataStore.StringValue("reach"), "");
 						SetValue("me:intent:action:isComplete", false, "");
 						// We begin grasping
-						currentState = GraspState.Grasping;
+						currentState = GraspState.Reaching;
 					}
 				}
 				break;
-			case GraspState.Grasping:
+			case GraspState.Reaching:
 				if (rightArmMotion == "reached")
 				{
-					held = target;
-					SetValue("me:holding", held.name, $"Holding {held.name}");
-
-                    // Do not respond to forces/collisions
-                    Rigging rigging = held.GetComponent<Rigging>();
-                    if (rigging != null)
-                    {
-                        rigging.ActivatePhysics(false);
-                        //RiggingHelper.RigTo(held.gameObject, hand.gameObject);
-                    }
-
 					SetValue("me:intent:action:isComplete", true, "");
-					currentState = GraspState.Holding;
+					currentState = GraspState.Reached;
 				}
-				else if (action == ungraspAction)
+				else if (action == unreachAction)
 				{
 					SetValue("me:intent:motion:rightArm", new DataStore.StringValue("unreach"), "");
 					SetValue("me:intent:action:isComplete", false, "");
-					currentState = GraspState.Ungrasping;
+					currentState = GraspState.Unreaching;
 				}
-				else if (action == graspAction)
+				else if (action == reachAction)
 				{
 					// Try to resolve the target by name
 					string targetName = DataStore.GetStringValue("me:intent:targetName");
@@ -143,20 +134,48 @@ public class GraspModule : ModuleBase
 					}
 				}
 				break;
-			case GraspState.Holding:
-				if (action == ungraspAction)
+			case GraspState.Reached:
+				if (action == holdAction)
 				{
+					held = target;
+					SetValue("me:holding", held.name, $"Holding {held.name}");
+
+					// Do not respond to forces/collisions
+					Rigging rigging = held.GetComponent<Rigging>();
+					if (rigging != null)
+					{
+						rigging.ActivatePhysics(false);
+						//RiggingHelper.RigTo(held.gameObject, hand.gameObject);
+					}
+				}
+				else if (action == releaseAction)
+				{
+					if (held != null)
+					{
+						SetValue("me:holding", "", $"Releasing {held.name}");
+						
+						Rigging rigging = held.GetComponent<Rigging>();
+						if (rigging != null)
+						{
+							rigging.ActivatePhysics(true);
+						}
+						held = null;
+					}
+				}
+				else if (action == unreachAction)
+				{
+					if (held != null)
+						SetValue("me:holding", "", $"Holding nothing");
 					held = null;
-					SetValue("me:holding", "", $"Holding nothing");
 
 					target = null;
 					movePosition = default;
 
 					SetValue("me:intent:motion:rightArm", new DataStore.StringValue("unreach"), "");
 					SetValue("me:intent:action:isComplete", false, "");
-					currentState = GraspState.Ungrasping;
+					currentState = GraspState.Unreaching;
 				}
-				else if (action == graspAction)
+				else if (action == reachAction)
 				{
 					// Try to resolve the target by name
 					string targetName = DataStore.GetStringValue("me:intent:targetName");
@@ -174,7 +193,7 @@ public class GraspModule : ModuleBase
 						SetValue("me:intent:handPosR", movePosition, currentState.ToString());
 						SetValue("me:intent:action:isComplete", false, "");
 
-						currentState = GraspState.Grasping;
+						currentState = GraspState.Reaching;
 					}
 				}
 				else if (action == moveAction)
@@ -195,7 +214,7 @@ public class GraspModule : ModuleBase
 				if (rightArmMotion == "reached")
 				{
 					SetValue("me:intent:action:isComplete", true, "");
-					currentState = GraspState.Holding;
+					currentState = GraspState.Reached;
 				}
 				else if (rightArmMotion == "moving")
 				{
@@ -208,7 +227,7 @@ public class GraspModule : ModuleBase
 					}
 				}
 				break;
-			case GraspState.Ungrasping:
+			case GraspState.Unreaching:
 				if (rightArmMotion == "idle")
 				{
 					SetValue("me:intent:action:isComplete", true, "");

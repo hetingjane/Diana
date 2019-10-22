@@ -9,9 +9,11 @@ public class TestGraspModule : MonoBehaviour
 {
 	public Transform manipulableObjectsRoot;
 
-	public bool doGraspRandomObject;
+	public bool doReachRandomObject;
 	public bool doMoveRandomLocation;
-	public bool doUngrasp;
+	public bool doUnreach;
+	public bool doHold;
+	public bool doRelease;
 
 	/// <summary>
 	/// Offset of the block's position (geometrical center in world coordinates) w.r.t hand bone.
@@ -23,9 +25,9 @@ public class TestGraspModule : MonoBehaviour
 	// Start is called before the first frame update
 	void Start()
     {
-		doGraspRandomObject = false;
+		doReachRandomObject = false;
 		doMoveRandomLocation = false;
-		doUngrasp = false;
+		doUnreach = false;
 
 		manipulableObjects = new GameObject[manipulableObjectsRoot.childCount];
 		for (int i=0; i<manipulableObjects.Length; i++)
@@ -56,14 +58,16 @@ public class TestGraspModule : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-		doGraspRandomObject = doGraspRandomObject || Input.GetKeyDown(KeyCode.J);
+		doReachRandomObject = doReachRandomObject || Input.GetKeyDown(KeyCode.J);
 		doMoveRandomLocation = doMoveRandomLocation || Input.GetKeyDown(KeyCode.K);
-		doUngrasp = doUngrasp || Input.GetKeyDown(KeyCode.L);
+		doUnreach = doUnreach || Input.GetKeyDown(KeyCode.L);
+		doHold = doHold || Input.GetKeyDown(KeyCode.Semicolon);
+		doRelease = doRelease || Input.GetKeyDown(KeyCode.Quote);
 
-		if (doGraspRandomObject)
+		if (doReachRandomObject)
 		{
 			targetBlock = GetRandomObject();
-			DataStore.SetValue("me:intent:action", new DataStore.StringValue("grasp"), null, "");
+			DataStore.SetValue("me:intent:action", new DataStore.StringValue("reach"), null, "");
 			DataStore.SetValue("me:intent:targetName", new DataStore.StringValue(targetBlock.name), null, "");
 			// Either by name or location, we successfully resolved the target object
 			// Get bounds of the Voxeme geometry
@@ -77,7 +81,7 @@ public class TestGraspModule : MonoBehaviour
 			var curReachTarget = setDownPos + Vector3.up * bounds.size.y - holdOffset;
 
 			DataStore.SetValue("me:intent:target", new DataStore.Vector3Value(curReachTarget), null, "");
-			doGraspRandomObject = false;
+			doReachRandomObject = false;
 		}
 
 		else if (doMoveRandomLocation)
@@ -88,10 +92,20 @@ public class TestGraspModule : MonoBehaviour
 			doMoveRandomLocation = false;
 		}
 
-		else if (doUngrasp)
+		else if (doUnreach)
 		{
-			DataStore.SetValue("me:intent:action", new DataStore.StringValue("ungrasp"), null, "");
-			doUngrasp = false;
+			DataStore.SetValue("me:intent:action", new DataStore.StringValue("unreach"), null, "");
+			doUnreach = false;
+		}
+		else if (doHold)
+		{
+			DataStore.SetValue("me:intent:action", new DataStore.StringValue("hold"), null, "");
+			doHold = false;
+		}
+		else if (doRelease)
+		{
+			DataStore.SetValue("me:intent:action", new DataStore.StringValue("release"), null, "");
+			doRelease = false;
 		}
     }
 
@@ -102,6 +116,5 @@ public class TestGraspModule : MonoBehaviour
 			Gizmos.color = Color.red;
 			Gizmos.DrawSphere(DataStore.GetVector3Value("me:intent:target"), 0.01f);
 		}
-		
 	}
 }
