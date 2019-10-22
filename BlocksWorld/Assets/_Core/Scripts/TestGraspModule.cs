@@ -111,10 +111,13 @@ public class TestGraspModule : MonoBehaviour
 
 	private void OnDrawGizmos()
 	{
-		if (DataStore.GetStringValue("me:intent:action") == "move")
+		if (DataStore.instance != null)
 		{
-			Gizmos.color = Color.red;
-			Gizmos.DrawSphere(DataStore.GetVector3Value("me:intent:target"), 0.01f);
+			if (DataStore.GetStringValue("me:intent:action") == "move")
+			{
+				Gizmos.color = Color.red;
+				Gizmos.DrawSphere(DataStore.GetVector3Value("me:intent:target"), 0.01f);
+			}
 		}
 	}
 }
