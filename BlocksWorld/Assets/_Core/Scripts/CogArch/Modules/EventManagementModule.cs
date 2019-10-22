@@ -431,6 +431,14 @@ public class EventManagementModule : ModuleBase
                             SetValue("user:intent:append:partialEvent", 
                                 appendEventStr.Replace(match, GlobalHelper.VectorToParsable(targetPos)), string.Empty);
                         }
+                        else if (appendEventStr.Contains("{0}"))
+                        {
+                            if (!string.IsNullOrEmpty(objectStr))
+                            {
+                                appendEventStr = appendEventStr.Replace("{0}", objectStr);
+                                SetValue("user:intent:append:partialEvent", appendEventStr, string.Empty);
+                            }
+                        }
                     }
                 }
             }

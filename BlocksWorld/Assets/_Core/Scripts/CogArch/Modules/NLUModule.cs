@@ -37,13 +37,34 @@ public class NLUModule : ModuleBase
 
         Debug.Log(string.Format("Diana's World: Heard you was talkin' \"{0}\".",input));
 
+        if (input.StartsWith("yes"))
+        {
+            // do posack
+            SetValue("user:intent:isPosack", true, string.Empty);
+            input = input.Replace("yes", "").Trim();
+        }
+        else if (input.StartsWith("no"))
+        {
+            // do negack
+            SetValue("user:intent:isNegack", true, string.Empty);
+            input = input.Replace("no", "").Trim();
+        }
+        else if ((input.StartsWith("never mind") || (input.StartsWith("wait"))))
+        {
+            // do nevermind
+            SetValue("user:intent:isNevermind", true, string.Empty);
+            input = input.Replace("never mind", "").Replace("wait", "").Trim();
+        }
+
         string mapped = MapTerms(input);
 	    Debug.Log(string.Format("Diana's World: Heard you was talkin' \"{0}\".",mapped));
 
         string parsed = communicationsBridge.NLParse(mapped);
         Debug.Log(string.Format("Diana's World: Heard you was talkin' \"{0}\".",parsed));
 
-        SetValue("user:intent:partialEvent", parsed, string.Empty);
+        if (parsed.Length > 0) {
+            SetValue("user:intent:partialEvent", parsed, string.Empty);
+        }
     }
 
     string MapTerms(string input) {

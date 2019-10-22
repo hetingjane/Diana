@@ -2,7 +2,7 @@
 using System.Timers;
 
 using VoxSimPlatform.Agent.CharacterLogic;
-using VoxSimPlatform.Logging;
+using VoxSimPlatform.Global;
 using VoxSimPlatform.Interaction;
 
 public class DialogueInteractionModule : ModuleBase
@@ -135,6 +135,16 @@ public class DialogueInteractionModule : ModuleBase
                         Debug.Log(string.Format("Setting user:intent:location to {0} ({1})", DataStore.GetVector3Value(key), key));
                         SetValue("user:intent:location", DataStore.GetVector3Value(key), string.Empty);
                     }
+                }
+            }
+            else if (key == "user:intent:object") {
+                if (string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:action")) && 
+                    string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:location"))) {
+                    SetValue("me:speech:intent", "OK.", string.Empty);
+                    SetValue("me:intent:action", "point", string.Empty);
+                    SetValue("me:intent:pointAt", DataStore.GetStringValue(key), string.Empty);
+                    SetValue("me:intent:target",
+                        GlobalHelper.GetObjectWorldSize(GameObject.Find(DataStore.GetStringValue(key))).max, string.Empty);
                 }
             }
             else if (key == "user:communication") {
