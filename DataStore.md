@@ -30,8 +30,8 @@ As a general rule, each part of a key should be named like a variable or propert
 |`me:speech:intent`               |String       |            |Text that Diana intends to speak                                                                    |
 |`me:standingBy`                  |Boolean      |T or F      |Whether agent is on "stand by" and ignoring input until she hears her name                          |
 |`me:voice`                       |String       |voice name  |Name of voice (or voices) agent should use, e.g.: "Victoria;Microsoft Zira Desktop"                 |
-|`user:EmotionAngry`              |Integer      |0 to 100    |Measure of how angry the user looks                                                                 |
-|`user:EmotionHappy`              |Integer      |0 to 100    |Measure of how happy the user looks                                                                 |
+|`user:emotionAngry`              |Integer      |0 to 100    |Measure of how angry the user looks                                                                 |
+|`user:emotionHappy`              |Integer      |0 to 100    |Measure of how happy the user looks                                                                 |
 |`user:armMotion:left`            |String       |            |servo behavior of left arm: "servo" or "still"                                                      |
 |`user:armMotion:right`           |String       |            |servo behavior of right arm: "servo" or "still"                                                     |
 |`user:communication`             |Communication|            |Semantic representation of the user's last utterance                                                |
