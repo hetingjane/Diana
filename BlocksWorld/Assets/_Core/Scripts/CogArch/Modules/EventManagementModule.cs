@@ -702,6 +702,7 @@ public class EventManagementModule : ModuleBase
                     string responseStr = string.Format("There is no {0} {1} here.", pred,
                         (objs[0] as GameObject).GetComponent<Voxeme>().voxml.Lex.Pred);
                     SetValue("me:speech:intent", responseStr, string.Empty);
+                    SetValue("me:emotion", "confusion", string.Empty);
                 }
             }
         }
@@ -713,6 +714,7 @@ public class EventManagementModule : ModuleBase
 
             string responseStr = string.Format("There is no {0} here.", ((EventReferentArgs)e).Referent as string);
             SetValue("me:speech:intent", responseStr, string.Empty);
+            SetValue("me:emotion", "confusion", string.Empty);
         }
 
         if (string.IsNullOrEmpty(DataStore.GetStringValue("me:holding"))) {
