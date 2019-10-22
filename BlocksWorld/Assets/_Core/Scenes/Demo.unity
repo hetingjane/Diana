@@ -2641,9 +2641,9 @@ MonoBehaviour:
       m_Calls: []
   m_text: "<color=blue>1</color> \u2014 posack\n<color=blue>2</color> \u2014 negack\n<color=blue>3</color>
     \u2014 pushLeft\n<color=blue>4</color> \u2014 pushRight\n<color=blue>5</color>
-    \u2014 pushFront\n<color=blue>6</color> \u2014 pushBack\n<color=blue>#</color>
-    \u2014 servoLeft\n<color=blue>$</color> \u2014 servoRight\n<color=blue>%</color>
-    \u2014 servoFront\n<color=blue>^</color> \u2014 servoBack\n<color=blue>7</color>
+    \u2014 pushFront\n<color=blue>6</color> \u2014 pushBack\n<color=blue>[</color>
+    \u2014 servoLeft\n<color=blue>]</color> \u2014 servoRight\n<color=blue>;</color>
+    \u2014 servoFront\n<color=blue>'</color> \u2014 servoBack\n<color=blue>7</color>
     \u2014 claw\n<color=blue>8</color> \u2014 nevermind\n<color=blue>9</color> \u2014
     wave"
   m_isRightToLeft: 0
@@ -5535,13 +5535,13 @@ MonoBehaviour:
     blackboardKey: user:intent:isPushFront
   - keyboardKey: 54
     blackboardKey: user:intent:isPushBack
-  - keyboardKey: 35
+  - keyboardKey: 91
     blackboardKey: user:intent:isServoLeft
-  - keyboardKey: 36
+  - keyboardKey: 93
     blackboardKey: user:intent:isServoRight
-  - keyboardKey: 37
+  - keyboardKey: 59
     blackboardKey: user:intent:isServoFront
-  - keyboardKey: 94
+  - keyboardKey: 39
     blackboardKey: user:intent:isServoBack
   - keyboardKey: 55
     blackboardKey: user:intent:isClaw
