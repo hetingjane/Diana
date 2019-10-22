@@ -281,6 +281,12 @@ public class EventManagementModule : ModuleBase
             } 
             else if (key == "user:intent:action")
             {
+                if (actionStr.StartsWith("slide")) {
+                    if (GlobalHelper.GetTopPredicate(eventStr) == "servo") {
+                        eventManager.ClearEvents();
+                    }
+                }
+
                 if (!string.IsNullOrEmpty(actionStr))
                 {
                     if (!string.IsNullOrEmpty(objectStr))
