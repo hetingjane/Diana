@@ -154,6 +154,7 @@ public class GraspModule : ModuleBase
 					{
 						SetValue("me:holding", "", $"Releasing {held.name}");
 						
+						// Reactivate phsyics
 						Rigging rigging = held.GetComponent<Rigging>();
 						if (rigging != null)
 						{
@@ -165,7 +166,16 @@ public class GraspModule : ModuleBase
 				else if (action == unreachAction)
 				{
 					if (held != null)
+					{
 						SetValue("me:holding", "", $"Holding nothing");
+
+						// Reactivate phsyics
+						Rigging rigging = held.GetComponent<Rigging>();
+						if (rigging != null)
+						{
+							rigging.ActivatePhysics(true);
+						}
+					}
 					held = null;
 
 					target = null;
