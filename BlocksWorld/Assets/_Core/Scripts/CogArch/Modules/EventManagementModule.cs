@@ -796,6 +796,14 @@ public class EventManagementModule : ModuleBase
 		    }
 	    }
 
+        // still didn't find one
+        if (objName == string.Empty) {
+            // it might be the same as the current object intent
+            if (!string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:object"))) {
+                objName = DataStore.GetStringValue("user:intent:object");
+            }
+        }
+
 	    return objName;
     }
 
@@ -820,6 +828,14 @@ public class EventManagementModule : ModuleBase
 	        if (target != null) {
 	        	objName = target.name;
 	        }
+        }
+
+        // still didn't find one
+        if (objName == string.Empty) {
+            // it might be the same as the current object intent
+            if (!string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:object"))) {
+                objName = DataStore.GetStringValue("user:intent:object");
+            }
         }
 
         return objName;
