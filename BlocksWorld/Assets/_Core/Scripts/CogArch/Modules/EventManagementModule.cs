@@ -464,6 +464,14 @@ public class EventManagementModule : ModuleBase
                     SetValue("user:intent:append:action", string.Empty, string.Empty);
                     SetValue("user:intent:append:action", "servo({0},{1}(right))", string.Empty);
                 }
+                else if (DataStore.GetBoolValue("user:intent:isServoFront")) {
+                    SetValue("user:intent:append:action", string.Empty, string.Empty);
+                    SetValue("user:intent:append:action", "servo({0},{1}(front))", string.Empty);
+                }
+                else if (DataStore.GetBoolValue("user:intent:isServoBack")) {
+                    SetValue("user:intent:append:action", string.Empty, string.Empty);
+                    SetValue("user:intent:append:action", "servo({0},{1}(back))", string.Empty);
+                }
             }
         }
 

@@ -69,6 +69,16 @@ public class DialogueInteractionModule : ModuleBase
                     SetValue("user:intent:action", "slide({0},{1}(right))", string.Empty);
                 }
             }
+            else if (key == "user:intent:isPushFront") {
+                if (DataStore.GetBoolValue(key)) {
+                    SetValue("user:intent:action", "slide({0},{1}(front))", string.Empty);
+                }
+            }
+            else if (key == "user:intent:isPushBack") {
+                if (DataStore.GetBoolValue(key)) {
+                    SetValue("user:intent:action", "slide({0},{1}(back))", string.Empty);
+                }
+            }
             else if (key == "user:intent:isServoLeft") {
                 if (DataStore.GetBoolValue(key)) {
                     SetValue("user:intent:action", "servo({0},{1}(left))", string.Empty);
@@ -90,6 +100,42 @@ public class DialogueInteractionModule : ModuleBase
             else if (key == "user:intent:isServoRight") {
                 if (DataStore.GetBoolValue(key)) {
                     SetValue("user:intent:action", "servo({0},{1}(right))", string.Empty);
+                    SetValue("me:isCheckingServo", false, string.Empty);
+
+                    servoLoopTimer.Interval = servoLoopTimerTime;
+                    servoLoopTimer.Enabled = true;
+                }
+                else {
+                    SetValue("user:intent:append:action", "ungrasp({0})", string.Empty);
+                    SetValue("user:intent:action", string.Empty, string.Empty);
+                    SetValue("me:isCheckingServo", false, string.Empty);
+                    SetValue("me:isInServoLoop", false, string.Empty);
+
+                    servoLoopTimer.Interval = servoLoopTimerTime;
+                    servoLoopTimer.Enabled = false;
+                }
+            }
+            else if (key == "user:intent:isServoFront") {
+                if (DataStore.GetBoolValue(key)) {
+                    SetValue("user:intent:action", "servo({0},{1}(front))", string.Empty);
+                    SetValue("me:isCheckingServo", false, string.Empty);
+
+                    servoLoopTimer.Interval = servoLoopTimerTime;
+                    servoLoopTimer.Enabled = true;
+                }
+                else {
+                    SetValue("user:intent:append:action", "ungrasp({0})", string.Empty);
+                    SetValue("user:intent:action", string.Empty, string.Empty);
+                    SetValue("me:isCheckingServo", false, string.Empty);
+                    SetValue("me:isInServoLoop", false, string.Empty);
+
+                    servoLoopTimer.Interval = servoLoopTimerTime;
+                    servoLoopTimer.Enabled = false;
+                }
+            }
+            else if (key == "user:intent:isServoBack") {
+                if (DataStore.GetBoolValue(key)) {
+                    SetValue("user:intent:action", "servo({0},{1}(back))", string.Empty);
                     SetValue("me:isCheckingServo", false, string.Empty);
 
                     servoLoopTimer.Interval = servoLoopTimerTime;
