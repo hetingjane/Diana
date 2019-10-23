@@ -140,6 +140,7 @@ public class GraspModule : ModuleBase
 			case GraspState.Reached:
 				if (action == holdAction)
 				{
+
 					if (target != null)
 					{
 						held = target;
@@ -155,7 +156,7 @@ public class GraspModule : ModuleBase
 						}
 					}
 					else
-						Debug.LogWarning("hold action set on me:intent:action when me:intent:target is empty");
+						Debug.LogWarning("hold action set on me:intent:action when me:intent:targetName is empty");
 					
 				}
 				else if (action == releaseAction)
