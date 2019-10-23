@@ -31,6 +31,7 @@ using VoxSimPlatform.CogPhysics;
 using VoxSimPlatform.Core;
 using VoxSimPlatform.Global;
 using VoxSimPlatform.Pathfinding;
+using VoxSimPlatform.SpatialReasoning.QSR;
 using VoxSimPlatform.Vox;
 
 public class EventManagementModule : ModuleBase
@@ -663,6 +664,10 @@ public class EventManagementModule : ModuleBase
 
             SetValue("user:intent:append:partialEvent",DataStore.StringValue.Empty,string.Empty);
             SetValue("user:intent:append:action",DataStore.StringValue.Empty,string.Empty);
+
+            if (DataStore.GetStringValue("user:intent:lastEvent").StartsWith("servo")) {
+                SetValue("me:intent:target","user",string.Empty);
+            }
         }
     }
    

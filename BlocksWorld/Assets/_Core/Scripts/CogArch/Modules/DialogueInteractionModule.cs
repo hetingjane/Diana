@@ -168,10 +168,20 @@ public class DialogueInteractionModule : ModuleBase
                         SetValue("user:intent:object", DataStore.GetStringValue(key), string.Empty);
                     }
                     else if (DataStore.GetStringValue("user:intent:object") != DataStore.GetStringValue(key)) {
-                        SetValue("user:intent:partialEvent",
-                            string.Format("put({0},on({1}))",
-                            DataStore.GetStringValue("user:intent:object"),
-                            DataStore.GetStringValue(key)), string.Empty);
+                        GameObject target = GameObject.Find(DataStore.GetStringValue(key));
+                        GameObject blocker = null;
+                        do
+                        {
+                            DialogueUtility.SurfaceClear(target, out blocker);
+                            if (blocker != null)
+                            {
+                                target = blocker;
+                            }
+                        } while (blocker != null);
+                            SetValue("user:intent:partialEvent",
+                                string.Format("put({0},on({1}))",
+                                DataStore.GetStringValue("user:intent:object"),
+                                target.name), string.Empty);
                     }
                 }
             }
