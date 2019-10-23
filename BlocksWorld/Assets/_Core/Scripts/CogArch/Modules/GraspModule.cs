@@ -73,6 +73,16 @@ public class GraspModule : ModuleBase
 	private const string releaseAction = "release";
 	private const string unreachAction = "unreach";
 
+	private void GetCurrentTarget(out Voxeme curTarget, out Vector3 curTargetPosition)
+	{
+		// Try to resolve the target by name
+		string targetName = DataStore.GetStringValue("me:intent:targetName");
+		// If the target is a named object get its Voxeme component
+		curTarget = string.IsNullOrEmpty(targetName) ? null : GameObject.Find(targetName).GetComponent<Voxeme>();
+
+		curTargetPosition = DataStore.GetVector3Value("me:intent:target");
+	}
+
 	// Update is called once per frame
 	void Update()
     {
@@ -84,12 +94,7 @@ public class GraspModule : ModuleBase
 			case GraspState.Idle:
 				if (action == reachAction)
 				{
-					// Try to resolve the target by name
-					string targetName = DataStore.GetStringValue("me:intent:targetName");
-					// If the target is a named object get its Voxeme component
-					var curTarget = string.IsNullOrEmpty(targetName) ? null : GameObject.Find(targetName).GetComponent<Voxeme>();
-
-					Vector3 curMovePosition = DataStore.GetVector3Value("me:intent:target");
+					GetCurrentTarget(out Voxeme curTarget, out Vector3 curMovePosition);
 
 					if (curMovePosition != default)
 					{
@@ -121,12 +126,7 @@ public class GraspModule : ModuleBase
 				}
 				else if (action == reachAction)
 				{
-					// Try to resolve the target by name
-					string targetName = DataStore.GetStringValue("me:intent:targetName");
-					// If the target is a named object get its Voxeme component
-					var curTarget = string.IsNullOrEmpty(targetName) ? null : GameObject.Find(targetName).GetComponent<Voxeme>();
-
-					Vector3 curMovePosition = DataStore.GetVector3Value("me:intent:target");
+					GetCurrentTarget(out Voxeme curTarget, out Vector3 curMovePosition);
 
 					if (curTarget != target && curMovePosition != default)
 					{
@@ -203,13 +203,7 @@ public class GraspModule : ModuleBase
 				}
 				else if (action == reachAction)
 				{
-					// Try to resolve the target by name
-					string targetName = DataStore.GetStringValue("me:intent:targetName");
-
-					// If the target is a named object get its Voxeme component
-					var curTarget = string.IsNullOrEmpty(targetName) ? null : GameObject.Find(targetName).GetComponent<Voxeme>();
-
-					Vector3 curMovePosition = DataStore.GetVector3Value("me:intent:target");
+					GetCurrentTarget(out Voxeme curTarget, out Vector3 curMovePosition);
 
 					if ((curTarget == null || curTarget != target) && curMovePosition != default)
 					{
