@@ -366,6 +366,8 @@ public class EventManagementModule : ModuleBase
                     {
                         Debug.Log(string.Format("Composed object {0}, action {1}, and location {2} into event {3}",
                             objectStr, actionStr, GlobalHelper.VectorToParsable(locationPos), eventStr));
+                        SetValue("me:lastTheme",objectStr,string.Empty);
+                        SetValue("me:lastThemePos",GameObject.Find(objectStr).transform.position,string.Empty);
                         SetValue("user:intent:event", eventStr, string.Empty);
                     }
                     else
@@ -658,6 +660,7 @@ public class EventManagementModule : ModuleBase
 
                 if (string.IsNullOrEmpty(DataStore.GetStringValue("me:holding"))) {
                     SetValue("user:intent:object",DataStore.StringValue.Empty,string.Empty);
+                    SetValue("me:lastThemePos",DataStore.Vector3Value.Zero,string.Empty);
                 }
 
                 SetValue("user:intent:action",DataStore.StringValue.Empty,string.Empty);

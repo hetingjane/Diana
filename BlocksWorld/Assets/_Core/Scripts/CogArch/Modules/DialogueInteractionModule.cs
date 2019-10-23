@@ -229,6 +229,12 @@ public class DialogueInteractionModule : ModuleBase
                 undoEventStr = lastEventStr.Replace("grasp", "ungrasp");
                 break;
 
+            case "put":
+                undoEventStr = string.Format("put({0},{1})",
+                    DataStore.GetStringValue("me:lastTheme"),
+                    GlobalHelper.VectorToParsable(DataStore.GetVector3Value("me:lastThemePos")));
+                break;
+
             default:
                 break;
         }
