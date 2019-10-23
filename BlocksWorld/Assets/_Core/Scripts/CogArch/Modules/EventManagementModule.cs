@@ -649,24 +649,28 @@ public class EventManagementModule : ModuleBase
     void EventDoneExecuting(string key, DataStore.IValue value) {
         if ((value as DataStore.BoolValue).val == true) {
             // if "me:intent:action:isComplete" is true
-            SetValue("user:intent:lastEvent", DataStore.GetStringValue("user:intent:event"),
-	            string.Format("Store user:intent:event ({0}) in user:intent:lastEvent in case Diana did something wrong",
-	            	DataStore.GetStringValue("user:intent:event")));
-            SetValue("user:intent:event",DataStore.StringValue.Empty,string.Empty);
-            SetValue("user:intent:partialEvent",DataStore.StringValue.Empty,string.Empty);
+            if (DataStore.GetStringValue("me:intent:action") == "unreach") {
+                SetValue("user:intent:lastEvent", DataStore.GetStringValue("user:intent:event"),
+    	            string.Format("Store user:intent:event ({0}) in user:intent:lastEvent in case Diana did something wrong",
+    	            	DataStore.GetStringValue("user:intent:event")));
+                SetValue("user:intent:event",DataStore.StringValue.Empty,string.Empty);
+                SetValue("user:intent:partialEvent",DataStore.StringValue.Empty,string.Empty);
 
-            if (string.IsNullOrEmpty(DataStore.GetStringValue("me:holding"))) {
-                SetValue("user:intent:object",DataStore.StringValue.Empty,string.Empty);
-            }
+                if (string.IsNullOrEmpty(DataStore.GetStringValue("me:holding"))) {
+                    SetValue("user:intent:object",DataStore.StringValue.Empty,string.Empty);
+                }
 
-            SetValue("user:intent:action",DataStore.StringValue.Empty,string.Empty);
-            SetValue("user:intent:location",DataStore.Vector3Value.Zero,string.Empty);
+                SetValue("user:intent:action",DataStore.StringValue.Empty,string.Empty);
+                SetValue("user:intent:location",DataStore.Vector3Value.Zero,string.Empty);
 
-            SetValue("user:intent:append:partialEvent",DataStore.StringValue.Empty,string.Empty);
-            SetValue("user:intent:append:action",DataStore.StringValue.Empty,string.Empty);
+                SetValue("user:intent:append:partialEvent",DataStore.StringValue.Empty,string.Empty);
+                SetValue("user:intent:append:action",DataStore.StringValue.Empty,string.Empty);
 
-            if (DataStore.GetStringValue("user:intent:lastEvent").StartsWith("servo")) {
-                SetValue("me:intent:target","user",string.Empty);
+	            if (string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:lastEvent"))) {
+	                if (DataStore.GetStringValue("user:intent:lastEvent").StartsWith("servo")) {
+	                    SetValue("me:intent:target","user",string.Empty);
+	                }
+	            }
             }
         }
     }
@@ -753,9 +757,11 @@ public class EventManagementModule : ModuleBase
 		                RiggingHelper.UnRig(obj, obj.transform.parent.gameObject);	                	
 	                //}
 
-                    SetValue("me:intent:action", "grasp", string.Empty);
+                    SetValue("me:intent:action", "reach", string.Empty);
                     SetValue("me:intent:targetName", obj.name, string.Format("Grasping {0}",obj.name));
                     SetValue("me:intent:target", obj.transform.position - holdOffset, string.Empty);
+                    SetValue("me:intent:action", "hold", string.Empty);
+                    SetValue("user:intent:lastEvent", string.Format("grasp({0})", obj.name), string.Empty);
                 }
             }                    
         }
@@ -770,7 +776,8 @@ public class EventManagementModule : ModuleBase
                 if (args[0] is GameObject)
                 {
                     GameObject obj = (args[0] as GameObject);
-                    SetValue("me:intent:action", "ungrasp", string.Empty);
+                    SetValue("me:intent:action", "release", string.Empty);
+                    SetValue("me:intent:action", "unreach", string.Empty);
                     SetValue("me:intent:target", obj.transform.position, 
                         string.Format("Ungrasping {0} at {1}", obj.name, GlobalHelper.VectorToParsable(obj.transform.position)));
                 }

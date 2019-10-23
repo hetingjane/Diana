@@ -59,7 +59,15 @@ public class DialogueInteractionModule : ModuleBase
             stateMachine.GenerateStackSymbol(DataStore.instance)));
 
         if (DataStore.GetBoolValue("user:isInteracting")) {
-            if (key == "user:intent:isPushLeft") {
+            if (key == "user:intent:isNevermind") {
+                if (!string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:lastEvent"))) {
+                    UndoLastEvent();
+                }
+                else if (!string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:object"))) {
+                    ForgetFocusObject();
+                }
+            } 
+            else if (key == "user:intent:isPushLeft") {
                 if (DataStore.GetBoolValue(key)) {
                     SetValue("user:intent:action", "slide({0},{1}(left))", string.Empty);
                 }
@@ -163,7 +171,7 @@ public class DialogueInteractionModule : ModuleBase
                 }
             }
             else if (key == "user:lastPointedAt:name") {
-                if (DataStore.GetStringValue(key) != string.Empty) {
+                if (!string.IsNullOrEmpty(DataStore.GetStringValue(key))) {
                     if (string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:object"))) {
                         SetValue("user:intent:object", DataStore.GetStringValue(key), string.Empty);
                     }
@@ -194,13 +202,15 @@ public class DialogueInteractionModule : ModuleBase
                 }
             }
             else if (key == "user:intent:object") {
-                if (string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:action")) && 
-                    string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:location"))) {
-                    SetValue("me:speech:intent", "OK.", string.Empty);
-                    SetValue("me:intent:action", "point", string.Empty);
-                    SetValue("me:intent:pointAt", DataStore.GetStringValue(key), string.Empty);
-                    SetValue("me:intent:target",
-                        GlobalHelper.GetObjectWorldSize(GameObject.Find(DataStore.GetStringValue(key))).max, string.Empty);
+                if (!string.IsNullOrEmpty(DataStore.GetStringValue(key))) {
+                    if (string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:action")) && 
+                        string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:location"))) {
+                        SetValue("me:speech:intent", "OK.", string.Empty);
+                        SetValue("me:intent:action", "reach", string.Empty);
+                        SetValue("me:intent:target",
+                            GlobalHelper.GetObjectWorldSize(GameObject.Find(DataStore.GetStringValue(key))).max, string.Empty);
+                        SetValue("me:intent:targetName", DataStore.GetStringValue(key), string.Empty);
+                    }
                 }
             }
             else if (key == "user:communication") {
@@ -208,6 +218,30 @@ public class DialogueInteractionModule : ModuleBase
     	        Debug.Log(string.Format("User communication: {0} {1} {2} {3}", comm.val, comm.val.directAddress, comm.val.parse, comm.val.originalText));
             }
         }
+    }
+
+    void UndoLastEvent() {
+        string lastEventStr = DataStore.GetStringValue("user:intent:lastEvent");
+        string undoEventStr = string.Empty;
+
+        switch(GlobalHelper.GetTopPredicate(lastEventStr)) {
+            case "grasp":
+                undoEventStr = lastEventStr.Replace("grasp", "ungrasp");
+                break;
+
+            default:
+                break;
+        }
+
+        if (!string.IsNullOrEmpty(undoEventStr)) {
+            SetValue("user:intent:event", undoEventStr, string.Empty);
+        }
+    }
+
+    void ForgetFocusObject() {
+        SetValue("user:intent:object", string.Empty, string.Empty);
+        SetValue("me:intent:action", "unreach", string.Empty);
+
     }
 
     void CheckServoStatus(object sender, ElapsedEventArgs e) {
