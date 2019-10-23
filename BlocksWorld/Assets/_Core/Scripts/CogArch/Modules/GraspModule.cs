@@ -92,7 +92,7 @@ public class GraspModule : ModuleBase
 		switch (currentState)
 		{
 			case GraspState.Idle:
-				if (action == reachAction)
+				if (action == reachAction || action == holdAction)
 				{
 					GetCurrentTarget(out Voxeme curTarget, out Vector3 curMovePosition);
 
@@ -113,6 +113,8 @@ public class GraspModule : ModuleBase
 				if (rightArmMotion == "reached")
 				{
 					SetValue("me:intent:action:isComplete", true, "");
+					if (action == holdAction)
+						SetValue("me:intent:action", new DataStore.StringValue("hold"), string.Empty);
 					currentState = GraspState.Reached;
 				}
 				else if (action == unreachAction)
