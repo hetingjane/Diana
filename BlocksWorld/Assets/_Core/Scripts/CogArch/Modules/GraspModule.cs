@@ -148,8 +148,10 @@ public class GraspModule : ModuleBase
 						Rigging rigging = held.GetComponent<Rigging>();
 						if (rigging != null)
 						{
-							rigging.ActivatePhysics(false);
-							//RiggingHelper.RigTo(held.gameObject, hand.gameObject);
+                            if (rigging.usePhysicsRig)
+                            {	rigging.ActivatePhysics(false);
+                                //RiggingHelper.RigTo(held.gameObject, hand.gameObject);
+                            }
 						}
 					}
 					else
@@ -166,8 +168,11 @@ public class GraspModule : ModuleBase
 						Rigging rigging = held.GetComponent<Rigging>();
 						if (rigging != null)
 						{
-							rigging.ActivatePhysics(true);
-						}
+                            if (!rigging.usePhysicsRig)
+                            {
+    							rigging.ActivatePhysics(true);
+    						} 
+                        }
 						held = null;
 					}
 					else
