@@ -8,7 +8,7 @@ using VoxSimPlatform.Vox;
 public class TestGraspModule : MonoBehaviour
 {
 	public Transform manipulableObjectsRoot;
-
+	public bool doReachRandomLocation;
 	public bool doReachRandomObject;
 	public bool doMoveRandomLocation;
 	public bool doUnreach;
@@ -58,6 +58,7 @@ public class TestGraspModule : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+		doReachRandomLocation = doReachRandomLocation || Input.GetKeyDown(KeyCode.H);
 		doReachRandomObject = doReachRandomObject || Input.GetKeyDown(KeyCode.J);
 		doMoveRandomLocation = doMoveRandomLocation || Input.GetKeyDown(KeyCode.K);
 		doUnreach = doUnreach || Input.GetKeyDown(KeyCode.L);
@@ -83,7 +84,14 @@ public class TestGraspModule : MonoBehaviour
 			DataStore.SetValue("me:intent:target", new DataStore.Vector3Value(curReachTarget), null, "");
 			doReachRandomObject = false;
 		}
-
+		else if (doReachRandomLocation)
+		{
+			DataStore.SetValue("me:intent:action", new DataStore.StringValue("reach"), null, "");
+			Vector3 v = GetRandomLocation();
+			DataStore.SetValue("me:intent:targetName", DataStore.StringValue.Empty, null, string.Empty);
+			DataStore.SetValue("me:intent:target", new DataStore.Vector3Value(v), null, "");
+			doReachRandomLocation = false;
+		}
 		else if (doMoveRandomLocation)
 		{
 			DataStore.SetValue("me:intent:action", new DataStore.StringValue("move"), null, "");

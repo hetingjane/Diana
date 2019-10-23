@@ -91,7 +91,7 @@ public class GraspModule : ModuleBase
 
 					Vector3 curMovePosition = DataStore.GetVector3Value("me:intent:target");
 
-					if (curTarget != null && curMovePosition != default)
+					if (curMovePosition != default)
 					{
 						target = curTarget;
 						movePosition = curMovePosition;
@@ -99,7 +99,7 @@ public class GraspModule : ModuleBase
 						SetValue("me:intent:handPosR", movePosition, currentState.ToString());
 						SetValue("me:intent:motion:rightArm", new DataStore.StringValue("reach"), "");
 						SetValue("me:intent:action:isComplete", false, "");
-						// We begin grasping
+						// We begin reaching for the object or the location
 						currentState = GraspState.Reaching;
 					}
 				}
@@ -112,6 +112,9 @@ public class GraspModule : ModuleBase
 				}
 				else if (action == unreachAction)
 				{
+					target = null;
+					movePosition = default;
+
 					SetValue("me:intent:motion:rightArm", new DataStore.StringValue("unreach"), "");
 					SetValue("me:intent:action:isComplete", false, "");
 					currentState = GraspState.Unreaching;
@@ -137,23 +140,28 @@ public class GraspModule : ModuleBase
 			case GraspState.Reached:
 				if (action == holdAction)
 				{
-					held = target;
-					SetValue("me:holding", held.name, $"Holding {held.name}");
-
-					// Do not respond to forces/collisions
-					Rigging rigging = held.GetComponent<Rigging>();
-					if (rigging != null)
+					if (target != null)
 					{
-						rigging.ActivatePhysics(false);
-						//RiggingHelper.RigTo(held.gameObject, hand.gameObject);
+						held = target;
+						SetValue("me:holding", held.name, $"Holding {held.name}");
+						// Do not respond to forces/collisions
+						Rigging rigging = held.GetComponent<Rigging>();
+						if (rigging != null)
+						{
+							rigging.ActivatePhysics(false);
+							//RiggingHelper.RigTo(held.gameObject, hand.gameObject);
+						}
 					}
+					else
+						Debug.LogWarning("hold action set on me:intent:action when me:intent:target is empty");
+					
 				}
 				else if (action == releaseAction)
 				{
 					if (held != null)
 					{
 						SetValue("me:holding", "", $"Releasing {held.name}");
-						
+
 						// Reactivate phsyics
 						Rigging rigging = held.GetComponent<Rigging>();
 						if (rigging != null)
@@ -162,6 +170,8 @@ public class GraspModule : ModuleBase
 						}
 						held = null;
 					}
+					else
+						Debug.LogWarning("release action set on me:intent:action without holding an object");
 				}
 				else if (action == unreachAction)
 				{
@@ -195,7 +205,7 @@ public class GraspModule : ModuleBase
 
 					Vector3 curMovePosition = DataStore.GetVector3Value("me:intent:target");
 
-					if (curTarget != null && curTarget != target)
+					if ((curTarget == null || curTarget != target) && curMovePosition != default)
 					{
 						target = curTarget;
 						movePosition = curMovePosition;
