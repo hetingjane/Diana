@@ -204,7 +204,7 @@ public class DialogueInteractionModule : ModuleBase
             else if (key == "user:intent:object") {
                 if (!string.IsNullOrEmpty(DataStore.GetStringValue(key))) {
                     if (string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:action")) && 
-                        string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:location"))) {
+                        DataStore.GetVector3Value("user:intent:location") == default) {
                         SetValue("me:speech:intent", "OK.", string.Empty);
                         SetValue("me:intent:action", "reach", string.Empty);
                         SetValue("me:intent:target",
@@ -224,15 +224,50 @@ public class DialogueInteractionModule : ModuleBase
         string lastEventStr = DataStore.GetStringValue("user:intent:lastEvent");
         string undoEventStr = string.Empty;
 
+        Debug.Log(string.Format("Undoing last event {0}", lastEventStr));
+
         switch(GlobalHelper.GetTopPredicate(lastEventStr)) {
             case "grasp":
                 undoEventStr = lastEventStr.Replace("grasp", "ungrasp");
                 break;
 
-            case "put":
+            case "lift":
                 undoEventStr = string.Format("put({0},{1})",
                     DataStore.GetStringValue("me:lastTheme"),
                     GlobalHelper.VectorToParsable(DataStore.GetVector3Value("me:lastThemePos")));
+                break;
+
+            case "put":
+                if (DataStore.GetVector3Value("me:lastThemePos") != default) {
+                    undoEventStr = string.Format("put({0},{1})",
+                        DataStore.GetStringValue("me:lastTheme"),
+                        GlobalHelper.VectorToParsable(DataStore.GetVector3Value("me:lastThemePos")));
+                }
+                else {
+                    SetValue("me:speech:intent", "I already undid that.  What more do you want from me?", string.Empty);
+                }
+                break;
+
+            case "slide":
+                if (DataStore.GetVector3Value("me:lastThemePos") != default) {
+                    undoEventStr = string.Format("slide({0},{1})",
+                        DataStore.GetStringValue("me:lastTheme"),
+                        GlobalHelper.VectorToParsable(DataStore.GetVector3Value("me:lastThemePos")));
+                }
+                else {
+                    SetValue("me:speech:intent", "I already undid that.  What more do you want from me?", string.Empty);
+                }
+                break;
+
+            case "servo":
+                if (DataStore.GetVector3Value("me:lastThemePos") != default) {
+                    undoEventStr = string.Format("slide({0},{1})",
+                        DataStore.GetStringValue("me:lastTheme"),
+                        GlobalHelper.VectorToParsable(DataStore.GetVector3Value("me:lastThemePos")));
+                }
+                else {
+                    SetValue("me:speech:intent", "I already undid that.  What more do you want from me?", string.Empty);
+                }
                 break;
 
             default:
@@ -240,6 +275,7 @@ public class DialogueInteractionModule : ModuleBase
         }
 
         if (!string.IsNullOrEmpty(undoEventStr)) {
+            SetValue("me:isUndoing", true, string.Empty);
             SetValue("user:intent:event", undoEventStr, string.Empty);
         }
     }
@@ -247,7 +283,7 @@ public class DialogueInteractionModule : ModuleBase
     void ForgetFocusObject() {
         SetValue("user:intent:object", string.Empty, string.Empty);
         SetValue("me:intent:action", "unreach", string.Empty);
-
+        SetValue("me:intent:targetName", "unreach", string.Empty);
     }
 
     void CheckServoStatus(object sender, ElapsedEventArgs e) {
