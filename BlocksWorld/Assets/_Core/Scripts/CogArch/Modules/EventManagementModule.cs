@@ -296,10 +296,12 @@ public class EventManagementModule : ModuleBase
             } 
             else if (key == "user:intent:action")
             {
-                if (actionStr.StartsWith("slide")) {
-                    if (GlobalHelper.GetTopPredicate(eventStr) == "servo") {
-                        eventManager.ClearEvents();
-                    }
+	            if (actionStr.StartsWith("slide")) {
+		            if (!string.IsNullOrEmpty(eventStr)) {
+	                    if (GlobalHelper.GetTopPredicate(eventStr) == "servo") {
+	                        eventManager.ClearEvents();
+	                    }
+		            }
                 }
 
                 if (!string.IsNullOrEmpty(actionStr))
@@ -545,7 +547,7 @@ public class EventManagementModule : ModuleBase
         {
             case "left":
                 options = options.Where(o =>
-                    ((Vector3.Dot((o.transform.position - theme.transform.position), directionVectors[oppositeDir[dir]]) > 0.5f) &&
+                    ((Vector3.Dot(Vector3.Normalize(o.transform.position - theme.transform.position), directionVectors[oppositeDir[dir]]) > 0.5f) &&
                     (DialogueUtility.FitsTouching(theme, grabbableBlocks, o, dir)))).ToList();
                 choice = options.OrderByDescending(o =>
                     Vector3.Dot((o.transform.position - theme.transform.position), directionVectors[oppositeDir[dir]])).
@@ -574,8 +576,8 @@ public class EventManagementModule : ModuleBase
 
             case "right":
                 options = options.Where(o =>
-                    (Vector3.Dot((o.transform.position - theme.transform.position), directionVectors[oppositeDir[dir]]) > 0.5f) &&
-                    (DialogueUtility.FitsTouching(theme, grabbableBlocks, o, dir))).ToList();
+                    ((Vector3.Dot(Vector3.Normalize(o.transform.position - theme.transform.position), directionVectors[oppositeDir[dir]]) > 0.5f) &&
+                    (DialogueUtility.FitsTouching(theme, grabbableBlocks, o, dir)))).ToList();
                 choice = options.OrderByDescending(o =>
                     Vector3.Dot((o.transform.position - theme.transform.position), directionVectors[oppositeDir[dir]])).
                     ThenBy(o => (o.transform.position - theme.transform.position).magnitude).FirstOrDefault();
@@ -602,8 +604,9 @@ public class EventManagementModule : ModuleBase
 
             case "front":
                 options = options.Where(o =>
-                    (Vector3.Dot((o.transform.position - theme.transform.position), directionVectors[oppositeDir[dir]]) > 0.5f) &&
-                    (DialogueUtility.FitsTouching(theme, grabbableBlocks, o, dir))).ToList();
+                    ((Vector3.Dot(Vector3.Normalize(o.transform.position - theme.transform.position), directionVectors[oppositeDir[dir]]) > 0.5f) &&
+                    (DialogueUtility.FitsTouching(theme, grabbableBlocks, o, dir)))).ToList();
+                Debug.Log("front: " + options.Count + " options");
                 choice = options.OrderByDescending(o =>
                     Vector3.Dot((o.transform.position - theme.transform.position), directionVectors[oppositeDir[dir]])).
                     ThenBy(o => (o.transform.position - theme.transform.position).magnitude).FirstOrDefault();
@@ -629,8 +632,8 @@ public class EventManagementModule : ModuleBase
 
             case "back":
                 options = options.Where(o =>
-                    (Vector3.Dot((o.transform.position - theme.transform.position), directionVectors[oppositeDir[dir]]) > 0.5f) &&
-                    (DialogueUtility.FitsTouching(theme, grabbableBlocks, o, dir))).ToList();
+                    ((Vector3.Dot(Vector3.Normalize(o.transform.position - theme.transform.position), directionVectors[oppositeDir[dir]]) > 0.5f) &&
+                    (DialogueUtility.FitsTouching(theme, grabbableBlocks, o, dir)))).ToList();
                 choice = options.OrderByDescending(o =>
                     Vector3.Dot((o.transform.position - theme.transform.position), directionVectors[oppositeDir[dir]])).
                     ThenBy(o => (o.transform.position - theme.transform.position).magnitude).FirstOrDefault();
@@ -665,6 +668,29 @@ public class EventManagementModule : ModuleBase
     Vector3 CalcServoTarget(GameObject theme, string dir)
     {
         Vector3 loc = theme.transform.position + (directionVectors[oppositeDir[dir]] * servoSpeed);
+
+        Bounds themeBounds = GlobalHelper.GetObjectWorldSize(theme);
+
+        Bounds projectedBounds = new Bounds(loc,themeBounds.size);
+        foreach (Transform test in grabbableBlocks) {
+            if (test.gameObject != theme.gameObject) {
+                if (!RCC8.DC(projectedBounds, GlobalHelper.GetObjectWorldSize(test.gameObject)) &&
+                    !RCC8.EC(projectedBounds, GlobalHelper.GetObjectWorldSize(test.gameObject))) {
+                    if ((dir == "left") || (dir == "right")) {
+                        loc = new Vector3(
+                            (test.transform.position + Vector3.Scale(GlobalHelper.GetObjectWorldSize(test.gameObject).extents,
+                            directionVectors[dir]) + Vector3.Scale(GlobalHelper.GetObjectWorldSize(theme.gameObject).extents,
+                            directionVectors[dir])).x,loc.y,loc.z);
+                    }
+                    else if ((dir == "front") || (dir == "back")) {
+                        loc = new Vector3(loc.x,loc.y,
+                            (test.transform.position + Vector3.Scale(GlobalHelper.GetObjectWorldSize(test.gameObject).extents,
+                            directionVectors[dir]) + Vector3.Scale(GlobalHelper.GetObjectWorldSize(theme.gameObject).extents,
+                            directionVectors[dir])).z);
+                    }
+                }
+            }
+        }
 
         return loc;
     }
@@ -794,7 +820,6 @@ public class EventManagementModule : ModuleBase
 		                RiggingHelper.UnRig(obj, obj.transform.parent.gameObject);	                	
 	                //}
 
-                    SetValue("me:intent:action", "reach", string.Empty);
                     SetValue("me:intent:targetName", obj.name, string.Format("Grasping {0}",obj.name));
                     SetValue("me:intent:target", obj.transform.position - holdOffset, string.Empty);
                     SetValue("me:intent:action", "hold", string.Empty);

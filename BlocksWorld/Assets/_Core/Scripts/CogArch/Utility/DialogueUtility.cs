@@ -67,18 +67,18 @@ public static class DialogueUtility
                         fits = false;
                     }
                 }
-                else if (dir == "in_front") {
+                else if (dir == "front") {
                     Bounds projectedBounds = new Bounds(
-                        new Vector3(objBounds.center.x, objBounds.center.y, objBounds.min.z - themeBounds.extents.z),
+                        new Vector3(objBounds.center.x, objBounds.center.y, objBounds.max.z + themeBounds.extents.z),
                         themeBounds.size);
                     if (!RCC8.DC(projectedBounds, GlobalHelper.GetObjectWorldSize(test.gameObject)) &&
                         !RCC8.EC(projectedBounds, GlobalHelper.GetObjectWorldSize(test.gameObject))) {
                         fits = false;
                     }
                 }
-                else if (dir == "behind") {
+                else if (dir == "back") {
                     Bounds projectedBounds = new Bounds(
-                        new Vector3(objBounds.center.x, objBounds.center.y, objBounds.max.z + themeBounds.extents.z),
+                        new Vector3(objBounds.center.x, objBounds.center.y, objBounds.min.z - themeBounds.extents.z),
                         themeBounds.size);
                     if (!RCC8.DC(projectedBounds, GlobalHelper.GetObjectWorldSize(test.gameObject)) &&
                         !RCC8.EC(projectedBounds, GlobalHelper.GetObjectWorldSize(test.gameObject))) {
