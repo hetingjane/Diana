@@ -52,8 +52,6 @@ public class WatsonStreamingSR : ModuleBase
     private SpeechToTextService _speechToText;
 
 	IEnumerator Start() {
-        LogSystem.InstallDefaultReactors();
-
 		Runnable.Run(CreateService());
 		yield return null;
 	}
