@@ -58,7 +58,6 @@ public class FaceUpdate : ModuleBase
                 smileRightIndex.Add(rightIdx);
             }
         }
-        DataStore.Subscribe("user:isEngaged", NoteUserIsEngaged);
         //SetValue("me:emotion", "neutral", "Initialize");
         coroutineChange = WaitAndChange(dianaEmotion, 0.4f);
         coroutineDecade = WaitAndDecade(5f);
@@ -90,6 +89,8 @@ public class FaceUpdate : ModuleBase
     }
     protected void Update()
     {
+        DataStore.Subscribe("user:isEngaged", NoteUserIsEngaged);
+
         dianaEmotion = DataStore.GetStringValue("me:emotion");
         switch (dianaEmotion)
         {
@@ -136,7 +137,7 @@ public class FaceUpdate : ModuleBase
         }
         if (userEmotion != "joy" && !userPointing && dianaEmotion != "greet")
         {
-            SetValue("me:emotion", "neutral", "Diana is neutral");
+            StartCoroutine(coroutineDecade);
         }
         if (userEmotion == "angry")
         {
