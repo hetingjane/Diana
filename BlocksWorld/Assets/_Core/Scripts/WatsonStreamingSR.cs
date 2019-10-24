@@ -153,8 +153,9 @@ public class WatsonStreamingSR : ModuleBase
     private void OnError(string error)
     {
         Active = false;
-
         Log.Debug("ExampleStreaming.OnError()", "Error! {0}", error);
+        if (error == "Session timed out.")
+            Runnable.Run(CreateService());
     }
 
     private IEnumerator RecordingHandler()
