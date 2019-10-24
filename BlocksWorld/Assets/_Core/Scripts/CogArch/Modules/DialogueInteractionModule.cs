@@ -295,6 +295,9 @@ public class DialogueInteractionModule : ModuleBase
 
     public void BeginInteraction(object content) {
         SetValue("me:speech:intent", "Hello.", string.Empty);
+        // TODO: this animation looks like a crazy alien wave
+        // no really, it terrified me to the pit of my soul when I first saw it
+        //SetValue("me:intent:motion:rightArm", "wave", string.Empty);
     }
 
     public void Ready(object content) {
