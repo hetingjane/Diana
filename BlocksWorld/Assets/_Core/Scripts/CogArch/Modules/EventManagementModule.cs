@@ -545,8 +545,8 @@ public class EventManagementModule : ModuleBase
         {
             case "left":
                 options = options.Where(o =>
-                    (Vector3.Dot((o.transform.position - theme.transform.position), directionVectors[oppositeDir[dir]]) > 0.5f) &&
-                    (DialogueUtility.FitsTouching(theme, grabbableBlocks, o, dir))).ToList();
+                    ((Vector3.Dot((o.transform.position - theme.transform.position), directionVectors[oppositeDir[dir]]) > 0.5f) &&
+                    (DialogueUtility.FitsTouching(theme, grabbableBlocks, o, dir)))).ToList();
                 choice = options.OrderByDescending(o =>
                     Vector3.Dot((o.transform.position - theme.transform.position), directionVectors[oppositeDir[dir]])).
                     ThenBy(o => (o.transform.position - theme.transform.position).magnitude).FirstOrDefault();

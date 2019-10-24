@@ -47,14 +47,14 @@ public static class DialogueUtility
         Bounds themeBounds = GlobalHelper.GetObjectWorldSize(theme);
         Bounds objBounds = GlobalHelper.GetObjectWorldSize(obj);
 
-        foreach (GameObject test in grabbableBlocks) {
+        foreach (Transform test in grabbableBlocks) {
             if ((test != theme) && (test != obj)) {
                 if (dir == "left") {
                     Bounds projectedBounds = new Bounds(
                         new Vector3(objBounds.min.x - themeBounds.extents.x, objBounds.center.y, objBounds.center.z),
                         themeBounds.size);
-                    if (!RCC8.DC(projectedBounds, GlobalHelper.GetObjectWorldSize(test)) &&
-                        !RCC8.EC(projectedBounds, GlobalHelper.GetObjectWorldSize(test))) {
+                    if (!RCC8.DC(projectedBounds, GlobalHelper.GetObjectWorldSize(test.gameObject)) &&
+                        !RCC8.EC(projectedBounds, GlobalHelper.GetObjectWorldSize(test.gameObject))) {
                         fits = false;
                     }
                 }
@@ -62,8 +62,8 @@ public static class DialogueUtility
                     Bounds projectedBounds = new Bounds(
                         new Vector3(objBounds.max.x + themeBounds.extents.x, objBounds.center.y, objBounds.center.z),
                         themeBounds.size);
-                    if (!RCC8.DC(projectedBounds, GlobalHelper.GetObjectWorldSize(test)) &&
-                        !RCC8.EC(projectedBounds, GlobalHelper.GetObjectWorldSize(test))) {
+                    if (!RCC8.DC(projectedBounds, GlobalHelper.GetObjectWorldSize(test.gameObject)) &&
+                        !RCC8.EC(projectedBounds, GlobalHelper.GetObjectWorldSize(test.gameObject))) {
                         fits = false;
                     }
                 }
@@ -71,8 +71,8 @@ public static class DialogueUtility
                     Bounds projectedBounds = new Bounds(
                         new Vector3(objBounds.center.x, objBounds.center.y, objBounds.min.z - themeBounds.extents.z),
                         themeBounds.size);
-                    if (!RCC8.DC(projectedBounds, GlobalHelper.GetObjectWorldSize(test)) &&
-                        !RCC8.EC(projectedBounds, GlobalHelper.GetObjectWorldSize(test))) {
+                    if (!RCC8.DC(projectedBounds, GlobalHelper.GetObjectWorldSize(test.gameObject)) &&
+                        !RCC8.EC(projectedBounds, GlobalHelper.GetObjectWorldSize(test.gameObject))) {
                         fits = false;
                     }
                 }
@@ -80,8 +80,8 @@ public static class DialogueUtility
                     Bounds projectedBounds = new Bounds(
                         new Vector3(objBounds.center.x, objBounds.center.y, objBounds.max.z + themeBounds.extents.z),
                         themeBounds.size);
-                    if (!RCC8.DC(projectedBounds, GlobalHelper.GetObjectWorldSize(test)) &&
-                        !RCC8.EC(projectedBounds, GlobalHelper.GetObjectWorldSize(test))) {
+                    if (!RCC8.DC(projectedBounds, GlobalHelper.GetObjectWorldSize(test.gameObject)) &&
+                        !RCC8.EC(projectedBounds, GlobalHelper.GetObjectWorldSize(test.gameObject))) {
                         fits = false;
                     }
                 }
