@@ -676,9 +676,18 @@ public class EventManagementModule : ModuleBase
             if (test.gameObject != theme.gameObject) {
                 if (!RCC8.DC(projectedBounds, GlobalHelper.GetObjectWorldSize(test.gameObject)) &&
                     !RCC8.EC(projectedBounds, GlobalHelper.GetObjectWorldSize(test.gameObject))) {
-                    loc = test.transform.position + Vector3.Scale(GlobalHelper.GetObjectWorldSize(test.gameObject).extents,
-                        directionVectors[dir]) + Vector3.Scale(GlobalHelper.GetObjectWorldSize(theme.gameObject).extents,
-                        directionVectors[dir]);
+                    if ((dir == "left") || (dir == "right")) {
+                        loc = new Vector3(
+                            (test.transform.position + Vector3.Scale(GlobalHelper.GetObjectWorldSize(test.gameObject).extents,
+                            directionVectors[dir]) + Vector3.Scale(GlobalHelper.GetObjectWorldSize(theme.gameObject).extents,
+                            directionVectors[dir])).x,loc.y,loc.z);
+                    }
+                    else if ((dir == "front") || (dir == "back")) {
+                        loc = new Vector3(loc.x,loc.y,
+                            (test.transform.position + Vector3.Scale(GlobalHelper.GetObjectWorldSize(test.gameObject).extents,
+                            directionVectors[dir]) + Vector3.Scale(GlobalHelper.GetObjectWorldSize(theme.gameObject).extents,
+                            directionVectors[dir])).z);
+                    }
                 }
             }
         }
