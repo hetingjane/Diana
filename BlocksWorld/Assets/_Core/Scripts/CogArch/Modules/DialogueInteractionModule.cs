@@ -172,12 +172,14 @@ public class DialogueInteractionModule : ModuleBase
             }
             else if (key == "user:lastPointedAt:name") {
                 if (!string.IsNullOrEmpty(DataStore.GetStringValue(key))) {
-                    if (string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:object"))) {
+                    GameObject target = GameObject.Find(DataStore.GetStringValue(key));
+                    GameObject blocker = null;
+
+                    if (string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:object")) &&
+                        DialogueUtility.SurfaceClear(target, out blocker)) {
                         SetValue("user:intent:object", DataStore.GetStringValue(key), string.Empty);
                     }
                     else if (DataStore.GetStringValue("user:intent:object") != DataStore.GetStringValue(key)) {
-                        GameObject target = GameObject.Find(DataStore.GetStringValue(key));
-                        GameObject blocker = null;
                         do
                         {
                             DialogueUtility.SurfaceClear(target, out blocker);
