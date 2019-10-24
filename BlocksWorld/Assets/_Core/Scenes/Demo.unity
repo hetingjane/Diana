@@ -7828,9 +7828,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   manipulableObjectsRoot: {fileID: 184680267}
-  doGraspRandomObject: 0
+  doReachRandomLocation: 0
+  doReachRandomObject: 0
   doMoveRandomLocation: 0
-  doUngrasp: 0
+  doUnreach: 0
+  doHold: 0
+  doRelease: 0
 --- !u!114 &1073022111
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14733,7 +14736,7 @@ MonoBehaviour:
   eventManager: {fileID: 1725009506}
   grabbableBlocks: {fileID: 184680267}
   demoSurface: {fileID: 672448213}
-  servoSpeed: 0.02
+  servoSpeed: 0.05
 --- !u!1 &2054860432
 GameObject:
   m_ObjectHideFlags: 0
