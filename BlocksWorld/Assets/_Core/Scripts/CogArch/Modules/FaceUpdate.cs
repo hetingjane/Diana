@@ -21,10 +21,8 @@ public class FaceUpdate : ModuleBase
     List<int> smileLeftIndex;
     List<int> smileRightIndex;
 
-    private float currSmileStrength;
+    private readonly float currSmileStrength;
 
-    private float maxStrength = 100;
-    private float recoveryRate = 10;
     string dianaEmotion;
     BlendShapeMixer bsm;
     private IEnumerator coroutineChange;
@@ -62,33 +60,32 @@ public class FaceUpdate : ModuleBase
         }
         DataStore.Subscribe("user:isEngaged", NoteUserIsEngaged);
         //SetValue("me:emotion", "neutral", "Initialize");
-        coroutineChange = WaitAndChange(dianaEmotion,0.6f);
-        coroutineDecade = WaitAndDecade(0.6f);
+        coroutineChange = WaitAndChange(dianaEmotion, 0.4f);
+        coroutineDecade = WaitAndDecade(5f);
 
     }
     protected void NoteUserIsEngaged(string key, DataStore.IValue value)
     {
         if ((value as DataStore.BoolValue).val)
         {
-            SetValue("me:emotion", "joy", "Diana is happpy");
             StartCoroutine(coroutineChange);
-            //StartCoroutine(coroutineDecade);
+            StartCoroutine(coroutineDecade);
         }
         else SetValue("me:emotion", "neutral", "Diana is neutral");
 
 
     }
-    private IEnumerator WaitAndChange(string dianaEmotion,float waitTime)
+    private IEnumerator WaitAndChange(string dianaEmotion, float waitTime)
     {
         yield return new WaitForSeconds(waitTime);
-        bsm.Apply(dianaEmotion);
+        SetValue("me:emotion", "greet", "Diana is happpy");
+
 
     }
     private IEnumerator WaitAndDecade(float waitTime)
     {
         yield return new WaitForSeconds(waitTime);
-        //SetValue("me:emotion", "neutral", "Diana is neutral");
-        bsm.ResetToNeutral();
+        SetValue("me:emotion", "neutral", "Diana is neutral");
 
     }
     protected void Update()
@@ -96,16 +93,26 @@ public class FaceUpdate : ModuleBase
         dianaEmotion = DataStore.GetStringValue("me:emotion");
         switch (dianaEmotion)
         {
+            case "greet":
+                bsm.Apply("joy");
+                break;
             case "neutral":
-                StartCoroutine(coroutineDecade);
-                
+                bsm.ResetToNeutral();
                 break;
             case "joy":
-                StartCoroutine(coroutineChange);
-
+                bsm.Apply(dianaEmotion);
                 break;
             case "concentration":
-                StartCoroutine(coroutineChange);
+                bsm.Apply(dianaEmotion);
+                break;
+            case "joy+concentration":
+                bsm.Apply(dianaEmotion);
+                break;
+            case "confusion":
+                bsm.Apply(dianaEmotion);
+                break;
+            case "frustration":
+                bsm.Apply(dianaEmotion);
                 break;
             default:
                 break;
@@ -119,18 +126,22 @@ public class FaceUpdate : ModuleBase
         }
         if (userEmotion != "joy" && userPointing)
         {
+
             SetValue("me:emotion", "concentration", "Diana is concentrated");
         }
         if (userEmotion == "joy" && !userPointing)
         {
+
             SetValue("me:emotion", "joy", "Diana is happy");
         }
-        if (userEmotion != "joy" && !userPointing)
+        if (userEmotion != "joy" && !userPointing && dianaEmotion != "greet")
         {
-//            StartCoroutine(coroutineDecade);
             SetValue("me:emotion", "neutral", "Diana is neutral");
         }
-
+        if (userEmotion == "angry")
+        {
+            SetValue("me:emotion", "frustration", "Diana is furstrated");
+        }
 
 
     }

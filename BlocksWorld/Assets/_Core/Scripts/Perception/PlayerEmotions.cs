@@ -13,23 +13,23 @@ using UnityEngine;
 public enum Emotion
 {
     neutral,
-    //Angry,
+    angry,
     joy,
-    
+
 }
 
 public class PlayerEmotions : ModuleBase, ImageResultsListener
 {
     float currentJoy = 0f;
-    //float currentAnger = 0f;
+    float currentAnger = 0f;
 
     public Emotion dominantEmotion = Emotion.neutral;
 
     [Range(0, 100)]
-    public float happyThreshold = 10f;
+    public float happyThreshold = 50f;
 
     //[Range(0, 100)]
-    //public float angryThreshold = 1f;
+    public float angryThreshold = 10f;
     public void onFaceFound(float timestamp, int faceId)
     {
         Debug.Log("Found the face");
@@ -50,35 +50,23 @@ public class PlayerEmotions : ModuleBase, ImageResultsListener
 
             //Retrieve the Emotions Scores
             face.Emotions.TryGetValue(Emotions.Joy, out currentJoy);
-            //face.Emotions.TryGetValue(Emotions.Anger, out currentAnger);
-
-            //Retrieve the Smile Score
-            //face.Expressions.TryGetValue(Expressions.Smile, out currentSmile);
-
-
+            face.Emotions.TryGetValue(Emotions.Anger, out currentAnger);
 
             if (currentJoy > happyThreshold)
             {
                 dominantEmotion = Emotion.joy;
-
-
-                //var emotionValue = new DataStore.IntValue((int)currentJoy);
                 SetValue("user:emotion", dominantEmotion.ToString(), "User is happy");
             }
-            //else if (currentAnger > angryThreshold)
-            //{
-            //    dominantEmotion = Emotion.Angry;
-            //    var emotionValue = new DataStore.IntValue((int)currentAnger);
-            //    DataStore.SetValue("user:emotion" + dominantEmotion.ToString(), emotionValue, null, emotionValue.ToString());
-            //    DataStore.SetStringValue("user:dominantEmotion", new DataStore.StringValue(dominantEmotion.ToString()), null, dominantEmotion.ToString());
-
-            //}
+            else if (currentAnger > angryThreshold)
+            {
+                dominantEmotion = Emotion.angry;
+                SetValue("user:emotion", dominantEmotion.ToString(), "User is angry");
+            }
             else
             {
                 dominantEmotion = Emotion.neutral;
                 SetValue("user:emotion", dominantEmotion.ToString(), "User is neutral");
             }
-
         }
 
     }

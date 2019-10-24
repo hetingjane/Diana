@@ -401,7 +401,7 @@ public class DataStore : MonoBehaviour {
 		return instance.ISetValue(key, value, module, comment);
 	}
     /// <summary>
-	/// Set a string indicates the dominant emotion of user associated with a key.  Note that if the string is unchanged
+	/// Set a string denotes the emotion associated with a key.  Note that if the string is unchanged
 	/// from its previous string, this method does nothing.
 	/// 
 	/// Also note that this method currently must be called only on the main thread.

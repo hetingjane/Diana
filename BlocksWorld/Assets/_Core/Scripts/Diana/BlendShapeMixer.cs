@@ -33,23 +33,26 @@ public class BlendShapeMixer : MonoBehaviour
     }
 
     public List<Expression> expressions;
-    private float currStrength;
-    private float recoveryRate = 30;
+    private readonly float recoveryRate = 40;
     [ContextMenu("Save current as new expression")]
     void SaveCurrent()
     {
         foreach (var e in expressions) e.weight = 0;
-        var exp = new Expression();
-        exp.targets = new List<TargetWeight>();
-        exp.weight = 100;
+        var exp = new Expression
+        {
+            targets = new List<TargetWeight>(),
+            weight = 100
+        };
         var smr = GetComponent<SkinnedMeshRenderer>();
         var mesh = smr.sharedMesh;
         for (int i = 0; i < mesh.blendShapeCount; i++)
         {
             if (smr.GetBlendShapeWeight(i) == 0) continue;
-            var tw = new TargetWeight();
-            tw.blendShape = mesh.GetBlendShapeName(i);
-            tw.weight = smr.GetBlendShapeWeight(i);
+            var tw = new TargetWeight
+            {
+                blendShape = mesh.GetBlendShapeName(i),
+                weight = smr.GetBlendShapeWeight(i)
+            };
             exp.targets.Add(tw);
         }
         if (expressions == null) expressions = new List<Expression>();
@@ -64,23 +67,24 @@ public class BlendShapeMixer : MonoBehaviour
 
         foreach (var exp in expressions)
         {
+
             foreach (var tv in exp.targets)
             {
-                totalWeight[tv.blendShape] = 0;
+                if (tv.blendShape.Contains("Smile")) totalWeight[tv.blendShape] = 30;
 
+                else totalWeight[tv.blendShape] = 0;
             }
         }
 
         var smr = GetComponent<SkinnedMeshRenderer>();
         var mesh = smr.sharedMesh;
-        currStrength = Mathf.MoveTowards(currStrength, 0, recoveryRate * Time.deltaTime);
 
         foreach (var kv in totalWeight)
         {
-            //for (int j = 0; j < 50; j++)
-            //{
-                smr.SetBlendShapeWeight(mesh.GetBlendShapeIndex(kv.Key), 0);
-            //}
+
+            float currStrength = smr.GetBlendShapeWeight(mesh.GetBlendShapeIndex(kv.Key));
+            currStrength = Mathf.MoveTowards(currStrength, kv.Value, recoveryRate * Time.deltaTime);
+            smr.SetBlendShapeWeight(mesh.GetBlendShapeIndex(kv.Key), currStrength);
         }
     }
     [ContextMenu("Apply Expressions")]
@@ -92,7 +96,7 @@ public class BlendShapeMixer : MonoBehaviour
         Dictionary<string, float> totalWeight = new Dictionary<string, float>();
         foreach (var exp in expressions)
         {
-            if (exp.name==emo)
+            if (emo.Contains(exp.name))
             {
                 foreach (var tv in exp.targets)
                 {
@@ -101,17 +105,27 @@ public class BlendShapeMixer : MonoBehaviour
                     else totalWeight[tv.blendShape] = newWeight;
                 }
             }
+            else
+            {
+                foreach (var tv in exp.targets)
+                {
+                    if (tv.blendShape.Contains("Smile")) totalWeight[tv.blendShape] = 30;
+
+                    else totalWeight[tv.blendShape] = 0;
+                }
+            }
 
         }
         var smr = GetComponent<SkinnedMeshRenderer>();
         var mesh = smr.sharedMesh;
+
         foreach (var kv in totalWeight)
         {
-            //for (int j=0; j < 10; j++)
-            //{
-                currStrength = Mathf.MoveTowards(currStrength, kv.Value, recoveryRate * Time.deltaTime);
-                smr.SetBlendShapeWeight(mesh.GetBlendShapeIndex(kv.Key), currStrength);
-            //}
+
+            float currStrength = smr.GetBlendShapeWeight(mesh.GetBlendShapeIndex(kv.Key));
+            currStrength = Mathf.MoveTowards(currStrength, kv.Value, recoveryRate * Time.deltaTime);
+            smr.SetBlendShapeWeight(mesh.GetBlendShapeIndex(kv.Key), currStrength);
+
 
         }
     }
