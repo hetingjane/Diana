@@ -224,7 +224,8 @@ namespace IBM.Cloud.SDK
 #if UNITY_EDITOR || NETFX_CORE
         public static void Debug(string subSystem, string messageFmt, params object[] args)
         {
-			if(!LogSystem.InstalledDefaultReactors)
+            UnityEngine.Debug.Log($"IBM {LogLevel.DEBUG.ToString()}: {subSystem} {String.Format(messageFmt, args)}"); return;
+            if (!LogSystem.InstalledDefaultReactors)
                 System.Console.WriteLine("Call LogSystem.InstallDefaultReactors() prior to logging to see the output of Log.Debug(), Log.Status(), Log.Warning(), Log.Error() and Log.Critical().");            
             LogSystem.Instance.ProcessLog(new LogRecord(LogLevel.DEBUG, subSystem, messageFmt, args));
 #if !NETFX_CORE
@@ -245,7 +246,8 @@ namespace IBM.Cloud.SDK
         /// <param name="args">Formatting arguments.</param>
         public static void Status(string subSystem, string messageFmt, params object[] args)
         {
-            if(!LogSystem.InstalledDefaultReactors)
+            UnityEngine.Debug.Log($"IBM {LogLevel.STATUS.ToString()}: {subSystem} {String.Format(messageFmt, args)}"); return;
+            if (!LogSystem.InstalledDefaultReactors)
                 System.Console.WriteLine("Call LogSystem.InstallDefaultReactors() prior to logging to see the output of Log.Debug(), Log.Status(), Log.Warning(), Log.Error() and Log.Critical().");
             LogSystem.Instance.ProcessLog(new LogRecord(LogLevel.STATUS, subSystem, messageFmt, args));
 #if !NETFX_CORE
@@ -260,7 +262,8 @@ namespace IBM.Cloud.SDK
         /// <param name="args">Formatting arguments.</param>
         public static void Warning(string subSystem, string messageFmt, params object[] args)
         {
-            if(!LogSystem.InstalledDefaultReactors)
+            UnityEngine.Debug.LogWarning($"IBM {LogLevel.WARNING.ToString()}: {subSystem} {String.Format(messageFmt, args)}"); return;
+            if (!LogSystem.InstalledDefaultReactors)
                 System.Console.WriteLine("Call LogSystem.InstallDefaultReactors() prior to logging to see the output of Log.Debug(), Log.Status(), Log.Warning(), Log.Error() and Log.Critical().");
             LogSystem.Instance.ProcessLog(new LogRecord(LogLevel.WARNING, subSystem, messageFmt, args));
 #if !NETFX_CORE
@@ -275,7 +278,8 @@ namespace IBM.Cloud.SDK
         /// <param name="args">Formatting arguments.</param>
         public static void Error(string subSystem, string messageFmt, params object[] args)
         {
-            if(!LogSystem.InstalledDefaultReactors)
+            UnityEngine.Debug.LogError($"IBM {LogLevel.ERROR.ToString()}: {subSystem} {String.Format(messageFmt, args)}"); return;
+            if (!LogSystem.InstalledDefaultReactors)
                 System.Console.WriteLine("Call LogSystem.InstallDefaultReactors() prior to logging to see the output of Log.Debug(), Log.Status(), Log.Warning(), Log.Error() and Log.Critical().");
             LogSystem.Instance.ProcessLog(new LogRecord(LogLevel.ERROR, subSystem, messageFmt, args));
 #if !NETFX_CORE
@@ -290,7 +294,8 @@ namespace IBM.Cloud.SDK
         /// <param name="args">Formatting arguments.</param>
         public static void Critical(string subSystem, string messageFmt, params object[] args)
         {
-            if(!LogSystem.InstalledDefaultReactors)
+            UnityEngine.Debug.LogError($"IBM {LogLevel.CRITICAL.ToString()}: {subSystem} {String.Format(messageFmt, args)}"); return;
+            if (!LogSystem.InstalledDefaultReactors)
                 System.Console.WriteLine("Call LogSystem.InstallDefaultReactors() prior to logging to see the output of Log.Debug(), Log.Status(), Log.Warning(), Log.Error() and Log.Critical().");
             LogSystem.Instance.ProcessLog(new LogRecord(LogLevel.CRITICAL, subSystem, messageFmt, args));
 #if !NETFX_CORE
