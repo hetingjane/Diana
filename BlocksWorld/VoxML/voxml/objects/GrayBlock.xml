@@ -40,6 +40,7 @@
   <Attributes>
     <Attrs>
       <Attr Value="gray" />
+      <Attr Value="white" />
     </Attrs>
   </Attributes>
 </VoxML>
