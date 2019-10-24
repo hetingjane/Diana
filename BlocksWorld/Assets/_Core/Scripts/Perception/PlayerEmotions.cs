@@ -12,24 +12,24 @@ using UnityEngine;
 
 public enum Emotion
 {
-    Neutral,
-    Angry,
-    Happy,
-    //Confused
+    neutral,
+    //Angry,
+    joy,
+    
 }
 
 public class PlayerEmotions : ModuleBase, ImageResultsListener
 {
     float currentJoy = 0f;
-    float currentAnger = 0f;
+    //float currentAnger = 0f;
 
-    public Emotion dominantEmotion = Emotion.Neutral;
+    public Emotion dominantEmotion = Emotion.neutral;
 
     [Range(0, 100)]
     public float happyThreshold = 10f;
 
-    [Range(0, 100)]
-    public float angryThreshold = 1f;
+    //[Range(0, 100)]
+    //public float angryThreshold = 1f;
     public void onFaceFound(float timestamp, int faceId)
     {
         Debug.Log("Found the face");
@@ -50,7 +50,7 @@ public class PlayerEmotions : ModuleBase, ImageResultsListener
 
             //Retrieve the Emotions Scores
             face.Emotions.TryGetValue(Emotions.Joy, out currentJoy);
-            face.Emotions.TryGetValue(Emotions.Anger, out currentAnger);
+            //face.Emotions.TryGetValue(Emotions.Anger, out currentAnger);
 
             //Retrieve the Smile Score
             //face.Expressions.TryGetValue(Expressions.Smile, out currentSmile);
@@ -59,28 +59,24 @@ public class PlayerEmotions : ModuleBase, ImageResultsListener
 
             if (currentJoy > happyThreshold)
             {
-                dominantEmotion = Emotion.Happy;
+                dominantEmotion = Emotion.joy;
 
 
-                var emotionValue = new DataStore.IntValue((int)currentJoy);
-                DataStore.SetValue("user:emotion" + dominantEmotion.ToString(), emotionValue, null, emotionValue.ToString());
-                DataStore.SetStringValue("user:dominantEmotion", new DataStore.StringValue(dominantEmotion.ToString()), null, dominantEmotion.ToString());
+                //var emotionValue = new DataStore.IntValue((int)currentJoy);
+                SetValue("user:emotion", dominantEmotion.ToString(), "User is happy");
             }
-            else if (currentAnger > angryThreshold)
-            {
-                dominantEmotion = Emotion.Angry;
-                var emotionValue = new DataStore.IntValue((int)currentAnger);
-                DataStore.SetValue("user:emotion" + dominantEmotion.ToString(), emotionValue, null, emotionValue.ToString());
-                DataStore.SetStringValue("user:dominantEmotion", new DataStore.StringValue(dominantEmotion.ToString()), null, dominantEmotion.ToString());
+            //else if (currentAnger > angryThreshold)
+            //{
+            //    dominantEmotion = Emotion.Angry;
+            //    var emotionValue = new DataStore.IntValue((int)currentAnger);
+            //    DataStore.SetValue("user:emotion" + dominantEmotion.ToString(), emotionValue, null, emotionValue.ToString());
+            //    DataStore.SetStringValue("user:dominantEmotion", new DataStore.StringValue(dominantEmotion.ToString()), null, dominantEmotion.ToString());
 
-            }
+            //}
             else
             {
-                dominantEmotion = Emotion.Neutral;
-                DataStore.SetValue("user:emotionHappy" , new DataStore.IntValue(0), null, "0");
-                DataStore.SetValue("user:emotionAngry", new DataStore.IntValue(0), null, "0");
-                DataStore.SetStringValue("user:dominantEmotion", new DataStore.StringValue(dominantEmotion.ToString()), null, dominantEmotion.ToString());
-
+                dominantEmotion = Emotion.neutral;
+                SetValue("user:emotion", dominantEmotion.ToString(), "User is neutral");
             }
 
         }

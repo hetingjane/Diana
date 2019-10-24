@@ -17,64 +17,103 @@ using UnityEngine;
 
 public class BlendShapeMixer : MonoBehaviour
 {
-	[System.Serializable]
-	public struct TargetWeight {
-		public string blendShape;
-		[Range(0,100)] public float weight;
-	}
-	
-	[System.Serializable]
-	public class Expression {
-		public string name;
-		[Range(0,100)] public float weight;
-		public List<TargetWeight> targets;
-	}
-
-	public List<Expression> expressions;
-	
-	[ContextMenu("Save current as new expression")]
-	void SaveCurrent() {
-		foreach (var e in expressions) e.weight = 0;
-		var exp = new Expression();
-		exp.targets = new List<TargetWeight>();
-		exp.weight = 100;
-		var smr = GetComponent<SkinnedMeshRenderer>();
-		var mesh = smr.sharedMesh;
-		for (int i=0; i<mesh.blendShapeCount; i++) {
-			if (smr.GetBlendShapeWeight(i) == 0) continue;
-			var tw = new TargetWeight();
-			tw.blendShape = mesh.GetBlendShapeName(i);
-			tw.weight = smr.GetBlendShapeWeight(i);
-			exp.targets.Add(tw);
-		}
-		if (expressions == null) expressions = new List<Expression>();
-		expressions.Add(exp);
-	}
-
-	
-	[ContextMenu("Reset to neutral")]
-    public void ResetToNeutral() {
-        float idx = 0;
-        Apply(idx);
+    [System.Serializable]
+    public struct TargetWeight
+    {
+        public string blendShape;
+        [Range(0, 100)] public float weight;
     }
-	
-	[ContextMenu("Apply Expressions")]
-	public void Apply(float idx = 1) { // This index works as a parameter to control if we want to set the blendshape weights to some value or reset to 0
-		// There are opportunities for improvement here; creating and throwing out
-		// a dictionary every time is pretty expensive, as is GetBlendShapeIndex.
-		// But this works well enough for now.  (--JJS)
-		Dictionary<string, float> totalWeight = new Dictionary<string, float>();
-		foreach (var exp in expressions) {
-			foreach (var tv in exp.targets) {
-				float newWeight = tv.weight * exp.weight * 0.01f * idx;
-				if (totalWeight.ContainsKey(tv.blendShape)) totalWeight[tv.blendShape] += newWeight;
-				else totalWeight[tv.blendShape] = newWeight;
-			}
-		}
-		var smr = GetComponent<SkinnedMeshRenderer>();
-		var mesh = smr.sharedMesh;
-		foreach (var kv in totalWeight) {
-			smr.SetBlendShapeWeight(mesh.GetBlendShapeIndex(kv.Key), kv.Value);
-		}
-	}
+
+    [System.Serializable]
+    public class Expression
+    {
+        public string name;
+        [Range(0, 100)] public float weight;
+        public List<TargetWeight> targets;
+    }
+
+    public List<Expression> expressions;
+    private float currStrength;
+    private float recoveryRate = 30;
+    [ContextMenu("Save current as new expression")]
+    void SaveCurrent()
+    {
+        foreach (var e in expressions) e.weight = 0;
+        var exp = new Expression();
+        exp.targets = new List<TargetWeight>();
+        exp.weight = 100;
+        var smr = GetComponent<SkinnedMeshRenderer>();
+        var mesh = smr.sharedMesh;
+        for (int i = 0; i < mesh.blendShapeCount; i++)
+        {
+            if (smr.GetBlendShapeWeight(i) == 0) continue;
+            var tw = new TargetWeight();
+            tw.blendShape = mesh.GetBlendShapeName(i);
+            tw.weight = smr.GetBlendShapeWeight(i);
+            exp.targets.Add(tw);
+        }
+        if (expressions == null) expressions = new List<Expression>();
+        expressions.Add(exp);
+    }
+
+
+    [ContextMenu("Reset to neutral")]
+    public void ResetToNeutral()
+    {
+        Dictionary<string, float> totalWeight = new Dictionary<string, float>();
+
+        foreach (var exp in expressions)
+        {
+            foreach (var tv in exp.targets)
+            {
+                totalWeight[tv.blendShape] = 0;
+
+            }
+        }
+
+        var smr = GetComponent<SkinnedMeshRenderer>();
+        var mesh = smr.sharedMesh;
+        currStrength = Mathf.MoveTowards(currStrength, 0, recoveryRate * Time.deltaTime);
+
+        foreach (var kv in totalWeight)
+        {
+            //for (int j = 0; j < 50; j++)
+            //{
+                smr.SetBlendShapeWeight(mesh.GetBlendShapeIndex(kv.Key), 0);
+            //}
+        }
+    }
+    [ContextMenu("Apply Expressions")]
+    public void Apply(string emo)
+    { // This index works as a parameter to control if we want to set the blendshape weights to some value or reset to 0
+      // There are opportunities for improvement here; creating and throwing out
+      // a dictionary every time is pretty expensive, as is GetBlendShapeIndex.
+      // But this works well enough for now.  (--JJS)
+        Dictionary<string, float> totalWeight = new Dictionary<string, float>();
+        foreach (var exp in expressions)
+        {
+            if (exp.name==emo)
+            {
+                foreach (var tv in exp.targets)
+                {
+                    float newWeight = tv.weight * exp.weight * 0.01f;
+                    if (totalWeight.ContainsKey(tv.blendShape)) totalWeight[tv.blendShape] += newWeight;
+                    else totalWeight[tv.blendShape] = newWeight;
+                }
+            }
+
+        }
+        var smr = GetComponent<SkinnedMeshRenderer>();
+        var mesh = smr.sharedMesh;
+        foreach (var kv in totalWeight)
+        {
+            //for (int j=0; j < 10; j++)
+            //{
+                currStrength = Mathf.MoveTowards(currStrength, kv.Value, recoveryRate * Time.deltaTime);
+                smr.SetBlendShapeWeight(mesh.GetBlendShapeIndex(kv.Key), currStrength);
+            //}
+
+        }
+    }
+
 }
