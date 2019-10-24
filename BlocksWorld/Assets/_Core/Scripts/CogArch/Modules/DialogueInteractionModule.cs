@@ -210,7 +210,7 @@ public class DialogueInteractionModule : ModuleBase
                         SetValue("me:speech:intent", "OK.", string.Empty);
                         SetValue("me:intent:action", "reach", string.Empty);
                         SetValue("me:intent:target",
-                            GlobalHelper.GetObjectWorldSize(GameObject.Find(DataStore.GetStringValue(key))).max, string.Empty);
+                           GlobalHelper.GetObjectWorldSize(GameObject.Find(DataStore.GetStringValue(key))).max, string.Empty);
                         SetValue("me:intent:targetName", DataStore.GetStringValue(key), string.Empty);
                     }
                 }

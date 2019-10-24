@@ -669,42 +669,19 @@ public class EventManagementModule : ModuleBase
     {
         Vector3 loc = theme.transform.position + (directionVectors[oppositeDir[dir]] * servoSpeed);
 
-        //if if (dir == "left") {
-                //    Bounds projectedBounds = new Bounds(
-                //        new Vector3(objBounds.min.x - themeBounds.extents.x, objBounds.center.y, objBounds.center.z),
-                //        themeBounds.size);
-                //    if (!RCC8.DC(projectedBounds, GlobalHelper.GetObjectWorldSize(test.gameObject)) &&
-                //        !RCC8.EC(projectedBounds, GlobalHelper.GetObjectWorldSize(test.gameObject))) {
-                //        fits = false;
-                //    }
-                //}
-                //else if (dir == "right") {
-                //    Bounds projectedBounds = new Bounds(
-                //        new Vector3(objBounds.max.x + themeBounds.extents.x, objBounds.center.y, objBounds.center.z),
-                //        themeBounds.size);
-                //    if (!RCC8.DC(projectedBounds, GlobalHelper.GetObjectWorldSize(test.gameObject)) &&
-                //        !RCC8.EC(projectedBounds, GlobalHelper.GetObjectWorldSize(test.gameObject))) {
-                //        fits = false;
-                //    }
-                //}
-                //else if (dir == "in_front") {
-                //    Bounds projectedBounds = new Bounds(
-                //        new Vector3(objBounds.center.x, objBounds.center.y, objBounds.min.z - themeBounds.extents.z),
-                //        themeBounds.size);
-                //    if (!RCC8.DC(projectedBounds, GlobalHelper.GetObjectWorldSize(test.gameObject)) &&
-                //        !RCC8.EC(projectedBounds, GlobalHelper.GetObjectWorldSize(test.gameObject))) {
-                //        fits = false;
-                //    }
-                //}
-                //else if (dir == "behind") {
-                //    Bounds projectedBounds = new Bounds(
-                //        new Vector3(objBounds.center.x, objBounds.center.y, objBounds.max.z + themeBounds.extents.z),
-                //        themeBounds.size);
-                //    if (!RCC8.DC(projectedBounds, GlobalHelper.GetObjectWorldSize(test.gameObject)) &&
-                //        !RCC8.EC(projectedBounds, GlobalHelper.GetObjectWorldSize(test.gameObject))) {
-                //        fits = false;
-                //    }
-                //}
+        Bounds themeBounds = GlobalHelper.GetObjectWorldSize(theme);
+
+        Bounds projectedBounds = new Bounds(loc,themeBounds.size);
+        foreach (Transform test in grabbableBlocks) {
+            if (test.gameObject != theme.gameObject) {
+                if (!RCC8.DC(projectedBounds, GlobalHelper.GetObjectWorldSize(test.gameObject)) &&
+                    !RCC8.EC(projectedBounds, GlobalHelper.GetObjectWorldSize(test.gameObject))) {
+                    loc = test.transform.position + Vector3.Scale(GlobalHelper.GetObjectWorldSize(test.gameObject).extents,
+                        directionVectors[dir]) + Vector3.Scale(GlobalHelper.GetObjectWorldSize(theme.gameObject).extents,
+                        directionVectors[dir]);
+                }
+            }
+        }
 
         return loc;
     }
@@ -834,7 +811,6 @@ public class EventManagementModule : ModuleBase
 		                RiggingHelper.UnRig(obj, obj.transform.parent.gameObject);	                	
 	                //}
 
-                    SetValue("me:intent:action", "reach", string.Empty);
                     SetValue("me:intent:targetName", obj.name, string.Format("Grasping {0}",obj.name));
                     SetValue("me:intent:target", obj.transform.position - holdOffset, string.Empty);
                     SetValue("me:intent:action", "hold", string.Empty);
