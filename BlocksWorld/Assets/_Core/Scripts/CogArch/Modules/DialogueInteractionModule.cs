@@ -246,7 +246,7 @@ public class DialogueInteractionModule : ModuleBase
                         GlobalHelper.VectorToParsable(DataStore.GetVector3Value("me:lastThemePos")));
                 }
                 else {
-                    //SetValue("me:speech:intent", "I already undid that.  What more do you want from me?", string.Empty);
+                    SetValue("me:speech:intent", "I already undid that.  What else would you like me to do?", string.Empty);
                 }
                 break;
 
@@ -257,7 +257,7 @@ public class DialogueInteractionModule : ModuleBase
                         GlobalHelper.VectorToParsable(DataStore.GetVector3Value("me:lastThemePos")));
                 }
                 else {
-                    //SetValue("me:speech:intent", "I already undid that.  What more do you want from me?", string.Empty);
+                    SetValue("me:speech:intent", "I already undid that.  What else would you like me to do?", string.Empty);
                 }
                 break;
 
@@ -268,7 +268,7 @@ public class DialogueInteractionModule : ModuleBase
                         GlobalHelper.VectorToParsable(DataStore.GetVector3Value("me:lastThemePos")));
                 }
                 else {
-                    //SetValue("me:speech:intent", "I already undid that.  What more do you want from me?", string.Empty);
+                    SetValue("me:speech:intent", "I already undid that.  What else would you like me to do?", string.Empty);
                 }
                 break;
 
