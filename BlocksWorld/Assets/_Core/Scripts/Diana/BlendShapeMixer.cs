@@ -33,7 +33,7 @@ public class BlendShapeMixer : MonoBehaviour
     }
 
     public List<Expression> expressions;
-    private readonly float recoveryRate = 40;
+    private readonly float recoveryRate = 50;
     [ContextMenu("Save current as new expression")]
     void SaveCurrent()
     {

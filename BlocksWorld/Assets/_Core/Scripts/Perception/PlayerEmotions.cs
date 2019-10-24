@@ -2,8 +2,7 @@
 This script gets all the emotions recognized by Affectiva and determines current dominantEmotion.
 It compares emotion scores of all non-trivial emotions(above a low threshold) and picks the maximum then sets key-value pairs onto BlackBoard.
 
-Writes:		user:dominantEmotion: (StringValue)
-user:dominantEmotion:(enum)Emotion: (IntValue, ranges from 0 to 100)
+Writes:		user:emotion: (StringValue)
 TODO: add more emotions			
 */
 using Affdex;

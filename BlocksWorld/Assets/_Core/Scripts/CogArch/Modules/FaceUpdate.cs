@@ -2,8 +2,7 @@
 This is the module to change Diana's facial expressions based on emotion scores we get from BlackBoard.
 It sets different weights to blend shapes when the score of a certain emotion below/above a certain threshold.
 
-Reads:  user:dominantEmotion (StringValue)
-        user:dominantEmotion:(enum)Emotion: (IntValue, ranges from 0 to 100)
+Reads:  user:emotion (StringValue)
 
 TODO: add more emotions and a dynamic mechanism to let Diana express supportive empathy in appropraite context.
 */
@@ -59,8 +58,9 @@ public class FaceUpdate : ModuleBase
             }
         }
         //SetValue("me:emotion", "neutral", "Initialize");
-        coroutineChange = WaitAndChange(dianaEmotion, 0.4f);
-        coroutineDecade = WaitAndDecade(5f);
+        DataStore.Subscribe("user:isEngaged", NoteUserIsEngaged);
+        coroutineChange = WaitAndChange(dianaEmotion, 0.5f);
+        coroutineDecade = WaitAndDecade(4f);
 
     }
     protected void NoteUserIsEngaged(string key, DataStore.IValue value)
@@ -89,7 +89,7 @@ public class FaceUpdate : ModuleBase
     }
     protected void Update()
     {
-        DataStore.Subscribe("user:isEngaged", NoteUserIsEngaged);
+
 
         dianaEmotion = DataStore.GetStringValue("me:emotion");
         switch (dianaEmotion)
@@ -109,6 +109,9 @@ public class FaceUpdate : ModuleBase
             case "joy+concentration":
                 bsm.Apply(dianaEmotion);
                 break;
+            case "frustration+concentration":
+                bsm.Apply(dianaEmotion);
+                break;
             case "confusion":
                 bsm.Apply(dianaEmotion);
                 break;
@@ -121,29 +124,19 @@ public class FaceUpdate : ModuleBase
 
         string userEmotion = DataStore.GetStringValue("user:emotion");
         bool userPointing = DataStore.GetBoolValue("user:isPointing");
-        if (userEmotion == "joy" && userPointing)
+        if (userPointing)
         {
-            SetValue("me:emotion", "joy+concentration", "Diana is happy and concentrated");
-        }
-        if (userEmotion != "joy" && userPointing)
-        {
+            if (userEmotion == "joy") SetValue("me:emotion", "joy+concentration", "Diana is happy and concentrated");
+            else if (userEmotion == "angry") SetValue("me:emotion", "frustration+concentration", "Diana is frustrated and concentrated");
+            else SetValue("me:emotion", "concentration", "Diana is concentrated");
 
-            SetValue("me:emotion", "concentration", "Diana is concentrated");
         }
-        if (userEmotion == "joy" && !userPointing)
+        if (!userPointing)
         {
-
-            SetValue("me:emotion", "joy", "Diana is happy");
+            if (userEmotion == "joy") SetValue("me:emotion", "joy", "Diana is happy");
+            else if (userEmotion == "angry") SetValue("me:emotion", "frustration", "Diana is frustrated");
+            else if (dianaEmotion != "greet" && dianaEmotion != "confusion") SetValue("me:emotion", "neutral", "Diana is neutral");
         }
-        if (userEmotion != "joy" && !userPointing && dianaEmotion != "greet")
-        {
-            StartCoroutine(coroutineDecade);
-        }
-        if (userEmotion == "angry")
-        {
-            SetValue("me:emotion", "frustration", "Diana is furstrated");
-        }
-
 
     }
 }

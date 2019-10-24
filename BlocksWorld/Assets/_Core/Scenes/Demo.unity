@@ -1263,13 +1263,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   comment: 
   display: {fileID: 0}
-  blackboardKey: user:dominantEmotion
+  blackboardKey: user:emotion
   defaultValue: 
   keyMappings:
   - keyboardKey: 61
-    valueToSet: Happy
+    valueToSet: joy
   - keyboardKey: 45
-    valueToSet: Angry
+    valueToSet: angry
 --- !u!114 &143427718
 MonoBehaviour:
   m_ObjectHideFlags: 0
