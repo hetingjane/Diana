@@ -174,8 +174,22 @@ public class EventManagementModule : ModuleBase
             string eventStr = value.ToString().Trim();
             if (string.IsNullOrEmpty(eventStr)) return;
 
+            if (!DataStore.GetBoolValue("me:isUndoing"))
+            {
+                Debug.Log(string.Format("Setting last event {0}", DataStore.GetStringValue("user:intent:event")));
+                SetValue("user:intent:lastEvent", DataStore.GetStringValue("user:intent:event"),
+                    string.Format("Store user:intent:event ({0}) in user:intent:lastEvent in case Diana did something wrong",
+                        DataStore.GetStringValue("user:intent:event")));
+            }
+                
             try
             {
+                if (DataStore.GetBoolValue("me:isUndoing"))
+                {
+                    Debug.Log("Clearing events");
+                    eventManager.ClearEvents();
+                }
+
                 eventManager.InsertEvent("", 0);
                 eventManager.InsertEvent(eventStr, 1);
             }
@@ -365,10 +379,14 @@ public class EventManagementModule : ModuleBase
                     if (!Regex.IsMatch(eventStr, @"\{[0-1]+\}"))
                     {
                         Debug.Log(string.Format("Composed object {0}, action {1}, and location {2} into event {3}",
-                            objectStr, actionStr, GlobalHelper.VectorToParsable(locationPos), eventStr));
-                        SetValue("me:lastTheme",objectStr,string.Empty);
-                        SetValue("me:lastThemePos",GameObject.Find(objectStr).transform.position,string.Empty);
-                        SetValue("user:intent:event", eventStr, string.Empty);
+	                        objectStr, actionStr, GlobalHelper.VectorToParsable(locationPos), eventStr));
+                            
+	                    if (!string.IsNullOrEmpty(objectStr)) {
+	                        SetValue("me:lastTheme",objectStr,string.Empty);
+	                        SetValue("me:lastThemePos",GameObject.Find(objectStr).transform.position,string.Empty);
+	                    }
+	                    
+	                	SetValue("user:intent:event", eventStr, string.Empty);
                     }
                     else
                     {
@@ -467,7 +485,6 @@ public class EventManagementModule : ModuleBase
         if ((val) && (DataStore.GetStringValue("me:actual:motion:rightArm") == "reached"))
         {
             if (eventManager.events.Count == 0) {
-                Debug.Log("Add new servo");
                 SetValue("user:intent:append:partialEvent", string.Empty, string.Empty);
 
                 if (DataStore.GetBoolValue("user:intent:isServoLeft")) {
@@ -528,7 +545,8 @@ public class EventManagementModule : ModuleBase
         {
             case "left":
                 options = options.Where(o =>
-                    Vector3.Dot((o.transform.position - theme.transform.position), directionVectors[oppositeDir[dir]]) > 0.5f).ToList();
+                    ((Vector3.Dot((o.transform.position - theme.transform.position), directionVectors[oppositeDir[dir]]) > 0.5f) &&
+                    (DialogueUtility.FitsTouching(theme, grabbableBlocks, o, dir)))).ToList();
                 choice = options.OrderByDescending(o =>
                     Vector3.Dot((o.transform.position - theme.transform.position), directionVectors[oppositeDir[dir]])).
                     ThenBy(o => (o.transform.position - theme.transform.position).magnitude).FirstOrDefault();
@@ -556,7 +574,8 @@ public class EventManagementModule : ModuleBase
 
             case "right":
                 options = options.Where(o =>
-                    Vector3.Dot((o.transform.position - theme.transform.position), directionVectors[oppositeDir[dir]]) > 0.5f).ToList();
+                    (Vector3.Dot((o.transform.position - theme.transform.position), directionVectors[oppositeDir[dir]]) > 0.5f) &&
+                    (DialogueUtility.FitsTouching(theme, grabbableBlocks, o, dir))).ToList();
                 choice = options.OrderByDescending(o =>
                     Vector3.Dot((o.transform.position - theme.transform.position), directionVectors[oppositeDir[dir]])).
                     ThenBy(o => (o.transform.position - theme.transform.position).magnitude).FirstOrDefault();
@@ -583,7 +602,8 @@ public class EventManagementModule : ModuleBase
 
             case "front":
                 options = options.Where(o =>
-                    Vector3.Dot((o.transform.position - theme.transform.position), directionVectors[oppositeDir[dir]]) > 0.5f).ToList();
+                    (Vector3.Dot((o.transform.position - theme.transform.position), directionVectors[oppositeDir[dir]]) > 0.5f) &&
+                    (DialogueUtility.FitsTouching(theme, grabbableBlocks, o, dir))).ToList();
                 choice = options.OrderByDescending(o =>
                     Vector3.Dot((o.transform.position - theme.transform.position), directionVectors[oppositeDir[dir]])).
                     ThenBy(o => (o.transform.position - theme.transform.position).magnitude).FirstOrDefault();
@@ -609,7 +629,8 @@ public class EventManagementModule : ModuleBase
 
             case "back":
                 options = options.Where(o =>
-                    Vector3.Dot((o.transform.position - theme.transform.position), directionVectors[oppositeDir[dir]]) > 0.5f).ToList();
+                    (Vector3.Dot((o.transform.position - theme.transform.position), directionVectors[oppositeDir[dir]]) > 0.5f) &&
+                    (DialogueUtility.FitsTouching(theme, grabbableBlocks, o, dir))).ToList();
                 choice = options.OrderByDescending(o =>
                     Vector3.Dot((o.transform.position - theme.transform.position), directionVectors[oppositeDir[dir]])).
                     ThenBy(o => (o.transform.position - theme.transform.position).magnitude).FirstOrDefault();
@@ -652,9 +673,6 @@ public class EventManagementModule : ModuleBase
         if ((value as DataStore.BoolValue).val == true) {
             // if "me:intent:action:isComplete" is true
             if (DataStore.GetStringValue("me:intent:action") == "unreach") {
-                SetValue("user:intent:lastEvent", DataStore.GetStringValue("user:intent:event"),
-    	            string.Format("Store user:intent:event ({0}) in user:intent:lastEvent in case Diana did something wrong",
-    	            	DataStore.GetStringValue("user:intent:event")));
                 SetValue("user:intent:event",DataStore.StringValue.Empty,string.Empty);
                 SetValue("user:intent:partialEvent",DataStore.StringValue.Empty,string.Empty);
 
@@ -669,11 +687,13 @@ public class EventManagementModule : ModuleBase
                 SetValue("user:intent:append:partialEvent",DataStore.StringValue.Empty,string.Empty);
                 SetValue("user:intent:append:action",DataStore.StringValue.Empty,string.Empty);
 
-	            if (string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:lastEvent"))) {
+	            if (!string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:lastEvent"))) {
 	                if (DataStore.GetStringValue("user:intent:lastEvent").StartsWith("servo")) {
 	                    SetValue("me:intent:target","user",string.Empty);
 	                }
 	            }
+
+                SetValue("me:isUndoing",false,string.Empty);
             }
         }
     }
@@ -692,6 +712,20 @@ public class EventManagementModule : ModuleBase
 
         if (((EventReferentArgs)e).Referent is string) {
             SetValue("user:intent:object", ((EventReferentArgs)e).Referent as string, string.Empty);
+
+            if (!string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:event"))) {
+                // currently executing an event
+                if (DataStore.GetStringValue("me:lastTheme") != DataStore.GetStringValue("user:intent:object")) {
+                    // "pick up the yellow block"
+                    // nevermind
+                    // "put the yellow block on the green block"
+                    // nevermind
+                    // FU Diana
+                    string objectStr = DataStore.GetStringValue("user:intent:object");
+                    SetValue("me:lastTheme",objectStr,string.Empty);
+                    SetValue("me:lastThemePos",GameObject.Find(objectStr).transform.position,string.Empty);
+                }
+            }
         }
     }
 
@@ -764,7 +798,6 @@ public class EventManagementModule : ModuleBase
                     SetValue("me:intent:targetName", obj.name, string.Format("Grasping {0}",obj.name));
                     SetValue("me:intent:target", obj.transform.position - holdOffset, string.Empty);
                     SetValue("me:intent:action", "hold", string.Empty);
-                    SetValue("user:intent:lastEvent", string.Format("grasp({0})", obj.name), string.Empty);
                 }
             }                    
         }
