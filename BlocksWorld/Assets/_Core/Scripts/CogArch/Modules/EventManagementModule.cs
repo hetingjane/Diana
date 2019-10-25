@@ -38,6 +38,8 @@ public class EventManagementModule : ModuleBase
 {
     public EventManager eventManager;
 
+    public VoxMLLibrary voxmlLibrary;
+
     /// <summary>
     /// Reference to the manipulable objects in the scene.
     /// Only these will be searched when an object is referred by name.
@@ -173,13 +175,16 @@ public class EventManagementModule : ModuleBase
         {
             string eventStr = value.ToString().Trim();
             if (string.IsNullOrEmpty(eventStr)) return;
-
+            
             if (!DataStore.GetBoolValue("me:isUndoing"))
             {
-                Debug.Log(string.Format("Setting last event {0}", DataStore.GetStringValue("user:intent:event")));
-                SetValue("user:intent:lastEvent", DataStore.GetStringValue("user:intent:event"),
-                    string.Format("Store user:intent:event ({0}) in user:intent:lastEvent in case Diana did something wrong",
-                        DataStore.GetStringValue("user:intent:event")));
+                if (DialogueUtility.GetPredicateType(GlobalHelper.GetTopPredicate(eventStr),voxmlLibrary) != "programs")
+                {
+                    Debug.Log(string.Format("Setting last event {0}", DataStore.GetStringValue("user:intent:event")));
+                    SetValue("user:intent:lastEvent", DataStore.GetStringValue("user:intent:event"),
+                        string.Format("Store user:intent:event ({0}) in user:intent:lastEvent in case Diana did something wrong",
+                            DataStore.GetStringValue("user:intent:event")));
+                }
             }
                 
             try

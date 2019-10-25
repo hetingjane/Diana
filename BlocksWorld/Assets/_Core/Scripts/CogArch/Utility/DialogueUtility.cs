@@ -5,6 +5,7 @@ using System.Linq;
 
 using VoxSimPlatform.Global;
 using VoxSimPlatform.SpatialReasoning.QSR;
+using VoxSimPlatform.Vox;
 
 public static class DialogueUtility
 {
@@ -89,5 +90,15 @@ public static class DialogueUtility
         }
 
         return fits;
+    }
+
+    public static string GetPredicateType(string pred, VoxMLLibrary voxmllLibrary) {
+        string type = string.Empty;
+
+        if (voxmllLibrary.VoxMLEntityTypeDict.ContainsKey(pred)) {
+            type = voxmllLibrary.VoxMLEntityTypeDict[pred];
+        }
+
+        return type;
     }
 }

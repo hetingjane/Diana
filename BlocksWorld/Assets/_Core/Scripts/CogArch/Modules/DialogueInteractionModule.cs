@@ -4,6 +4,7 @@ using System.Timers;
 using VoxSimPlatform.Agent.CharacterLogic;
 using VoxSimPlatform.Global;
 using VoxSimPlatform.Interaction;
+using VoxSimPlatform.Vox;
 
 public class DialogueInteractionModule : ModuleBase
 {
@@ -13,6 +14,8 @@ public class DialogueInteractionModule : ModuleBase
 
     public Transform grabbableBlocks;
     public GameObject demoSurface;
+
+    public VoxMLLibrary voxmlLibrary;
 
     Timer servoLoopTimer;
 
@@ -61,6 +64,9 @@ public class DialogueInteractionModule : ModuleBase
         if (DataStore.GetBoolValue("user:isInteracting")) {
             if (key == "user:intent:isNevermind") {
                 if (!string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:lastEvent"))) {
+                    string lastEventStr = DataStore.GetStringValue("user:intent:lastEvent");
+                //if (GlobalHelper.GetTopPredicate(lastEventStr) 
+
                     UndoLastEvent();
                 }
                 else if (!string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:object"))) {
