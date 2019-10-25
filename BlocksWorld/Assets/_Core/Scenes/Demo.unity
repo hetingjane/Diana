@@ -5528,9 +5528,9 @@ MonoBehaviour:
     weight: 100
     targets:
     - blendShape: BrowsDown_Left
-      weight: 50
+      weight: 40
     - blendShape: BrowsDown_Right
-      weight: 50
+      weight: 40
     - blendShape: Frown_Left
       weight: 50
     - blendShape: Frown_Right
@@ -5539,19 +5539,23 @@ MonoBehaviour:
       weight: 0
     - blendShape: MouthNarrow_Left
       weight: 0
+    - blendShape: BrowsOuterLower_Left
+      weight: 100
+    - blendShape: BrowsOuterLower_Right
+      weight: 100
   - name: concentration
     weight: 100
     targets:
     - blendShape: BrowsUp_Left
-      weight: 30
+      weight: 25
     - blendShape: BrowsUp_Right
-      weight: 30
+      weight: 25
     - blendShape: EyesWide_Left
-      weight: 30
+      weight: 25
     - blendShape: EyesWide_Right
-      weight: 30
+      weight: 25
     - blendShape: MouthOpen
-      weight: 5
+      weight: 4
   - name: confusion
     weight: 100
     targets:
@@ -5562,11 +5566,11 @@ MonoBehaviour:
     - blendShape: Squint_Left
       weight: 30
     - blendShape: NoseScrunch_Left
-      weight: 30
+      weight: 25
     - blendShape: NoseScrunch_Right
-      weight: 30
+      weight: 25
     - blendShape: Jaw_Down
-      weight: 30
+      weight: 15
     - blendShape: Squint_Right
       weight: 30
   - name: joy
@@ -5576,6 +5580,16 @@ MonoBehaviour:
       weight: 80
     - blendShape: Smile_Right
       weight: 80
+    - blendShape: MouthOpen
+      weight: 1
+    - blendShape: BrowsUp_Left
+      weight: 5
+    - blendShape: BrowsUp_Right
+      weight: 5
+    - blendShape: EyesWide_Left
+      weight: 5
+    - blendShape: EyesWide_Right
+      weight: 5
 --- !u!137 &799875429 stripped
 SkinnedMeshRenderer:
   m_CorrespondingSourceObject: {fileID: 8099405383717301183, guid: 5513b84b0fc9b4d2c8a2f2d54403a352,
@@ -8244,12 +8258,12 @@ PrefabInstance:
     - target: {fileID: 8099405383717301183, guid: 5513b84b0fc9b4d2c8a2f2d54403a352,
         type: 3}
       propertyPath: m_BlendShapeWeights.Array.data[6]
-      value: 60
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 8099405383717301183, guid: 5513b84b0fc9b4d2c8a2f2d54403a352,
         type: 3}
       propertyPath: m_BlendShapeWeights.Array.data[7]
-      value: 60
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 8099405383717301183, guid: 5513b84b0fc9b4d2c8a2f2d54403a352,
         type: 3}
@@ -8334,7 +8348,7 @@ PrefabInstance:
     - target: {fileID: 8099405383717301183, guid: 5513b84b0fc9b4d2c8a2f2d54403a352,
         type: 3}
       propertyPath: m_BlendShapeWeights.Array.data[16]
-      value: 0
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 8099405383717301183, guid: 5513b84b0fc9b4d2c8a2f2d54403a352,
         type: 3}
@@ -8364,6 +8378,21 @@ PrefabInstance:
     - target: {fileID: 8099405383717301183, guid: 5513b84b0fc9b4d2c8a2f2d54403a352,
         type: 3}
       propertyPath: m_BlendShapeWeights.Array.data[49]
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8099405383717301183, guid: 5513b84b0fc9b4d2c8a2f2d54403a352,
+        type: 3}
+      propertyPath: m_BlendShapeWeights.Array.data[27]
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8099405383717301183, guid: 5513b84b0fc9b4d2c8a2f2d54403a352,
+        type: 3}
+      propertyPath: m_BlendShapeWeights.Array.data[18]
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8099405383717301183, guid: 5513b84b0fc9b4d2c8a2f2d54403a352,
+        type: 3}
+      propertyPath: m_BlendShapeWeights.Array.data[11]
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8099405383720516379, guid: 5513b84b0fc9b4d2c8a2f2d54403a352,
