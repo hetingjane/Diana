@@ -441,6 +441,11 @@ public class EventManagementModule : ModuleBase
                                 eventStr = eventStr.Replace("{1}", GlobalHelper.VectorToParsable(targetLoc));
                                 SetValue("user:intent:partialEvent", eventStr, string.Empty);
                             }
+                            else if (!string.IsNullOrEmpty(objectStr))
+                            {
+                                eventStr = eventStr.Replace("{1}", string.Format("on({0})",objectStr));
+                                SetValue("user:intent:partialEvent", eventStr, string.Empty);
+                            }
                         }
                     }
                 }
@@ -520,6 +525,11 @@ public class EventManagementModule : ModuleBase
 
                                 appendEventStr = eventStr.Replace("{1}", GlobalHelper.VectorToParsable(targetLoc));
                                 SetValue("user:intent:append:partialEvent", appendEventStr, string.Empty);
+                            }
+                            else if (!string.IsNullOrEmpty(objectStr))
+                            {
+                                eventStr = eventStr.Replace("{1}", string.Format("on({0})",objectStr));
+                                SetValue("user:intent:append:partialEvent", eventStr, string.Empty);
                             }
                         }
                     }
