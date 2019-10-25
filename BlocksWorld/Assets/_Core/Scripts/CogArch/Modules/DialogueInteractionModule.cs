@@ -226,7 +226,7 @@ public class DialogueInteractionModule : ModuleBase
         string lastEventStr = DataStore.GetStringValue("user:intent:lastEvent");
         string undoEventStr = string.Empty;
 
-        Debug.Log(string.Format("Undoing last event {0}", lastEventStr));
+        Debug.Log(string.Format("Undo: Undoing last event {0}", lastEventStr));
 
         switch(GlobalHelper.GetTopPredicate(lastEventStr)) {
             case "grasp":
@@ -283,6 +283,7 @@ public class DialogueInteractionModule : ModuleBase
     }
 
     void ForgetFocusObject() {
+        Debug.Log(string.Format("Undo: forgetting focus object {0}", DataStore.GetBoolValue("user:intent:object")));
         SetValue("user:intent:object", string.Empty, string.Empty);
         SetValue("me:intent:action", "unreach", string.Empty);
         SetValue("me:intent:targetName", "unreach", string.Empty);
