@@ -392,9 +392,10 @@ public class EventManagementModule : ModuleBase
             {
                 if (!string.IsNullOrEmpty(eventStr))
                 {
-                    // if no variables left in the composed event string
-                    if (!Regex.IsMatch(eventStr, @"\{[0-1]+\}"))
+                    // if no variables left in the composed event string and no empty parens
+                    if (!Regex.IsMatch(eventStr, @"\{[0-1]+\}") && !Regex.IsMatch(eventStr, @"\(\)"))
                     {
+                        // if parens match and > 0
                         if (eventStr.Count(f => f == '(') == eventStr.Count(f => f == ')') &&
                             (eventStr.Count(f => f == '(') + eventStr.Count(f => f == ')') > 0))
                         {
