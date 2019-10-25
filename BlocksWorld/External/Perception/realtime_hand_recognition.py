@@ -20,7 +20,7 @@ class RealTimeHandRecognition:
                                          optimizer='mom')
 
         self.BLIND_IDX = blind_idx
-        self.active_arm_threshold = 0.16
+        self.active_arm_threshold = 200
         self.pixel_intensity_threshold = 0.4
         model = hands_resnet_model.ResNet(hps, "eval")
         model.build_graph()
@@ -55,9 +55,11 @@ class RealTimeHandRecognition:
         frame, hand_y, hand_z, spine_base_y, spine_base_z = data
         
         #we don't want to process frames when user's hand is resting (at/near spine base y or z)
-        hand_low = hand_y <= spine_base_y
+        hand_low = hand_y > spine_base_y
         hand_close_to_body = (spine_base_z - hand_z) < self.active_arm_threshold
         hand_behind = spine_base_z < hand_z
+        
+        print('low', hand_low, 'close', hand_close_to_body, 'behind', hand_behind, end='\t')
         
         if hand_behind or (hand_low and hand_close_to_body):
             self.past_probs_L = None
@@ -90,9 +92,9 @@ class RealTimeHandRecognition:
         input[1] = frame_R
         (predictions) = self.sess.run(self.model.predictions, feed_dict={self.model._images: input})
 
-        smoothed_L = predictions[0] #self.smoothL(predictions[0])
+        smoothed_L = self.smoothL(predictions[0])
         top1_L = np.argmax(smoothed_L)
-        smoothed_R = predictions[1] #self.smoothR(predictions[1])
+        smoothed_R = self.smoothR(predictions[1])
         top1_R = np.argmax(smoothed_R)
         return top1_L, top1_R
 
