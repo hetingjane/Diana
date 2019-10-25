@@ -234,8 +234,6 @@ public class DialogueInteractionModule : ModuleBase
         string lastEventStr = DataStore.GetStringValue("user:intent:lastEvent");
         string undoEventStr = string.Empty;
 
-        Debug.Log(string.Format("Undo: Undoing last event {0}", lastEventStr));
-
         switch(GlobalHelper.GetTopPredicate(lastEventStr)) {
             case "grasp":
                 undoEventStr = lastEventStr.Replace("grasp", "ungrasp");
@@ -283,8 +281,10 @@ public class DialogueInteractionModule : ModuleBase
             default:
                 break;
         }
-
+                
         if (!string.IsNullOrEmpty(undoEventStr)) {
+            Debug.Log(string.Format("Undo: Undoing last event {0} (reverse event calculated as {1})", lastEventStr, undoEventStr));
+
             SetValue("me:isUndoing", true, string.Empty);
             SetValue("user:intent:event", undoEventStr, string.Empty);
         }
