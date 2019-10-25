@@ -294,7 +294,6 @@ public class DialogueInteractionModule : ModuleBase
         Debug.Log(string.Format("Undo: forgetting focus object {0}", DataStore.GetStringValue("user:intent:object")));
         SetValue("user:intent:object", string.Empty, string.Empty);
         SetValue("me:intent:action", "unreach", string.Empty);
-        SetValue("me:intent:targetName", "unreach", string.Empty);
     }
 
     void CheckServoStatus(object sender, ElapsedEventArgs e) {

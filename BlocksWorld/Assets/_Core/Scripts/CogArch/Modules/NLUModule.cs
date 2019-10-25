@@ -51,11 +51,12 @@ public class NLUModule : ModuleBase
             SetValue("user:intent:isNegack", true, string.Empty);
             input = input.Replace("no", "").Trim();
         }
-        else if ((input.StartsWith("never mind") || (input.StartsWith("wait"))))
+        else if ((input.StartsWith("never mind")) || (input.StartsWith("wait")) ||
+            (input.StartsWith("no wait")))
         {
             // do nevermind
             SetValue("user:intent:isNevermind", true, string.Empty);
-            input = input.Replace("never mind", "").Replace("wait", "").Trim();
+            input = input.Replace("never mind", "").Replace("wait", "").Replace("no wait", "").Trim();
             SetValue("user:intent:isNevermind", false, string.Empty);
         }
 
