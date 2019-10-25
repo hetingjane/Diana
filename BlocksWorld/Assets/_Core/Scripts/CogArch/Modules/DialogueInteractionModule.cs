@@ -291,7 +291,7 @@ public class DialogueInteractionModule : ModuleBase
     }
 
     void ForgetFocusObject() {
-        Debug.Log(string.Format("Undo: forgetting focus object {0}", DataStore.GetBoolValue("user:intent:object")));
+        Debug.Log(string.Format("Undo: forgetting focus object {0}", DataStore.GetStringValue("user:intent:object")));
         SetValue("user:intent:object", string.Empty, string.Empty);
         SetValue("me:intent:action", "unreach", string.Empty);
         SetValue("me:intent:targetName", "unreach", string.Empty);
