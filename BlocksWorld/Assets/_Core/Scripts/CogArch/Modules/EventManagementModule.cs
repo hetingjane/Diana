@@ -848,10 +848,16 @@ public class EventManagementModule : ModuleBase
             if (objs.Count > 0) {
                 if (!objs.Any(o => (o == null) || (o.GetType() != typeof(GameObject)))) {
                     // if all objects are game objects
-                    Debug.Log(string.Format("{0} {1} does not exist!", pred,
-                        (objs[0] as GameObject).GetComponent<Voxeme>().voxml.Lex.Pred));
-                    string responseStr = string.Format("There is no {0} {1} here.", pred,
-                        (objs[0] as GameObject).GetComponent<Voxeme>().voxml.Lex.Pred);
+                    string responseStr = string.Empty;
+                    if (pred == "this" || pred == "that") {
+                        responseStr = string.Format("Which {0}?",(objs[0] as GameObject).GetComponent<Voxeme>().voxml.Lex.Pred);
+                    }
+                    else {
+                        Debug.Log(string.Format("{0} {1} does not exist!", pred,
+                            (objs[0] as GameObject).GetComponent<Voxeme>().voxml.Lex.Pred));
+                        responseStr = string.Format("There is no {0} {1} here.", pred,
+                            (objs[0] as GameObject).GetComponent<Voxeme>().voxml.Lex.Pred);
+                    }
                     SetValue("me:speech:intent", responseStr, string.Empty);
                     SetValue("me:emotion", "confusion", string.Empty);
                 }
