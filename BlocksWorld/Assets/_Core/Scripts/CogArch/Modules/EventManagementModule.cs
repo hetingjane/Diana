@@ -396,7 +396,7 @@ public class EventManagementModule : ModuleBase
                     if (!Regex.IsMatch(eventStr, @"\{[0-1]+\}"))
                     {
                         if (eventStr.Count(f => f == '(') == eventStr.Count(f => f == ')') &&
-                            (eventStr.Count(f => f == '(') + eventStr.Count(f => f == ')') > 0)
+                            (eventStr.Count(f => f == '(') + eventStr.Count(f => f == ')') > 0))
                         {
                             Debug.Log(string.Format("Composed object {0}, action {1}, and location {2} into event {3}",
     	                        objectStr, actionStr, GlobalHelper.VectorToParsable(locationPos), eventStr));
