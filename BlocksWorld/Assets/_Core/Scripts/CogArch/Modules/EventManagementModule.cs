@@ -190,6 +190,7 @@ public class EventManagementModule : ModuleBase
                     eventManager.ClearEvents();
                 }
 
+                SetValue("me:speech:intent", "OK.", string.Empty);
                 eventManager.InsertEvent("", 0);
                 eventManager.InsertEvent(eventStr, 1);
             }
