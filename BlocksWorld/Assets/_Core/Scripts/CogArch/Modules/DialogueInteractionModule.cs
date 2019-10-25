@@ -207,7 +207,7 @@ public class DialogueInteractionModule : ModuleBase
                 if (!string.IsNullOrEmpty(DataStore.GetStringValue(key))) {
                     if (string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:action")) && 
                         DataStore.GetVector3Value("user:intent:location") == default) {
-                        SetValue("me:speech:intent", "OK.", string.Empty);
+                        //SetValue("me:speech:intent", "OK.", string.Empty);
                         SetValue("me:intent:action", "reach", string.Empty);
                         SetValue("me:intent:target",
                            GlobalHelper.GetObjectWorldSize(GameObject.Find(DataStore.GetStringValue(key))).max, string.Empty);
