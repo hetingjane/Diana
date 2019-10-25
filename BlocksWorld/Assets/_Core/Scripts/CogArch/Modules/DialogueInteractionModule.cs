@@ -63,14 +63,16 @@ public class DialogueInteractionModule : ModuleBase
 
         if (DataStore.GetBoolValue("user:isInteracting")) {
             if (key == "user:intent:isNevermind") {
-                if (!string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:lastEvent"))) {
-                    string lastEventStr = DataStore.GetStringValue("user:intent:lastEvent");
-                //if (GlobalHelper.GetTopPredicate(lastEventStr) 
+                if (DataStore.GetBoolValue(key)) {
+                    if (!string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:lastEvent"))) {
+                        string lastEventStr = DataStore.GetStringValue("user:intent:lastEvent");
+                    //if (GlobalHelper.GetTopPredicate(lastEventStr) 
 
-                    UndoLastEvent();
-                }
-                else if (!string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:object"))) {
-                    ForgetFocusObject();
+                        UndoLastEvent();
+                    }
+                    else if (!string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:object"))) {
+                        ForgetFocusObject();
+                    }
                 }
             } 
             else if (key == "user:intent:isPushLeft") {
