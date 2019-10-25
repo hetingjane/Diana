@@ -246,6 +246,8 @@ public class EventManagementModule : ModuleBase
             string objectStr = DataStore.GetStringValue("user:intent:object");
             Vector3 locationPos = DataStore.GetVector3Value("user:intent:location");
 
+            string lastTheme = DataStore.GetStringValue("me:lastTheme");
+
             if (key == "user:intent:object")
             {
                 if (!string.IsNullOrEmpty(objectStr))
@@ -311,6 +313,13 @@ public class EventManagementModule : ModuleBase
                         if (actionStr.Contains("{0}"))
                         {
                             eventStr = actionStr.Replace("{0}", objectStr);
+                        }
+                    }
+                    else if (!string.IsNullOrEmpty(lastTheme))
+                    {
+                        if (actionStr.Contains("{0}"))
+                        {
+                            eventStr = actionStr.Replace("{0}", lastTheme);
                         }
                     }
 
@@ -412,12 +421,24 @@ public class EventManagementModule : ModuleBase
 	                        	eventStr = eventStr.Replace("{0}", objectStr);
 	                        	SetValue("user:intent:partialEvent", eventStr, string.Empty);
 	                        }
+                            else if (!string.IsNullOrEmpty(lastTheme))
+                            {
+                                eventStr = actionStr.Replace("{0}", lastTheme);
+                                SetValue("user:intent:partialEvent", eventStr, string.Empty);
+                            }
                         }
                         else if (eventStr.Contains("{1}"))
                         {
                             if (locationPos != default)
                             {
-                                eventStr = eventStr.Replace("{1}", GlobalHelper.VectorToParsable(locationPos));
+                                Vector3 targetLoc = locationPos;
+
+                                if (!string.IsNullOrEmpty(objectStr))
+                                {
+                                    targetLoc = new Vector3(locationPos.x, locationPos.y + GlobalHelper.GetObjectWorldSize(GameObject.Find(objectStr)).extents.y, locationPos.z);
+                                }
+
+                                eventStr = eventStr.Replace("{1}", GlobalHelper.VectorToParsable(targetLoc));
                                 SetValue("user:intent:partialEvent", eventStr, string.Empty);
                             }
                         }
@@ -480,12 +501,24 @@ public class EventManagementModule : ModuleBase
                                 appendEventStr = appendEventStr.Replace("{0}", objectStr);
                                 SetValue("user:intent:append:partialEvent", appendEventStr, string.Empty);
                             }
+                            else if (!string.IsNullOrEmpty(lastTheme))
+                            {
+                                eventStr = actionStr.Replace("{0}", lastTheme);
+                                SetValue("user:intent:append:partialEvent", eventStr, string.Empty);
+                            }
                         }
                         else if (appendEventStr.Contains("{1}"))
                         {
                             if (locationPos != default)
                             {
-                                appendEventStr = appendEventStr.Replace("{1}", GlobalHelper.VectorToParsable(locationPos));
+                                Vector3 targetLoc = locationPos;
+
+                                if (!string.IsNullOrEmpty(objectStr))
+                                {
+                                    targetLoc = new Vector3(locationPos.x, locationPos.y + GlobalHelper.GetObjectWorldSize(GameObject.Find(objectStr)).extents.y, locationPos.z);
+                                }
+
+                                appendEventStr = eventStr.Replace("{1}", GlobalHelper.VectorToParsable(targetLoc));
                                 SetValue("user:intent:append:partialEvent", appendEventStr, string.Empty);
                             }
                         }
@@ -757,7 +790,7 @@ public class EventManagementModule : ModuleBase
 
             if (!string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:event"))) {
                 // currently executing an event
-                if (DataStore.GetStringValue("me:lastTheme") != DataStore.GetStringValue("user:intent:object")) {
+                //if (DataStore.GetStringValue("me:lastTheme") != DataStore.GetStringValue("user:intent:object")) {
                     // "pick up the yellow block"
                     // nevermind
                     // "put the yellow block on the green block"
@@ -766,7 +799,7 @@ public class EventManagementModule : ModuleBase
                     string objectStr = DataStore.GetStringValue("user:intent:object");
                     SetValue("me:lastTheme",objectStr,string.Empty);
                     SetValue("me:lastThemePos",GameObject.Find(objectStr).transform.position,string.Empty);
-                }
+                //}
             }
         }
     }
