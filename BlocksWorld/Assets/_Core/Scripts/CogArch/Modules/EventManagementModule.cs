@@ -258,21 +258,17 @@ public class EventManagementModule : ModuleBase
             {
                 if (!string.IsNullOrEmpty(objectStr))
                 {
-                    if (!string.IsNullOrEmpty(eventStr))
+                    if ((!string.IsNullOrEmpty(eventStr)) && (eventStr.Contains("{0}")) &&
+                        (DialogueUtility.GetPredicateType(GlobalHelper.GetTopPredicate(eventStr),voxmlLibrary) == "programs"))
                     {
-                        if (eventStr.Contains("{0}"))
-                        {
-                            eventStr = eventStr.Replace("{0}", objectStr);
-                            SetValue("user:intent:partialEvent", eventStr, string.Empty);
-                        }
+                        eventStr = eventStr.Replace("{0}", objectStr);
+                        SetValue("user:intent:partialEvent", eventStr, string.Empty);
                     }
-                    else if (!string.IsNullOrEmpty(appendEventStr))
+                    else if ((!string.IsNullOrEmpty(eventStr)) && (eventStr.Contains("{0}")) &&
+                        (DialogueUtility.GetPredicateType(GlobalHelper.GetTopPredicate(eventStr),voxmlLibrary) == "programs"))
                     {
-                        if (appendEventStr.Contains("{0}"))
-                        {
-                            appendEventStr = appendEventStr.Replace("{0}", objectStr);
-                            SetValue("user:intent:append:partialEvent", appendEventStr, string.Empty);
-                        }
+                        appendEventStr = appendEventStr.Replace("{0}", objectStr);
+                        SetValue("user:intent:append:partialEvent", appendEventStr, string.Empty);
                     }
                     else if (!string.IsNullOrEmpty(actionStr))
                     {
