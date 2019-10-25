@@ -104,7 +104,7 @@ public class WatsonStreamingSR : ModuleBase
                 _speechToText.DetectSilence = true;
                 _speechToText.EnableWordConfidence = true;
                 _speechToText.EnableTimestamps = true;
-                _speechToText.SilenceThreshold = 0.1f;
+                _speechToText.SilenceThreshold = 0.2f;
 	            _speechToText.MaxAlternatives = 5;
                 _speechToText.EnableInterimResults = true;
                 _speechToText.OnError = OnError;

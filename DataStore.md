@@ -17,6 +17,7 @@ As a general rule, each part of a key should be named like a variable or propert
 |`me:actual:handPosR`             |Vector3      |Position    |Position of Diana's right hand in world coordinates                                                 |
 |`me:alertness`                   |Integer      |0 to 10     |How alert Diana is; 0 = asleep, 7 = normal, 10 = hyperexcited                                       |
 |`me:attending`                   |String       |            |What Diana is paying attention to: "none", "user"                                                   |
+|`me:emotion`                   |String       |            |Current emotion of Diana: "joy", "concentration", "frustration", or combination of them, etc.                                                   |
 |`me:eyes:open`                   |Integer      |0 to 100    |Current position of Diana's eyelids; 0 = closed, 100 = wide open                                    |
 |`me:holding`                     |String       |block name  |Name of block Diana is currently holding                                                            |
 |`me:intent:action`               |String       |            |What action Diana intends to do: "point", "grab", etc.                                              |
@@ -30,12 +31,10 @@ As a general rule, each part of a key should be named like a variable or propert
 |`me:speech:intent`               |String       |            |Text that Diana intends to speak                                                                    |
 |`me:standingBy`                  |Boolean      |T or F      |Whether agent is on "stand by" and ignoring input until she hears her name                          |
 |`me:voice`                       |String       |voice name  |Name of voice (or voices) agent should use, e.g.: "Victoria;Microsoft Zira Desktop"                 |
-|`user:emotionAngry`              |Integer      |0 to 100    |Measure of how angry the user looks                                                                 |
-|`user:emotionHappy`              |Integer      |0 to 100    |Measure of how happy the user looks                                                                 |
 |`user:armMotion:left`            |String       |            |servo behavior of left arm: "servo" or "still"                                                      |
 |`user:armMotion:right`           |String       |            |servo behavior of right arm: "servo" or "still"                                                     |
 |`user:communication`             |Communication|            |Semantic representation of the user's last utterance                                                |
-|`user:dominantEmotion`           |String       |            |Current user dominant emotion, e.g. "Happy", "Angry"                                                |
+|`user:emotion`              |String      |   |Current emotion of user: "joy", "angry", "neutral"                                                             |
 |`user:hands:[right,left]`        |String       |            |Current hand pose for either left or right hand                                                     |
 |`user:intent:isClaw`             |Boolean      |T or F      |Whether the user is doing a claw down gesture with either hand                                      |
 |`user:intent:isNegack`           |Boolean      |T or F      |Whether the user is doing a thumbs down gesture with either hand                                    |
