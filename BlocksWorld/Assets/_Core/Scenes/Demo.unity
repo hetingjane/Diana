@@ -13501,7 +13501,7 @@ MonoBehaviour:
   comment: 
   display: {fileID: 0}
   stateMachine: {fileID: 1463965744}
-  servoLoopTimerTime: 10
+  servoLoopTimerTime: 20
   grabbableBlocks: {fileID: 184680267}
   demoSurface: {fileID: 672448213}
 --- !u!114 &1831328035
@@ -15091,7 +15091,7 @@ MonoBehaviour:
   eventManager: {fileID: 1725009506}
   grabbableBlocks: {fileID: 184680267}
   demoSurface: {fileID: 672448213}
-  servoSpeed: 0.05
+  servoSpeed: 0.02
 --- !u!1 &2054860432
 GameObject:
   m_ObjectHideFlags: 0
