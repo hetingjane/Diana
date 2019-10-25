@@ -10,7 +10,9 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
+using VoxSimPlatform.Global;
 using VoxSimPlatform.Network;
 
 public class NLUModule : ModuleBase
@@ -49,11 +51,13 @@ public class NLUModule : ModuleBase
             SetValue("user:intent:isNegack", true, string.Empty);
             input = input.Replace("no", "").Trim();
         }
-        else if ((input.StartsWith("never mind") || (input.StartsWith("wait"))))
+        else if ((input.StartsWith("never mind")) || (input.StartsWith("wait")) ||
+            (input.StartsWith("no wait")))
         {
             // do nevermind
             SetValue("user:intent:isNevermind", true, string.Empty);
-            input = input.Replace("never mind", "").Replace("wait", "").Trim();
+            input = input.Replace("never mind", "").Replace("wait", "").Replace("no wait", "").Trim();
+            SetValue("user:intent:isNevermind", false, string.Empty);
         }
 
         string mapped = MapTerms(input);
@@ -133,6 +137,10 @@ public class NLUModule : ModuleBase
         else if (mapped.Contains("on the top of")) {
             mapped = mapped.Replace("on the top of", "on");
         }
+        else if (mapped.Contains("next to")) {
+            mapped = mapped.Replace("next to",
+                new List<string>() { "left of", "right of" }[RandomHelper.RandomInt(0, 1, (int)RandomHelper.RangeFlags.MaxInclusive)]);
+        }
 
         // insert "one" after "this"/"that" if not already followed by noun
         if (mapped.Split().Contains("this")) {
@@ -156,24 +164,24 @@ public class NLUModule : ModuleBase
 
         // add anaphor placeholder
         if (mapped.Split().Contains("one")) {
-            mapped = mapped.Replace("one", "{2}");
+            mapped = Regex.Replace(mapped, @"\bone\b", "{2}");
         }
         else if (mapped.Split().Contains("ones")) {
-            mapped = mapped.Replace("ones", "{2}");
+            mapped = Regex.Replace(mapped, @"\bones\b", "{2}");
         }
 
         if (mapped.Split().Contains("it")) {
-            mapped = mapped.Replace("it", "{0}");
+            mapped = Regex.Replace(mapped, @"\bit\b", "{0}");
         }
         else if (mapped.Split().Contains("them")) {
-            mapped = mapped.Replace("them", "{0}");
+            mapped = Regex.Replace(mapped, @"\bthem\b", "{0}");
         }
 
         if (mapped.Contains("there")) {
-            mapped = mapped.Replace("there", "{1}");
+            mapped = Regex.Replace(mapped, @"\bthere\b", "{1}");
         }
         else if (mapped.Contains("here")) {
-	        mapped = mapped.Replace("here", "{1}");
+            mapped = Regex.Replace(mapped, @"\bhere\b", "{1}");
         }
 
         return mapped;

@@ -38,6 +38,8 @@ public class EventManagementModule : ModuleBase
 {
     public EventManager eventManager;
 
+    public VoxMLLibrary voxmlLibrary;
+
     /// <summary>
     /// Reference to the manipulable objects in the scene.
     /// Only these will be searched when an object is referred by name.
@@ -173,13 +175,16 @@ public class EventManagementModule : ModuleBase
         {
             string eventStr = value.ToString().Trim();
             if (string.IsNullOrEmpty(eventStr)) return;
-
+            
             if (!DataStore.GetBoolValue("me:isUndoing"))
             {
-                Debug.Log(string.Format("Setting last event {0}", DataStore.GetStringValue("user:intent:event")));
-                SetValue("user:intent:lastEvent", DataStore.GetStringValue("user:intent:event"),
-                    string.Format("Store user:intent:event ({0}) in user:intent:lastEvent in case Diana did something wrong",
-                        DataStore.GetStringValue("user:intent:event")));
+                if (DialogueUtility.GetPredicateType(GlobalHelper.GetTopPredicate(eventStr),voxmlLibrary) == "programs")
+                {
+                    Debug.Log(string.Format("Setting last event {0}", DataStore.GetStringValue("user:intent:event")));
+                    SetValue("user:intent:lastEvent", DataStore.GetStringValue("user:intent:event"),
+                        string.Format("Store user:intent:event ({0}) in user:intent:lastEvent in case Diana did something wrong",
+                            DataStore.GetStringValue("user:intent:event")));
+                }
             }
                 
             try
@@ -190,6 +195,7 @@ public class EventManagementModule : ModuleBase
                     eventManager.ClearEvents();
                 }
 
+                SetValue("me:speech:intent", "OK.", string.Empty);
                 eventManager.InsertEvent("", 0);
                 eventManager.InsertEvent(eventStr, 1);
             }
@@ -246,25 +252,23 @@ public class EventManagementModule : ModuleBase
             string objectStr = DataStore.GetStringValue("user:intent:object");
             Vector3 locationPos = DataStore.GetVector3Value("user:intent:location");
 
+            string lastTheme = DataStore.GetStringValue("me:lastTheme");
+
             if (key == "user:intent:object")
             {
                 if (!string.IsNullOrEmpty(objectStr))
                 {
-                    if (!string.IsNullOrEmpty(eventStr))
+                    if ((!string.IsNullOrEmpty(eventStr)) && (eventStr.Contains("{0}")) &&
+                        (DialogueUtility.GetPredicateType(GlobalHelper.GetTopPredicate(eventStr),voxmlLibrary) == "programs"))
                     {
-                        if (eventStr.Contains("{0}"))
-                        {
-                            eventStr = eventStr.Replace("{0}", objectStr);
-                            SetValue("user:intent:partialEvent", eventStr, string.Empty);
-                        }
+                        eventStr = eventStr.Replace("{0}", objectStr);
+                        SetValue("user:intent:partialEvent", eventStr, string.Empty);
                     }
-                    else if (!string.IsNullOrEmpty(appendEventStr))
+                    else if ((!string.IsNullOrEmpty(eventStr)) && (eventStr.Contains("{0}")) &&
+                        (DialogueUtility.GetPredicateType(GlobalHelper.GetTopPredicate(eventStr),voxmlLibrary) == "programs"))
                     {
-                        if (appendEventStr.Contains("{0}"))
-                        {
-                            appendEventStr = appendEventStr.Replace("{0}", objectStr);
-                            SetValue("user:intent:append:partialEvent", appendEventStr, string.Empty);
-                        }
+                        appendEventStr = appendEventStr.Replace("{0}", objectStr);
+                        SetValue("user:intent:append:partialEvent", appendEventStr, string.Empty);
                     }
                     else if (!string.IsNullOrEmpty(actionStr))
                     {
@@ -311,6 +315,15 @@ public class EventManagementModule : ModuleBase
                         if (actionStr.Contains("{0}"))
                         {
                             eventStr = actionStr.Replace("{0}", objectStr);
+                            SetValue("user:intent:partialEvent", eventStr, string.Empty);
+                        }
+                    }
+                    else if (!string.IsNullOrEmpty(lastTheme))
+                    {
+                        if (actionStr.Contains("{0}"))
+                        {
+                            eventStr = actionStr.Replace("{0}", lastTheme);
+                            SetValue("user:intent:partialEvent", eventStr, string.Empty);
                         }
                     }
 
@@ -319,10 +332,9 @@ public class EventManagementModule : ModuleBase
                         if (actionStr.Contains("{1}"))
                         {
                             eventStr = actionStr.Replace("{1}", GlobalHelper.VectorToParsable(locationPos));
+                            SetValue("user:intent:partialEvent", eventStr, string.Empty);
                         }
                     }
-
-	                SetValue("user:intent:partialEvent", eventStr, string.Empty);
                 }
             }
             else if (key == "user:intent:location")
@@ -375,20 +387,25 @@ public class EventManagementModule : ModuleBase
             } 
             else if (key == "user:intent:partialEvent")
             {
-                // if no variables left in the composed event string
                 if (!string.IsNullOrEmpty(eventStr))
                 {
-                    if (!Regex.IsMatch(eventStr, @"\{[0-1]+\}"))
+                    // if no variables left in the composed event string and no empty parens
+                    if (!Regex.IsMatch(eventStr, @"\{[0-1]+\}") && !Regex.IsMatch(eventStr, @"\(\)"))
                     {
-                        Debug.Log(string.Format("Composed object {0}, action {1}, and location {2} into event {3}",
-	                        objectStr, actionStr, GlobalHelper.VectorToParsable(locationPos), eventStr));
-                            
-	                    if (!string.IsNullOrEmpty(objectStr)) {
-	                        SetValue("me:lastTheme",objectStr,string.Empty);
-	                        SetValue("me:lastThemePos",GameObject.Find(objectStr).transform.position,string.Empty);
-	                    }
-	                    
-	                	SetValue("user:intent:event", eventStr, string.Empty);
+                        // if parens match and > 0
+                        if (eventStr.Count(f => f == '(') == eventStr.Count(f => f == ')') &&
+                            (eventStr.Count(f => f == '(') + eventStr.Count(f => f == ')') > 0))
+                        {
+                            Debug.Log(string.Format("Composed object {0}, action {1}, and location {2} into event {3}",
+    	                        objectStr, actionStr, GlobalHelper.VectorToParsable(locationPos), eventStr));
+                                
+    	                    if (!string.IsNullOrEmpty(objectStr)) {
+    	                        SetValue("me:lastTheme",objectStr,string.Empty);
+    	                        SetValue("me:lastThemePos",GameObject.Find(objectStr).transform.position,string.Empty);
+    	                    }
+    	                    
+    	                	SetValue("user:intent:event", eventStr, string.Empty);
+                        }
                     }
                     else
                     {
@@ -412,6 +429,31 @@ public class EventManagementModule : ModuleBase
 	                        	eventStr = eventStr.Replace("{0}", objectStr);
 	                        	SetValue("user:intent:partialEvent", eventStr, string.Empty);
 	                        }
+                            else if (!string.IsNullOrEmpty(lastTheme))
+                            {
+                                eventStr = actionStr.Replace("{0}", lastTheme);
+                                SetValue("user:intent:partialEvent", eventStr, string.Empty);
+                            }
+                        }
+                        else if (eventStr.Contains("{1}"))
+                        {
+                            if (locationPos != default)
+                            {
+                                Vector3 targetLoc = locationPos;
+
+                                if (!string.IsNullOrEmpty(objectStr))
+                                {
+                                    targetLoc = new Vector3(locationPos.x, locationPos.y + GlobalHelper.GetObjectWorldSize(GameObject.Find(objectStr)).extents.y, locationPos.z);
+                                }
+
+                                eventStr = eventStr.Replace("{1}", GlobalHelper.VectorToParsable(targetLoc));
+                                SetValue("user:intent:partialEvent", eventStr, string.Empty);
+                            }
+                            else if (!string.IsNullOrEmpty(objectStr))
+                            {
+                                eventStr = eventStr.Replace("{1}", string.Format("on({0})",objectStr));
+                                SetValue("user:intent:partialEvent", eventStr, string.Empty);
+                            }
                         }
                     }
                 }
@@ -471,6 +513,31 @@ public class EventManagementModule : ModuleBase
                             {
                                 appendEventStr = appendEventStr.Replace("{0}", objectStr);
                                 SetValue("user:intent:append:partialEvent", appendEventStr, string.Empty);
+                            }
+                            else if (!string.IsNullOrEmpty(lastTheme))
+                            {
+                                eventStr = actionStr.Replace("{0}", lastTheme);
+                                SetValue("user:intent:append:partialEvent", eventStr, string.Empty);
+                            }
+                        }
+                        else if (appendEventStr.Contains("{1}"))
+                        {
+                            if (locationPos != default)
+                            {
+                                Vector3 targetLoc = locationPos;
+
+                                if (!string.IsNullOrEmpty(objectStr))
+                                {
+                                    targetLoc = new Vector3(locationPos.x, locationPos.y + GlobalHelper.GetObjectWorldSize(GameObject.Find(objectStr)).extents.y, locationPos.z);
+                                }
+
+                                appendEventStr = eventStr.Replace("{1}", GlobalHelper.VectorToParsable(targetLoc));
+                                SetValue("user:intent:append:partialEvent", appendEventStr, string.Empty);
+                            }
+                            else if (!string.IsNullOrEmpty(objectStr))
+                            {
+                                eventStr = eventStr.Replace("{1}", string.Format("on({0})",objectStr));
+                                SetValue("user:intent:append:partialEvent", eventStr, string.Empty);
                             }
                         }
                     }
@@ -704,7 +771,6 @@ public class EventManagementModule : ModuleBase
 
                 if (string.IsNullOrEmpty(DataStore.GetStringValue("me:holding"))) {
                     SetValue("user:intent:object",DataStore.StringValue.Empty,string.Empty);
-                    SetValue("me:lastThemePos",DataStore.Vector3Value.Zero,string.Empty);
                 }
 
                 SetValue("user:intent:action",DataStore.StringValue.Empty,string.Empty);
@@ -737,11 +803,13 @@ public class EventManagementModule : ModuleBase
         //  otherwise, Diana should indicate the entity and prompt for more information
 
         if (((EventReferentArgs)e).Referent is string) {
-            SetValue("user:intent:object", ((EventReferentArgs)e).Referent as string, string.Empty);
+            if (string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:object"))) {
+                SetValue("user:intent:object", ((EventReferentArgs)e).Referent as string, string.Empty);
+            }
 
             if (!string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:event"))) {
                 // currently executing an event
-                if (DataStore.GetStringValue("me:lastTheme") != DataStore.GetStringValue("user:intent:object")) {
+                //if (DataStore.GetStringValue("me:lastTheme") != DataStore.GetStringValue("user:intent:object")) {
                     // "pick up the yellow block"
                     // nevermind
                     // "put the yellow block on the green block"
@@ -750,7 +818,7 @@ public class EventManagementModule : ModuleBase
                     string objectStr = DataStore.GetStringValue("user:intent:object");
                     SetValue("me:lastTheme",objectStr,string.Empty);
                     SetValue("me:lastThemePos",GameObject.Find(objectStr).transform.position,string.Empty);
-                }
+                //}
             }
         }
     }
@@ -780,10 +848,16 @@ public class EventManagementModule : ModuleBase
             if (objs.Count > 0) {
                 if (!objs.Any(o => (o == null) || (o.GetType() != typeof(GameObject)))) {
                     // if all objects are game objects
-                    Debug.Log(string.Format("{0} {1} does not exist!", pred,
-                        (objs[0] as GameObject).GetComponent<Voxeme>().voxml.Lex.Pred));
-                    string responseStr = string.Format("There is no {0} {1} here.", pred,
-                        (objs[0] as GameObject).GetComponent<Voxeme>().voxml.Lex.Pred);
+                    string responseStr = string.Empty;
+                    if (pred == "this" || pred == "that") {
+                        responseStr = string.Format("Which {0}?",(objs[0] as GameObject).GetComponent<Voxeme>().voxml.Lex.Pred);
+                    }
+                    else {
+                        Debug.Log(string.Format("{0} {1} does not exist!", pred,
+                            (objs[0] as GameObject).GetComponent<Voxeme>().voxml.Lex.Pred));
+                        responseStr = string.Format("There is no {0} {1} here.", pred,
+                            (objs[0] as GameObject).GetComponent<Voxeme>().voxml.Lex.Pred);
+                    }
                     SetValue("me:speech:intent", responseStr, string.Empty);
                     SetValue("me:emotion", "confusion", string.Empty);
                 }

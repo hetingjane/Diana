@@ -19,7 +19,8 @@
     </Args>
     <Body>
       <Subevent Value="grasp(x,y)" />
-      <Subevent Value="while(hold(x,y)^on(y,w)^!at(y,z)):move(x,y,z,'')" />
+      <!--<Subevent Value="while(hold(x,y)^on(y,w)^!at(y,z)):move(x,y,z,'')" />-->
+      <Subevent Value="move(x,y,z,'')" />
     </Body>
     <Scale />
     <Arity />

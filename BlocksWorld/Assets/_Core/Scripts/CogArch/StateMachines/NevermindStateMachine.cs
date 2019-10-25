@@ -21,7 +21,7 @@ public class NevermindStateMachine : RuleStateMachine<NevermindState>
 			}
 
 			return false;
-		}, 100));
+		}, 600));
 
 		SetTransitionRule(NevermindState.NevermindStart, NevermindState.NevermindStop, new TimedRule(() =>
 		{
@@ -36,6 +36,6 @@ public class NevermindStateMachine : RuleStateMachine<NevermindState>
 
 				return leftHandGesture != "stop" && rightHandGesture != "stop" && leftHandGesture != "five front" && rightHandGesture != "five front";
 			}
-		}, 100));
+		}, 600));
 	}
 }

@@ -4,6 +4,7 @@ using System.Timers;
 using VoxSimPlatform.Agent.CharacterLogic;
 using VoxSimPlatform.Global;
 using VoxSimPlatform.Interaction;
+using VoxSimPlatform.Vox;
 
 public class DialogueInteractionModule : ModuleBase
 {
@@ -13,6 +14,8 @@ public class DialogueInteractionModule : ModuleBase
 
     public Transform grabbableBlocks;
     public GameObject demoSurface;
+
+    public VoxMLLibrary voxmlLibrary;
 
     Timer servoLoopTimer;
 
@@ -60,11 +63,16 @@ public class DialogueInteractionModule : ModuleBase
 
         if (DataStore.GetBoolValue("user:isInteracting")) {
             if (key == "user:intent:isNevermind") {
-                if (!string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:lastEvent"))) {
-                    UndoLastEvent();
-                }
-                else if (!string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:object"))) {
-                    ForgetFocusObject();
+                if (DataStore.GetBoolValue(key)) {
+                    if (!string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:lastEvent"))) {
+                        string lastEventStr = DataStore.GetStringValue("user:intent:lastEvent");
+                    //if (GlobalHelper.GetTopPredicate(lastEventStr) 
+
+                        UndoLastEvent();
+                    }
+                    else if (!string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:object"))) {
+                        ForgetFocusObject();
+                    }
                 }
             } 
             else if (key == "user:intent:isPushLeft") {
@@ -207,7 +215,7 @@ public class DialogueInteractionModule : ModuleBase
                 if (!string.IsNullOrEmpty(DataStore.GetStringValue(key))) {
                     if (string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:action")) && 
                         DataStore.GetVector3Value("user:intent:location") == default) {
-                        SetValue("me:speech:intent", "OK.", string.Empty);
+                        //SetValue("me:speech:intent", "OK.", string.Empty);
                         SetValue("me:intent:action", "reach", string.Empty);
                         SetValue("me:intent:target",
                            GlobalHelper.GetObjectWorldSize(GameObject.Find(DataStore.GetStringValue(key))).max, string.Empty);
@@ -225,8 +233,6 @@ public class DialogueInteractionModule : ModuleBase
     void UndoLastEvent() {
         string lastEventStr = DataStore.GetStringValue("user:intent:lastEvent");
         string undoEventStr = string.Empty;
-
-        Debug.Log(string.Format("Undoing last event {0}", lastEventStr));
 
         switch(GlobalHelper.GetTopPredicate(lastEventStr)) {
             case "grasp":
@@ -275,17 +281,19 @@ public class DialogueInteractionModule : ModuleBase
             default:
                 break;
         }
-
+                
         if (!string.IsNullOrEmpty(undoEventStr)) {
+            Debug.Log(string.Format("Undo: Undoing last event {0} (reverse event calculated as {1})", lastEventStr, undoEventStr));
+
             SetValue("me:isUndoing", true, string.Empty);
             SetValue("user:intent:event", undoEventStr, string.Empty);
         }
     }
 
     void ForgetFocusObject() {
+        Debug.Log(string.Format("Undo: forgetting focus object {0}", DataStore.GetStringValue("user:intent:object")));
         SetValue("user:intent:object", string.Empty, string.Empty);
         SetValue("me:intent:action", "unreach", string.Empty);
-        SetValue("me:intent:targetName", "unreach", string.Empty);
     }
 
     void CheckServoStatus(object sender, ElapsedEventArgs e) {

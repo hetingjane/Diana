@@ -5528,9 +5528,9 @@ MonoBehaviour:
     weight: 100
     targets:
     - blendShape: BrowsDown_Left
-      weight: 50
+      weight: 40
     - blendShape: BrowsDown_Right
-      weight: 50
+      weight: 40
     - blendShape: Frown_Left
       weight: 50
     - blendShape: Frown_Right
@@ -5539,19 +5539,23 @@ MonoBehaviour:
       weight: 0
     - blendShape: MouthNarrow_Left
       weight: 0
+    - blendShape: BrowsOuterLower_Left
+      weight: 100
+    - blendShape: BrowsOuterLower_Right
+      weight: 100
   - name: concentration
     weight: 100
     targets:
     - blendShape: BrowsUp_Left
-      weight: 30
+      weight: 25
     - blendShape: BrowsUp_Right
-      weight: 30
+      weight: 25
     - blendShape: EyesWide_Left
-      weight: 30
+      weight: 25
     - blendShape: EyesWide_Right
-      weight: 30
+      weight: 25
     - blendShape: MouthOpen
-      weight: 5
+      weight: 4
   - name: confusion
     weight: 100
     targets:
@@ -5562,11 +5566,11 @@ MonoBehaviour:
     - blendShape: Squint_Left
       weight: 30
     - blendShape: NoseScrunch_Left
-      weight: 30
+      weight: 25
     - blendShape: NoseScrunch_Right
-      weight: 30
+      weight: 25
     - blendShape: Jaw_Down
-      weight: 30
+      weight: 15
     - blendShape: Squint_Right
       weight: 30
   - name: joy
@@ -5576,6 +5580,16 @@ MonoBehaviour:
       weight: 80
     - blendShape: Smile_Right
       weight: 80
+    - blendShape: MouthOpen
+      weight: 1
+    - blendShape: BrowsUp_Left
+      weight: 5
+    - blendShape: BrowsUp_Right
+      weight: 5
+    - blendShape: EyesWide_Left
+      weight: 5
+    - blendShape: EyesWide_Right
+      weight: 5
 --- !u!137 &799875429 stripped
 SkinnedMeshRenderer:
   m_CorrespondingSourceObject: {fileID: 8099405383717301183, guid: 5513b84b0fc9b4d2c8a2f2d54403a352,
@@ -8244,12 +8258,12 @@ PrefabInstance:
     - target: {fileID: 8099405383717301183, guid: 5513b84b0fc9b4d2c8a2f2d54403a352,
         type: 3}
       propertyPath: m_BlendShapeWeights.Array.data[6]
-      value: 60
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 8099405383717301183, guid: 5513b84b0fc9b4d2c8a2f2d54403a352,
         type: 3}
       propertyPath: m_BlendShapeWeights.Array.data[7]
-      value: 60
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 8099405383717301183, guid: 5513b84b0fc9b4d2c8a2f2d54403a352,
         type: 3}
@@ -8334,7 +8348,7 @@ PrefabInstance:
     - target: {fileID: 8099405383717301183, guid: 5513b84b0fc9b4d2c8a2f2d54403a352,
         type: 3}
       propertyPath: m_BlendShapeWeights.Array.data[16]
-      value: 0
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 8099405383717301183, guid: 5513b84b0fc9b4d2c8a2f2d54403a352,
         type: 3}
@@ -8364,6 +8378,21 @@ PrefabInstance:
     - target: {fileID: 8099405383717301183, guid: 5513b84b0fc9b4d2c8a2f2d54403a352,
         type: 3}
       propertyPath: m_BlendShapeWeights.Array.data[49]
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8099405383717301183, guid: 5513b84b0fc9b4d2c8a2f2d54403a352,
+        type: 3}
+      propertyPath: m_BlendShapeWeights.Array.data[27]
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8099405383717301183, guid: 5513b84b0fc9b4d2c8a2f2d54403a352,
+        type: 3}
+      propertyPath: m_BlendShapeWeights.Array.data[18]
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8099405383717301183, guid: 5513b84b0fc9b4d2c8a2f2d54403a352,
+        type: 3}
+      propertyPath: m_BlendShapeWeights.Array.data[11]
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8099405383720516379, guid: 5513b84b0fc9b4d2c8a2f2d54403a352,
@@ -10270,6 +10299,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1278411396}
   m_CullTransparentMesh: 0
+--- !u!114 &1287634396 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8370107686997645972, guid: 1d104b2c6fd8e45d9a2953c2779e4ad0,
+    type: 3}
+  m_PrefabInstance: {fileID: 2029239242}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e09b983fd382e403cbda846a3ceb4b75, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &1291544163 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4836846081410544, guid: fb9fefddb78e7bc4da8e32aad5c490f0,
@@ -13501,9 +13542,10 @@ MonoBehaviour:
   comment: 
   display: {fileID: 0}
   stateMachine: {fileID: 1463965744}
-  servoLoopTimerTime: 10
+  servoLoopTimerTime: 20
   grabbableBlocks: {fileID: 184680267}
   demoSurface: {fileID: 672448213}
+  voxmlLibrary: {fileID: 1287634396}
 --- !u!114 &1831328035
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15089,9 +15131,10 @@ MonoBehaviour:
   comment: 
   display: {fileID: 0}
   eventManager: {fileID: 1725009506}
+  voxmlLibrary: {fileID: 1287634396}
   grabbableBlocks: {fileID: 184680267}
   demoSurface: {fileID: 672448213}
-  servoSpeed: 0.05
+  servoSpeed: 0.02
 --- !u!1 &2054860432
 GameObject:
   m_ObjectHideFlags: 0

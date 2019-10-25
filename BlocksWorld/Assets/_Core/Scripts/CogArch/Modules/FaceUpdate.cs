@@ -128,7 +128,7 @@ public class FaceUpdate : ModuleBase
         {
             if (userEmotion == "joy") SetValue("me:emotion", "joy+concentration", "Diana is happy and concentrated");
             else if (userEmotion == "angry") SetValue("me:emotion", "frustration+concentration", "Diana is frustrated and concentrated");
-            else SetValue("me:emotion", "concentration", "Diana is concentrated");
+            else if (dianaEmotion != "greet" && dianaEmotion != "confusion") SetValue("me:emotion", "concentration", "Diana is concentrated");
 
         }
         if (!userPointing)
