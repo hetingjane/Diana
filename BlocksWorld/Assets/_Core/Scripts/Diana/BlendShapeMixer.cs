@@ -73,7 +73,6 @@ public class BlendShapeMixer : MonoBehaviour
                 if (tv.blendShape.Contains("Smile")) totalWeight[tv.blendShape] = 30;
                 else if (tv.blendShape.Contains("BrowsOuterLower")) totalWeight[tv.blendShape] = 50;
                 else if (tv.blendShape.Contains("MouthNarrow")) totalWeight[tv.blendShape] = 15;
-
                 else totalWeight[tv.blendShape] = 0;
             }
         }
@@ -111,10 +110,14 @@ public class BlendShapeMixer : MonoBehaviour
             {
                 foreach (var tv in exp.targets)
                 {
-                    if (tv.blendShape.Contains("Smile")) totalWeight[tv.blendShape] = 30;
-                    else if (tv.blendShape.Contains("BrowsOuterLower")) totalWeight[tv.blendShape] = 50;
-                    else if (tv.blendShape.Contains("MouthNarrow")) totalWeight[tv.blendShape] = 15;
-                    else totalWeight[tv.blendShape] = 0;
+                    if (!totalWeight.ContainsKey(tv.blendShape))
+                    {
+                        if (tv.blendShape.Contains("Smile")) totalWeight[tv.blendShape] = 30;
+                        else if (tv.blendShape.Contains("BrowsOuterLower")) totalWeight[tv.blendShape] = 50;
+                        else if (tv.blendShape.Contains("MouthNarrow")) totalWeight[tv.blendShape] = 15;
+                    }
+
+                    //else totalWeight[tv.blendShape] = 0;
                 }
             }
 
