@@ -390,20 +390,24 @@ public class EventManagementModule : ModuleBase
             } 
             else if (key == "user:intent:partialEvent")
             {
-                // if no variables left in the composed event string
                 if (!string.IsNullOrEmpty(eventStr))
                 {
+                    // if no variables left in the composed event string
                     if (!Regex.IsMatch(eventStr, @"\{[0-1]+\}"))
                     {
-                        Debug.Log(string.Format("Composed object {0}, action {1}, and location {2} into event {3}",
-	                        objectStr, actionStr, GlobalHelper.VectorToParsable(locationPos), eventStr));
-                            
-	                    if (!string.IsNullOrEmpty(objectStr)) {
-	                        SetValue("me:lastTheme",objectStr,string.Empty);
-	                        SetValue("me:lastThemePos",GameObject.Find(objectStr).transform.position,string.Empty);
-	                    }
-	                    
-	                	SetValue("user:intent:event", eventStr, string.Empty);
+                        if (eventStr.Count(f => f == '(') == eventStr.Count(f => f == ')') &&
+                            (eventStr.Count(f => f == '(') + eventStr.Count(f => f == ')') > 0)
+                        {
+                            Debug.Log(string.Format("Composed object {0}, action {1}, and location {2} into event {3}",
+    	                        objectStr, actionStr, GlobalHelper.VectorToParsable(locationPos), eventStr));
+                                
+    	                    if (!string.IsNullOrEmpty(objectStr)) {
+    	                        SetValue("me:lastTheme",objectStr,string.Empty);
+    	                        SetValue("me:lastThemePos",GameObject.Find(objectStr).transform.position,string.Empty);
+    	                    }
+    	                    
+    	                	SetValue("user:intent:event", eventStr, string.Empty);
+                        }
                     }
                     else
                     {
