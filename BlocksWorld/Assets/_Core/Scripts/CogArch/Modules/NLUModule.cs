@@ -10,6 +10,7 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 using VoxSimPlatform.Network;
 
@@ -156,24 +157,24 @@ public class NLUModule : ModuleBase
 
         // add anaphor placeholder
         if (mapped.Split().Contains("one")) {
-            mapped = mapped.Replace("one", "{2}");
+            mapped = Regex.Replace(mapped, @"\bone\b", "{2}");
         }
         else if (mapped.Split().Contains("ones")) {
-            mapped = mapped.Replace("ones", "{2}");
+            mapped = Regex.Replace(mapped, @"\bones\b", "{2}");
         }
 
         if (mapped.Split().Contains("it")) {
-            mapped = mapped.Replace("it", "{0}");
+            mapped = Regex.Replace(mapped, @"\bit\b", "{0}");
         }
         else if (mapped.Split().Contains("them")) {
-            mapped = mapped.Replace("them", "{0}");
+            mapped = Regex.Replace(mapped, @"\bthem\b", "{0}");
         }
 
         if (mapped.Contains("there")) {
-            mapped = mapped.Replace("there", "{1}");
+            mapped = Regex.Replace(mapped, @"\bthere\b", "{1}");
         }
         else if (mapped.Contains("here")) {
-	        mapped = mapped.Replace("here", "{1}");
+            mapped = Regex.Replace(mapped, @"\bhere\b", "{1}");
         }
 
         return mapped;
