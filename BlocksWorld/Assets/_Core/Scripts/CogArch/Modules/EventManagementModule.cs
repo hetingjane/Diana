@@ -315,6 +315,7 @@ public class EventManagementModule : ModuleBase
                         if (actionStr.Contains("{0}"))
                         {
                             eventStr = actionStr.Replace("{0}", objectStr);
+                            SetValue("user:intent:partialEvent", eventStr, string.Empty);
                         }
                     }
                     else if (!string.IsNullOrEmpty(lastTheme))
@@ -322,6 +323,7 @@ public class EventManagementModule : ModuleBase
                         if (actionStr.Contains("{0}"))
                         {
                             eventStr = actionStr.Replace("{0}", lastTheme);
+                            SetValue("user:intent:partialEvent", eventStr, string.Empty);
                         }
                     }
 
@@ -330,10 +332,9 @@ public class EventManagementModule : ModuleBase
                         if (actionStr.Contains("{1}"))
                         {
                             eventStr = actionStr.Replace("{1}", GlobalHelper.VectorToParsable(locationPos));
+                            SetValue("user:intent:partialEvent", eventStr, string.Empty);
                         }
                     }
-
-	                SetValue("user:intent:partialEvent", eventStr, string.Empty);
                 }
             }
             else if (key == "user:intent:location")
@@ -803,7 +804,9 @@ public class EventManagementModule : ModuleBase
         //  otherwise, Diana should indicate the entity and prompt for more information
 
         if (((EventReferentArgs)e).Referent is string) {
-            SetValue("user:intent:object", ((EventReferentArgs)e).Referent as string, string.Empty);
+            if (string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:object"))) {
+                SetValue("user:intent:object", ((EventReferentArgs)e).Referent as string, string.Empty);
+            }
 
             if (!string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:event"))) {
                 // currently executing an event
