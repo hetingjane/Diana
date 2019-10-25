@@ -178,7 +178,7 @@ public class EventManagementModule : ModuleBase
             
             if (!DataStore.GetBoolValue("me:isUndoing"))
             {
-                if (DialogueUtility.GetPredicateType(GlobalHelper.GetTopPredicate(eventStr),voxmlLibrary) != "programs")
+                if (DialogueUtility.GetPredicateType(GlobalHelper.GetTopPredicate(eventStr),voxmlLibrary) == "programs")
                 {
                     Debug.Log(string.Format("Setting last event {0}", DataStore.GetStringValue("user:intent:event")));
                     SetValue("user:intent:lastEvent", DataStore.GetStringValue("user:intent:event"),
