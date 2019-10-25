@@ -3,7 +3,7 @@ import numpy as np
 from realtime_hand_recognition import RealTimeHandRecognition, RealTimeHandRecognitionOneShot
 from kinect import Kinect
 from socket_api import SocketAPI
-from postures import left_hand_postures, right_hand_postures
+from postures import hand_postures
 
 # kinect frame processing settings
 SEGMENT_SIZE = 224  # the resulting size of the segmented depth frame (square)
@@ -30,29 +30,40 @@ class DepthClient:
                 print("Socket didn't start, waiting 3 seconds...")
                 time.sleep(3)
         print("Connected!")
-        self.HandModel = RealTimeHandRecognition("RH", 32, 2)
+        self.HandModel = RealTimeHandRecognition("RH", 32, 2, len(hand_postures) - 1)
+        
+    def get_labels(self, idx_L, idx_R):
+        label_L = hand_postures[idx_L]
+        if label_L == '':
+            label_L = 'other'
+        else:
+            label_L = label_L.replace("DIRECTION", "right")
+        
+        label_R = hand_postures[idx_R]
+        if label_R == '':
+            label_R = 'other'
+        else:
+            label_R = label_R.replace("DIRECTION", "left")
+        
+        return label_L, label_R
 
     def run(self):
         while True:
             frames = self.kinect.get()
             if frames is None:
                 print("waiting for frames...")
-                continue
-            time.sleep(1/60)
-            LH_out, RH_out = self.HandModel.classifyLR(frames[0], frames[1])
-            LH_idx = np.argmax(LH_out)
-            LH_label = left_hand_postures[LH_idx][3:]
-            RH_idx = np.argmax(RH_out)
-            RH_label = right_hand_postures[RH_idx][3:]
-            self.socket_api.set("user:hands:left", LH_label)
-            self.socket_api.set("user:hands:right", RH_label)
-            print(LH_label, RH_label)
+            else: #elif self.kinect.kinect.has_new_body_frame():
+                LH_pred, RH_pred = self.HandModel.get_predsmax(frames[0], frames[1])
+                LH_label, RH_label = self.get_labels(LH_pred, RH_pred)
+                self.socket_api.set("user:hands:left", LH_label)
+                self.socket_api.set("user:hands:right", RH_label)
+                print(LH_label, RH_label)
             
-            #import cv2
-            #fram = np.squeeze(np.hstack((frames[0], frames[1])))
-            #fram = np.vstack((fram, np.fliplr(fram)))
-            #cv2.imshow("frams", fram)
-            #cv2.waitKey(6)
+                #import cv2
+                #fram = np.squeeze(np.hstack((frames[0], frames[1])))
+                #fram = np.vstack((fram, np.fliplr(fram)))
+                #cv2.imshow("frams", fram)
+                #cv2.waitKey(6)
 
 if __name__ == '__main__':
     print("starting")

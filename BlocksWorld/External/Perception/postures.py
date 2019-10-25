@@ -25,13 +25,14 @@ right_hand_postures = ['rh blank', 'rh hands together', 'rh other', 'rh beckon',
                        'rh teaching',
                        'rh taught gesture 1', 'rh taught gesture 2', 'rh taught gesture 3',
                        'rh blind']
+
 excl_hand_postures = [0, 1, 2, 5, 6, 7, 9, 12, 14, 15, 16, 17, 19, 21, 23, 25, 26, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38]
 
 hand_postures = ['', '', '', 'beckon', 'claw down',
                        '', '', '', 'closed back',
-                       '', 'closed front', 'closed', '',
+                       '', 'closed front', 'closed DIRECTION', '',
                        'five front', '', '', '', '',
-                       'open back', '', 'open', '',
+                       'open back', '', 'closed DIRECTION', '',
                        'point front', '', 'stop', '',
                        '', 'thumbs down', 'thumbs up', '',
                        '', '',
@@ -40,13 +41,12 @@ hand_postures = ['', '', '', 'beckon', 'claw down',
                        '', '', '',
                        'blind']
 
-for i in range(len(hand_postures)):
-    print(hand_postures[i], end=' ')
-    if i in excl_hand_postures:
-        print('EXCLUDED', i)
-    else:
-        print()
-        
+#for i in range(len(hand_postures)):
+#    print(hand_postures[i], end=' ')
+#    if i in excl_hand_postures:
+#        print('EXCLUDED', i)
+#    else:
+#        print()        
 
 left_arm_motions = ['la move right', 'la move left', 'la move up', 'la move down', 'la move back',
                     'la move front', 'la move right up', 'la move right down', 'la move right back',

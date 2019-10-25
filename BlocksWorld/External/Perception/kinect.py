@@ -52,8 +52,6 @@ class Kinect:
 
         self.latest_frames = None
 
-        self.active_arm_threshold = 0.16
-        self.pixel_intensity_threshold = 0.4
         self.engage_min = engage_min
         self.engage_max = engage_max
         self.sensor_height = 424
@@ -66,35 +64,55 @@ class Kinect:
         self.fallback_size = 200
 
         self._bodies = None
+        
+    def CropImage(self, depth, com):
+        cube_size_z = 300
+        cube_size = 396
+        img_size = 168
 
-    def _is_bright(self, depth_frame):
-        #hand_arr = np.squeeze(depth_frame)
+        fx = 288.03
+        fy = 287.07
 
-        bright_corners = np.sum([depth_frame[i, j] > self.pixel_intensity_threshold for i in [0, -1] for j in [0, -1]])
-        return bright_corners >= 3
+        u, v, d = com
 
-    def _is_gesture(self, hand, frame_pieces, posx, posy):
-        """we don't want to process frames when user is not engaged or hands are resting (at/near spine base y or z)"""
 
-        if len(frame_pieces) != 0:
-            spine_base_ind = 0
-            if hand == "RH":
-                hand_ind = 11
-            else:
-                hand_ind = 7
-            spine_base_y = frame_pieces[spine_base_ind * 9 + 8]
-            spine_base_z = frame_pieces[spine_base_ind * 9 + 9]
+        if d == 0:
+            return np.ones((img_size,img_size),"uint16")*255
 
-            hand_y = frame_pieces[hand_ind * 9 + 8]
-            hand_z = frame_pieces[hand_ind * 9 + 9]
+        zstart = d - cube_size_z / 2.
+        zend = d + cube_size_z / 2.
+
+        xstart = int(math.floor((u * d / fx - cube_size / 2.) / d * fx))
+        xend = int(math.floor((u * d / fx + cube_size / 2.) / d * fx))
+
+        ystart = int(math.floor((v * d / fy - cube_size / 2.) / d * fy))
+        yend = int(math.floor((v * d / fy + cube_size / 2.) / d * fy))
+
+        cropped = depth[max(ystart, 0):min(yend, depth.shape[0]), max(xstart, 0):min(xend, depth.shape[1])].copy()
+
+        cropped = np.pad(cropped, ((abs(ystart)-max(ystart, 0), abs(yend)-min(yend, depth.shape[0])),
+                                    (abs(xstart)-max(xstart, 0), abs(xend)-min(xend, depth.shape[1]))), mode='constant', constant_values=0)
+
+        msk1 = np.bitwise_and(cropped < zstart, cropped != 0)
+        msk2 = np.bitwise_and(cropped > zend, cropped != 0)
+        msk3 = cropped == 0
+
+        cropped[msk1] = zstart
+        cropped[msk2] = zend
+        cropped[msk3] = zend
+
+        dsize = (img_size, img_size)
+        wb = (xend - xstart)
+        hb = (yend - ystart)
+        if wb > hb:
+            sz = (dsize[0], hb * dsize[0] / wb)
         else:
-            return False
+            sz = (wb * dsize[1] / hb, dsize[1])
+        rz = cv2.resize(cropped, sz).astype(np.float32)
 
-        if (posx == -1 and posy == -1) or \
-                ((hand_y < spine_base_y) and ((spine_base_z - hand_z) < self.active_arm_threshold)) or \
-                (spine_base_z < hand_z):
-            return False
-        return True
+        rz = ((rz - d) / (cube_size_z / 2))
+
+        return rz
 
     def _segment(self, depth_data, joints, joints_to_segment):
         x_start = 0
@@ -155,7 +173,16 @@ class Kinect:
             segmented = resize(segmented, (168, 168))
             segmented = segmented[20:-20, 20:-20]
             segmented = segmented.reshape((1, 128, 128, 1))
-            segmented_frames.append(segmented)
+            
+            spine_base_x = joints[JointType_SpineBase].x
+            spine_base_y = joints[JointType_SpineBase].y
+            spine_base_z = np.mean(
+                hand_arr[int(spine_base_y) - z_space:int(spine_base_y) + z_space, 
+                         int(spine_base_x) - z_space:int(spine_base_x) + z_space])
+
+            
+            segmented_frames.append((segmented, 
+                y, z, spine_base_y, spine_base_z))
 
         return segmented_frames
 
