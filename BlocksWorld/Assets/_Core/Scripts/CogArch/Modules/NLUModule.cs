@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
+using VoxSimPlatform.Global;
 using VoxSimPlatform.Network;
 
 public class NLUModule : ModuleBase
@@ -133,6 +134,10 @@ public class NLUModule : ModuleBase
         }
         else if (mapped.Contains("on the top of")) {
             mapped = mapped.Replace("on the top of", "on");
+        }
+        else if (mapped.Contains("next to")) {
+            mapped = mapped.Replace("next to",
+                new List<string>() { "left of", "right of" }[RandomHelper.RandomInt(0, 1, (int)RandomHelper.RangeFlags.MaxInclusive)]);
         }
 
         // insert "one" after "this"/"that" if not already followed by noun
