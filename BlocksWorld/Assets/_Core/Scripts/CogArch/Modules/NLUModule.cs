@@ -56,6 +56,7 @@ public class NLUModule : ModuleBase
             // do nevermind
             SetValue("user:intent:isNevermind", true, string.Empty);
             input = input.Replace("never mind", "").Replace("wait", "").Trim();
+            SetValue("user:intent:isNevermind", false, string.Empty);
         }
 
         string mapped = MapTerms(input);
