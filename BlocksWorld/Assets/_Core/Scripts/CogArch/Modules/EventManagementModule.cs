@@ -771,7 +771,6 @@ public class EventManagementModule : ModuleBase
 
                 if (string.IsNullOrEmpty(DataStore.GetStringValue("me:holding"))) {
                     SetValue("user:intent:object",DataStore.StringValue.Empty,string.Empty);
-                    SetValue("me:lastThemePos",DataStore.Vector3Value.Zero,string.Empty);
                 }
 
                 SetValue("user:intent:action",DataStore.StringValue.Empty,string.Empty);
