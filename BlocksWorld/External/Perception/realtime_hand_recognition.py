@@ -73,16 +73,12 @@ class RealTimeHandRecognition:
         else:
             self.past_probs_L = (self.past_probs_L + LH_probs) / 2
 
-        max_prediction_LH = np.argmax(self.past_probs_L)
-
         if self.past_probs_R is None:
             self.past_probs_R = RH_probs
         else:
             self.past_probs_R = (self.past_probs_R+RH_probs)/2
 
-        max_prediction_RH = np.argmax(self.past_probs_R)
-
-        return (max_prediction_LH, self.past_probs_L), (max_prediction_RH, self.past_probs_R)
+        return self.past_probs_L, self.past_probs_R
 
 
 class RealTimeHandRecognitionOneShot(RealTimeHandRecognition):

@@ -39,18 +39,20 @@ class DepthClient:
                 print("waiting for frames...")
                 continue
             time.sleep(1/60)
-            (LH_probs, LH_out), (RH_probs, RH_out) = self.HandModel.classifyLR(frames[0], frames[1])
+            LH_out, RH_out = self.HandModel.classifyLR(frames[0], frames[1])
             LH_idx = np.argmax(LH_out)
             LH_label = left_hand_postures[LH_idx][3:]
             RH_idx = np.argmax(RH_out)
             RH_label = right_hand_postures[RH_idx][3:]
-            #self.socket_api.send_to_server("user:hands:left:probs", LH_out)
-            #self.socket_api.set("user:hands:left:argmax", int(LH_idx))
             self.socket_api.set("user:hands:left", LH_label)
-            #self.socket_api.send_to_server("user:hands:right:probs", RH_out)
-            #self.socket_api.set("user:hands:right:argmax", int(RH_idx))
             self.socket_api.set("user:hands:right", RH_label)
             print(LH_label, RH_label)
+            
+            #import cv2
+            #fram = np.squeeze(np.hstack((frames[0], frames[1])))
+            #fram = np.vstack((fram, np.fliplr(fram)))
+            #cv2.imshow("frams", fram)
+            #cv2.waitKey(6)
 
 if __name__ == '__main__':
     print("starting")

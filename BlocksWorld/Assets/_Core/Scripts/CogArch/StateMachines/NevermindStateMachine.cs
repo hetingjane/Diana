@@ -17,7 +17,7 @@ public class NevermindStateMachine : RuleStateMachine<NevermindState>
 				string leftHandGesture = DataStore.GetStringValue("user:hands:left");
 				string rightHandGesture = DataStore.GetStringValue("user:hands:right");
 
-				return leftHandGesture == "stop" || rightHandGesture == "stop";
+				return leftHandGesture == "stop" || rightHandGesture == "stop" || leftHandGesture == "five front" || rightHandGesture == "five front";
 			}
 
 			return false;
@@ -34,7 +34,7 @@ public class NevermindStateMachine : RuleStateMachine<NevermindState>
 				string leftHandGesture = DataStore.GetStringValue("user:hands:left");
 				string rightHandGesture = DataStore.GetStringValue("user:hands:right");
 
-				return leftHandGesture != "stop" && rightHandGesture != "stop";
+				return leftHandGesture != "stop" && rightHandGesture != "stop" && leftHandGesture != "five front" && rightHandGesture != "five front";
 			}
 		}, 100));
 	}

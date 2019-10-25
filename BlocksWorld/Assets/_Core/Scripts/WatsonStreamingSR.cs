@@ -24,9 +24,21 @@ public class WatsonStreamingSR : ModuleBase
 	[Header("Control Options")]
 	public bool pushToTalk = false;
 	public KeyCode talkKey = KeyCode.RightShift;
-	
-	[Header("SR Options")]
-	public string[] keywords;
+
+    [Header("SR Options")]
+    public string[] keywords =
+    {
+        "yes", "no", "of", "to", "the", "hello", "I", "me", "diana", "you",
+        "what", "where", "which", "what's", "who", "can", "do", "could", "would", "please",
+        "never", "mind", "wait", "pick", "up", "lift", "grab", "grasp", "take", "move", "put", "move", "push", "pull", "slide", "place",
+        "undo", "enough", "point", "where",
+        "box", "block", "blocks", "boxes", "mug", "mugs", "cup", "cups", "knife", "knives", "plate", "plates",
+        "one", "ones", "one's",
+        "this", "those", "that", "these", "them", "that's", "they", "they're", "are", "were", "is",
+        "yellow", "red", "blue", "purple", "green", "orange", "white", "gray", "black", "pink", "brown",
+        "left", "right", "front", "above", "below", "behind", "in", "on", "front", "back", "top",
+        "here", "there", "near", "next", "beside", "before", "around"
+    };
 	[Range(0,1)] public float keywordThreshold = 0.5f;
 	
 	[Header("Feedback")]

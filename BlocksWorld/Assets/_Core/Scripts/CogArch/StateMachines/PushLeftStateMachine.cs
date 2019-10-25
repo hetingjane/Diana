@@ -19,7 +19,7 @@ public class PushLeftStateMachine : RuleStateMachine<PushLeftState>
 				return (rightHandGesture == "open left" || rightHandGesture == "closed left") && rightArmMotion == "move left";
 			}
 			return false;
-		}, 300));
+		}, 200));
 
 		SetTransitionRule(PushLeftState.PushLeftStart, PushLeftState.PushLeftStop, new TimedRule(() =>
 		{
@@ -33,6 +33,6 @@ public class PushLeftStateMachine : RuleStateMachine<PushLeftState>
 				string rightArmMotion = DataStore.GetStringValue("user:arms:right");
 				return (rightHandGesture != "open left" && rightHandGesture != "closed left") || rightArmMotion != "move left";
 			}
-		}, 100));
+		}, 80));
 	}
 }
