@@ -413,6 +413,14 @@ public class EventManagementModule : ModuleBase
 	                        	SetValue("user:intent:partialEvent", eventStr, string.Empty);
 	                        }
                         }
+                        else if (eventStr.Contains("{1}"))
+                        {
+                            if (locationPos != default)
+                            {
+                                eventStr = eventStr.Replace("{1}", GlobalHelper.VectorToParsable(locationPos));
+                                SetValue("user:intent:partialEvent", eventStr, string.Empty);
+                            }
+                        }
                     }
                 }
             }
@@ -470,6 +478,14 @@ public class EventManagementModule : ModuleBase
                             if (!string.IsNullOrEmpty(objectStr))
                             {
                                 appendEventStr = appendEventStr.Replace("{0}", objectStr);
+                                SetValue("user:intent:append:partialEvent", appendEventStr, string.Empty);
+                            }
+                        }
+                        else if (appendEventStr.Contains("{1}"))
+                        {
+                            if (locationPos != default)
+                            {
+                                appendEventStr = appendEventStr.Replace("{1}", GlobalHelper.VectorToParsable(locationPos));
                                 SetValue("user:intent:append:partialEvent", appendEventStr, string.Empty);
                             }
                         }
