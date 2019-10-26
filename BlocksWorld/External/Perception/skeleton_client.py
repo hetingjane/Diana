@@ -27,8 +27,8 @@ class SkeletonClient:
                 print("Socket didn't start, waiting 3 seconds...")
                 time.sleep(3)
         print("Connected!")
-        self.model = armsolver.ArmMotionRecogntion()
-        #self.model = armsolver.PrimalRecognition()
+        #self.model = armsolver.ArmMotionRecogntion()
+        self.model = armsolver.PrimalRecognition()
 
     def run(self):
         while True:
