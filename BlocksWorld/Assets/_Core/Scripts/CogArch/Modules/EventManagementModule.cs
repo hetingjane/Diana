@@ -807,7 +807,7 @@ public class EventManagementModule : ModuleBase
                 SetValue("user:intent:object", ((EventReferentArgs)e).Referent as string, string.Empty);
             }
 
-            if (!string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:event"))) {
+            //if (!string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:event"))) {
                 // currently executing an event
                 //if (DataStore.GetStringValue("me:lastTheme") != DataStore.GetStringValue("user:intent:object")) {
                     // "pick up the yellow block"
@@ -819,7 +819,7 @@ public class EventManagementModule : ModuleBase
                     SetValue("me:lastTheme",objectStr,string.Empty);
                     SetValue("me:lastThemePos",GameObject.Find(objectStr).transform.position,string.Empty);
                 //}
-            }
+            //}
         }
     }
 
