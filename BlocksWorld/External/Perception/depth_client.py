@@ -52,18 +52,12 @@ class DepthClient:
             frames = self.kinect.get()
             if frames is None:
                 print("waiting for frames...")
-            else: #elif self.kinect.kinect.has_new_body_frame():
+            else:
                 LH_pred, RH_pred = self.HandModel.get_predsmax(frames[0], frames[1])
                 LH_label, RH_label = self.get_labels(LH_pred, RH_pred)
                 self.socket_api.set("user:hands:left", LH_label)
                 self.socket_api.set("user:hands:right", RH_label)
                 print(LH_label, RH_label)
-            
-                #import cv2
-                #fram = np.squeeze(np.hstack((frames[0], frames[1])))
-                #fram = np.vstack((fram, np.fliplr(fram)))
-                #cv2.imshow("frams", fram)
-                #cv2.waitKey(6)
 
 if __name__ == '__main__':
     print("starting")

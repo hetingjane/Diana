@@ -59,7 +59,7 @@ class RealTimeHandRecognition:
         hand_close_to_body = (spine_base_z - hand_z) < self.active_arm_threshold
         hand_behind = spine_base_z < hand_z
         
-        print('low', hand_low, 'close', hand_close_to_body, 'behind', hand_behind, end='\t')
+        #print('low', hand_low, 'close', hand_close_to_body, 'behind', hand_behind, end='\t')
         
         if hand_behind or (hand_low and hand_close_to_body):
             self.past_probs_L = None
@@ -88,7 +88,7 @@ class RealTimeHandRecognition:
         input_shape = list(frame_L.shape)
         input_shape[0] = 2
         input = np.empty(input_shape)
-        input[0] = np.flipud(frame_L)
+        input[0] = np.fliplr(np.squeeze(frame_L))[:,:,np.newaxis]
         input[1] = frame_R
         (predictions) = self.sess.run(self.model.predictions, feed_dict={self.model._images: input})
 

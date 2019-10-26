@@ -64,55 +64,6 @@ class Kinect:
         self.fallback_size = 200
 
         self._bodies = None
-        
-    def CropImage(self, depth, com):
-        cube_size_z = 300
-        cube_size = 396
-        img_size = 168
-
-        fx = 288.03
-        fy = 287.07
-
-        u, v, d = com
-
-
-        if d == 0:
-            return np.ones((img_size,img_size),"uint16")*255
-
-        zstart = d - cube_size_z / 2.
-        zend = d + cube_size_z / 2.
-
-        xstart = int(math.floor((u * d / fx - cube_size / 2.) / d * fx))
-        xend = int(math.floor((u * d / fx + cube_size / 2.) / d * fx))
-
-        ystart = int(math.floor((v * d / fy - cube_size / 2.) / d * fy))
-        yend = int(math.floor((v * d / fy + cube_size / 2.) / d * fy))
-
-        cropped = depth[max(ystart, 0):min(yend, depth.shape[0]), max(xstart, 0):min(xend, depth.shape[1])].copy()
-
-        cropped = np.pad(cropped, ((abs(ystart)-max(ystart, 0), abs(yend)-min(yend, depth.shape[0])),
-                                    (abs(xstart)-max(xstart, 0), abs(xend)-min(xend, depth.shape[1]))), mode='constant', constant_values=0)
-
-        msk1 = np.bitwise_and(cropped < zstart, cropped != 0)
-        msk2 = np.bitwise_and(cropped > zend, cropped != 0)
-        msk3 = cropped == 0
-
-        cropped[msk1] = zstart
-        cropped[msk2] = zend
-        cropped[msk3] = zend
-
-        dsize = (img_size, img_size)
-        wb = (xend - xstart)
-        hb = (yend - ystart)
-        if wb > hb:
-            sz = (dsize[0], hb * dsize[0] / wb)
-        else:
-            sz = (wb * dsize[1] / hb, dsize[1])
-        rz = cv2.resize(cropped, sz).astype(np.float32)
-
-        rz = ((rz - d) / (cube_size_z / 2))
-
-        return rz
 
     def _segment(self, depth_data, joints, joints_to_segment):
         x_start = 0
