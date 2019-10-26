@@ -52,6 +52,7 @@ class DepthClient:
             frames = self.kinect.get()
             if frames is None:
                 print("waiting for frames...")
+                time.sleep(1/60)
             else:
                 LH_pred, RH_pred = self.HandModel.get_predsmax(frames[0], frames[1])
                 LH_label, RH_label = self.get_labels(LH_pred, RH_pred)
