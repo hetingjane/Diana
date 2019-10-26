@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 
 using VoxSimPlatform.CogPhysics;
+using VoxSimPlatform.Global;
 using VoxSimPlatform.Vox;
 
 public enum GraspState
@@ -55,7 +56,7 @@ public class GraspModule : ModuleBase
 	/// <summary>
 	/// Current state
 	/// </summary>
-	private GraspState currentState;
+	public GraspState currentState;
 
 	// Start is called before the first frame update
 	protected override void Start()
@@ -134,7 +135,7 @@ public class GraspModule : ModuleBase
 					{
 						target = curTarget;
 						movePosition = curMovePosition;
-
+						
 						SetValue("me:intent:handPosR", movePosition, currentState.ToString());
 					}
 				}
@@ -142,19 +143,31 @@ public class GraspModule : ModuleBase
 			case GraspState.Reached:
 				if (action == holdAction)
 				{
+					GetCurrentTarget(out Voxeme curTarget, out Vector3 curMovePosition);
 
 					if (target != null)
 					{
-						held = target;
-						SetValue("me:holding", held.name, $"Holding {held.name}");
-						// Do not respond to forces/collisions
-						Rigging rigging = held.GetComponent<Rigging>();
-						if (rigging != null)
+						if (curTarget != target)	// target changed
 						{
-                            if (rigging.usePhysicsRig)
-                            {	rigging.ActivatePhysics(false);
-                                //RiggingHelper.RigTo(held.gameObject, hand.gameObject);
-                            }
+							SetValue("me:intent:action", "hold", string.Empty);
+							SetValue("me:intent:targetName", curTarget.name, string.Empty);
+							SetValue("me:intent:target",
+								GlobalHelper.GetObjectWorldSize(curTarget.gameObject).max, string.Empty);
+							currentState = GraspState.Idle;	// hack to restart reach
+						}
+						else
+						{
+							held = target;
+							SetValue("me:holding", held.name, $"Holding {held.name}");
+							// Do not respond to forces/collisions
+							Rigging rigging = held.GetComponent<Rigging>();
+							if (rigging != null)
+							{
+	                            if (rigging.usePhysicsRig)
+	                            {	rigging.ActivatePhysics(false);
+	                                //RiggingHelper.RigTo(held.gameObject, hand.gameObject);
+	                            }
+							}
 						}
 					}
 					else
