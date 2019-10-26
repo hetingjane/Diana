@@ -203,14 +203,14 @@ public class DialogueInteractionModule : ModuleBase
                     }
                 }
             }
-            else if (key == "user:lastPointedAt:position") {
-                if (string.IsNullOrEmpty(DataStore.GetStringValue("user:lastPointedAt:name"))) {
-                    if (DataStore.GetVector3Value(key) != default) {
-                        Debug.Log(string.Format("Setting user:intent:location to {0} ({1})", DataStore.GetVector3Value(key), key));
-                        SetValue("user:intent:location", DataStore.GetVector3Value(key), string.Empty);
-                    }
-                }
-            }
+            //else if (key == "user:lastPointedAt:position") {
+            //    if (string.IsNullOrEmpty(DataStore.GetStringValue("user:lastPointedAt:name"))) {
+            //        if (DataStore.GetVector3Value(key) != default) {
+            //            Debug.Log(string.Format("Setting user:intent:location to {0} ({1})", DataStore.GetVector3Value(key), key));
+            //            SetValue("user:intent:location", DataStore.GetVector3Value(key), string.Empty);
+            //        }
+            //    }
+            //}
             else if (key == "user:intent:object") {
                 if (!string.IsNullOrEmpty(DataStore.GetStringValue(key))) {
                     if (string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:action")) && 
