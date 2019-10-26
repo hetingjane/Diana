@@ -321,6 +321,8 @@ public class DialogueInteractionModule : ModuleBase
     }
 
     public void CleanUp(object content) {
+        SetValue("user:intent:isNevermind", true, string.Empty);
+        SetValue("user:intent:isNevermind", false, string.Empty);
         SetValue("me:speech:intent", "Bye!", string.Empty);
         SetValue("user:isInteracting", false, string.Empty);
     }
