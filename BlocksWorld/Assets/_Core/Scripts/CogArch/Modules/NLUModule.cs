@@ -52,11 +52,13 @@ public class NLUModule : ModuleBase
             input = input.Replace("no", "").Trim();
         }
         else if ((input.StartsWith("never mind")) || (input.StartsWith("wait")) ||
-            (input.StartsWith("no wait")))
+            (input.StartsWith("no wait")) || (input.StartsWith("wait stop")) || 
+            (input.StartsWith("stop")))
         {
             // do nevermind
             SetValue("user:intent:isNevermind", true, string.Empty);
-            input = input.Replace("never mind", "").Replace("wait", "").Replace("no wait", "").Trim();
+            input = input.Replace("never mind", "").Replace("wait", "").
+                Replace("no wait", "").Replace("wait stop", "").Replace("stop", "").Trim();
             SetValue("user:intent:isNevermind", false, string.Empty);
         }
 
