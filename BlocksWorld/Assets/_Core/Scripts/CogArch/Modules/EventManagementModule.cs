@@ -793,6 +793,9 @@ public class EventManagementModule : ModuleBase
             if (DataStore.GetBoolValue("me:isUndoing") == true) {
                 SetValue("me:isUndoing",false,string.Empty);
             }
+            else {
+                SetValue("user:intent:replaceContent",string.Empty,string.Empty);
+            }
         }
     }
    
