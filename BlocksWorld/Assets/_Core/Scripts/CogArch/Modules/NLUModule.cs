@@ -50,6 +50,12 @@ public class NLUModule : ModuleBase
             // do negack
             SetValue("user:intent:isNegack", true, string.Empty);
             input = input.Replace("no", "").Trim();
+
+            if (input != string.Empty)
+            {
+                // try to replace content
+                SetValue("user:intent:replaceContent", input, string.Empty);
+            }
         }
         else if ((input.StartsWith("never mind")) || (input.StartsWith("wait")) ||
             (input.StartsWith("no wait")) || (input.StartsWith("wait stop")) || 
@@ -60,6 +66,12 @@ public class NLUModule : ModuleBase
             input = input.Replace("never mind", "").Replace("wait", "").
                 Replace("no wait", "").Replace("wait stop", "").Replace("stop", "").Trim();
             SetValue("user:intent:isNevermind", false, string.Empty);
+
+            if (input != string.Empty)
+            {
+                // try to replace content
+                SetValue("user:intent:replaceContent", input, string.Empty);
+            }
         }
 
         string mapped = MapTerms(input);
