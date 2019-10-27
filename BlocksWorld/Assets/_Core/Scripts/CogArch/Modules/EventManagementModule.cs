@@ -286,16 +286,6 @@ public class EventManagementModule : ModuleBase
                             SetValue("user:intent:append:partialEvent", appendEventStr, string.Empty);
                         }
                     }
-                    else if (locationPos != default)
-                    {
-                        GameObject theme = GameObject.Find(objectStr);
-                        Vector3 targetLoc = new Vector3(locationPos.x, locationPos.y + GlobalHelper.GetObjectWorldSize(theme).extents.y, locationPos.z);
-                        if (!GlobalHelper.ContainingObjects(targetLoc).Contains(theme))
-                        {
-                            eventStr = "put({0},{1})".Replace("{0}", objectStr).Replace("{1}", GlobalHelper.VectorToParsable(targetLoc));
-                            SetValue("user:intent:partialEvent", eventStr, string.Empty);
-                        }
-                    }
                 }
             } 
             else if (key == "user:intent:action")
