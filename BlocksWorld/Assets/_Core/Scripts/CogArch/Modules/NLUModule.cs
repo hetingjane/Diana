@@ -54,7 +54,7 @@ public class NLUModule : ModuleBase
             if (input != string.Empty)
             {
                 // try to replace content
-                SetValue("user:intent:replaceContent", input, string.Empty);
+                SetValue("user:intent:replaceContent", communicationsBridge.NLParse(MapTerms(input)), string.Empty);
             }
         }
         else if ((input.StartsWith("never mind")) || (input.StartsWith("wait")) ||
