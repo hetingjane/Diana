@@ -298,6 +298,10 @@ public class EventManagementModule : ModuleBase
                             SetValue("user:intent:append:partialEvent", appendEventStr, string.Empty);
                         }
                     }
+
+                    if (!string.IsNullOrEmpty("user:intent:lastEvent")) {
+                        SetValue("user:intent:lastEvent", string.Empty, string.Empty);
+                    }
                 }
             } 
             else if (key == "user:intent:action")
