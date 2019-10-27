@@ -224,9 +224,8 @@ public class DialogueInteractionModule : ModuleBase
                     }
                 }
             }
-            else if (key == "user:communication") {
-                CommunicationValue comm = DataStore.GetValue("user:communication") as CommunicationValue;
-    	        Debug.Log(string.Format("User communication: {0} {1} {2} {3}", comm.val, comm.val.directAddress, comm.val.parse, comm.val.originalText));
+            else if (key == "user:intent:isPosack") {
+                SetValue("me:emtion", "joy", string.Empty);
             }
         }
     }
