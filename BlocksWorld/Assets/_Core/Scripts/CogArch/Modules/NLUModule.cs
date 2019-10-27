@@ -79,14 +79,16 @@ public class NLUModule : ModuleBase
         }
 
         if (string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:replaceContent"))) {
-            string mapped = MapTerms(input);
-    	    Debug.Log(string.Format("Diana's World: Heard you was talkin' \"{0}\".",mapped));
+            if (!string.IsNullOrEmpty(input)) {
+                string mapped = MapTerms(input);
+        	    Debug.Log(string.Format("Diana's World: Heard you was talkin' \"{0}\".",mapped));
 
-            string parsed = communicationsBridge.NLParse(mapped);
-            Debug.Log(string.Format("Diana's World: Heard you was talkin' \"{0}\".",parsed));
+                string parsed = communicationsBridge.NLParse(mapped);
+                Debug.Log(string.Format("Diana's World: Heard you was talkin' \"{0}\".",parsed));
 
-            if (parsed.Length > 0) {
-                SetValue("user:intent:partialEvent", parsed, string.Empty);
+                if (parsed.Length > 0) {
+                    SetValue("user:intent:partialEvent", parsed, string.Empty);
+                }
             }
         }
     }

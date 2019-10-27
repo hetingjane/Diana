@@ -213,6 +213,7 @@ public class EventManagementModule : ModuleBase
         if (DataStore.GetBoolValue("user:isInteracting"))
         {
             string eventStr = value.ToString().Trim();
+            Debug.Log(string.Format("Appending event {0}", eventStr));
             if (string.IsNullOrEmpty(eventStr)) return;
 
             if (!string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:replaceContent")))
@@ -787,7 +788,9 @@ public class EventManagementModule : ModuleBase
 	                    SetValue("me:intent:target","user",string.Empty);
 	                }
 	            }
+            }
 
+            if (DataStore.GetBoolValue("me:isUndoing") == true) {
                 SetValue("me:isUndoing",false,string.Empty);
             }
         }
@@ -829,10 +832,12 @@ public class EventManagementModule : ModuleBase
                 if ((((EventReferentArgs)e).Predicate as string) == 
                     GlobalHelper.GetTopPredicate(DataStore.GetStringValue("user:intent:append:event"))) {
                     // if this object falls directly under the scope of the event's main predicate
-                    SetValue("user:intent:object", ((EventReferentArgs)e).Referent as string, string.Empty);
-                    string objectStr = DataStore.GetStringValue("user:intent:object");
-                    SetValue("me:lastTheme",objectStr,string.Empty);
-                    SetValue("me:lastThemePos",GameObject.Find(objectStr).transform.position,string.Empty);
+                    if (!string.IsNullOrEmpty("user:intent:replaceContent")) {
+                        SetValue("user:intent:object", ((EventReferentArgs)e).Referent as string, string.Empty);
+                        string objectStr = DataStore.GetStringValue("user:intent:object");
+                        SetValue("me:lastTheme",objectStr,string.Empty);
+                        SetValue("me:lastThemePos",GameObject.Find(objectStr).transform.position,string.Empty);
+                    }
                 }
             }
         }

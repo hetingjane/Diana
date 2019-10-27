@@ -229,7 +229,7 @@ public class DialogueInteractionModule : ModuleBase
             }
             else if (key == "user:intent:isPosack") {
                 if (DataStore.GetBoolValue(key)) {
-                    SetValue("me:emtion", "joy", string.Empty);
+                    SetValue("me:emotion", "joy", string.Empty);
                 }
             }
         }
@@ -264,9 +264,19 @@ public class DialogueInteractionModule : ModuleBase
                     undoEventStr = string.Format("put({0},{1})",
                         DataStore.GetStringValue("me:lastTheme"),
                         GlobalHelper.VectorToParsable(DataStore.GetVector3Value("me:lastThemePos")));
-                }
-                else {
-                    SetValue("me:speech:intent", "I already undid that.  What else would you like me to do?", string.Empty);
+                    if ((DialogueUtility.GetPredicateType(GlobalHelper.GetTopPredicate(replacementContent), voxmlLibrary) == "attributes") || 
+                        (DialogueUtility.GetPredicateType(GlobalHelper.GetTopPredicate(replacementContent), voxmlLibrary) == "functions")) {
+                        string predArgs = lastEventStr.Split(new char[] { '(' }, 2)[1];
+                        predArgs = predArgs.Remove(predArgs.Length - 1);
+                        appendEventStr = string.Format(lastEventStr.Replace(predArgs.Split(',')[0], "{0}"), replacementContent);
+                    }
+                    else if (DialogueUtility.GetPredicateType(GlobalHelper.GetTopPredicate(replacementContent), voxmlLibrary) == "relations") {
+                        undoEventStr = string.Empty;
+
+                        string predArgs = lastEventStr.Split(new char[] { '(' }, 2)[1];
+                        predArgs = predArgs.Remove(predArgs.Length - 1);
+                        appendEventStr = string.Format(lastEventStr.Replace(predArgs.Split(',')[1], "{0}"), replacementContent);
+                    }
                 }
                 break;
 
@@ -275,9 +285,19 @@ public class DialogueInteractionModule : ModuleBase
                     undoEventStr = string.Format("slide({0},{1})",
                         DataStore.GetStringValue("me:lastTheme"),
                         GlobalHelper.VectorToParsable(DataStore.GetVector3Value("me:lastThemePos")));
-                }
-                else {
-                    SetValue("me:speech:intent", "I already undid that.  What else would you like me to do?", string.Empty);
+                    if ((DialogueUtility.GetPredicateType(GlobalHelper.GetTopPredicate(replacementContent), voxmlLibrary) == "attributes") || 
+                        (DialogueUtility.GetPredicateType(GlobalHelper.GetTopPredicate(replacementContent), voxmlLibrary) == "functions")) {
+                        string predArgs = lastEventStr.Split(new char[] { '(' }, 2)[1];
+                        predArgs = predArgs.Remove(predArgs.Length - 1);
+                        appendEventStr = string.Format(lastEventStr.Replace(predArgs.Split(',')[0], "{0}"), replacementContent);
+                    }
+                    else if (DialogueUtility.GetPredicateType(GlobalHelper.GetTopPredicate(replacementContent), voxmlLibrary) == "relations") {
+                        undoEventStr = string.Empty;
+
+                        string predArgs = lastEventStr.Split(new char[] { '(' }, 2)[1];
+                        predArgs = predArgs.Remove(predArgs.Length - 1);
+                        appendEventStr = string.Format(lastEventStr.Replace(predArgs.Split(',')[1], "{0}"), replacementContent);
+                    }
                 }
                 break;
 
@@ -286,9 +306,6 @@ public class DialogueInteractionModule : ModuleBase
                     undoEventStr = string.Format("slide({0},{1})",
                         DataStore.GetStringValue("me:lastTheme"),
                         GlobalHelper.VectorToParsable(DataStore.GetVector3Value("me:lastThemePos")));
-                }
-                else {
-                    SetValue("me:speech:intent", "I already undid that.  What else would you like me to do?", string.Empty);
                 }
                 break;
 
@@ -309,6 +326,14 @@ public class DialogueInteractionModule : ModuleBase
 
             if (string.IsNullOrEmpty(replacementContent)) {
                 SetValue("user:intent:replaceContent", string.Empty, string.Empty);
+            }
+        }
+        else {
+            if (!string.IsNullOrEmpty(appendEventStr)) {
+                Debug.Log(string.Format("Undo: Undoing last event {0} (alternate event calculated as {1})", lastEventStr, appendEventStr));
+
+                SetValue("me:isUndoing", true, string.Empty);
+                SetValue("user:intent:append:event", appendEventStr, string.Empty);
             }
         }
     }
