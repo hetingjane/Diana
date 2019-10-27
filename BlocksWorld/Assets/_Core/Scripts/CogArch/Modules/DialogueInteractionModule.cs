@@ -225,7 +225,9 @@ public class DialogueInteractionModule : ModuleBase
                 }
             }
             else if (key == "user:intent:isPosack") {
-                SetValue("me:emtion", "joy", string.Empty);
+                if (DataStore.GetBoolValue(key)) {
+                    SetValue("me:emtion", "joy", string.Empty);
+                }
             }
         }
     }
