@@ -73,6 +73,8 @@ public class DialogueInteractionModule : ModuleBase
                     else if (!string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:object"))) {
                         ForgetFocusObject();
                     }
+
+                    SetValue("me:emotion", "frustration", string.Empty);
                 }
             } 
             else if (key == "user:intent:isPushLeft") {
