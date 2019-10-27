@@ -802,19 +802,11 @@ public class EventManagementModule : ModuleBase
             if (!string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:event")) && 
                 (GlobalHelper.GetTopPredicate(eventManager.events[0]) == 
                     GlobalHelper.GetTopPredicate(DataStore.GetStringValue("user:intent:event")))) {
-                // currently executing an event
-                //if (DataStore.GetStringValue("me:lastTheme") != DataStore.GetStringValue("user:intent:object")) {
-                    // "pick up the yellow block"
-                    // nevermind
-                    // "put the yellow block on the green block"
-                    // nevermind
-                    // FU Diana
-                    string objectStr = DataStore.GetStringValue("user:intent:object");
-                    Debug.Log(string.Format("Setting lastTheme to {0}, lastThemePos to {1}", objectStr,
-                        GlobalHelper.VectorToParsable(GameObject.Find(objectStr).transform.position)));
-                    SetValue("me:lastTheme",objectStr,string.Empty);
-                    SetValue("me:lastThemePos",GameObject.Find(objectStr).transform.position,string.Empty);
-                //}
+                string objectStr = DataStore.GetStringValue("user:intent:object");
+                Debug.Log(string.Format("Setting lastTheme to {0}, lastThemePos to {1}", objectStr,
+                    GlobalHelper.VectorToParsable(GameObject.Find(objectStr).transform.position)));
+                SetValue("me:lastTheme",objectStr,string.Empty);
+                SetValue("me:lastThemePos",GameObject.Find(objectStr).transform.position,string.Empty);
             }
         }
     }
