@@ -213,8 +213,7 @@ public class DialogueInteractionModule : ModuleBase
             }
             else if (key == "user:intent:object") {
                 if (!string.IsNullOrEmpty(DataStore.GetStringValue(key))) {
-                    if (string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:action")) && 
-                        DataStore.GetVector3Value("user:intent:location") == default) {
+                    if (string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:action"))) {
                         //SetValue("me:speech:intent", "OK.", string.Empty);
                         SetValue("me:intent:action", "reach", string.Empty);
                         SetValue("me:intent:target",
