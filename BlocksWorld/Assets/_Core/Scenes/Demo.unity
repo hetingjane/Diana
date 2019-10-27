@@ -11144,7 +11144,7 @@ MonoBehaviour:
   comment: 
   display: {fileID: 0}
   calibrationMode: 0
-  windowSize: 3
+  windowSize: 2
   maxDistance: 10
   layerMask:
     serializedVersion: 2
