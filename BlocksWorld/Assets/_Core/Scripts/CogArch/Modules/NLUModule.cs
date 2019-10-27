@@ -47,41 +47,47 @@ public class NLUModule : ModuleBase
         }
         else if (input.StartsWith("no"))
         {
+            if (input != string.Empty)
+            {
+                // try to replace content
+                SetValue("user:intent:replaceContent", communicationsBridge.NLParse(MapTerms(input)), string.Empty);
+            }
+
             // do negack
             SetValue("user:intent:isNegack", true, string.Empty);
             input = input.Replace("no", "").Trim();
+        }
+        else if ((input.StartsWith("never mind")) || (input.StartsWith("wait")) ||
+            (input.StartsWith("wait stop")) ||  (input.StartsWith("stop")))
+        {
+            input = input.Replace("never mind", "").Replace("wait stop", "").
+                Replace("wait", "").Replace("stop", "").Trim();
 
             if (input != string.Empty)
             {
                 // try to replace content
                 SetValue("user:intent:replaceContent", communicationsBridge.NLParse(MapTerms(input)), string.Empty);
             }
-        }
-        else if ((input.StartsWith("never mind")) || (input.StartsWith("wait")) ||
-            (input.StartsWith("no wait")) || (input.StartsWith("wait stop")) || 
-            (input.StartsWith("stop")))
-        {
+            else
+            {
+                SetValue("user:intent:replaceContent", string.Empty, string.Empty);
+            }
+
             // do nevermind
             SetValue("user:intent:isNevermind", true, string.Empty);
-            input = input.Replace("never mind", "").Replace("wait", "").
-                Replace("no wait", "").Replace("wait stop", "").Replace("stop", "").Trim();
             SetValue("user:intent:isNevermind", false, string.Empty);
-
-            if (input != string.Empty)
-            {
-                // try to replace content
-                SetValue("user:intent:replaceContent", input, string.Empty);
-            }
         }
 
-        string mapped = MapTerms(input);
-	    Debug.Log(string.Format("Diana's World: Heard you was talkin' \"{0}\".",mapped));
+        if (string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:replaceContent"))) {
+            string mapped = MapTerms(input);
+    	    Debug.Log(string.Format("Diana's World: Heard you was talkin' \"{0}\".",mapped));
 
-        string parsed = communicationsBridge.NLParse(mapped);
-        Debug.Log(string.Format("Diana's World: Heard you was talkin' \"{0}\".",parsed));
+            string parsed = communicationsBridge.NLParse(mapped);
+            Debug.Log(string.Format("Diana's World: Heard you was talkin' \"{0}\".",parsed));
 
-        if (parsed.Length > 0) {
-            SetValue("user:intent:partialEvent", parsed, string.Empty);
+            if (parsed.Length > 0) {
+                SetValue("user:intent:partialEvent", parsed, string.Empty);
+            }
         }
     }
 

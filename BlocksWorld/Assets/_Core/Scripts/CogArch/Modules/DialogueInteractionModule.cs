@@ -66,9 +66,12 @@ public class DialogueInteractionModule : ModuleBase
                 if (DataStore.GetBoolValue(key)) {
                     if (!string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:lastEvent"))) {
                         string lastEventStr = DataStore.GetStringValue("user:intent:lastEvent");
-                    //if (GlobalHelper.GetTopPredicate(lastEventStr) 
-
-                        UndoLastEvent();
+                        if (!string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:replaceContent"))) {
+                            UndoLastEvent(DataStore.GetStringValue("user:intent:replaceContent"));
+                        }
+                        else {
+                            UndoLastEvent();
+                        }
                     }
                     else if (!string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:object"))) {
                         ForgetFocusObject();
@@ -232,19 +235,28 @@ public class DialogueInteractionModule : ModuleBase
         }
     }
 
-    void UndoLastEvent() {
+    void UndoLastEvent(string replacementContent = "") {
         string lastEventStr = DataStore.GetStringValue("user:intent:lastEvent");
         string undoEventStr = string.Empty;
+        string appendEventStr = string.Empty;
 
         switch(GlobalHelper.GetTopPredicate(lastEventStr)) {
             case "grasp":
                 undoEventStr = lastEventStr.Replace("grasp", "ungrasp");
+                if ((DialogueUtility.GetPredicateType(GlobalHelper.GetTopPredicate(replacementContent), voxmlLibrary) == "attributes") || 
+                    (DialogueUtility.GetPredicateType(GlobalHelper.GetTopPredicate(replacementContent), voxmlLibrary) == "functions")) {
+                    appendEventStr = string.Format("grasp({0})", replacementContent);
+                }
                 break;
 
             case "lift":
                 undoEventStr = string.Format("put({0},{1})",
                     DataStore.GetStringValue("me:lastTheme"),
                     GlobalHelper.VectorToParsable(DataStore.GetVector3Value("me:lastThemePos")));
+                if ((DialogueUtility.GetPredicateType(GlobalHelper.GetTopPredicate(replacementContent), voxmlLibrary) == "attributes") || 
+                    (DialogueUtility.GetPredicateType(GlobalHelper.GetTopPredicate(replacementContent), voxmlLibrary) == "functions")) {
+	                appendEventStr = string.Format("lift({0})", replacementContent);
+                }
                 break;
 
             case "put":
@@ -289,6 +301,15 @@ public class DialogueInteractionModule : ModuleBase
 
             SetValue("me:isUndoing", true, string.Empty);
             SetValue("user:intent:event", undoEventStr, string.Empty);
+
+            if (!string.IsNullOrEmpty(appendEventStr)) {
+                Debug.Log(string.Format("Undo: Appending replacement event {0}", appendEventStr));
+                SetValue("user:intent:append:event", appendEventStr, string.Empty);
+            }
+
+            if (string.IsNullOrEmpty(replacementContent)) {
+                SetValue("user:intent:replaceContent", string.Empty, string.Empty);
+            }
         }
     }
 

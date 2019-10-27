@@ -132,7 +132,6 @@ public class EventManagementModule : ModuleBase
 
         eventManager.EntityReferenced += EntityReferenced;
         eventManager.NonexistentEntityError += NonexistentReferent;
-        //eventManager.QueueEmpty += EventDoneExecuting;
 
         SatisfactionTest.OnUnhandledArgument += TryPropWordHandling;
         eventManager.OnUnhandledArgument += TryPropWordHandling;
@@ -216,10 +215,22 @@ public class EventManagementModule : ModuleBase
             string eventStr = value.ToString().Trim();
             if (string.IsNullOrEmpty(eventStr)) return;
 
+            if (!string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:replaceContent")))
+            {
+                Debug.Log(string.Format("Setting last event {0}", DataStore.GetStringValue("user:intent:append:event")));
+                SetValue("user:intent:lastEvent", DataStore.GetStringValue("user:intent:append:event"),
+                    string.Format("Store user:intent:append:event ({0}) in user:intent:lastEvent in case Diana did something wrong",
+                        DataStore.GetStringValue("user:intent:append:event")));
+            }
+
             try
             {
                 eventManager.InsertEvent("", eventManager.events.Count);
                 eventManager.InsertEvent(eventStr, eventManager.events.Count);
+
+                //if (!string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:replaceContent"))) {
+                //    SetValue("user:intent:replaceContent", string.Empty, string.Empty);
+                //}
             }
             catch (Exception ex)
             {
@@ -797,13 +808,28 @@ public class EventManagementModule : ModuleBase
             if (!string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:event")) && 
                 (GlobalHelper.GetTopPredicate(eventManager.events[0]) == 
                     GlobalHelper.GetTopPredicate(DataStore.GetStringValue("user:intent:event")))) {
-                    // if currently executing and event
+                    // if currently executing an event
                     //  (e.g., if user:intent:event is not empty
                     //  and is the same as the first (current) event in event manager)
                 if ((((EventReferentArgs)e).Predicate as string) == 
 	                GlobalHelper.GetTopPredicate(DataStore.GetStringValue("user:intent:event"))) {
                     // if this object falls directly under the scope of the event's main predicate
 	                SetValue("user:intent:object", ((EventReferentArgs)e).Referent as string, string.Empty);
+                    string objectStr = DataStore.GetStringValue("user:intent:object");
+                    SetValue("me:lastTheme",objectStr,string.Empty);
+                    SetValue("me:lastThemePos",GameObject.Find(objectStr).transform.position,string.Empty);
+                }
+            }
+            else if (!string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:append:event")) && 
+                (GlobalHelper.GetTopPredicate(eventManager.events[0]) == 
+                    GlobalHelper.GetTopPredicate(DataStore.GetStringValue("user:intent:append:event")))) {
+                    // if currently executing an event
+                    //  (e.g., if user:intent:event is not empty
+                    //  and is the same as the first (current) event in event manager)
+                if ((((EventReferentArgs)e).Predicate as string) == 
+                    GlobalHelper.GetTopPredicate(DataStore.GetStringValue("user:intent:append:event"))) {
+                    // if this object falls directly under the scope of the event's main predicate
+                    SetValue("user:intent:object", ((EventReferentArgs)e).Referent as string, string.Empty);
                     string objectStr = DataStore.GetStringValue("user:intent:object");
                     SetValue("me:lastTheme",objectStr,string.Empty);
                     SetValue("me:lastThemePos",GameObject.Find(objectStr).transform.position,string.Empty);
