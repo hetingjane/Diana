@@ -791,22 +791,23 @@ public class EventManagementModule : ModuleBase
     }
 
     public void EntityReferenced(object sender, EventArgs e) {
-        // if there's an event to go with this, proceed with the event
-        //  otherwise, Diana should indicate the entity and prompt for more information
+        // this is called when an entity name is extracted from an event formula
 
         if (((EventReferentArgs)e).Referent is string) {
-            if (string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:object"))) {
-                SetValue("user:intent:object", ((EventReferentArgs)e).Referent as string, string.Empty);
-            }
-
             if (!string.IsNullOrEmpty(DataStore.GetStringValue("user:intent:event")) && 
                 (GlobalHelper.GetTopPredicate(eventManager.events[0]) == 
                     GlobalHelper.GetTopPredicate(DataStore.GetStringValue("user:intent:event")))) {
-                string objectStr = DataStore.GetStringValue("user:intent:object");
-                Debug.Log(string.Format("Setting lastTheme to {0}, lastThemePos to {1}", objectStr,
-                    GlobalHelper.VectorToParsable(GameObject.Find(objectStr).transform.position)));
-                SetValue("me:lastTheme",objectStr,string.Empty);
-                SetValue("me:lastThemePos",GameObject.Find(objectStr).transform.position,string.Empty);
+                    // if currently executing and event
+                    //  (e.g., if user:intent:event is not empty
+                    //  and is the same as the first (current) event in event manager)
+                if ((((EventReferentArgs)e).Predicate as string) == 
+	                GlobalHelper.GetTopPredicate(DataStore.GetStringValue("user:intent:event"))) {
+                    // if this object falls directly under the scope of the event's main predicate
+	                SetValue("user:intent:object", ((EventReferentArgs)e).Referent as string, string.Empty);
+                    string objectStr = DataStore.GetStringValue("user:intent:object");
+                    SetValue("me:lastTheme",objectStr,string.Empty);
+                    SetValue("me:lastThemePos",GameObject.Find(objectStr).transform.position,string.Empty);
+                }
             }
         }
     }
