@@ -459,8 +459,11 @@ public class EventManagementModule : ModuleBase
                             }
                             else if (!string.IsNullOrEmpty(objectStr))
                             {
-                                eventStr = eventStr.Replace("{1}", string.Format("on({0})",objectStr));
-                                SetValue("user:intent:partialEvent", eventStr, string.Empty);
+                                if (!eventStr.Contains(objectStr))
+                                {
+                                    eventStr = eventStr.Replace("{1}", string.Format("on({0})",objectStr));
+                                    SetValue("user:intent:partialEvent", eventStr, string.Empty);
+                                }
                             }
                         }
                     }
