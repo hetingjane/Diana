@@ -2793,8 +2793,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   comment: 
   display: {fileID: 0}
-  maxZ: 2
-  minZ: 1.6
+  maxZ: 1.8
+  minZ: 1.2
   maxX: 0.8
   minX: -0.8
 --- !u!114 &303757788
@@ -7979,6 +7979,7 @@ MonoBehaviour:
   comment: 
   display: {fileID: 0}
   animator: {fileID: 1102099335}
+  currentState: 0
 --- !u!1001 &1082500141
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11149,10 +11150,10 @@ MonoBehaviour:
   layerMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  rHKinSpaceTopRight: {x: 0.4, y: 0.1, z: 1}
-  rHKinSpaceBotLeft: {x: -0.8, y: -0.4, z: 1}
+  rHKinSpaceTopRight: {x: 0.3, y: 0.1, z: 1}
+  rHKinSpaceBotLeft: {x: -0.7, y: -0.3, z: 1}
   lHKinSpaceTopRight: {x: 0.7, y: 0.2, z: 1}
-  lHKinSpaceBotLeft: {x: -0.4, y: -0.5, z: 1}
+  lHKinSpaceBotLeft: {x: -0.3, y: -0.3, z: 1}
 --- !u!1001 &1525973501
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -19,7 +19,7 @@ public class PushRightStateMachine : RuleStateMachine<PushRightState>
 				return (leftHandGesture == "open right" || leftHandGesture == "closed right") && leftArmMotion == "move right";
 			}
 			return false;
-		}, 300));
+		}, 200));
 
 		SetTransitionRule(PushRightState.PushRightStart, PushRightState.PushRightStop, new TimedRule(() =>
 		{
