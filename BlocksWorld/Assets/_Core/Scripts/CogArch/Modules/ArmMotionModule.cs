@@ -63,7 +63,7 @@ public class ArmMotionModule : ModuleBase
             string s = handRightAngles.Max() + " " + handRightAngles.Min() + " " + wristRightAngles.Max() + " " + wristRightAngles.Min();
             if (handRightAngles.Max() - handRightAngles.Min() > 100 || wristRightAngles.Max() - wristRightAngles.Min() > 100)
             {
-                DataStore.SetValue("user:armMotion:right", new DataStore.StringValue("servo "+s), this, "based on handRight angle");
+                DataStore.SetValue("user:armMotion:right", new DataStore.StringValue("servo"+s), this, "based on handRight angle");
             }
             else
             {

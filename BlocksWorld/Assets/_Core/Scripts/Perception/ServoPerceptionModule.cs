@@ -81,7 +81,7 @@ public class ServoPerceptionModule : ModuleBase
             string s = handRightAngles.Max() + " " + handRightAngles.Min() + " " + wristRightAngles.Max() + " " + wristRightAngles.Min();
             if (handRightAngles.Max() - handRightAngles.Min() > 80 || wristRightAngles.Max() - wristRightAngles.Min() > 50)
             {
-                //SetValue("user:armMotion:right", "servo ", "based on handRight angle");
+                //SetValue("user:armMotion:right", "servo", "based on handRight angle");
                 tempRight = new System.Numerics.Vector2(0.0f, 1.0f);
             }
             else

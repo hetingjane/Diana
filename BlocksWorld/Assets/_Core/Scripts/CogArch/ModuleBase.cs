@@ -83,7 +83,7 @@ public class ModuleBase : MonoBehaviour
 	/// <param name="comment">Comment explaining the change</param>
     protected void SetValue(string key, string value, string comment)
     {
-		SetValue(key, new DataStore.StringValue(value), comment);
+		SetValue(key, new DataStore.StringValue(value.Trim()), comment);
 	}
 
     /// <summary>
