@@ -129,6 +129,8 @@ class Kinect:
             spine_base_y = joints[JointType_SpineBase].y
             if np.isinf(spine_base_y):
                 spine_base_y = 0
+            if np.isinf(spine_base_x):
+                spine_base_x = 0
             spine_base_z = np.mean(
                 hand_arr[int(spine_base_y) - z_space:int(spine_base_y) + z_space, 
                          int(spine_base_x) - z_space:int(spine_base_x) + z_space])
