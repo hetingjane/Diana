@@ -14,18 +14,18 @@ using System.Collections;
 public class FaceUpdate : ModuleBase
 {
     // List of SkinnedMeshRenderers to change blend shapes on
-    List<SkinnedMeshRenderer> renderers;
+    private List<SkinnedMeshRenderer> renderers;
 
     // Index of the left and right blend shapes to set for each renderer above.
-    List<int> smileLeftIndex;
-    List<int> smileRightIndex;
+    private List<int> smileLeftIndex;
+    private List<int> smileRightIndex;
 
     private readonly float currSmileStrength;
 
-    string dianaEmotion;
-    BlendShapeMixer bsm;
+    private BlendShapeMixer bsm;
     private IEnumerator coroutineChange;
-    private IEnumerator coroutineDecade;
+    private IEnumerator coroutineFade;
+    private IEnumerator coroutineConcentration;
 
     protected override void Start()
     {
@@ -59,39 +59,112 @@ public class FaceUpdate : ModuleBase
         }
         //SetValue("me:emotion", "neutral", "Initialize");
         DataStore.Subscribe("user:isEngaged", NoteUserIsEngaged);
-        coroutineChange = WaitAndChange(dianaEmotion, 0.5f);
-        coroutineDecade = WaitAndDecade(4f);
+        //DataStore.Subscribe("me:emotion", NoteDianaEmotion);
+        DataStore.Subscribe("user:isPointing", NoteUserIsPointing);
+        DataStore.Subscribe("user:emotion", NoteUserEmotion);
 
+        
     }
-    protected void NoteUserIsEngaged(string key, DataStore.IValue value)
+    private void NoteUserIsEngaged(string key, DataStore.IValue value)
     {
         if ((value as DataStore.BoolValue).val)
         {
+            coroutineChange = WaitAndChange(0.5f);
+            coroutineFade = WaitAndFade(2f);
             StartCoroutine(coroutineChange);
-            StartCoroutine(coroutineDecade);
+            StartCoroutine(coroutineFade);
         }
         else SetValue("me:emotion", "neutral", "Diana is neutral");
 
 
     }
-    private IEnumerator WaitAndChange(string dianaEmotion, float waitTime)
+    private IEnumerator WaitAndChange(float waitTime)
     {
         yield return new WaitForSeconds(waitTime);
-        SetValue("me:emotion", "greet", "Diana is happpy");
+        SetValue("me:emotion", "greet", "Diana is happy");
 
 
     }
-    private IEnumerator WaitAndDecade(float waitTime)
+    private IEnumerator WaitAndFade(float waitTime)
     {
         yield return new WaitForSeconds(waitTime);
         SetValue("me:emotion", "neutral", "Diana is neutral");
 
     }
-    protected void Update()
+    private IEnumerator WaitAndConcentrate(float waitTime)
+    {
+        yield return new WaitForSeconds(waitTime);
+        SetValue("me:emotion", "concentration", "Diana is concentrated");
+
+
+
+    }
+    private void NoteDianaEmotion(string key, DataStore.IValue value)
+    {
+        bool userPointing = DataStore.GetBoolValue("user:isPointing");
+        if ((value as DataStore.StringValue).val != "neutral" && (value as DataStore.StringValue).val != "concentration")
+        {
+            if (userPointing)
+            {
+                //lock (coroutineConcentration)
+                { StartCoroutine(coroutineConcentration); }
+            }
+            else
+            {
+                //lock (coroutineFade)
+                { StartCoroutine(coroutineFade); }
+            }
+        }
+
+
+    }
+    private void NoteUserEmotion(string key, DataStore.IValue value)
+    {
+        bool userPointing = DataStore.GetBoolValue("user:isPointing");
+        string dianaEmotion = DataStore.GetStringValue("me:emotion");
+        if ((value as DataStore.StringValue).val == "joy")
+        {
+            if (userPointing) SetValue("me:emotion", "joy+concentration", "Diana is happy and concentrated");
+            else SetValue("me:emotion", "joy", "Diana is happy");
+        }
+        if ((value as DataStore.StringValue).val == "angry")
+        {
+            if (userPointing) SetValue("me:emotion", "frustration+concentration", "Diana is frustrated and concentrated");
+            else SetValue("me:emotion", "frustration", "Diana is frustrated");
+        }
+        if ((value as DataStore.StringValue).val == "neutral" && dianaEmotion != "neutral" && dianaEmotion != "concentration")
+        {
+            coroutineFade = WaitAndFade(2f);
+            coroutineConcentration = WaitAndConcentrate(2f);
+            if (userPointing) StartCoroutine(coroutineConcentration);
+            else StartCoroutine(coroutineFade);
+        }
+    }
+    private void NoteUserIsPointing(string key, DataStore.IValue value)
+    {
+        string userEmotion = DataStore.GetStringValue("user:emotion");
+        if ((value as DataStore.BoolValue).val)
+        {
+            if (userEmotion == "joy") SetValue("me:emotion", "joy+concentration", "Diana is happy and concentrated");
+            if (userEmotion == "angry") SetValue("me:emotion", "frustration+concentration", "Diana is frustrated and concentrated");
+            else SetValue("me:emotion", "concentration", "Diana is concentrated");
+        }
+        else
+        {
+
+            if (userEmotion == "joy") SetValue("me:emotion", "joy", "Diana is happy");
+            if (userEmotion == "angry") SetValue("me:emotion", "frustration", "Diana is frustrated");
+            else SetValue("me:emotion", "neutral", "Diana is neutral");
+        }
+
+
+
+    }
+    private void Update()
     {
 
 
-        dianaEmotion = DataStore.GetStringValue("me:emotion");
+        string dianaEmotion = DataStore.GetStringValue("me:emotion");
         switch (dianaEmotion)
         {
             case "greet":
@@ -122,21 +195,24 @@ public class FaceUpdate : ModuleBase
                 break;
         }
 
-        string userEmotion = DataStore.GetStringValue("user:emotion");
-        bool userPointing = DataStore.GetBoolValue("user:isPointing");
-        if (userPointing)
-        {
-            if (userEmotion == "joy") SetValue("me:emotion", "joy+concentration", "Diana is happy and concentrated");
-            else if (userEmotion == "angry") SetValue("me:emotion", "frustration+concentration", "Diana is frustrated and concentrated");
-            else if (dianaEmotion != "greet" && dianaEmotion != "confusion") SetValue("me:emotion", "concentration", "Diana is concentrated");
+        //string userEmotion = DataStore.GetStringValue("user:emotion");
+        //bool userPointing = DataStore.GetBoolValue("user:isPointing");
+        //if (userPointing)
+        //{
+        //    //SetValue("me:emotion", "concentration", "Diana is concentrated");
+        //    if (userEmotion == "joy") SetValue("me:emotion", "joy+concentration", "Diana is happy and concentrated");
+        //    else if (userEmotion == "angry") SetValue("me:emotion", "frustration+concentration", "Diana is frustrated and concentrated");
+        //    //else if (dianaEmotion != "neutral") StartCoroutine(coroutineFade); //if (dianaEmotion != "greet" && dianaEmotion != "confusion") SetValue("me:emotion", "concentration", "Diana is concentrated");
 
-        }
-        if (!userPointing)
-        {
-            if (userEmotion == "joy") SetValue("me:emotion", "joy", "Diana is happy");
-            else if (userEmotion == "angry") SetValue("me:emotion", "frustration", "Diana is frustrated");
-            else if (dianaEmotion != "greet" && dianaEmotion != "confusion") SetValue("me:emotion", "neutral", "Diana is neutral");
-        }
+        //}
+        //if (!userPointing)
+        //{
+        //    //SetValue("me:emotion", "neutral", "Diana is neutral");
+
+        //    if (userEmotion == "joy") SetValue("me:emotion", "joy", "Diana is happy");
+        //    else if (userEmotion == "angry") SetValue("me:emotion", "frustration", "Diana is frustrated");
+        //    //else if (dianaEmotion != "neutral") StartCoroutine(coroutineFade); //if (dianaEmotion != "greet" && dianaEmotion != "confusion") SetValue("me:emotion", "neutral", "Diana is neutral");
+        //}
 
     }
 }
