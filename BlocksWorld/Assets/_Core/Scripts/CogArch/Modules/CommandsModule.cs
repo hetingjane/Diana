@@ -181,7 +181,8 @@ public class CommandsModule : ModuleBase
 			obj = FindObjectFromSpec(act.directObject);
 			if (obj == null) {
 				SetValue("me:speech:intent", "I'm not sure what you are referring to.", comment);
-			} else {
+                    SetValue("me:emotion", "confusion", string.Empty);
+                } else {
 				// Convert the CamelCase object name into more natural speech.
 				// (reference: https://stackoverflow.com/questions/155303)
 				string name = obj.name;
