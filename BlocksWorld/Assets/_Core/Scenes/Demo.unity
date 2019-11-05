@@ -21477,6 +21477,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5eb2894e50ae34f11a70c529c001899e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  keysToShow: 
+  keysToHide: user:joint:*
 --- !u!1 &6261051346335415126
 GameObject:
   m_ObjectHideFlags: 0
