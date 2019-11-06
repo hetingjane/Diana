@@ -93,6 +93,16 @@ public class DianaMotorControl : MonoBehaviour
 	private readonly DataStore.StringValue waving = new DataStore.StringValue("waving");
 	#endregion
 
+
+	#region Animator Hashes
+	private readonly int animX = Animator.StringToHash("x");
+	private readonly int animY = Animator.StringToHash("y");
+	private readonly int animZ = Animator.StringToHash("z");
+
+	private readonly int animGrab = Animator.StringToHash("grab");
+	private readonly int animWave = Animator.StringToHash("wave");
+
+	#endregion
 	/// <summary>
 	/// The key to which this script writes on the blackboard. The key
 	/// describes Diana's animation state (manual or automatic).
@@ -134,9 +144,9 @@ public class DianaMotorControl : MonoBehaviour
 
 	private bool AnimatorGrab
 	{
-		get => animator.GetFloat("grab") > 0.0f;
+		get => animator.GetFloat(animGrab) > 0.0f;
 
-		set => animator.SetFloat("grab", value ? 1f : -1f);
+		set => animator.SetFloat(animGrab, value ? 1f : -1f);
 	}
 
 	/// <summary>
@@ -195,7 +205,7 @@ public class DianaMotorControl : MonoBehaviour
 		else if (motion == "unreach")
 			AnimatorGrab = false;
 		else if (motion == "wave")
-			animator.SetBool("wave", true);
+			animator.SetBool(animWave, true);
 	}
 
 	/// <summary>
@@ -207,9 +217,9 @@ public class DianaMotorControl : MonoBehaviour
 	{
 		//Debug.Log("LerpAnimatorXYZ");
 		Vector3 originalAnimatorXYZ = new Vector3(
-				animator.GetFloat("x"),
-				animator.GetFloat("y"),
-				animator.GetFloat("z"));
+				animator.GetFloat(animX),
+				animator.GetFloat(animY),
+				animator.GetFloat(animZ));
 		
 		float originalDistance = Vector3.Distance(originalAnimatorXYZ, intentXYZ);
 
@@ -247,11 +257,11 @@ public class DianaMotorControl : MonoBehaviour
 	private void SetAnimatorXYZ(float x = float.NaN, float y = float.NaN, float z = float.NaN)
 	{
 		if (!float.IsNaN(x))
-			animator.SetFloat("x", x);
+			animator.SetFloat(animX, x);
 		if (!float.IsNaN(y))
-			animator.SetFloat("y", y);
+			animator.SetFloat(animY, y);
 		if (!float.IsNaN(z))
-			animator.SetFloat("z", z);
+			animator.SetFloat(animZ, z);
 	}
 
 	/// <summary>
