@@ -113,6 +113,12 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!4 &8087597 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8099405383720516229, guid: 5513b84b0fc9b4d2c8a2f2d54403a352,
+    type: 3}
+  m_PrefabInstance: {fileID: 1102099334}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &10100817
 GameObject:
   m_ObjectHideFlags: 0
@@ -287,6 +293,7 @@ MonoBehaviour:
   display: {fileID: 0}
   grabbableBlocks: {fileID: 184680267}
   animator: {fileID: 1102099335}
+  hand: {fileID: 0}
   radius: 0.1
 --- !u!1 &26311430
 GameObject:
@@ -7088,20 +7095,6 @@ MonoBehaviour:
     spineStiffness: 0.5
     pullBodyVertical: 0.5
     pullBodyHorizontal: 0
---- !u!114 &994621913
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 994621910}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 025988666334c4de5a3a80c38df40b82, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  comment: 
-  display: {fileID: 0}
 --- !u!114 &994621914
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7119,7 +7112,7 @@ MonoBehaviour:
   backoffTowards: {fileID: 1525973510}
   smoothTime: 0.1
   maxSpeed: 20
---- !u!114 &994621916
+--- !u!114 &994621915
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -7128,6 +7121,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 994621910}
   m_Enabled: 1
   m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01a2fd897b8a9474ab240b6e75b3dae1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  comment: 
+  display: {fileID: 0}
+  avatarName: Sam
+  voices: Alex;Microsoft David Desktop;english;en;Daniel
+  primaryHand: {fileID: 1525973503}
+  secondaryHand: {fileID: 1525973504}
+--- !u!114 &994621916
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 994621910}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4be20cae630174288b78809419d0a661, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
@@ -7135,6 +7146,7 @@ MonoBehaviour:
   display: {fileID: 0}
   grabbableBlocks: {fileID: 184680267}
   animator: {fileID: 0}
+  hand: {fileID: 0}
   radius: 0.1
 --- !u!1 &1000591898
 GameObject:
@@ -9070,6 +9082,12 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 1102099334}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &1170713088 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8099405383720516295, guid: 5513b84b0fc9b4d2c8a2f2d54403a352,
+    type: 3}
+  m_PrefabInstance: {fileID: 1102099334}
+  m_PrefabAsset: {fileID: 0}
 --- !u!65 &1170713089
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -10192,11 +10210,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 1463965736}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6ca46be57ca5b404c8f4267d15d17cea, type: 3}
+  m_Script: {fileID: 11500000, guid: 01a2fd897b8a9474ab240b6e75b3dae1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   comment: 
   display: {fileID: 0}
+  avatarName: Diana
+  voices: Samantha;Microsoft Zira Desktop
+  primaryHand: {fileID: 1170713088}
+  secondaryHand: {fileID: 8087597}
 --- !u!114 &1463965740
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16031,11 +16053,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 4475387102917052167}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f6f92573df7ed48559f83dc78d7bf605, type: 3}
+  m_Script: {fileID: 11500000, guid: 01a2fd897b8a9474ab240b6e75b3dae1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   comment: 
   display: {fileID: 0}
+  avatarName: Botarm
+  voices: Fred;Microsoft David Desktop;english;en;Daniel
+  primaryHand: {fileID: 440533447}
+  secondaryHand: {fileID: 0}
 --- !u!1 &4580777672470854489
 GameObject:
   m_ObjectHideFlags: 0

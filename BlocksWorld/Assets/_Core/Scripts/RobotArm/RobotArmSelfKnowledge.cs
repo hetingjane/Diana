@@ -1,4 +1,8 @@
 ﻿/*
+
+OBSOLETE (replaced by SelfKnowledge.cs, 2019-11-11).
+
+
 This trivial module injects a few bits of information about the robot arm itself
 onto the blackboard, for use by other modules.
 

@@ -28,8 +28,14 @@ public class GrabPlaceModule : ModuleBase
     /// <summary>
     /// Reference to the animator attached to the humanoid character
     /// </summary>
-    [Tooltip("Drag drop the character model here")]
+	[Tooltip("Animator component of the avatar, if any")]
     public Animator animator;
+
+	/// <summary>
+	/// Reference to the effector bone to be used for manipulating objects
+	/// </summary>
+	[Tooltip("Bone to be used in manipulating objects (may be left blank if Animator is used)")]
+	public Transform hand;
 
 	public static bool paused = false;		// Hacky hack hack
 
@@ -105,11 +111,6 @@ public class GrabPlaceModule : ModuleBase
     /// Public, static reference to the block currently being held
     /// </summary>
     public static Transform heldObject = null;
-
-    /// <summary>
-    /// Reference to the effector bone to be used for manipulating objects
-    /// </summary>
-    private Transform hand;
 
     /// <summary>
     /// Radius of the sphere to test for objects near to a location
