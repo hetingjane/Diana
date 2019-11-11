@@ -1,4 +1,8 @@
 ﻿/*
+
+OBSOLETE (replaced by SelfKnowledge.cs, 2019-11-11).
+
+
 This trivial module injects a few bits of information about Sam himself
 onto the blackboard, for use by other modules.
 
