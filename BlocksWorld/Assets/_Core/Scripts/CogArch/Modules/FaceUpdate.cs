@@ -30,13 +30,8 @@ public class FaceUpdate : ModuleBase
     protected override void Start()
     {
         //Find the avatar to change blend shape on
-
-        var avatar = GameObject.Find("Diana2");
-        if (avatar == null)
-        {
-            Debug.LogError("EmotionModule: Cannot find Diana2 object!");
-            return;
-        }
+	    //(this is now always the object this component is on)
+	    var avatar = gameObject;
         bsm = avatar.GetComponentInChildren<BlendShapeMixer>();
         if (bsm == null)
         {
