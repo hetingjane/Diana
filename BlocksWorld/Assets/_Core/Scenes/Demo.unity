@@ -4091,6 +4091,18 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 476300785}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &483957095 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8370107686997645972, guid: 1d104b2c6fd8e45d9a2953c2779e4ad0,
+    type: 3}
+  m_PrefabInstance: {fileID: 2029239242}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e09b983fd382e403cbda846a3ceb4b75, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &499450009
 GameObject:
   m_ObjectHideFlags: 0
@@ -11024,19 +11036,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3cbf237ce12994861bf541b17a1ac2bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1463965744
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1463965736}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 89cd9f69a293643b9890b7fb4bc3f16b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  scenarioController: {fileID: 0}
 --- !u!114 &1463965745
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13899,6 +13898,7 @@ GameObject:
   - component: {fileID: 1831328033}
   - component: {fileID: 1831328034}
   - component: {fileID: 1831328035}
+  - component: {fileID: 1831328036}
   m_Layer: 0
   m_Name: DialogueInteractionModule
   m_TagString: Untagged
@@ -13934,7 +13934,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   comment: 
   display: {fileID: 0}
-  stateMachine: {fileID: 1463965744}
+  stateMachine: {fileID: 1831328036}
   servoLoopTimerTime: 10
   grabbableBlocks: {fileID: 0}
   demoSurface: {fileID: 0}
@@ -13951,6 +13951,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ab6887d5598b48098363537d785af28, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1831328036
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1831328032}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89cd9f69a293643b9890b7fb4bc3f16b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scenarioController: {fileID: 0}
 --- !u!1 &1837520094
 GameObject:
   m_ObjectHideFlags: 0
@@ -15479,9 +15492,9 @@ MonoBehaviour:
   comment: 
   display: {fileID: 0}
   eventManager: {fileID: 1725009506}
-  voxmlLibrary: {fileID: 0}
-  grabbableBlocks: {fileID: 0}
-  demoSurface: {fileID: 0}
+  voxmlLibrary: {fileID: 483957095}
+  grabbableBlocks: {fileID: 184680267}
+  demoSurface: {fileID: 672448213}
   servoSpeed: 0.05
 --- !u!1 &2054860432
 GameObject:

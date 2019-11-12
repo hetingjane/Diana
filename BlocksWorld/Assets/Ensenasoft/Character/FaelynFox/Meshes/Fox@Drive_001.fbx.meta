@@ -1,0 +1,942 @@
+fileFormatVersion: 2
+guid: bf225126645c528438e87291dfd49d82
+timeCreated: 1452278639
+licenseType: Store
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: //RootNode
+    100002: Fox_REF:Back_Colar_01_JNT
+    100004: Fox_REF:Back_Colar_02_JNT
+    100006: Fox_REF:Back_Colar_TIP
+    100008: Fox_REF:Fox_Geo
+    100010: Fox_REF:Goggles_JNT
+    100012: Fox_REF:Goggles_TIP
+    100014: Fox_REF:Hair_01_JNT
+    100016: Fox_REF:Hair_02_JNT
+    100018: Fox_REF:Hair_03_JNT
+    100020: Fox_REF:Hair_04_JNT
+    100022: Fox_REF:Hair_05_JNT
+    100024: Fox_REF:Hair_06_JNT
+    100026: Fox_REF:Hair_TIP
+    100028: Fox_REF:Head_JNT
+    100030: Fox_REF:Head_TIP
+    100032: Fox_REF:Hips_JNT
+    100034: Fox_REF:Jaw_JNT
+    100036: Fox_REF:Jaw_TIP
+    100038: Fox_REF:L__Thumb_02_JNT
+    100040: Fox_REF:L__Thumb_03_JNT
+    100042: Fox_REF:L__Thumb_TIP
+    100044: Fox_REF:L_Ankle_JNT
+    100046: Fox_REF:L_Ball_JNT
+    100048: Fox_REF:L_Breast_JNT
+    100050: Fox_REF:L_Breast_TIP
+    100052: Fox_REF:L_Clav_JNT
+    100054: Fox_REF:L_Colar_01_JNT
+    100056: Fox_REF:L_Colar_02_JNT
+    100058: Fox_REF:L_Colar_TIP
+    100060: Fox_REF:L_Ear_01_JNT
+    100062: Fox_REF:L_Ear_02_JNT
+    100064: Fox_REF:L_Ear_TIP
+    100066: Fox_REF:L_Elbow_JNT
+    100068: Fox_REF:L_Eye_JNT
+    100070: Fox_REF:L_Eye_TIP
+    100072: Fox_REF:L_Facial_Fur_JNT
+    100074: Fox_REF:L_Facial_Fur_JNT 1
+    100076: Fox_REF:L_Goggle_JNT
+    100078: Fox_REF:L_Goggle_TIP
+    100080: Fox_REF:L_Hand_JNT
+    100082: Fox_REF:L_Index_01_JNT
+    100084: Fox_REF:L_Index_02_JNT
+    100086: Fox_REF:L_Index_03_JNT
+    100088: Fox_REF:L_Index_TIP
+    100090: Fox_REF:L_Knee_JNT
+    100092: Fox_REF:L_Lid_Bttm_JNT
+    100094: Fox_REF:L_Lid_Bttm_TIP
+    100096: Fox_REF:L_Lid_TOP_JNT
+    100098: Fox_REF:L_Lid_TOP_TIP
+    100100: Fox_REF:L_Middle_01_JNT
+    100102: Fox_REF:L_Middle_02_JNT
+    100104: Fox_REF:L_Middle_03_JNT
+    100106: Fox_REF:L_Middle_TIP
+    100108: Fox_REF:L_Mouth_JNT
+    100110: Fox_REF:L_Mouth_TIP
+    100112: Fox_REF:L_Pinky_01_JNT
+    100114: Fox_REF:L_Pinky_02_JNT
+    100116: Fox_REF:L_Pinky_03_JNT
+    100118: Fox_REF:L_Pinky_TIP
+    100120: Fox_REF:L_Ring_01_JNT
+    100122: Fox_REF:L_Ring_02_JNT
+    100124: Fox_REF:L_Ring_03_JNT
+    100126: Fox_REF:L_Ring_TIP
+    100128: Fox_REF:L_Shoulder_JNT
+    100130: Fox_REF:L_Thight_JNT
+    100132: Fox_REF:L_Thumb_01_JNT
+    100134: Fox_REF:L_Toe_TIP
+    100136: Fox_REF:Neck_JNT
+    100138: Fox_REF:Nose_JNT
+    100140: Fox_REF:Nose_TIP
+    100142: Fox_REF:R__Thumb_02_JNT
+    100144: Fox_REF:R__Thumb_03_JNT
+    100146: Fox_REF:R__Thumb_TIP
+    100148: Fox_REF:R_Ankle_JNT
+    100150: Fox_REF:R_Ball_JNT
+    100152: Fox_REF:R_Breast_JNT
+    100154: Fox_REF:R_Breast_TIP
+    100156: Fox_REF:R_Clav_JNT
+    100158: Fox_REF:R_Colar_01_JNT
+    100160: Fox_REF:R_Colar_02_JNT
+    100162: Fox_REF:R_Colar_TIP
+    100164: Fox_REF:R_Ear_01_JNT
+    100166: Fox_REF:R_Ear_02_JNT
+    100168: Fox_REF:R_Ear_TIP
+    100170: Fox_REF:R_Elbow_JNT
+    100172: Fox_REF:R_Eye_JNT
+    100174: Fox_REF:R_Eye_TIP
+    100176: Fox_REF:R_Facial_Fur_JNT
+    100178: Fox_REF:R_Facial_Fur_JNT 1
+    100180: Fox_REF:R_Goggle_JNT
+    100182: Fox_REF:R_Goggle_TIP
+    100184: Fox_REF:R_Hand_JNT
+    100186: Fox_REF:R_Index_01_JNT
+    100188: Fox_REF:R_Index_02_JNT
+    100190: Fox_REF:R_Index_03_JNT
+    100192: Fox_REF:R_Index_TIP
+    100194: Fox_REF:R_Knee_JNT
+    100196: Fox_REF:R_Lid_Bttm_JNT
+    100198: Fox_REF:R_Lid_Bttm_TIP
+    100200: Fox_REF:R_Lid_TOP_JNT
+    100202: Fox_REF:R_Lid_TOP_TIP
+    100204: Fox_REF:R_Middle_01_JNT
+    100206: Fox_REF:R_Middle_02_JNT
+    100208: Fox_REF:R_Middle_03_JNT
+    100210: Fox_REF:R_Middle_TIP
+    100212: Fox_REF:R_Mouth_JNT
+    100214: Fox_REF:R_Mouth_TIP
+    100216: Fox_REF:R_Pinky_01_JNT
+    100218: Fox_REF:R_Pinky_02_JNT
+    100220: Fox_REF:R_Pinky_03_JNT
+    100222: Fox_REF:R_Pinky_TIP
+    100224: Fox_REF:R_Ring_01_JNT
+    100226: Fox_REF:R_Ring_02_JNT
+    100228: Fox_REF:R_Ring_03_JNT
+    100230: Fox_REF:R_Ring_TIP
+    100232: Fox_REF:R_Shoulder_JNT
+    100234: Fox_REF:R_Thight_JNT
+    100236: Fox_REF:R_Thumb_01_JNT
+    100238: Fox_REF:R_Toe_TIP
+    100240: Fox_REF:Root_JNT
+    100242: Fox_REF:Spine_01_JNT
+    100244: Fox_REF:Spine_02_JNT
+    100246: Fox_REF:Spine_03_JNT
+    100248: Fox_REF:Tail_01_JNT
+    100250: Fox_REF:Tail_02_JNT
+    100252: Fox_REF:Tail_03_JNT
+    100254: Fox_REF:Tail_04_JNT
+    100256: Fox_REF:Tail_05_JNT
+    100258: Fox_REF:Tail_TIP
+    100260: Fox_REF:Tongue_01_JNT
+    100262: Fox_REF:Tongue_02_JNT
+    100264: Fox_REF:Tongue_03_JNT
+    100266: Fox_REF:Tongue_TIP
+    100268: Fox_REF:World_Control
+    100270: Fox_REF:World_NODE
+    100272: Fox_REF:Wrench_JNT
+    100274: Fox_REF:Wrench_JNT 1
+    100276: Back_Colar_01_JNT
+    100278: Back_Colar_02_JNT
+    100280: Back_Colar_TIP
+    100282: Fox_Geo
+    100284: Goggles_JNT
+    100286: Goggles_TIP
+    100288: Hair_01_JNT
+    100290: Hair_02_JNT
+    100292: Hair_03_JNT
+    100294: Hair_04_JNT
+    100296: Hair_05_JNT
+    100298: Hair_06_JNT
+    100300: Hair_TIP
+    100302: Head_JNT
+    100304: Head_TIP
+    100306: Hips_JNT
+    100308: Jaw_JNT
+    100310: Jaw_TIP
+    100312: L__Thumb_02_JNT
+    100314: L__Thumb_03_JNT
+    100316: L__Thumb_TIP
+    100318: L_Ankle_JNT
+    100320: L_Ball_JNT
+    100322: L_Breast_JNT
+    100324: L_Breast_TIP
+    100326: L_Clav_JNT
+    100328: L_Colar_01_JNT
+    100330: L_Colar_02_JNT
+    100332: L_Colar_TIP
+    100334: L_Ear_01_JNT
+    100336: L_Ear_02_JNT
+    100338: L_Ear_TIP
+    100340: L_Elbow_JNT
+    100342: L_Eye_JNT
+    100344: L_Eye_TIP
+    100346: L_Facial_Fur_JNT
+    100348: L_Facial_Fur_JNT 1
+    100350: L_Goggle_JNT
+    100352: L_Goggle_TIP
+    100354: L_Hand_JNT
+    100356: L_Index_01_JNT
+    100358: L_Index_02_JNT
+    100360: L_Index_03_JNT
+    100362: L_Index_TIP
+    100364: L_Knee_JNT
+    100366: L_Lid_Bttm_JNT
+    100368: L_Lid_Bttm_TIP
+    100370: L_Lid_TOP_JNT
+    100372: L_Lid_TOP_TIP
+    100374: L_Middle_01_JNT
+    100376: L_Middle_02_JNT
+    100378: L_Middle_03_JNT
+    100380: L_Middle_TIP
+    100382: L_Mouth_JNT
+    100384: L_Mouth_TIP
+    100386: L_Pinky_01_JNT
+    100388: L_Pinky_02_JNT
+    100390: L_Pinky_03_JNT
+    100392: L_Pinky_TIP
+    100394: L_Ring_01_JNT
+    100396: L_Ring_02_JNT
+    100398: L_Ring_03_JNT
+    100400: L_Ring_TIP
+    100402: L_Shoulder_JNT
+    100404: L_Thight_JNT
+    100406: L_Thumb_01_JNT
+    100408: L_Toe_TIP
+    100410: Neck_JNT
+    100412: Nose_JNT
+    100414: Nose_TIP
+    100416: R__Thumb_02_JNT
+    100418: R__Thumb_03_JNT
+    100420: R__Thumb_TIP
+    100422: R_Ankle_JNT
+    100424: R_Ball_JNT
+    100426: R_Breast_JNT
+    100428: R_Breast_TIP
+    100430: R_Clav_JNT
+    100432: R_Colar_01_JNT
+    100434: R_Colar_02_JNT
+    100436: R_Colar_TIP
+    100438: R_Ear_01_JNT
+    100440: R_Ear_02_JNT
+    100442: R_Ear_TIP
+    100444: R_Elbow_JNT
+    100446: R_Eye_JNT
+    100448: R_Eye_TIP
+    100450: R_Facial_Fur_JNT
+    100452: R_Facial_Fur_JNT 1
+    100454: R_Goggle_JNT
+    100456: R_Goggle_TIP
+    100458: R_Hand_JNT
+    100460: R_Index_01_JNT
+    100462: R_Index_02_JNT
+    100464: R_Index_03_JNT
+    100466: R_Index_TIP
+    100468: R_Knee_JNT
+    100470: R_Lid_Bttm_JNT
+    100472: R_Lid_Bttm_TIP
+    100474: R_Lid_TOP_JNT
+    100476: R_Lid_TOP_TIP
+    100478: R_Middle_01_JNT
+    100480: R_Middle_02_JNT
+    100482: R_Middle_03_JNT
+    100484: R_Middle_TIP
+    100486: R_Mouth_JNT
+    100488: R_Mouth_TIP
+    100490: R_Pinky_01_JNT
+    100492: R_Pinky_02_JNT
+    100494: R_Pinky_03_JNT
+    100496: R_Pinky_TIP
+    100498: R_Ring_01_JNT
+    100500: R_Ring_02_JNT
+    100502: R_Ring_03_JNT
+    100504: R_Ring_TIP
+    100506: R_Shoulder_JNT
+    100508: R_Thight_JNT
+    100510: R_Thumb_01_JNT
+    100512: R_Toe_TIP
+    100514: Root_JNT
+    100516: Spine_01_JNT
+    100518: Spine_02_JNT
+    100520: Spine_03_JNT
+    100522: Tail_01_JNT
+    100524: Tail_02_JNT
+    100526: Tail_03_JNT
+    100528: Tail_04_JNT
+    100530: Tail_05_JNT
+    100532: Tail_TIP
+    100534: Tongue_01_JNT
+    100536: Tongue_02_JNT
+    100538: Tongue_03_JNT
+    100540: Tongue_TIP
+    100542: World_NODE
+    100544: Wrench_JNT
+    100546: Wrench_JNT 1
+    100548: Fox_Geo_Group
+    100550: Wrench_Geo
+    400000: //RootNode
+    400002: Fox_REF:Back_Colar_01_JNT
+    400004: Fox_REF:Back_Colar_02_JNT
+    400006: Fox_REF:Back_Colar_TIP
+    400008: Fox_REF:Fox_Geo
+    400010: Fox_REF:Goggles_JNT
+    400012: Fox_REF:Goggles_TIP
+    400014: Fox_REF:Hair_01_JNT
+    400016: Fox_REF:Hair_02_JNT
+    400018: Fox_REF:Hair_03_JNT
+    400020: Fox_REF:Hair_04_JNT
+    400022: Fox_REF:Hair_05_JNT
+    400024: Fox_REF:Hair_06_JNT
+    400026: Fox_REF:Hair_TIP
+    400028: Fox_REF:Head_JNT
+    400030: Fox_REF:Head_TIP
+    400032: Fox_REF:Hips_JNT
+    400034: Fox_REF:Jaw_JNT
+    400036: Fox_REF:Jaw_TIP
+    400038: Fox_REF:L__Thumb_02_JNT
+    400040: Fox_REF:L__Thumb_03_JNT
+    400042: Fox_REF:L__Thumb_TIP
+    400044: Fox_REF:L_Ankle_JNT
+    400046: Fox_REF:L_Ball_JNT
+    400048: Fox_REF:L_Breast_JNT
+    400050: Fox_REF:L_Breast_TIP
+    400052: Fox_REF:L_Clav_JNT
+    400054: Fox_REF:L_Colar_01_JNT
+    400056: Fox_REF:L_Colar_02_JNT
+    400058: Fox_REF:L_Colar_TIP
+    400060: Fox_REF:L_Ear_01_JNT
+    400062: Fox_REF:L_Ear_02_JNT
+    400064: Fox_REF:L_Ear_TIP
+    400066: Fox_REF:L_Elbow_JNT
+    400068: Fox_REF:L_Eye_JNT
+    400070: Fox_REF:L_Eye_TIP
+    400072: Fox_REF:L_Facial_Fur_JNT
+    400074: Fox_REF:L_Facial_Fur_JNT 1
+    400076: Fox_REF:L_Goggle_JNT
+    400078: Fox_REF:L_Goggle_TIP
+    400080: Fox_REF:L_Hand_JNT
+    400082: Fox_REF:L_Index_01_JNT
+    400084: Fox_REF:L_Index_02_JNT
+    400086: Fox_REF:L_Index_03_JNT
+    400088: Fox_REF:L_Index_TIP
+    400090: Fox_REF:L_Knee_JNT
+    400092: Fox_REF:L_Lid_Bttm_JNT
+    400094: Fox_REF:L_Lid_Bttm_TIP
+    400096: Fox_REF:L_Lid_TOP_JNT
+    400098: Fox_REF:L_Lid_TOP_TIP
+    400100: Fox_REF:L_Middle_01_JNT
+    400102: Fox_REF:L_Middle_02_JNT
+    400104: Fox_REF:L_Middle_03_JNT
+    400106: Fox_REF:L_Middle_TIP
+    400108: Fox_REF:L_Mouth_JNT
+    400110: Fox_REF:L_Mouth_TIP
+    400112: Fox_REF:L_Pinky_01_JNT
+    400114: Fox_REF:L_Pinky_02_JNT
+    400116: Fox_REF:L_Pinky_03_JNT
+    400118: Fox_REF:L_Pinky_TIP
+    400120: Fox_REF:L_Ring_01_JNT
+    400122: Fox_REF:L_Ring_02_JNT
+    400124: Fox_REF:L_Ring_03_JNT
+    400126: Fox_REF:L_Ring_TIP
+    400128: Fox_REF:L_Shoulder_JNT
+    400130: Fox_REF:L_Thight_JNT
+    400132: Fox_REF:L_Thumb_01_JNT
+    400134: Fox_REF:L_Toe_TIP
+    400136: Fox_REF:Neck_JNT
+    400138: Fox_REF:Nose_JNT
+    400140: Fox_REF:Nose_TIP
+    400142: Fox_REF:R__Thumb_02_JNT
+    400144: Fox_REF:R__Thumb_03_JNT
+    400146: Fox_REF:R__Thumb_TIP
+    400148: Fox_REF:R_Ankle_JNT
+    400150: Fox_REF:R_Ball_JNT
+    400152: Fox_REF:R_Breast_JNT
+    400154: Fox_REF:R_Breast_TIP
+    400156: Fox_REF:R_Clav_JNT
+    400158: Fox_REF:R_Colar_01_JNT
+    400160: Fox_REF:R_Colar_02_JNT
+    400162: Fox_REF:R_Colar_TIP
+    400164: Fox_REF:R_Ear_01_JNT
+    400166: Fox_REF:R_Ear_02_JNT
+    400168: Fox_REF:R_Ear_TIP
+    400170: Fox_REF:R_Elbow_JNT
+    400172: Fox_REF:R_Eye_JNT
+    400174: Fox_REF:R_Eye_TIP
+    400176: Fox_REF:R_Facial_Fur_JNT
+    400178: Fox_REF:R_Facial_Fur_JNT 1
+    400180: Fox_REF:R_Goggle_JNT
+    400182: Fox_REF:R_Goggle_TIP
+    400184: Fox_REF:R_Hand_JNT
+    400186: Fox_REF:R_Index_01_JNT
+    400188: Fox_REF:R_Index_02_JNT
+    400190: Fox_REF:R_Index_03_JNT
+    400192: Fox_REF:R_Index_TIP
+    400194: Fox_REF:R_Knee_JNT
+    400196: Fox_REF:R_Lid_Bttm_JNT
+    400198: Fox_REF:R_Lid_Bttm_TIP
+    400200: Fox_REF:R_Lid_TOP_JNT
+    400202: Fox_REF:R_Lid_TOP_TIP
+    400204: Fox_REF:R_Middle_01_JNT
+    400206: Fox_REF:R_Middle_02_JNT
+    400208: Fox_REF:R_Middle_03_JNT
+    400210: Fox_REF:R_Middle_TIP
+    400212: Fox_REF:R_Mouth_JNT
+    400214: Fox_REF:R_Mouth_TIP
+    400216: Fox_REF:R_Pinky_01_JNT
+    400218: Fox_REF:R_Pinky_02_JNT
+    400220: Fox_REF:R_Pinky_03_JNT
+    400222: Fox_REF:R_Pinky_TIP
+    400224: Fox_REF:R_Ring_01_JNT
+    400226: Fox_REF:R_Ring_02_JNT
+    400228: Fox_REF:R_Ring_03_JNT
+    400230: Fox_REF:R_Ring_TIP
+    400232: Fox_REF:R_Shoulder_JNT
+    400234: Fox_REF:R_Thight_JNT
+    400236: Fox_REF:R_Thumb_01_JNT
+    400238: Fox_REF:R_Toe_TIP
+    400240: Fox_REF:Root_JNT
+    400242: Fox_REF:Spine_01_JNT
+    400244: Fox_REF:Spine_02_JNT
+    400246: Fox_REF:Spine_03_JNT
+    400248: Fox_REF:Tail_01_JNT
+    400250: Fox_REF:Tail_02_JNT
+    400252: Fox_REF:Tail_03_JNT
+    400254: Fox_REF:Tail_04_JNT
+    400256: Fox_REF:Tail_05_JNT
+    400258: Fox_REF:Tail_TIP
+    400260: Fox_REF:Tongue_01_JNT
+    400262: Fox_REF:Tongue_02_JNT
+    400264: Fox_REF:Tongue_03_JNT
+    400266: Fox_REF:Tongue_TIP
+    400268: Fox_REF:World_Control
+    400270: Fox_REF:World_NODE
+    400272: Fox_REF:Wrench_JNT
+    400274: Fox_REF:Wrench_JNT 1
+    400276: Back_Colar_01_JNT
+    400278: Back_Colar_02_JNT
+    400280: Back_Colar_TIP
+    400282: Fox_Geo
+    400284: Goggles_JNT
+    400286: Goggles_TIP
+    400288: Hair_01_JNT
+    400290: Hair_02_JNT
+    400292: Hair_03_JNT
+    400294: Hair_04_JNT
+    400296: Hair_05_JNT
+    400298: Hair_06_JNT
+    400300: Hair_TIP
+    400302: Head_JNT
+    400304: Head_TIP
+    400306: Hips_JNT
+    400308: Jaw_JNT
+    400310: Jaw_TIP
+    400312: L__Thumb_02_JNT
+    400314: L__Thumb_03_JNT
+    400316: L__Thumb_TIP
+    400318: L_Ankle_JNT
+    400320: L_Ball_JNT
+    400322: L_Breast_JNT
+    400324: L_Breast_TIP
+    400326: L_Clav_JNT
+    400328: L_Colar_01_JNT
+    400330: L_Colar_02_JNT
+    400332: L_Colar_TIP
+    400334: L_Ear_01_JNT
+    400336: L_Ear_02_JNT
+    400338: L_Ear_TIP
+    400340: L_Elbow_JNT
+    400342: L_Eye_JNT
+    400344: L_Eye_TIP
+    400346: L_Facial_Fur_JNT
+    400348: L_Facial_Fur_JNT 1
+    400350: L_Goggle_JNT
+    400352: L_Goggle_TIP
+    400354: L_Hand_JNT
+    400356: L_Index_01_JNT
+    400358: L_Index_02_JNT
+    400360: L_Index_03_JNT
+    400362: L_Index_TIP
+    400364: L_Knee_JNT
+    400366: L_Lid_Bttm_JNT
+    400368: L_Lid_Bttm_TIP
+    400370: L_Lid_TOP_JNT
+    400372: L_Lid_TOP_TIP
+    400374: L_Middle_01_JNT
+    400376: L_Middle_02_JNT
+    400378: L_Middle_03_JNT
+    400380: L_Middle_TIP
+    400382: L_Mouth_JNT
+    400384: L_Mouth_TIP
+    400386: L_Pinky_01_JNT
+    400388: L_Pinky_02_JNT
+    400390: L_Pinky_03_JNT
+    400392: L_Pinky_TIP
+    400394: L_Ring_01_JNT
+    400396: L_Ring_02_JNT
+    400398: L_Ring_03_JNT
+    400400: L_Ring_TIP
+    400402: L_Shoulder_JNT
+    400404: L_Thight_JNT
+    400406: L_Thumb_01_JNT
+    400408: L_Toe_TIP
+    400410: Neck_JNT
+    400412: Nose_JNT
+    400414: Nose_TIP
+    400416: R__Thumb_02_JNT
+    400418: R__Thumb_03_JNT
+    400420: R__Thumb_TIP
+    400422: R_Ankle_JNT
+    400424: R_Ball_JNT
+    400426: R_Breast_JNT
+    400428: R_Breast_TIP
+    400430: R_Clav_JNT
+    400432: R_Colar_01_JNT
+    400434: R_Colar_02_JNT
+    400436: R_Colar_TIP
+    400438: R_Ear_01_JNT
+    400440: R_Ear_02_JNT
+    400442: R_Ear_TIP
+    400444: R_Elbow_JNT
+    400446: R_Eye_JNT
+    400448: R_Eye_TIP
+    400450: R_Facial_Fur_JNT
+    400452: R_Facial_Fur_JNT 1
+    400454: R_Goggle_JNT
+    400456: R_Goggle_TIP
+    400458: R_Hand_JNT
+    400460: R_Index_01_JNT
+    400462: R_Index_02_JNT
+    400464: R_Index_03_JNT
+    400466: R_Index_TIP
+    400468: R_Knee_JNT
+    400470: R_Lid_Bttm_JNT
+    400472: R_Lid_Bttm_TIP
+    400474: R_Lid_TOP_JNT
+    400476: R_Lid_TOP_TIP
+    400478: R_Middle_01_JNT
+    400480: R_Middle_02_JNT
+    400482: R_Middle_03_JNT
+    400484: R_Middle_TIP
+    400486: R_Mouth_JNT
+    400488: R_Mouth_TIP
+    400490: R_Pinky_01_JNT
+    400492: R_Pinky_02_JNT
+    400494: R_Pinky_03_JNT
+    400496: R_Pinky_TIP
+    400498: R_Ring_01_JNT
+    400500: R_Ring_02_JNT
+    400502: R_Ring_03_JNT
+    400504: R_Ring_TIP
+    400506: R_Shoulder_JNT
+    400508: R_Thight_JNT
+    400510: R_Thumb_01_JNT
+    400512: R_Toe_TIP
+    400514: Root_JNT
+    400516: Spine_01_JNT
+    400518: Spine_02_JNT
+    400520: Spine_03_JNT
+    400522: Tail_01_JNT
+    400524: Tail_02_JNT
+    400526: Tail_03_JNT
+    400528: Tail_04_JNT
+    400530: Tail_05_JNT
+    400532: Tail_TIP
+    400534: Tongue_01_JNT
+    400536: Tongue_02_JNT
+    400538: Tongue_03_JNT
+    400540: Tongue_TIP
+    400542: World_NODE
+    400544: Wrench_JNT
+    400546: Wrench_JNT 1
+    400548: Fox_Geo_Group
+    400550: Wrench_Geo
+    4300000: Fox_REF:Fox_Geo
+    4300002: Fox_Geo
+    4300004: Wrench_Geo
+    7400000: Drive_001
+    9500000: //RootNode
+    11100000: //RootNode
+    13700000: Fox_REF:Fox_Geo
+    13700002: Fox_Geo
+    13700004: Wrench_Geo
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 3
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 2
+    extraExposedTransformPaths: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: Drive_001
+      takeName: Take 001
+      firstFrame: 0
+      lastFrame: 48
+      wrapMode: 2
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 1
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Fox_REF:Fox_Geo
+        weight: 1
+      - path: Fox_REF:World_Control
+        weight: 1
+      - path: Fox_REF:World_NODE
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Hips_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Hips_JNT/Fox_REF:L_Thight_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Hips_JNT/Fox_REF:L_Thight_JNT/Fox_REF:L_Knee_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Hips_JNT/Fox_REF:L_Thight_JNT/Fox_REF:L_Knee_JNT/Fox_REF:L_Ankle_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Hips_JNT/Fox_REF:L_Thight_JNT/Fox_REF:L_Knee_JNT/Fox_REF:L_Ankle_JNT/Fox_REF:L_Ball_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Hips_JNT/Fox_REF:L_Thight_JNT/Fox_REF:L_Knee_JNT/Fox_REF:L_Ankle_JNT/Fox_REF:L_Ball_JNT/Fox_REF:L_Toe_TIP
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Hips_JNT/Fox_REF:R_Thight_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Hips_JNT/Fox_REF:R_Thight_JNT/Fox_REF:R_Knee_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Hips_JNT/Fox_REF:R_Thight_JNT/Fox_REF:R_Knee_JNT/Fox_REF:R_Ankle_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Hips_JNT/Fox_REF:R_Thight_JNT/Fox_REF:R_Knee_JNT/Fox_REF:R_Ankle_JNT/Fox_REF:R_Ball_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Hips_JNT/Fox_REF:R_Thight_JNT/Fox_REF:R_Knee_JNT/Fox_REF:R_Ankle_JNT/Fox_REF:R_Ball_JNT/Fox_REF:R_Toe_TIP
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Back_Colar_01_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Back_Colar_01_JNT/Fox_REF:Back_Colar_02_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Back_Colar_01_JNT/Fox_REF:Back_Colar_02_JNT/Fox_REF:Back_Colar_TIP
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:L_Breast_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:L_Breast_JNT/Fox_REF:L_Breast_TIP
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:L_Clav_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:L_Clav_JNT/Fox_REF:L_Colar_01_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:L_Clav_JNT/Fox_REF:L_Colar_01_JNT/Fox_REF:L_Colar_02_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:L_Clav_JNT/Fox_REF:L_Colar_01_JNT/Fox_REF:L_Colar_02_JNT/Fox_REF:L_Colar_TIP
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:L_Clav_JNT/Fox_REF:L_Shoulder_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:L_Clav_JNT/Fox_REF:L_Shoulder_JNT/Fox_REF:L_Elbow_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:L_Clav_JNT/Fox_REF:L_Shoulder_JNT/Fox_REF:L_Elbow_JNT/Fox_REF:L_Hand_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:L_Clav_JNT/Fox_REF:L_Shoulder_JNT/Fox_REF:L_Elbow_JNT/Fox_REF:L_Hand_JNT/Fox_REF:L_Index_01_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:L_Clav_JNT/Fox_REF:L_Shoulder_JNT/Fox_REF:L_Elbow_JNT/Fox_REF:L_Hand_JNT/Fox_REF:L_Index_01_JNT/Fox_REF:L_Index_02_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:L_Clav_JNT/Fox_REF:L_Shoulder_JNT/Fox_REF:L_Elbow_JNT/Fox_REF:L_Hand_JNT/Fox_REF:L_Index_01_JNT/Fox_REF:L_Index_02_JNT/Fox_REF:L_Index_03_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:L_Clav_JNT/Fox_REF:L_Shoulder_JNT/Fox_REF:L_Elbow_JNT/Fox_REF:L_Hand_JNT/Fox_REF:L_Index_01_JNT/Fox_REF:L_Index_02_JNT/Fox_REF:L_Index_03_JNT/Fox_REF:L_Index_TIP
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:L_Clav_JNT/Fox_REF:L_Shoulder_JNT/Fox_REF:L_Elbow_JNT/Fox_REF:L_Hand_JNT/Fox_REF:L_Middle_01_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:L_Clav_JNT/Fox_REF:L_Shoulder_JNT/Fox_REF:L_Elbow_JNT/Fox_REF:L_Hand_JNT/Fox_REF:L_Middle_01_JNT/Fox_REF:L_Middle_02_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:L_Clav_JNT/Fox_REF:L_Shoulder_JNT/Fox_REF:L_Elbow_JNT/Fox_REF:L_Hand_JNT/Fox_REF:L_Middle_01_JNT/Fox_REF:L_Middle_02_JNT/Fox_REF:L_Middle_03_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:L_Clav_JNT/Fox_REF:L_Shoulder_JNT/Fox_REF:L_Elbow_JNT/Fox_REF:L_Hand_JNT/Fox_REF:L_Middle_01_JNT/Fox_REF:L_Middle_02_JNT/Fox_REF:L_Middle_03_JNT/Fox_REF:L_Middle_TIP
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:L_Clav_JNT/Fox_REF:L_Shoulder_JNT/Fox_REF:L_Elbow_JNT/Fox_REF:L_Hand_JNT/Fox_REF:L_Pinky_01_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:L_Clav_JNT/Fox_REF:L_Shoulder_JNT/Fox_REF:L_Elbow_JNT/Fox_REF:L_Hand_JNT/Fox_REF:L_Pinky_01_JNT/Fox_REF:L_Pinky_02_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:L_Clav_JNT/Fox_REF:L_Shoulder_JNT/Fox_REF:L_Elbow_JNT/Fox_REF:L_Hand_JNT/Fox_REF:L_Pinky_01_JNT/Fox_REF:L_Pinky_02_JNT/Fox_REF:L_Pinky_03_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:L_Clav_JNT/Fox_REF:L_Shoulder_JNT/Fox_REF:L_Elbow_JNT/Fox_REF:L_Hand_JNT/Fox_REF:L_Pinky_01_JNT/Fox_REF:L_Pinky_02_JNT/Fox_REF:L_Pinky_03_JNT/Fox_REF:L_Pinky_TIP
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:L_Clav_JNT/Fox_REF:L_Shoulder_JNT/Fox_REF:L_Elbow_JNT/Fox_REF:L_Hand_JNT/Fox_REF:L_Ring_01_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:L_Clav_JNT/Fox_REF:L_Shoulder_JNT/Fox_REF:L_Elbow_JNT/Fox_REF:L_Hand_JNT/Fox_REF:L_Ring_01_JNT/Fox_REF:L_Ring_02_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:L_Clav_JNT/Fox_REF:L_Shoulder_JNT/Fox_REF:L_Elbow_JNT/Fox_REF:L_Hand_JNT/Fox_REF:L_Ring_01_JNT/Fox_REF:L_Ring_02_JNT/Fox_REF:L_Ring_03_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:L_Clav_JNT/Fox_REF:L_Shoulder_JNT/Fox_REF:L_Elbow_JNT/Fox_REF:L_Hand_JNT/Fox_REF:L_Ring_01_JNT/Fox_REF:L_Ring_02_JNT/Fox_REF:L_Ring_03_JNT/Fox_REF:L_Ring_TIP
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:L_Clav_JNT/Fox_REF:L_Shoulder_JNT/Fox_REF:L_Elbow_JNT/Fox_REF:L_Hand_JNT/Fox_REF:L_Thumb_01_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:L_Clav_JNT/Fox_REF:L_Shoulder_JNT/Fox_REF:L_Elbow_JNT/Fox_REF:L_Hand_JNT/Fox_REF:L_Thumb_01_JNT/Fox_REF:L__Thumb_02_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:L_Clav_JNT/Fox_REF:L_Shoulder_JNT/Fox_REF:L_Elbow_JNT/Fox_REF:L_Hand_JNT/Fox_REF:L_Thumb_01_JNT/Fox_REF:L__Thumb_02_JNT/Fox_REF:L__Thumb_03_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:L_Clav_JNT/Fox_REF:L_Shoulder_JNT/Fox_REF:L_Elbow_JNT/Fox_REF:L_Hand_JNT/Fox_REF:L_Thumb_01_JNT/Fox_REF:L__Thumb_02_JNT/Fox_REF:L__Thumb_03_JNT/Fox_REF:L__Thumb_TIP
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:Goggles_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:Goggles_JNT/Fox_REF:Goggles_TIP
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:Goggles_JNT/Fox_REF:L_Goggle_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:Goggles_JNT/Fox_REF:L_Goggle_JNT/Fox_REF:L_Goggle_TIP
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:Goggles_JNT/Fox_REF:R_Goggle_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:Goggles_JNT/Fox_REF:R_Goggle_JNT/Fox_REF:R_Goggle_TIP
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:Hair_01_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:Hair_01_JNT/Fox_REF:Hair_02_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:Hair_01_JNT/Fox_REF:Hair_02_JNT/Fox_REF:Hair_03_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:Hair_01_JNT/Fox_REF:Hair_02_JNT/Fox_REF:Hair_03_JNT/Fox_REF:Hair_04_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:Hair_01_JNT/Fox_REF:Hair_02_JNT/Fox_REF:Hair_03_JNT/Fox_REF:Hair_04_JNT/Fox_REF:Hair_05_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:Hair_01_JNT/Fox_REF:Hair_02_JNT/Fox_REF:Hair_03_JNT/Fox_REF:Hair_04_JNT/Fox_REF:Hair_05_JNT/Fox_REF:Hair_06_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:Hair_01_JNT/Fox_REF:Hair_02_JNT/Fox_REF:Hair_03_JNT/Fox_REF:Hair_04_JNT/Fox_REF:Hair_05_JNT/Fox_REF:Hair_06_JNT/Fox_REF:Hair_TIP
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:Head_TIP
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:Jaw_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:Jaw_JNT/Fox_REF:Jaw_TIP
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:Jaw_JNT/Fox_REF:Tongue_01_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:Jaw_JNT/Fox_REF:Tongue_01_JNT/Fox_REF:Tongue_02_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:Jaw_JNT/Fox_REF:Tongue_01_JNT/Fox_REF:Tongue_02_JNT/Fox_REF:Tongue_03_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:Jaw_JNT/Fox_REF:Tongue_01_JNT/Fox_REF:Tongue_02_JNT/Fox_REF:Tongue_03_JNT/Fox_REF:Tongue_TIP
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:L_Ear_01_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:L_Ear_01_JNT/Fox_REF:L_Ear_02_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:L_Ear_01_JNT/Fox_REF:L_Ear_02_JNT/Fox_REF:L_Ear_TIP
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:L_Eye_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:L_Eye_JNT/Fox_REF:L_Eye_TIP
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:L_Facial_Fur_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:L_Facial_Fur_JNT/Fox_REF:L_Facial_Fur_JNT
+          1
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:L_Lid_Bttm_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:L_Lid_Bttm_JNT/Fox_REF:L_Lid_Bttm_TIP
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:L_Lid_TOP_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:L_Lid_TOP_JNT/Fox_REF:L_Lid_TOP_TIP
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:L_Mouth_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:L_Mouth_JNT/Fox_REF:L_Mouth_TIP
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:Nose_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:Nose_JNT/Fox_REF:Nose_TIP
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:R_Ear_01_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:R_Ear_01_JNT/Fox_REF:R_Ear_02_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:R_Ear_01_JNT/Fox_REF:R_Ear_02_JNT/Fox_REF:R_Ear_TIP
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:R_Eye_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:R_Eye_JNT/Fox_REF:R_Eye_TIP
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:R_Facial_Fur_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:R_Facial_Fur_JNT/Fox_REF:R_Facial_Fur_JNT
+          1
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:R_Lid_Bttm_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:R_Lid_Bttm_JNT/Fox_REF:R_Lid_Bttm_TIP
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:R_Lid_TOP_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:R_Lid_TOP_JNT/Fox_REF:R_Lid_TOP_TIP
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:R_Mouth_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:Neck_JNT/Fox_REF:Head_JNT/Fox_REF:R_Mouth_JNT/Fox_REF:R_Mouth_TIP
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:R_Breast_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:R_Breast_JNT/Fox_REF:R_Breast_TIP
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:R_Clav_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:R_Clav_JNT/Fox_REF:R_Colar_01_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:R_Clav_JNT/Fox_REF:R_Colar_01_JNT/Fox_REF:R_Colar_02_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:R_Clav_JNT/Fox_REF:R_Colar_01_JNT/Fox_REF:R_Colar_02_JNT/Fox_REF:R_Colar_TIP
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:R_Clav_JNT/Fox_REF:R_Shoulder_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:R_Clav_JNT/Fox_REF:R_Shoulder_JNT/Fox_REF:R_Elbow_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:R_Clav_JNT/Fox_REF:R_Shoulder_JNT/Fox_REF:R_Elbow_JNT/Fox_REF:R_Hand_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:R_Clav_JNT/Fox_REF:R_Shoulder_JNT/Fox_REF:R_Elbow_JNT/Fox_REF:R_Hand_JNT/Fox_REF:R_Index_01_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:R_Clav_JNT/Fox_REF:R_Shoulder_JNT/Fox_REF:R_Elbow_JNT/Fox_REF:R_Hand_JNT/Fox_REF:R_Index_01_JNT/Fox_REF:R_Index_02_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:R_Clav_JNT/Fox_REF:R_Shoulder_JNT/Fox_REF:R_Elbow_JNT/Fox_REF:R_Hand_JNT/Fox_REF:R_Index_01_JNT/Fox_REF:R_Index_02_JNT/Fox_REF:R_Index_03_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:R_Clav_JNT/Fox_REF:R_Shoulder_JNT/Fox_REF:R_Elbow_JNT/Fox_REF:R_Hand_JNT/Fox_REF:R_Index_01_JNT/Fox_REF:R_Index_02_JNT/Fox_REF:R_Index_03_JNT/Fox_REF:R_Index_TIP
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:R_Clav_JNT/Fox_REF:R_Shoulder_JNT/Fox_REF:R_Elbow_JNT/Fox_REF:R_Hand_JNT/Fox_REF:R_Middle_01_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:R_Clav_JNT/Fox_REF:R_Shoulder_JNT/Fox_REF:R_Elbow_JNT/Fox_REF:R_Hand_JNT/Fox_REF:R_Middle_01_JNT/Fox_REF:R_Middle_02_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:R_Clav_JNT/Fox_REF:R_Shoulder_JNT/Fox_REF:R_Elbow_JNT/Fox_REF:R_Hand_JNT/Fox_REF:R_Middle_01_JNT/Fox_REF:R_Middle_02_JNT/Fox_REF:R_Middle_03_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:R_Clav_JNT/Fox_REF:R_Shoulder_JNT/Fox_REF:R_Elbow_JNT/Fox_REF:R_Hand_JNT/Fox_REF:R_Middle_01_JNT/Fox_REF:R_Middle_02_JNT/Fox_REF:R_Middle_03_JNT/Fox_REF:R_Middle_TIP
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:R_Clav_JNT/Fox_REF:R_Shoulder_JNT/Fox_REF:R_Elbow_JNT/Fox_REF:R_Hand_JNT/Fox_REF:R_Pinky_01_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:R_Clav_JNT/Fox_REF:R_Shoulder_JNT/Fox_REF:R_Elbow_JNT/Fox_REF:R_Hand_JNT/Fox_REF:R_Pinky_01_JNT/Fox_REF:R_Pinky_02_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:R_Clav_JNT/Fox_REF:R_Shoulder_JNT/Fox_REF:R_Elbow_JNT/Fox_REF:R_Hand_JNT/Fox_REF:R_Pinky_01_JNT/Fox_REF:R_Pinky_02_JNT/Fox_REF:R_Pinky_03_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:R_Clav_JNT/Fox_REF:R_Shoulder_JNT/Fox_REF:R_Elbow_JNT/Fox_REF:R_Hand_JNT/Fox_REF:R_Pinky_01_JNT/Fox_REF:R_Pinky_02_JNT/Fox_REF:R_Pinky_03_JNT/Fox_REF:R_Pinky_TIP
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:R_Clav_JNT/Fox_REF:R_Shoulder_JNT/Fox_REF:R_Elbow_JNT/Fox_REF:R_Hand_JNT/Fox_REF:R_Ring_01_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:R_Clav_JNT/Fox_REF:R_Shoulder_JNT/Fox_REF:R_Elbow_JNT/Fox_REF:R_Hand_JNT/Fox_REF:R_Ring_01_JNT/Fox_REF:R_Ring_02_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:R_Clav_JNT/Fox_REF:R_Shoulder_JNT/Fox_REF:R_Elbow_JNT/Fox_REF:R_Hand_JNT/Fox_REF:R_Ring_01_JNT/Fox_REF:R_Ring_02_JNT/Fox_REF:R_Ring_03_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:R_Clav_JNT/Fox_REF:R_Shoulder_JNT/Fox_REF:R_Elbow_JNT/Fox_REF:R_Hand_JNT/Fox_REF:R_Ring_01_JNT/Fox_REF:R_Ring_02_JNT/Fox_REF:R_Ring_03_JNT/Fox_REF:R_Ring_TIP
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:R_Clav_JNT/Fox_REF:R_Shoulder_JNT/Fox_REF:R_Elbow_JNT/Fox_REF:R_Hand_JNT/Fox_REF:R_Thumb_01_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:R_Clav_JNT/Fox_REF:R_Shoulder_JNT/Fox_REF:R_Elbow_JNT/Fox_REF:R_Hand_JNT/Fox_REF:R_Thumb_01_JNT/Fox_REF:R__Thumb_02_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:R_Clav_JNT/Fox_REF:R_Shoulder_JNT/Fox_REF:R_Elbow_JNT/Fox_REF:R_Hand_JNT/Fox_REF:R_Thumb_01_JNT/Fox_REF:R__Thumb_02_JNT/Fox_REF:R__Thumb_03_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Spine_01_JNT/Fox_REF:Spine_02_JNT/Fox_REF:Spine_03_JNT/Fox_REF:R_Clav_JNT/Fox_REF:R_Shoulder_JNT/Fox_REF:R_Elbow_JNT/Fox_REF:R_Hand_JNT/Fox_REF:R_Thumb_01_JNT/Fox_REF:R__Thumb_02_JNT/Fox_REF:R__Thumb_03_JNT/Fox_REF:R__Thumb_TIP
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Tail_01_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Tail_01_JNT/Fox_REF:Tail_02_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Tail_01_JNT/Fox_REF:Tail_02_JNT/Fox_REF:Tail_03_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Tail_01_JNT/Fox_REF:Tail_02_JNT/Fox_REF:Tail_03_JNT/Fox_REF:Tail_04_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Tail_01_JNT/Fox_REF:Tail_02_JNT/Fox_REF:Tail_03_JNT/Fox_REF:Tail_04_JNT/Fox_REF:Tail_05_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Root_JNT/Fox_REF:Tail_01_JNT/Fox_REF:Tail_02_JNT/Fox_REF:Tail_03_JNT/Fox_REF:Tail_04_JNT/Fox_REF:Tail_05_JNT/Fox_REF:Tail_TIP
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Wrench_JNT
+        weight: 1
+      - path: Fox_REF:World_NODE/Fox_REF:Wrench_JNT/Fox_REF:Wrench_JNT 1
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 4
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 1
+    skeletonHasParents: 0
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -30,7 +30,7 @@ public class DialogueInteractionModule : ModuleBase
         {
             if (GameObject.Find("Avatars (Pick One)").transform.transform.GetChild(i).gameObject.activeSelf)
             {
-                stateMachine = GameObject.Find("Avatars (Pick One)").transform.GetChild(i).GetComponent<DialogueStateMachine>();
+	            if (stateMachine == null) stateMachine = GameObject.Find("Avatars (Pick One)").transform.GetChild(i).GetComponent<DialogueStateMachine>();
                 stateMachine.scenarioController = gameObject.GetComponent<SingleAgentInteraction>();
             }
         }
